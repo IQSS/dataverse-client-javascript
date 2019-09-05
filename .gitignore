@@ -1,0 +1,8 @@
+dist
+node_modules
+
+# intellij
+.idea
+
+# unit tests
+coverage

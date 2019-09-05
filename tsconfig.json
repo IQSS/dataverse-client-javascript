@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+        "declaration": true,
+        "declarationDir": "./dist",
+        "module": "commonjs",
+        "noImplicitAny": true,
+		"lib": ["es2017", "es7", "es6", "dom"],
+		"moduleResolution": "node",
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"sourceMap": true,
+		"target": "es5",
+		"outDir": "./dist",
+		"esModuleInterop": true
+    },
+    "typedocOptions": {
+        "mode": "modules",
+        "out": "docs"
+    },
+    "include": [ "src/**/*"],
+	"exclude": ["node_modules", "dist"]
+}

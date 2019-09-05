@@ -1,0 +1,54 @@
+{
+  "name": "js-dataverse",
+  "version": "1.0.0",
+  "description": "A Dataverse module for JavaScript/TypeScript",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "publish": "npm publish",
+    "test": "jest --watchAll",
+    "test:coverage": "jest --coverage --watchAll",
+    "test:ci": "jest --ci --maxWorkers=2 --detectOpenHandles --forceExit",
+    "eslint:check": "eslint --ext '.js,.jsx,.ts,.tsx' .",
+    "eslint:fix": "eslint --ext '.js,.jsx,.ts,.tsx' . --fix",
+    "format:check": "tsfmt --verify",
+    "format:fix": "tsfmt --replace"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dell-research-harvard/js-dataverse.git"
+  },
+  "keywords": [
+    "dataverse"
+  ],
+  "author": "Tai Nguyen Bui <tai@theagilemonkeys.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dell-research-harvard/js-dataverse/issues"
+  },
+  "homepage": "https://github.com/dell-research-harvard/js-dataverse#readme",
+  "devDependencies": {
+    "@types/chai": "^4.2.1",
+    "@types/faker": "^4.1.5",
+    "@types/jest": "^24.0.18",
+    "@types/sinon": "^7.0.13",
+    "@typescript-eslint/eslint-plugin": "^2.1.0",
+    "@typescript-eslint/parser": "^2.1.0",
+    "chai": "^4.2.0",
+    "eslint": "^6.3.0",
+    "eslint-config-prettier": "^6.2.0",
+    "faker": "^4.1.0",
+    "jest": "^24.9.0",
+    "sinon": "^7.4.2",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.6.2",
+    "typescript-formatter": "^7.2.2"
+  },
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
+}
