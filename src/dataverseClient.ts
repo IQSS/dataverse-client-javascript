@@ -26,6 +26,11 @@ export class DataverseClient {
     return axios.get(url, { params: requestOptions })
   }
 
+  public getFile(fileId: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/access/datafile/${fileId}` + this.getApiToken()
+    return axios.get(url)
+  }
+
   private getApiToken(): string {
     return this.apiToken ? `?key=${this.apiToken}` : ''
   }

@@ -137,4 +137,29 @@ describe('DataverseClient', () => {
       expect(response).to.be.deep.eq(expectedResponse)
     })
   })
+
+  describe('getFile', () => {
+    it('should call axios with expected url', async () => {
+      const fileId: string = random.number().toString()
+
+      await client.getFile(fileId)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}?key=${apiToken}`)
+    })
+
+    it('should return expected response', async () => {
+      const fileId: string = random.number().toString()
+      const expectedResponse = {
+        ...mockResponse
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/access/datafile/${fileId}?key=${apiToken}`)
+        .resolves(mockResponse)
+
+      const response = await client.getFile(fileId)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+  })
 })
