@@ -31,6 +31,11 @@ export class DataverseClient {
     return axios.get(url)
   }
 
+  public getDatasetInformation(datasetId: string, datasetVersion: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/datasets/${datasetId}/versions/${datasetVersion}` + this.getApiToken()
+    return axios.get(url)
+  }
+
   private getApiToken(): string {
     return this.apiToken ? `?key=${this.apiToken}` : ''
   }

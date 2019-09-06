@@ -148,6 +148,16 @@ describe('DataverseClient', () => {
       assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}?key=${apiToken}`)
     })
 
+    it('should call axios with expected url when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+      const fileId: string = random.number().toString()
+
+      await client.getFile(fileId)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}`)
+    })
+
     it('should return expected response', async () => {
       const fileId: string = random.number().toString()
       const expectedResponse = {
@@ -158,6 +168,44 @@ describe('DataverseClient', () => {
         .resolves(mockResponse)
 
       const response = await client.getFile(fileId)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+  })
+
+  describe('getDatasetInformation', () => {
+    it('should call axios with expected url', async () => {
+      const datasetId: string = random.number().toString()
+      const datasetVersion = ':draft'
+
+      await client.getDatasetInformation(datasetId, datasetVersion)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions/${datasetVersion}?key=${apiToken}`)
+    })
+
+    it('should call axios with expected url when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+      const datasetId: string = random.number().toString()
+      const datasetVersion = ':draft'
+
+      await client.getDatasetInformation(datasetId, datasetVersion)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions/${datasetVersion}`)
+    })
+
+    it('should return expected response', async () => {
+      const datasetId: string = random.number().toString()
+      const datasetVersion = ':draft'
+      const expectedResponse = {
+        ...mockResponse
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/datasets/${datasetId}/versions/${datasetVersion}?key=${apiToken}`)
+        .resolves(mockResponse)
+
+      const response = await client.getDatasetInformation(datasetId, datasetVersion)
 
       expect(response).to.be.deep.equal(expectedResponse)
     })
