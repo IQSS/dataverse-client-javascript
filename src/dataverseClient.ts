@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios'
+import { DataverseSearchOptions, SearchOptions } from './@types/searchOptions'
 
 export class DataverseClient {
   private readonly host: string
@@ -19,7 +20,27 @@ export class DataverseClient {
     return axios.get(url)
   }
 
+  public search(options: SearchOptions): Promise<AxiosResponse> {
+    const url = `${this.host}/api/search`
+    const requestOptions: DataverseSearchOptions = this.mapSearchOptions(options)
+    return axios.get(url, { params: requestOptions })
+  }
+
   private getApiToken(): string {
     return this.apiToken ? `?key=${this.apiToken}` : ''
+  }
+
+  private mapSearchOptions(options: SearchOptions): DataverseSearchOptions {
+    return {
+      q: options.query,
+      subtree: options.dataverseAlias,
+      start: options.startPosition,
+      type: options.type,
+      sort: options.sortAttribute,
+      order: options.order,
+      'per_page': options.itemsPerPage,
+      'show_entity_ids': options.showEntityIds,
+      'show_relevance': options.showRelevance
+    }
   }
 }

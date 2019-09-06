@@ -1,5 +1,5 @@
-import { DataverseClient } from '../src/index'
-import { createSandbox, SinonSandbox, SinonStub, assert } from 'sinon'
+import { DataverseClient, DataverseSearchOptions, SearchType } from '../src/index'
+import { assert, createSandbox, SinonSandbox, SinonStub } from 'sinon'
 import { expect } from 'chai'
 import axios from 'axios'
 import { internet, random } from 'faker'
@@ -97,6 +97,42 @@ describe('DataverseClient', () => {
         .resolves(mockResponse)
 
       const response = await client.listDatasets(alias)
+
+      expect(response).to.be.deep.eq(expectedResponse)
+    })
+  })
+
+  describe('search', () => {
+    it('should call axios with expected url and options', async () => {
+      const query = random.word()
+      const type: SearchType = SearchType.DATASET
+      const expectedOptions: DataverseSearchOptions = {
+        q: query,
+        subtree: undefined,
+        start: undefined,
+        type,
+        sort: undefined,
+        order: undefined,
+        'per_page': undefined,
+        'show_entity_ids': undefined,
+        'show_relevance': undefined
+      }
+      await client.search({ query, type })
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/search`, { params: expectedOptions })
+    })
+
+    it('should return expected response', async () => {
+      const query = random.word()
+      const expectedResponse = {
+        ...mockResponse
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/search`)
+        .resolves(mockResponse)
+
+      const response = await client.search({ query })
 
       expect(response).to.be.deep.eq(expectedResponse)
     })
