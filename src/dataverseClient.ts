@@ -42,6 +42,11 @@ export class DataverseClient {
     return axios.get(url, { headers: this.getHeaders() })
   }
 
+  public listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/dataverses/${dataverseAlias}/assignments`
+    return axios.get(url, { headers: this.getHeaders() })
+  }
+
   private getHeaders(): DataverseHeaders {
     return {
       'X-Dataverse-key': this.apiToken ? this.apiToken : ''

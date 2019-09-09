@@ -25,5 +25,6 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 
 `public getDatasetInformation(datasetId: string, datasetVersion: string): Promise<AxiosResponse> {`
 
+`public listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {`
 ## Contributing
 [If you are interested in contributing, please click here](/CONTRIBUTING.md)

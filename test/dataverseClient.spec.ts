@@ -282,4 +282,39 @@ describe('DataverseClient', () => {
       expect(response).to.be.deep.equal(expectedResponse)
     })
   })
+
+  describe('listDataverseRoleAssignments', () => {
+    it('should call axios with expected url', async () => {
+      const alias = random.word()
+
+      await client.listDataverseRoleAssignments(alias)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/dataverses/${alias}/assignments`, { headers: { 'X-Dataverse-key': apiToken } })
+    })
+
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+      const alias = random.word()
+
+      await client.listDataverseRoleAssignments(alias)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/dataverses/${alias}/assignments`, { headers: { 'X-Dataverse-key': '' } })
+    })
+
+    it('should return expected response', async () => {
+      const alias = random.word()
+      const expectedResponse = {
+        ...mockResponse
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/dataverses/${alias}/assignments`, { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves(mockResponse)
+
+      const response = await client.listDataverseRoleAssignments(alias)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+  })
 })
