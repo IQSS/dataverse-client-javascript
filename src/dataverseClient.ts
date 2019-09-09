@@ -11,13 +11,13 @@ export class DataverseClient {
     this.apiToken = apiToken
   }
 
-  public getDataverseInformation(alias: string): Promise<AxiosResponse> {
-    const url = `${this.host}/api/dataverses/${alias}`
+  public getDataverseInformation(dataverseAlias: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/dataverses/${dataverseAlias}`
     return axios.get(url, { headers: this.getHeaders() })
   }
 
-  public listDatasets(alias: string): Promise<AxiosResponse> {
-    const url = `${this.host}/api/dataverses/${alias}/contents`
+  public listDatasets(dataverseAlias: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/dataverses/${dataverseAlias}/contents`
     return axios.get(url, { headers: this.getHeaders() })
   }
 
