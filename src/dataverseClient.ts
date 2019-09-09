@@ -32,6 +32,11 @@ export class DataverseClient {
     return axios.get(url, { headers: this.getHeaders() })
   }
 
+  public getFileMetadata(fileId: string, draftVersion = false): Promise<AxiosResponse> {
+    const url = `${this.host}/api/files/${fileId}/metadata/${draftVersion ? 'draft' : ''}`
+    return axios.get(url, { headers: this.getHeaders() })
+  }
+
   public getDatasetInformation(datasetId: string, datasetVersion: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/datasets/${datasetId}/versions/${datasetVersion}`
     return axios.get(url, { headers: this.getHeaders() })

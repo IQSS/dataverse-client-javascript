@@ -21,6 +21,8 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 
 `public getFile(fileId: string): Promise<AxiosResponse> {`
 
+`public getFileMetadata(fileId: string, draftVersion: boolean = false): Promise<AxiosResponse> {`
+
 `public getDatasetInformation(datasetId: string, datasetVersion: string): Promise<AxiosResponse> {`
 
 ## Contributing

@@ -42,7 +42,7 @@ describe('DataverseClient', () => {
       assert.calledWithExactly(axiosGetStub, `${host}/api/dataverses/${alias}`, { headers: { 'X-Dataverse-key': apiToken } })
     })
 
-    it('should call axios with expected url when no apiToken provided', async () => {
+    it('should call axios with expected headers when no apiToken provided', async () => {
       client = new DataverseClient(host)
       const alias = random.word()
 
@@ -77,7 +77,7 @@ describe('DataverseClient', () => {
       assert.calledWithExactly(axiosGetStub, `${host}/api/dataverses/${alias}/contents`, { headers: { 'X-Dataverse-key': apiToken } })
     })
 
-    it('should call axios with expected url when no apiToken provided', async () => {
+    it('should call axios with expected headers when no apiToken provided', async () => {
       client = new DataverseClient(host)
       const alias = random.word()
 
@@ -150,7 +150,7 @@ describe('DataverseClient', () => {
       assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}`, { headers: { 'X-Dataverse-key': apiToken } })
     })
 
-    it('should call axios with expected url when no apiToken provided', async () => {
+    it('should call axios with expected headers when no apiToken provided', async () => {
       client = new DataverseClient(host)
       const fileId: string = random.number().toString()
 
@@ -175,6 +175,76 @@ describe('DataverseClient', () => {
     })
   })
 
+  describe('getFileMetadata', () => {
+    it('should call axios with expected url', async () => {
+      const fileId: string = random.number().toString()
+
+      await client.getFileMetadata(fileId)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/files/${fileId}/metadata/`, { headers: { 'X-Dataverse-key': apiToken } })
+    })
+
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+      const fileId: string = random.number().toString()
+
+      await client.getFileMetadata(fileId)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/files/${fileId}/metadata/`, { headers: { 'X-Dataverse-key': '' } })
+    })
+
+    it('should return expected response', async () => {
+      const fileId: string = random.number().toString()
+      const expectedResponse = {
+        ...mockResponse
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/files/${fileId}/metadata/`, { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves(mockResponse)
+
+      const response = await client.getFileMetadata(fileId)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    describe('Draft version', () => {
+      it('should call axios with expected url', async () => {
+        const fileId: string = random.number().toString()
+
+        await client.getFileMetadata(fileId, true)
+
+        assert.calledOnce(axiosGetStub)
+        assert.calledWithExactly(axiosGetStub, `${host}/api/files/${fileId}/metadata/draft`, { headers: { 'X-Dataverse-key': apiToken } })
+      })
+
+      it('should call axios with expected headers when no apiToken provided', async () => {
+        client = new DataverseClient(host)
+        const fileId: string = random.number().toString()
+
+        await client.getFileMetadata(fileId, true)
+
+        assert.calledOnce(axiosGetStub)
+        assert.calledWithExactly(axiosGetStub, `${host}/api/files/${fileId}/metadata/draft`, { headers: { 'X-Dataverse-key': '' } })
+      })
+
+      it('should return expected response', async () => {
+        const fileId: string = random.number().toString()
+        const expectedResponse = {
+          ...mockResponse
+        }
+        axiosGetStub
+          .withArgs(`${host}/api/files/${fileId}/metadata/draft`, { headers: { 'X-Dataverse-key': apiToken } })
+          .resolves(mockResponse)
+
+        const response = await client.getFileMetadata(fileId, true)
+
+        expect(response).to.be.deep.equal(expectedResponse)
+      })
+    })
+  })
+
   describe('getDatasetInformation', () => {
     it('should call axios with expected url', async () => {
       const datasetId: string = random.number().toString()
@@ -186,7 +256,7 @@ describe('DataverseClient', () => {
       assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions/${datasetVersion}`, { headers: { 'X-Dataverse-key': apiToken } })
     })
 
-    it('should call axios with expected url when no apiToken provided', async () => {
+    it('should call axios with expected headers when no apiToken provided', async () => {
       client = new DataverseClient(host)
       const datasetId: string = random.number().toString()
       const datasetVersion = ':draft'
