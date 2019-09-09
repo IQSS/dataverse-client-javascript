@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios'
 import { DataverseSearchOptions, SearchOptions } from './@types/searchOptions'
+import { DataverseHeaders } from './@types/dataverseHeaders'
 
 export class DataverseClient {
   private readonly host: string
@@ -11,13 +12,13 @@ export class DataverseClient {
   }
 
   public getDataverseInformation(alias: string): Promise<AxiosResponse> {
-    const url = `${this.host}/api/dataverses/${alias}` + this.getApiToken()
-    return axios.get(url)
+    const url = `${this.host}/api/dataverses/${alias}`
+    return axios.get(url, { headers: this.getHeaders() })
   }
 
   public listDatasets(alias: string): Promise<AxiosResponse> {
-    const url = `${this.host}/api/dataverses/${alias}/contents` + this.getApiToken()
-    return axios.get(url)
+    const url = `${this.host}/api/dataverses/${alias}/contents`
+    return axios.get(url, { headers: this.getHeaders() })
   }
 
   public search(options: SearchOptions): Promise<AxiosResponse> {
@@ -27,17 +28,19 @@ export class DataverseClient {
   }
 
   public getFile(fileId: string): Promise<AxiosResponse> {
-    const url = `${this.host}/api/access/datafile/${fileId}` + this.getApiToken()
-    return axios.get(url)
+    const url = `${this.host}/api/access/datafile/${fileId}`
+    return axios.get(url, { headers: this.getHeaders() })
   }
 
   public getDatasetInformation(datasetId: string, datasetVersion: string): Promise<AxiosResponse> {
-    const url = `${this.host}/api/datasets/${datasetId}/versions/${datasetVersion}` + this.getApiToken()
-    return axios.get(url)
+    const url = `${this.host}/api/datasets/${datasetId}/versions/${datasetVersion}`
+    return axios.get(url, { headers: this.getHeaders() })
   }
 
-  private getApiToken(): string {
-    return this.apiToken ? `?key=${this.apiToken}` : ''
+  private getHeaders(): DataverseHeaders {
+    return {
+      'X-Dataverse-key': this.apiToken ? this.apiToken : ''
+    }
   }
 
   private mapSearchOptions(options: SearchOptions): DataverseSearchOptions {
