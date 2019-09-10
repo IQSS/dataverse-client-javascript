@@ -3,6 +3,7 @@ import { assert, createSandbox, SinonSandbox, SinonStub } from 'sinon'
 import { expect } from 'chai'
 import axios from 'axios'
 import { internet, random } from 'faker'
+import { DataverseException } from '../src/exceptions/dataverseException'
 
 describe('DataverseClient', () => {
   const sandbox: SinonSandbox = createSandbox()
@@ -65,6 +66,23 @@ describe('DataverseClient', () => {
 
       expect(response).to.be.deep.eq(expectedResponse)
     })
+
+    describe('on error', () => {
+      it('should throw expected error', async () => {
+        const alias = random.word()
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+
+        let error: DataverseException = undefined
+
+        await client.getDataverseInformation(alias).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
+    })
   })
 
   describe('listDatasets', () => {
@@ -99,6 +117,23 @@ describe('DataverseClient', () => {
       const response = await client.listDatasets(alias)
 
       expect(response).to.be.deep.eq(expectedResponse)
+    })
+
+    describe('on error', () => {
+      it('should throw expected error', async () => {
+        const alias = random.word()
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+
+        let error: DataverseException = undefined
+
+        await client.listDatasets(alias).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
     })
   })
 
@@ -138,6 +173,23 @@ describe('DataverseClient', () => {
 
       expect(response).to.be.deep.eq(expectedResponse)
     })
+
+    describe('on error', () => {
+      it('should throw expected error', async () => {
+        const query = random.word()
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+
+        let error: DataverseException = undefined
+
+        await client.search({ query }).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
+    })
   })
 
   describe('getFile', () => {
@@ -172,6 +224,23 @@ describe('DataverseClient', () => {
       const response = await client.getFile(fileId)
 
       expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    describe('on error', () => {
+      it('should throw expected error', async () => {
+        const fileId: string = random.number().toString()
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+
+        let error: DataverseException = undefined
+
+        await client.getFile(fileId).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
     })
   })
 
@@ -209,6 +278,23 @@ describe('DataverseClient', () => {
       expect(response).to.be.deep.equal(expectedResponse)
     })
 
+    describe('on error', () => {
+      it('should throw expected error', async () => {
+        const fileId: string = random.number().toString()
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+
+        let error: DataverseException = undefined
+
+        await client.getFileMetadata(fileId).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
+    })
+
     describe('Draft version', () => {
       it('should call axios with expected url', async () => {
         const fileId: string = random.number().toString()
@@ -241,6 +327,23 @@ describe('DataverseClient', () => {
         const response = await client.getFileMetadata(fileId, true)
 
         expect(response).to.be.deep.equal(expectedResponse)
+      })
+
+      describe('on error', () => {
+        it('should throw expected error', async () => {
+          const fileId: string = random.number().toString()
+          const errorMessage = random.words()
+          const errorCode = random.number()
+          axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+
+          let error: DataverseException = undefined
+
+          await client.getFileMetadata(fileId, true).catch(e => error = e)
+
+          expect(error).to.be.instanceOf(Error)
+          expect(error.message).to.be.equal(errorMessage)
+          expect(error.errorCode).to.be.equal(errorCode)
+        })
       })
     })
   })
@@ -281,6 +384,24 @@ describe('DataverseClient', () => {
 
       expect(response).to.be.deep.equal(expectedResponse)
     })
+
+    describe('on error', () => {
+      it('should throw expected error', async () => {
+        const datasetId: string = random.number().toString()
+        const datasetVersion = ':draft'
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+
+        let error: DataverseException = undefined
+
+        await client.getDatasetInformation(datasetId, datasetVersion).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
+    })
   })
 
   describe('listDataverseRoleAssignments', () => {
@@ -315,6 +436,23 @@ describe('DataverseClient', () => {
       const response = await client.listDataverseRoleAssignments(alias)
 
       expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    describe('on error', () => {
+      it('should throw expected error', async () => {
+        const alias = random.word()
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+
+        let error: DataverseException = undefined
+
+        await client.listDataverseRoleAssignments(alias).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
     })
   })
 })
