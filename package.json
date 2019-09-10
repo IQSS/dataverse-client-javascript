@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "publish": "npm publish",
+    "publish": "tsc && npm publish",
     "test": "jest --watchAll",
     "test:coverage": "jest --coverage --watchAll",
     "test:ci": "jest --ci --maxWorkers=2 --detectOpenHandles --forceExit",
