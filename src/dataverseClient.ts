@@ -15,14 +15,14 @@ export class DataverseClient {
   public getDataverseInformation(dataverseAlias: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/dataverses/${dataverseAlias}`
     return axios.get(url, { headers: this.getHeaders() }).catch(error => {
-      throw new DataverseException(error.statusCode, error.data.message)
+      throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
 
   public listDatasets(dataverseAlias: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/dataverses/${dataverseAlias}/contents`
     return axios.get(url, { headers: this.getHeaders() }).catch(error => {
-      throw new DataverseException(error.statusCode, error.data.message)
+      throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
 
@@ -30,35 +30,35 @@ export class DataverseClient {
     const url = `${this.host}/api/search`
     const requestOptions: DataverseSearchOptions = this.mapSearchOptions(options)
     return axios.get(url, { params: requestOptions }).catch(error => {
-      throw new DataverseException(error.statusCode, error.data.message)
+      throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
 
   public getFile(fileId: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/access/datafile/${fileId}`
     return axios.get(url, { headers: this.getHeaders() }).catch(error => {
-      throw new DataverseException(error.statusCode, error.data.message)
+      throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
 
   public getFileMetadata(fileId: string, draftVersion = false): Promise<AxiosResponse> {
     const url = `${this.host}/api/files/${fileId}/metadata/${draftVersion ? 'draft' : ''}`
     return axios.get(url, { headers: this.getHeaders() }).catch(error => {
-      throw new DataverseException(error.statusCode, error.data.message)
+      throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
 
   public getDatasetInformation(datasetId: string, datasetVersion: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/datasets/${datasetId}/versions/${datasetVersion}`
     return axios.get(url, { headers: this.getHeaders() }).catch(error => {
-      throw new DataverseException(error.statusCode, error.data.message)
+      throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
 
   public listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/dataverses/${dataverseAlias}/assignments`
     return axios.get(url, { headers: this.getHeaders() }).catch(error => {
-      throw new DataverseException(error.statusCode, error.data.message)
+      throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
 

@@ -72,7 +72,7 @@ describe('DataverseClient', () => {
         const alias = random.word()
         const errorMessage = random.words()
         const errorCode = random.number()
-        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+        axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
         let error: DataverseException = undefined
 
@@ -124,7 +124,7 @@ describe('DataverseClient', () => {
         const alias = random.word()
         const errorMessage = random.words()
         const errorCode = random.number()
-        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+        axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
         let error: DataverseException = undefined
 
@@ -179,7 +179,7 @@ describe('DataverseClient', () => {
         const query = random.word()
         const errorMessage = random.words()
         const errorCode = random.number()
-        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+        axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
         let error: DataverseException = undefined
 
@@ -231,7 +231,7 @@ describe('DataverseClient', () => {
         const fileId: string = random.number().toString()
         const errorMessage = random.words()
         const errorCode = random.number()
-        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+        axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
         let error: DataverseException = undefined
 
@@ -283,7 +283,7 @@ describe('DataverseClient', () => {
         const fileId: string = random.number().toString()
         const errorMessage = random.words()
         const errorCode = random.number()
-        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+        axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
         let error: DataverseException = undefined
 
@@ -334,7 +334,7 @@ describe('DataverseClient', () => {
           const fileId: string = random.number().toString()
           const errorMessage = random.words()
           const errorCode = random.number()
-          axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+          axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
           let error: DataverseException = undefined
 
@@ -391,7 +391,7 @@ describe('DataverseClient', () => {
         const datasetVersion = ':draft'
         const errorMessage = random.words()
         const errorCode = random.number()
-        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+        axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
         let error: DataverseException = undefined
 
@@ -443,7 +443,7 @@ describe('DataverseClient', () => {
         const alias = random.word()
         const errorMessage = random.words()
         const errorCode = random.number()
-        axiosGetStub.rejects({ statusCode: errorCode, data: { message: errorMessage } })
+        axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
         let error: DataverseException = undefined
 
