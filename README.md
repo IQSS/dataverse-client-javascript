@@ -23,8 +23,24 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 
 `public getFileMetadata(fileId: string, draftVersion: boolean = false): Promise<AxiosResponse> {`
 
-`public getDatasetInformation(datasetId: string, datasetVersion: string): Promise<AxiosResponse> {`
+`public getLatestDatasetInformation(datasetId: string): Promise<AxiosResponse> {`
+
+`public async getDatasetVersions(datasetId: string): Promise<AxiosResponse> {`
+
+```
+public async getDatasetVersion(datasetId: string, version: string): Promise<AxiosResponse> {
+
+Note: Version must be published, e.g.:
+http://demo.dataverse.org/api/datasets/389608/versions/1
+```
 
 `public listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {`
+
+`public async getMetric(datasetId: string, metricType: DataverseMetricType, yearMonth?: string): Promise<AxiosResponse> {`
+
+`public async getMetricByCountry(datasetId: string, metricType: DataverseMetricType, countryCode?: string, yearMonth?: string) {`
+
+`private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {`
+
 ## Contributing
 [If you are interested in contributing, please click here](/CONTRIBUTING.md)

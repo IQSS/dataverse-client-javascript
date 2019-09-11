@@ -343,53 +343,49 @@ describe('DataverseClient', () => {
     })
   })
 
-  describe('getDatasetInformation', () => {
+  describe('getLatestDatasetInformation', () => {
     it('should call axios with expected url', async () => {
       const datasetId: string = random.number().toString()
-      const datasetVersion = ':draft'
 
-      await client.getDatasetInformation(datasetId, datasetVersion)
+      await client.getLatestDatasetInformation(datasetId)
 
       assert.calledOnce(axiosGetStub)
-      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions/${datasetVersion}`, { headers: { 'X-Dataverse-key': apiToken } })
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}`, { headers: { 'X-Dataverse-key': apiToken } })
     })
 
     it('should call axios with expected headers when no apiToken provided', async () => {
       client = new DataverseClient(host)
       const datasetId: string = random.number().toString()
-      const datasetVersion = ':draft'
 
-      await client.getDatasetInformation(datasetId, datasetVersion)
+      await client.getLatestDatasetInformation(datasetId)
 
       assert.calledOnce(axiosGetStub)
-      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions/${datasetVersion}`, { headers: { 'X-Dataverse-key': '' } })
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}`, { headers: { 'X-Dataverse-key': '' } })
     })
 
     it('should return expected response', async () => {
       const datasetId: string = random.number().toString()
-      const datasetVersion = ':draft'
       const expectedResponse = {
         ...mockResponse
       }
       axiosGetStub
-        .withArgs(`${host}/api/datasets/${datasetId}/versions/${datasetVersion}`, { headers: { 'X-Dataverse-key': apiToken } })
+        .withArgs(`${host}/api/datasets/${datasetId}`, { headers: { 'X-Dataverse-key': apiToken } })
         .resolves(mockResponse)
 
-      const response = await client.getDatasetInformation(datasetId, datasetVersion)
+      const response = await client.getLatestDatasetInformation(datasetId)
 
       expect(response).to.be.deep.equal(expectedResponse)
     })
 
     it('should throw expected error', async () => {
       const datasetId: string = random.number().toString()
-      const datasetVersion = ':draft'
       const errorMessage = random.words()
       const errorCode = random.number()
       axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
       let error: DataverseException = undefined
 
-      await client.getDatasetInformation(datasetId, datasetVersion).catch(e => error = e)
+      await client.getLatestDatasetInformation(datasetId).catch(e => error = e)
 
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
@@ -397,6 +393,109 @@ describe('DataverseClient', () => {
     })
   })
 
+  describe('getDatasetVersions', () => {
+    it('should call axios with expected url', async () => {
+      const datasetId: string = random.number().toString()
+
+      await client.getDatasetVersions(datasetId)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions`, { headers: { 'X-Dataverse-key': apiToken } })
+    })
+
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+      const datasetId: string = random.number().toString()
+
+      await client.getDatasetVersions(datasetId)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions`, { headers: { 'X-Dataverse-key': '' } })
+    })
+
+    it('should return expected response', async () => {
+      const datasetId: string = random.number().toString()
+      const expectedResponse = {
+        ...mockResponse
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/datasets/${datasetId}/versions`, { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves(mockResponse)
+
+      const response = await client.getDatasetVersions(datasetId)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    it('should throw expected error', async () => {
+      const datasetId: string = random.number().toString()
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+
+      let error: DataverseException = undefined
+
+      await client.getDatasetVersions(datasetId).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
+    })
+  })
+
+  describe('getDatasetVersion', () => {
+    it('should call axios with expected url', async () => {
+      const datasetId: string = random.number().toString()
+      const version: string = random.number().toString()
+
+      await client.getDatasetVersion(datasetId, version)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions/${version}`, { headers: { 'X-Dataverse-key': apiToken } })
+    })
+
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+      const datasetId: string = random.number().toString()
+      const version: string = random.number().toString()
+
+      await client.getDatasetVersion(datasetId, version)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}/versions/${version}`, { headers: { 'X-Dataverse-key': '' } })
+    })
+
+    it('should return expected response', async () => {
+      const datasetId: string = random.number().toString()
+      const version: string = random.number().toString()
+      const expectedResponse = {
+        ...mockResponse
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/datasets/${datasetId}/versions/${version}`, { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves(mockResponse)
+
+      const response = await client.getDatasetVersion(datasetId, version)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    it('should throw expected error', async () => {
+      const datasetId: string = random.number().toString()
+      const version: string = random.number().toString()
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+
+      let error: DataverseException = undefined
+
+      await client.getDatasetVersion(datasetId, version).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
+    })
+  })
 
   describe('getDatasetThumbnail', () => {
     it('should call axios with expected url', async () => {
