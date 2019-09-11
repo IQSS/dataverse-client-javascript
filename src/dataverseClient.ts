@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 import { DataverseSearchOptions, SearchOptions } from './@types/searchOptions'
 import { DataverseHeaders } from './@types/dataverseHeaders'
 import { DataverseException } from './exceptions/dataverseException'
+import { DataverseMetricType } from './@types/dataverseMetricType'
 
 export class DataverseClient {
   private readonly host: string
@@ -43,6 +44,11 @@ export class DataverseClient {
     return this.getRequest(url)
   }
 
+  public async getDatasetThumbnail(datasetId: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/datasets/${datasetId}/thumbnail`
+    return this.getRequest(url)
+  }
+
   public async listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/dataverses/${dataverseAlias}/assignments`
     return this.getRequest(url)
@@ -53,7 +59,17 @@ export class DataverseClient {
     return this.getRequest(url)
   }
 
-  private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders} = { headers: this.getHeaders() }): Promise<AxiosResponse> {
+  public async getMetric(datasetId: string, metricType: DataverseMetricType, yearMonth?: string): Promise<AxiosResponse> {
+    return this.getMetricByCountry(datasetId, metricType, undefined, yearMonth)
+  }
+
+  public async getMetricByCountry(datasetId: string, metricType: DataverseMetricType, countryCode?: string, yearMonth?: string) {
+    const countryQueryParam = countryCode ? `?country=${countryCode}` : ''
+    const url = `${this.host}/api/datasets/${datasetId}/makeDataCount/${metricType.toString()}${yearMonth ? '/' + yearMonth : ''}${countryQueryParam}`
+    return this.getRequest(url)
+  }
+
+  private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.get(url, options).catch(error => {
       throw new DataverseException(error.response.status, error.response.data.message)
     })
