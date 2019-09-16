@@ -1,5 +1,8 @@
-# js-dataverse
+# dataverse-client-javascript
 A JavaScript/TypeScript client for [Dataverse](http://guides.dataverse.org/en/latest/api/).
+
+## NPM
+Module available as `js-dataverse` at https://www.npmjs.com/package/js-dataverse
 
 ## Usage
 Create a new client:
