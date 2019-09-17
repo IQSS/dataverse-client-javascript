@@ -33,7 +33,8 @@ export class DataverseClient {
     const url = `${this.host}/api/access/datafile/${fileId}`
     return this.getRequest(url, {
       headers: this.getHeaders(),
-      responseType: 'arraybuffer' })
+      responseType: 'arraybuffer'
+    })
   }
 
   public async getFileMetadata(fileId: string, draftVersion = false): Promise<AxiosResponse> {
@@ -81,7 +82,7 @@ export class DataverseClient {
     return this.getRequest(url)
   }
 
-  private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders, responseType? : ResponseType } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
+  private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders, responseType?: ResponseType } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.get(url, options).catch(error => {
       throw new DataverseException(error.response.status, error.response.data.message)
     })
