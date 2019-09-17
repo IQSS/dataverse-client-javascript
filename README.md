@@ -45,7 +45,22 @@ http://demo.dataverse.org/api/datasets/389608/versions/1
 
 `private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {`
 
-## Unit Tests
+## Build project
+
+In order to build the project, we need to run the following command:
+
+`yarn build` or `npm run build`
+
+the build generated will be placed in `dist` folder.
+
+## Tests and checks
+
+### Pre-requisites
+Make sure that you install all the project dependencies
+
+`yarn install` or `npm install`
+
+Keep consistent, whether you use yarn or npm
 
 ### Running tests in CICD pipeline
 
@@ -55,15 +70,26 @@ http://demo.dataverse.org/api/datasets/389608/versions/1
 
 `yarn test:coverage` or `npm run test:coverage`
 
-## Format checks
+### Format checks
 Making sure that the code format is following the guidelines
 
 `yarn format:check` or `npm run format:check`
 
-## Lint checks
+### Lint checks
 Running a linting check on the code
 
 `yarn eslint:check` or `npm run eslint:check`
+
+
+## Publishing new version
+
+Automated publishing of versions could be automated when merging to master. Below are the steps that would be required to publish a new version:
+
+1. Run tests and checks
+2. Build the project
+3. Commit changes
+4. Upgrade npm version
+5. Publish, `npm publish`
 
 ## Contributing
 [If you are interested in contributing, please click here](/CONTRIBUTING.md)
