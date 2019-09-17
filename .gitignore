@@ -6,3 +6,6 @@ node_modules
 
 # unit tests
 coverage
+
+# ignore npm lock
+package-json.lock
