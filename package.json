@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dell-research-harvard/js-dataverse.git"
+    "url": "git+https://github.com/IQSS/dataverse-client-javascript.git"
   },
   "keywords": [
     "dataverse"
@@ -28,9 +28,9 @@
   "author": "Tai Nguyen Bui <tai@theagilemonkeys.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dell-research-harvard/js-dataverse/issues"
+    "url": "https://github.com/IQSS/dataverse-client-javascript/issues"
   },
-  "homepage": "https://github.com/dell-research-harvard/js-dataverse#readme",
+  "homepage": "https://github.com/IQSS/dataverse-client-javascript#readme",
   "devDependencies": {
     "@types/chai": "^4.2.1",
     "@types/faker": "^4.1.5",
