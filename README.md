@@ -45,5 +45,25 @@ http://demo.dataverse.org/api/datasets/389608/versions/1
 
 `private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {`
 
+## Unit Tests
+
+### Running tests in CICD pipeline
+
+`yarn test:ci` or `npm run test:ci`
+
+### Test coverage
+
+`yarn test:coverage` or `npm run test:coverage`
+
+## Format checks
+Making sure that the code format is following the guidelines
+
+`yarn format:check` or `npm run format:check`
+
+## Lint checks
+Running a linting check on the code
+
+`yarn eslint:check` or `npm run eslint:check`
+
 ## Contributing
 [If you are interested in contributing, please click here](/CONTRIBUTING.md)
