@@ -59,7 +59,10 @@ export class DataverseClient {
 
   public async getDatasetThumbnail(datasetId: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/datasets/${datasetId}/thumbnail`
-    return this.getRequest(url)
+    return this.getRequest(url, {
+      headers: this.getHeaders(),
+      responseType: 'arraybuffer'
+    })
   }
 
   public async listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {
