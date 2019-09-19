@@ -5,6 +5,7 @@ import axios from 'axios'
 import { internet, random } from 'faker'
 import { DataverseException } from '../src/exceptions/dataverseException'
 import { DataverseMetricType } from '../src/@types/dataverseMetricType'
+import fs from 'fs'
 
 describe('DataverseClient', () => {
   const sandbox: SinonSandbox = createSandbox()
@@ -16,6 +17,7 @@ describe('DataverseClient', () => {
   let mockResponse: object
 
   let axiosGetStub: SinonStub
+  let axiosPostStub: SinonStub
 
   beforeEach(() => {
     apiToken = random.uuid()
@@ -28,6 +30,7 @@ describe('DataverseClient', () => {
     }
 
     axiosGetStub = sandbox.stub(axios, 'get').resolves(mockResponse)
+    axiosPostStub = sandbox.stub(axios, 'post').resolves(mockResponse)
   })
 
   afterEach(() => {
@@ -87,12 +90,12 @@ describe('DataverseClient', () => {
 
   describe('listDatasets', () => {
     it('should call axios with expected url', async () => {
-      const alias = random.word()
+      const dataverseAlias = random.word()
 
-      await client.listDatasets(alias)
+      await client.listDatasets(dataverseAlias)
 
       assert.calledOnce(axiosGetStub)
-      assert.calledWithExactly(axiosGetStub, `${host}/api/dataverses/${alias}/contents`, { headers: { 'X-Dataverse-key': apiToken } })
+      assert.calledWithExactly(axiosGetStub, `${host}/api/dataverses/${dataverseAlias}/contents`, { headers: { 'X-Dataverse-key': apiToken } })
     })
 
     it('should call axios with expected headers when no apiToken provided', async () => {
@@ -120,14 +123,67 @@ describe('DataverseClient', () => {
     })
 
     it('should throw expected error', async () => {
-      const alias = random.word()
+      const dataverseAlias = random.word()
       const errorMessage = random.words()
       const errorCode = random.number()
       axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
       let error: DataverseException = undefined
 
-      await client.listDatasets(alias).catch(e => error = e)
+      await client.listDatasets(dataverseAlias).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
+
+    })
+  })
+
+  describe('addDataset', () => {
+    const jsonFixture = JSON.parse(fs.readFileSync(`${__dirname}/fixtures/valid-dataset.json`, 'utf8').toString())
+
+    it('should call axios with expected url', async () => {
+      const dataverseAlias = random.word()
+
+      await client.addDataset(dataverseAlias, jsonFixture)
+
+      assert.calledOnce(axiosPostStub)
+      assert.calledWithExactly(axiosPostStub, `${host}/api/dataverses/${dataverseAlias}/datasets`, jsonFixture, { headers: { 'X-Dataverse-key': apiToken } })
+    })
+
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+      const dataverseAlias = random.word()
+
+      await client.addDataset(dataverseAlias, jsonFixture)
+
+      assert.calledOnce(axiosPostStub)
+      assert.calledWithExactly(axiosPostStub, `${host}/api/dataverses/${dataverseAlias}/datasets`, jsonFixture, { headers: { 'X-Dataverse-key': '' } })
+    })
+
+    it('should return expected response', async () => {
+      const expectedResponse = {
+        ...mockResponse
+      }
+      const dataverseAlias = random.word()
+      axiosGetStub
+        .withArgs(`${host}/api/dataverses/${dataverseAlias}/datasets`, jsonFixture, { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves(mockResponse)
+
+      const response = await client.addDataset(dataverseAlias, jsonFixture)
+
+      expect(response).to.be.deep.eq(expectedResponse)
+    })
+
+    it('should throw expected error', async () => {
+      const dataverseAlias = random.word()
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      axiosPostStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+
+      let error: DataverseException = undefined
+
+      await client.addDataset(dataverseAlias, jsonFixture).catch(e => error = e)
 
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
