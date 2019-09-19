@@ -23,6 +23,11 @@ export class DataverseClient {
     return this.getRequest(url)
   }
 
+  public async addDataset(dataverseAlias: string, payload: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/dataverses/${dataverseAlias}/datasets`
+    return this.postRequest(url, payload)
+  }
+
   public async search(options: SearchOptions): Promise<AxiosResponse> {
     const url = `${this.host}/api/search`
     const requestOptions: DataverseSearchOptions = this.mapSearchOptions(options)
@@ -87,6 +92,12 @@ export class DataverseClient {
 
   private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders, responseType?: ResponseType } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.get(url, options).catch(error => {
+      throw new DataverseException(error.response.status, error.response.data.message)
+    })
+  }
+
+  private async postRequest(url: string, data: string | object, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }) {
+    return await axios.post(url, data, options).catch(error => {
       throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
