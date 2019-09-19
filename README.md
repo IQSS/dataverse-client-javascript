@@ -16,17 +16,19 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 ```
 
 ## Current available functions
-`public getDataverseInformation(alias: string): Promise<AxiosResponse> {`
+`public async getDataverseInformation(alias: string): Promise<AxiosResponse> {`
 
-`public listDatasets(alias: string): Promise<AxiosResponse> {`
+`public async listDatasets(alias: string): Promise<AxiosResponse> {`
 
-`public search(options: SearchOptions): Promise<AxiosResponse> {`
+`public async addDataset(dataverseAlias: string, payload: string): Promise<AxiosResponse> {`
 
-`public getFile(fileId: string): Promise<AxiosResponse> {`
+`public async search(options: SearchOptions): Promise<AxiosResponse> {`
 
-`public getFileMetadata(fileId: string, draftVersion: boolean = false): Promise<AxiosResponse> {`
+`public async getFile(fileId: string): Promise<AxiosResponse> {`
 
-`public getLatestDatasetInformation(datasetId: string): Promise<AxiosResponse> {`
+`public async getFileMetadata(fileId: string, draftVersion: boolean = false): Promise<AxiosResponse> {`
+
+`public async getLatestDatasetInformation(datasetId: string): Promise<AxiosResponse> {`
 
 `public async getDatasetVersions(datasetId: string): Promise<AxiosResponse> {`
 
@@ -37,13 +39,11 @@ Note: Version must be published, e.g.:
 http://demo.dataverse.org/api/datasets/389608/versions/1
 ```
 
-`public listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {`
+`public async listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {`
 
 `public async getMetric(datasetId: string, metricType: DataverseMetricType, yearMonth?: string): Promise<AxiosResponse> {`
 
 `public async getMetricByCountry(datasetId: string, metricType: DataverseMetricType, countryCode?: string, yearMonth?: string) {`
-
-`private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {`
 
 ## Build project
 
