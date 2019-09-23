@@ -71,19 +71,18 @@ export class DataverseClient {
     })
   }
 
-  public async uploadDatasetThumbnail(datasetId: string, image: object){
+  public async uploadDatasetThumbnail(datasetId: string, image: object): Promise<any> {
     const url = `${this.host}/api/datasets/${datasetId}/thumbnail`
     const options = {
       url: url,
       headers: this.getHeaders(),
       formData: {
         file: image
-      }
+      },
+      resolveWithFullResponse: true
     }
 
-    return await request.post(options).then((response: any) => {
-      console.log(response)
-    })
+    return await request.post(options)
   }
 
   public async listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {

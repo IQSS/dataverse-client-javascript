@@ -619,16 +619,17 @@ describe('DataverseClient', () => {
   })
 
   describe('uploadDatasetThumbnail', () => {
-    it('should return response', async () => {
+    it('should return expected response', async () => {
       client = new DataverseClient('https://demo.dataverse.org', '9066b5a4-b89d-41d2-b389-6078c54f196a')
       const datasetId = '389610'
+      const successCode = 200
 
-      let imgFile = fs.createReadStream('/Users/mack/Downloads/Images/shiba.jpg')
-      // let imgFile = fs.createReadStream('/Users/mack/Downloads/theam.png')
+      let imgFile = fs.createReadStream('/Users/mack/Downloads/theam.png')
 
       const result = await client.uploadDatasetThumbnail(datasetId, imgFile)
 
-      console.log(result)
+      expect(result.statusCode).to.be.equal(successCode)
+      expect(result.body).to.contain("Thumbnail is now data:image/png;base64")
     })
   })
 
