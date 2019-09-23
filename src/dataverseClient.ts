@@ -3,7 +3,9 @@ import { DataverseSearchOptions, SearchOptions } from './@types/searchOptions'
 import { DataverseHeaders } from './@types/dataverseHeaders'
 import { DataverseException } from './exceptions/dataverseException'
 import { DataverseMetricType } from './@types/dataverseMetricType'
-const request = require('request-promise')
+import { BasicDatasetInformation } from './@types/basicDataset'
+import { DatasetUtil } from './utils/datasetUtil'
+import request from 'request-promise'
 
 export class DataverseClient {
   private readonly host: string
@@ -27,6 +29,18 @@ export class DataverseClient {
   public async addDataset(dataverseAlias: string, payload: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/dataverses/${dataverseAlias}/datasets`
     return this.postRequest(url, payload)
+  }
+
+  public async addBasicDataset(dataverseAlias: string, datasetInformation: BasicDatasetInformation): Promise<AxiosResponse> {
+    const url = `${this.host}/api/dataverses/${dataverseAlias}/datasets`
+    const payload = DatasetUtil.mapBasicDatasetInformation(datasetInformation)
+
+    return this.postRequest(url, payload, {
+      headers: {
+        ...this.getHeaders(),
+        'Content-Type': 'application/json'
+      }
+    })
   }
 
   public async search(options: SearchOptions): Promise<AxiosResponse> {
@@ -111,9 +125,8 @@ export class DataverseClient {
     })
   }
 
-  private async postRequest(url: string, data: string | object, options: { params?: object, headers?: any } = { headers: this.getHeaders() }) {
-    return await axios.post(url, data, options).catch(error => {
-      console.log(error)
+  private async postRequest(url: string, data: string | object, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }) {
+    return await axios.post(url, JSON.stringify(data), options).catch(error => {
       throw new DataverseException(error.response.status, error.response.data.message)
     })
   }

@@ -1,4 +1,6 @@
 # dataverse-client-javascript
+[![npm](https://img.shields.io/npm/v/js-dataverse.svg)](https://www.npmjs.com/package/js-dataverse)
+
 A JavaScript/TypeScript client for [Dataverse](http://guides.dataverse.org/en/latest/api/).
 
 ## NPM
@@ -21,6 +23,8 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 `public async listDatasets(alias: string): Promise<AxiosResponse> {`
 
 `public async addDataset(dataverseAlias: string, payload: string): Promise<AxiosResponse> {`
+
+`public async addBasicDataset(dataverseAlias: string, datasetInformation: BasicDatasetInformation): Promise<AxiosResponse> {`
 
 `public async search(options: SearchOptions): Promise<AxiosResponse> {`
 
