@@ -3,7 +3,7 @@ import { DataverseSearchOptions, SearchOptions } from './@types/searchOptions'
 import { DataverseHeaders } from './@types/dataverseHeaders'
 import { DataverseException } from './exceptions/dataverseException'
 import { DataverseMetricType } from './@types/dataverseMetricType'
-const request = require('request')
+const request = require('request-promise')
 
 export class DataverseClient {
   private readonly host: string
@@ -73,22 +73,16 @@ export class DataverseClient {
 
   public async uploadDatasetThumbnail(datasetId: string, image: object){
     const url = `${this.host}/api/datasets/${datasetId}/thumbnail`
-
-    let formData = {
-      file: image
+    const options = {
+      url: url,
+      headers: this.getHeaders(),
+      formData: {
+        file: image
+      }
     }
 
-    await request.post({
-      url: url,
-      headers: {
-        'X-Dataverse-key': '9066b5a4-b89d-41d2-b389-6078c54f196a'
-      },
-      formData: formData
-    }, function (error: any, _response: any, body: any) {
-      if (error) {
-        return console.error('upload failed:', error);
-      }
-      console.log('Upload successful!  Server responded with:', body);
+    return await request.post(options).then((response: any) => {
+      console.log(response)
     })
   }
 
