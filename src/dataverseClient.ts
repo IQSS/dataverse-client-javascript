@@ -3,6 +3,7 @@ import { DataverseSearchOptions, SearchOptions } from './@types/searchOptions'
 import { DataverseHeaders } from './@types/dataverseHeaders'
 import { DataverseException } from './exceptions/dataverseException'
 import { DataverseMetricType } from './@types/dataverseMetricType'
+const request = require('request')
 
 export class DataverseClient {
   private readonly host: string
@@ -70,6 +71,27 @@ export class DataverseClient {
     })
   }
 
+  public async uploadDatasetThumbnail(datasetId: string, image: object){
+    const url = `${this.host}/api/datasets/${datasetId}/thumbnail`
+
+    let formData = {
+      file: image
+    }
+
+    await request.post({
+      url: url,
+      headers: {
+        'X-Dataverse-key': '9066b5a4-b89d-41d2-b389-6078c54f196a'
+      },
+      formData: formData
+    }, function (error: any, _response: any, body: any) {
+      if (error) {
+        return console.error('upload failed:', error);
+      }
+      console.log('Upload successful!  Server responded with:', body);
+    })
+  }
+
   public async listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/dataverses/${dataverseAlias}/assignments`
     return this.getRequest(url)
@@ -96,8 +118,9 @@ export class DataverseClient {
     })
   }
 
-  private async postRequest(url: string, data: string | object, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }) {
+  private async postRequest(url: string, data: string | object, options: { params?: object, headers?: any } = { headers: this.getHeaders() }) {
     return await axios.post(url, data, options).catch(error => {
+      console.log(error)
       throw new DataverseException(error.response.status, error.response.data.message)
     })
   }
