@@ -231,7 +231,6 @@ describe('DataverseClient', () => {
   })
 
   describe('addBasicDataset', () => {
-
     it('should call mapBasicDatasetInformation with expected input', async () => {
       const dataverseAlias = 'theam'
       const datasetInformation: BasicDatasetInformation = {

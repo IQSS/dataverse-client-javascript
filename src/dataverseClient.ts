@@ -98,7 +98,7 @@ export class DataverseClient {
     return this.getMetricByCountry(datasetId, metricType, undefined, yearMonth)
   }
 
-  public async getMetricByCountry(datasetId: string, metricType: DataverseMetricType, countryCode?: string, yearMonth?: string) {
+  public async getMetricByCountry(datasetId: string, metricType: DataverseMetricType, countryCode?: string, yearMonth?: string): Promise<AxiosResponse> {
     const countryQueryParam = countryCode ? `?country=${countryCode}` : ''
     const url = `${this.host}/api/datasets/${datasetId}/makeDataCount/${metricType.toString()}${yearMonth ? '/' + yearMonth : ''}${countryQueryParam}`
     return this.getRequest(url)
@@ -110,7 +110,7 @@ export class DataverseClient {
     })
   }
 
-  private async postRequest(url: string, data: string | object, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }) {
+  private async postRequest(url: string, data: string | object, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.post(url, JSON.stringify(data), options).catch(error => {
       throw new DataverseException(error.response.status, error.response.data.message)
     })
