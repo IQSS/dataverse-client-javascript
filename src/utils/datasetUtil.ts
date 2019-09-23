@@ -9,7 +9,7 @@ export class DatasetUtil {
     const fields: MetadataBlockField[] = []
 
     if (!datasetInformation) {
-      return {}
+      return undefined
     }
 
     if (datasetInformation.title) {
