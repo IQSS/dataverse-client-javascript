@@ -20,7 +20,6 @@ describe('DataverseClient', () => {
   let client: DataverseClient
 
   let mockResponse: object
-  let mockRequestResponse: object
   let mockDatasetInformation: object
 
   let axiosGetStub: SinonStub
@@ -58,7 +57,7 @@ describe('DataverseClient', () => {
 
     axiosGetStub = sandbox.stub(axios, 'get').resolves(mockResponse)
     axiosPostStub = sandbox.stub(axios, 'post').resolves(mockResponse)
-    requestPostStub = sandbox.stub(request, 'post').resolves(mockRequestResponse)
+    requestPostStub = sandbox.stub(request, 'post').resolves(mockResponse)
 
     mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
   })
@@ -763,7 +762,7 @@ describe('DataverseClient', () => {
   })
 
   describe('uploadDatasetThumbnail', () => {
-    const testImage = fs.createReadStream(path.resolve(__dirname, '../test/assets/theam.png'))
+    const testImage = fs.readFileSync(path.resolve(__dirname, '../test/assets/theam.png'), 'base64')
 
     it('should call request with expected url', async () => {
       const datasetId: string = random.number().toString()
