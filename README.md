@@ -1,4 +1,6 @@
 # dataverse-client-javascript
+[![npm](https://img.shields.io/npm/v/js-dataverse.svg)](https://www.npmjs.com/package/js-dataverse)
+
 A JavaScript/TypeScript client for [Dataverse](http://guides.dataverse.org/en/latest/api/).
 
 ## NPM
