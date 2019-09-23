@@ -22,6 +22,8 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 
 `public async addDataset(dataverseAlias: string, payload: string): Promise<AxiosResponse> {`
 
+`public async addBasicDataset(dataverseAlias: string, datasetInformation: BasicDatasetInformation): Promise<AxiosResponse> {`
+
 `public async search(options: SearchOptions): Promise<AxiosResponse> {`
 
 `public async getFile(fileId: string): Promise<AxiosResponse> {`
