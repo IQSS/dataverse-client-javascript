@@ -8,6 +8,10 @@ export class DatasetUtil {
   public static mapBasicDatasetInformation(datasetInformation: BasicDatasetInformation): object {
     const fields: MetadataBlockField[] = []
 
+    if (!datasetInformation) {
+      return {}
+    }
+
     if (datasetInformation.title) {
       fields.push(MetadataBlocksUtil.createTitleField(datasetInformation.title))
     }
