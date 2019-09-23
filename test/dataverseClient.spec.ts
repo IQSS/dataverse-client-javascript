@@ -39,11 +39,6 @@ describe('DataverseClient', () => {
       data: {}
     }
 
-    mockRequestResponse = {
-      statusCode: random.number(),
-      data: {}
-    }
-
     mockDatasetInformation = {
       datasetVersion: {
         metadataBlocks: {
@@ -770,7 +765,7 @@ describe('DataverseClient', () => {
   describe('uploadDatasetThumbnail', () => {
     const testImage = fs.createReadStream(path.resolve(__dirname, '../test/assets/theam.png'))
 
-    it('should call axios with expected url', async () => {
+    it('should call request with expected url', async () => {
       const datasetId: string = random.number().toString()
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
@@ -785,7 +780,7 @@ describe('DataverseClient', () => {
       assert.calledWithExactly(requestPostStub, expectedRequest)
     })
 
-    it('should call axios with expected headers when no apiToken provided', async () => {
+    it('should call request with expected headers when no apiToken provided', async () => {
       const datasetId: string = random.number().toString()
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
@@ -803,13 +798,13 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const expectedResponse = {
-        ...mockRequestResponse
+        ...mockResponse
       }
       const datasetId: string = random.number().toString()
 
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
-        headers: { 'X-Dataverse-key': '' },
+        headers: { 'X-Dataverse-key': apiToken },
         formData: { file: testImage },
         resolveWithFullResponse: true
       }
