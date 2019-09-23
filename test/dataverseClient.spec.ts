@@ -2,6 +2,8 @@ import { DataverseClient, DataverseSearchOptions, SearchType } from '../src/inde
 import { assert, createSandbox, SinonSandbox, SinonStub } from 'sinon'
 import { expect } from 'chai'
 import axios from 'axios'
+import request from 'request-promise'
+import path from 'path'
 import { internet, random } from 'faker'
 import { DataverseException } from '../src/exceptions/dataverseException'
 import { DataverseMetricType } from '../src/@types/dataverseMetricType'
@@ -18,10 +20,12 @@ describe('DataverseClient', () => {
   let client: DataverseClient
 
   let mockResponse: object
+  let mockRequestResponse: object
   let mockDatasetInformation: object
 
   let axiosGetStub: SinonStub
   let axiosPostStub: SinonStub
+  let requestPostStub: SinonStub
 
   let mapBasicDatasetInformationStub: SinonStub
 
@@ -32,6 +36,11 @@ describe('DataverseClient', () => {
 
     mockResponse = {
       status: random.number(),
+      data: {}
+    }
+
+    mockRequestResponse = {
+      statusCode: random.number(),
       data: {}
     }
 
@@ -54,6 +63,7 @@ describe('DataverseClient', () => {
 
     axiosGetStub = sandbox.stub(axios, 'get').resolves(mockResponse)
     axiosPostStub = sandbox.stub(axios, 'post').resolves(mockResponse)
+    requestPostStub = sandbox.stub(request, 'post').resolves(mockRequestResponse)
 
     mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
   })
@@ -758,17 +768,72 @@ describe('DataverseClient', () => {
   })
 
   describe('uploadDatasetThumbnail', () => {
+    const testImage = fs.createReadStream(path.resolve(__dirname, '../test/assets/theam.png'))
+
+    it('should call axios with expected url', async () => {
+      const datasetId: string = random.number().toString()
+      const expectedRequest = {
+        url: `${host}/api/datasets/${datasetId}/thumbnail`,
+        headers: { 'X-Dataverse-key': apiToken },
+        formData: { file: testImage },
+        resolveWithFullResponse: true
+      }
+
+      await client.uploadDatasetThumbnail(datasetId, testImage)
+
+      assert.calledOnce(requestPostStub)
+      assert.calledWithExactly(requestPostStub, expectedRequest)
+    })
+
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      const datasetId: string = random.number().toString()
+      const expectedRequest = {
+        url: `${host}/api/datasets/${datasetId}/thumbnail`,
+        headers: { 'X-Dataverse-key': ''},
+        formData: { file: testImage },
+        resolveWithFullResponse: true
+      }
+      client = new DataverseClient(host)
+
+      await client.uploadDatasetThumbnail(datasetId, testImage)
+
+      assert.calledOnce(requestPostStub)
+      assert.calledWithExactly(requestPostStub, expectedRequest)
+    })
+
     it('should return expected response', async () => {
-      client = new DataverseClient('https://demo.dataverse.org', '9066b5a4-b89d-41d2-b389-6078c54f196a')
-      const datasetId = '389610'
-      const successCode = 200
+      const expectedResponse = {
+        ...mockRequestResponse
+      }
+      const datasetId: string = random.number().toString()
 
-      const imgFile = fs.createReadStream('/Users/mack/Downloads/theam.png')
+      const expectedRequest = {
+        url: `${host}/api/datasets/${datasetId}/thumbnail`,
+        headers: { 'X-Dataverse-key': '' },
+        formData: { file: testImage },
+        resolveWithFullResponse: true
+      }
 
-      const result = await client.uploadDatasetThumbnail(datasetId, imgFile)
+      requestPostStub.withArgs(expectedRequest).resolves(mockResponse)
 
-      expect(result.statusCode).to.be.equal(successCode)
-      expect(result.body).to.contain('Thumbnail is now data:image/png;base64')
+      const response = await client.uploadDatasetThumbnail(datasetId, testImage)
+
+      expect(response).to.be.deep.eq(expectedResponse)
+    })
+
+    it('should throw expected error', async() => {
+      const datasetId = random.word()
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      requestPostStub.rejects({ response: { statusCode: errorCode, data: { message: errorMessage } } })
+
+      let error: DataverseException = undefined
+
+      await client.uploadDatasetThumbnail(datasetId, testImage).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
     })
   })
 

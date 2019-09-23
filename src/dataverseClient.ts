@@ -98,7 +98,9 @@ export class DataverseClient {
       resolveWithFullResponse: true
     }
 
-    return await request.post(options)
+    return await request.post(options).catch(error => {
+      throw new DataverseException(error.response.statusCode, error.response.data.message)
+    })
   }
 
   public async listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {
