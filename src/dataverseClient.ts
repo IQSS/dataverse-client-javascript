@@ -90,7 +90,7 @@ export class DataverseClient {
   public async uploadDatasetThumbnail(datasetId: string, image: any): Promise<any> {
     const url = `${this.host}/api/datasets/${datasetId}/thumbnail`
     const options = {
-      url: url,
+      url,
       headers: this.getHeaders(),
       formData: {
         file: image

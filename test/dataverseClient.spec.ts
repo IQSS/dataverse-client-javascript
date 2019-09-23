@@ -812,7 +812,7 @@ describe('DataverseClient', () => {
 
       const response = await client.uploadDatasetThumbnail(datasetId, testImage)
 
-      expect(response).to.be.deep.eq(expectedResponse)
+      expect(response).to.be.deep.equal(expectedResponse)
     })
 
     it('should throw expected error', async() => {
