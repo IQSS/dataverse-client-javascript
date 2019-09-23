@@ -5,7 +5,9 @@ import axios from 'axios'
 import { internet, random } from 'faker'
 import { DataverseException } from '../src/exceptions/dataverseException'
 import { DataverseMetricType } from '../src/@types/dataverseMetricType'
-import fs from 'fs'
+import { DatasetSubjects } from '../src/@types/datasetSubjects'
+import { BasicDatasetInformation } from '../src/@types/basicDataset'
+import { DatasetUtil } from '../src/utils/datasetUtil'
 
 describe('DataverseClient', () => {
   const sandbox: SinonSandbox = createSandbox()
@@ -15,9 +17,12 @@ describe('DataverseClient', () => {
   let client: DataverseClient
 
   let mockResponse: object
+  let mockDatasetInformation: object
 
   let axiosGetStub: SinonStub
   let axiosPostStub: SinonStub
+
+  let mapBasicDatasetInformationStub: SinonStub
 
   beforeEach(() => {
     apiToken = random.uuid()
@@ -29,8 +34,27 @@ describe('DataverseClient', () => {
       data: {}
     }
 
+    mockDatasetInformation = {
+      datasetVersion: {
+        metadataBlocks: {
+          citation: {
+            fields: [{
+              value: "Darwin's Finches",
+              typeClass: 'primitive',
+              multiple: false,
+              typeName: 'title'
+            }
+            ],
+            displayName: 'Citation Metadata'
+          }
+        }
+      }
+    }
+
     axiosGetStub = sandbox.stub(axios, 'get').resolves(mockResponse)
     axiosPostStub = sandbox.stub(axios, 'post').resolves(mockResponse)
+
+    mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
   })
 
   afterEach(() => {
@@ -140,7 +164,22 @@ describe('DataverseClient', () => {
   })
 
   describe('addDataset', () => {
-    const jsonFixture = JSON.parse(fs.readFileSync(`${__dirname}/fixtures/valid-dataset.json`, 'utf8').toString())
+    const jsonFixture = JSON.stringify({
+      'datasetVersion': {
+        'metadataBlocks': {
+          'citation': {
+            'fields': [{
+              'value': "Darwin's Finches",
+              'typeClass': 'primitive',
+              'multiple': false,
+              'typeName': 'title'
+            }
+            ],
+            'displayName': 'Citation Metadata'
+          }
+        }
+      }
+    })
 
     it('should call axios with expected url', async () => {
       const dataverseAlias = random.word()
@@ -148,7 +187,7 @@ describe('DataverseClient', () => {
       await client.addDataset(dataverseAlias, jsonFixture)
 
       assert.calledOnce(axiosPostStub)
-      assert.calledWithExactly(axiosPostStub, `${host}/api/dataverses/${dataverseAlias}/datasets`, jsonFixture, { headers: { 'X-Dataverse-key': apiToken } })
+      assert.calledWithExactly(axiosPostStub, `${host}/api/dataverses/${dataverseAlias}/datasets`, JSON.stringify(jsonFixture), { headers: { 'X-Dataverse-key': apiToken } })
     })
 
     it('should call axios with expected headers when no apiToken provided', async () => {
@@ -158,7 +197,7 @@ describe('DataverseClient', () => {
       await client.addDataset(dataverseAlias, jsonFixture)
 
       assert.calledOnce(axiosPostStub)
-      assert.calledWithExactly(axiosPostStub, `${host}/api/dataverses/${dataverseAlias}/datasets`, jsonFixture, { headers: { 'X-Dataverse-key': '' } })
+      assert.calledWithExactly(axiosPostStub, `${host}/api/dataverses/${dataverseAlias}/datasets`, JSON.stringify(jsonFixture), { headers: { 'X-Dataverse-key': '' } })
     })
 
     it('should return expected response', async () => {
@@ -166,8 +205,8 @@ describe('DataverseClient', () => {
         ...mockResponse
       }
       const dataverseAlias = random.word()
-      axiosGetStub
-        .withArgs(`${host}/api/dataverses/${dataverseAlias}/datasets`, jsonFixture, { headers: { 'X-Dataverse-key': apiToken } })
+      axiosPostStub
+        .withArgs(`${host}/api/dataverses/${dataverseAlias}/datasets`, JSON.stringify(jsonFixture), { headers: { 'X-Dataverse-key': apiToken } })
         .resolves(mockResponse)
 
       const response = await client.addDataset(dataverseAlias, jsonFixture)
@@ -188,7 +227,107 @@ describe('DataverseClient', () => {
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
       expect(error.errorCode).to.be.equal(errorCode)
+    })
+  })
 
+  describe('addBasicDataset', () => {
+
+    it('should call mapBasicDatasetInformation with expected input', async () => {
+      const dataverseAlias = 'theam'
+      const datasetInformation: BasicDatasetInformation = {
+        title: 's',
+        descriptions: [{ text: 'some ', date: '2019-09-09' }],
+        authors: [
+          {
+            fullname: 'tester tests'
+          }
+        ],
+        contact: [{ email: 'tai@theagilemonkeys.com', fullname: 'Tai Nguyen' }],
+        subject: [DatasetSubjects.AGRICULTURAL_SCIENCE]
+      }
+
+      await client.addBasicDataset(dataverseAlias, datasetInformation)
+
+      assert.calledOnce(mapBasicDatasetInformationStub)
+      assert.calledWithExactly(mapBasicDatasetInformationStub, datasetInformation)
+    })
+
+    it('should call axios with expected url', async () => {
+      const dataverseAlias = 'theam'
+      const datasetInformation: BasicDatasetInformation = {
+        title: 's',
+        descriptions: [{ text: 'some ', date: '2019-09-09' }],
+        authors: [
+          {
+            fullname: 'tester tests'
+          }
+        ],
+        contact: [],
+        subject: [DatasetSubjects.AGRICULTURAL_SCIENCE]
+      }
+
+      await client.addBasicDataset(dataverseAlias, datasetInformation)
+
+      assert.calledOnce(axiosPostStub)
+      assert.calledWithExactly(axiosPostStub, `${host}/api/dataverses/${dataverseAlias}/datasets`, JSON.stringify(mockDatasetInformation), {
+        headers: {
+          'X-Dataverse-key': apiToken,
+          'Content-Type': 'application/json'
+        }
+      })
+    })
+
+    it('should return expected response', async () => {
+      const expectedResponse = {
+        ...mockResponse
+      }
+      const dataverseAlias = random.word()
+
+      const datasetInformation: BasicDatasetInformation = {
+        title: 's',
+        descriptions: [{ text: 'some ', date: '2019-09-09' }],
+        authors: [
+          {
+            fullname: 'tester tests'
+          }
+        ],
+        contact: [],
+        subject: [DatasetSubjects.AGRICULTURAL_SCIENCE]
+      }
+
+      axiosGetStub
+        .withArgs(`${host}/api/dataverses/${dataverseAlias}/datasets`, JSON.stringify(mockDatasetInformation), { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves(mockResponse)
+
+      const response = await client.addBasicDataset(dataverseAlias, datasetInformation)
+
+      expect(response).to.be.deep.eq(expectedResponse)
+    })
+
+    it('should throw expected error', async () => {
+      const dataverseAlias = random.word()
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      axiosPostStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+      const datasetInformation: BasicDatasetInformation = {
+        title: 's',
+        descriptions: [{ text: 'some ', date: '2019-09-09' }],
+        authors: [
+          {
+            fullname: 'tester tests'
+          }
+        ],
+        contact: [],
+        subject: [DatasetSubjects.AGRICULTURAL_SCIENCE]
+      }
+
+      let error: DataverseException = undefined
+
+      await client.addBasicDataset(dataverseAlias, datasetInformation).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
     })
   })
 
