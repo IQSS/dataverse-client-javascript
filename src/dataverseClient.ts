@@ -87,13 +87,13 @@ export class DataverseClient {
 
   // TO DO: find a way to implement this endpoint using `axios` instead of `request-promise`
   // Using `request-promise` was the only way so far to be able to upload an image without any issues
-  public async uploadDatasetThumbnail(datasetId: string, image: any): Promise<any> {
+  public async uploadDatasetThumbnail(datasetId: string, imageBuffer: Buffer): Promise<any> {
     const url = `${this.host}/api/datasets/${datasetId}/thumbnail`
     const options = {
       url,
       headers: this.getHeaders(),
       formData: {
-        file: image
+        file: imageBuffer
       },
       resolveWithFullResponse: true
     }
