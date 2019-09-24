@@ -2,12 +2,15 @@ import { DataverseClient, DataverseSearchOptions, SearchType } from '../src/inde
 import { assert, createSandbox, SinonSandbox, SinonStub } from 'sinon'
 import { expect } from 'chai'
 import axios from 'axios'
+import request from 'request-promise'
+import path from 'path'
 import { internet, random } from 'faker'
 import { DataverseException } from '../src/exceptions/dataverseException'
 import { DataverseMetricType } from '../src/@types/dataverseMetricType'
 import { DatasetSubjects } from '../src/@types/datasetSubjects'
 import { BasicDatasetInformation } from '../src/@types/basicDataset'
 import { DatasetUtil } from '../src/utils/datasetUtil'
+import fs from 'fs'
 
 describe('DataverseClient', () => {
   const sandbox: SinonSandbox = createSandbox()
@@ -21,6 +24,7 @@ describe('DataverseClient', () => {
 
   let axiosGetStub: SinonStub
   let axiosPostStub: SinonStub
+  let requestPostStub: SinonStub
 
   let mapBasicDatasetInformationStub: SinonStub
 
@@ -53,6 +57,7 @@ describe('DataverseClient', () => {
 
     axiosGetStub = sandbox.stub(axios, 'get').resolves(mockResponse)
     axiosPostStub = sandbox.stub(axios, 'post').resolves(mockResponse)
+    requestPostStub = sandbox.stub(request, 'post').resolves(mockResponse)
 
     mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
   })
@@ -749,6 +754,76 @@ describe('DataverseClient', () => {
       let error: DataverseException = undefined
 
       await client.getDatasetThumbnail(datasetId).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
+    })
+  })
+
+  describe('uploadDatasetThumbnail', () => {
+    const testImage = fs.readFileSync(path.resolve(__dirname, '../test/assets/theam.png'), 'base64')
+
+    it('should call request with expected url', async () => {
+      const datasetId: string = random.number().toString()
+      const expectedRequest = {
+        url: `${host}/api/datasets/${datasetId}/thumbnail`,
+        headers: { 'X-Dataverse-key': apiToken },
+        formData: { file: testImage },
+        resolveWithFullResponse: true
+      }
+
+      await client.uploadDatasetThumbnail(datasetId, testImage)
+
+      assert.calledOnce(requestPostStub)
+      assert.calledWithExactly(requestPostStub, expectedRequest)
+    })
+
+    it('should call request with expected headers when no apiToken provided', async () => {
+      const datasetId: string = random.number().toString()
+      const expectedRequest = {
+        url: `${host}/api/datasets/${datasetId}/thumbnail`,
+        headers: { 'X-Dataverse-key': ''},
+        formData: { file: testImage },
+        resolveWithFullResponse: true
+      }
+      client = new DataverseClient(host)
+
+      await client.uploadDatasetThumbnail(datasetId, testImage)
+
+      assert.calledOnce(requestPostStub)
+      assert.calledWithExactly(requestPostStub, expectedRequest)
+    })
+
+    it('should return expected response', async () => {
+      const expectedResponse = {
+        ...mockResponse
+      }
+      const datasetId: string = random.number().toString()
+
+      const expectedRequest = {
+        url: `${host}/api/datasets/${datasetId}/thumbnail`,
+        headers: { 'X-Dataverse-key': apiToken },
+        formData: { file: testImage },
+        resolveWithFullResponse: true
+      }
+
+      requestPostStub.withArgs(expectedRequest).resolves(mockResponse)
+
+      const response = await client.uploadDatasetThumbnail(datasetId, testImage)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    it('should throw expected error', async() => {
+      const datasetId = random.word()
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      requestPostStub.rejects({ response: { statusCode: errorCode, data: { message: errorMessage } } })
+
+      let error: DataverseException = undefined
+
+      await client.uploadDatasetThumbnail(datasetId, testImage).catch(e => error = e)
 
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
