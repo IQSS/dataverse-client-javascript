@@ -763,6 +763,7 @@ describe('DataverseClient', () => {
 
   describe('uploadDatasetThumbnail', () => {
     const testImage = fs.readFileSync(path.resolve(__dirname, '../test/assets/theam.png'), 'base64')
+    const imageBuffer = Buffer.from(testImage, 'base64')
 
     it('should call request with expected url', async () => {
       const datasetId: string = random.number().toString()
@@ -773,7 +774,7 @@ describe('DataverseClient', () => {
         resolveWithFullResponse: true
       }
 
-      await client.uploadDatasetThumbnail(datasetId, testImage)
+      await client.uploadDatasetThumbnail(datasetId, imageBuffer)
 
       assert.calledOnce(requestPostStub)
       assert.calledWithExactly(requestPostStub, expectedRequest)
@@ -789,7 +790,7 @@ describe('DataverseClient', () => {
       }
       client = new DataverseClient(host)
 
-      await client.uploadDatasetThumbnail(datasetId, testImage)
+      await client.uploadDatasetThumbnail(datasetId, imageBuffer)
 
       assert.calledOnce(requestPostStub)
       assert.calledWithExactly(requestPostStub, expectedRequest)
@@ -810,7 +811,7 @@ describe('DataverseClient', () => {
 
       requestPostStub.withArgs(expectedRequest).resolves(mockResponse)
 
-      const response = await client.uploadDatasetThumbnail(datasetId, testImage)
+      const response = await client.uploadDatasetThumbnail(datasetId, imageBuffer)
 
       expect(response).to.be.deep.equal(expectedResponse)
     })
@@ -823,7 +824,7 @@ describe('DataverseClient', () => {
 
       let error: DataverseException = undefined
 
-      await client.uploadDatasetThumbnail(datasetId, testImage).catch(e => error = e)
+      await client.uploadDatasetThumbnail(datasetId, imageBuffer).catch(e => error = e)
 
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
