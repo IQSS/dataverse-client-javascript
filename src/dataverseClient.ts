@@ -67,6 +67,11 @@ export class DataverseClient {
     return this.getRequest(url)
   }
 
+  public async getLatestDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/datasets/:persistentId?persistentId=doi:${doi}`
+    return this.getRequest(url)
+  }
+
   public async getDatasetVersions(datasetId: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/datasets/${datasetId}/versions`
     return this.getRequest(url)

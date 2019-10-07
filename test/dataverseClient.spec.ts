@@ -87,13 +87,15 @@ describe('DataverseClient', () => {
     })
 
     it('should return expected response', async () => {
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       const alias = random.word()
       axiosGetStub
-        .withArgs(`${host}/api/dataverses/${alias}?key=${apiToken}`)
-        .resolves(mockResponse)
+        .withArgs(`${host}/api/dataverses/${alias}`)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.getDataverseInformation(alias)
 
@@ -138,13 +140,15 @@ describe('DataverseClient', () => {
     })
 
     it('should return expected response', async () => {
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       const alias = random.word()
       axiosGetStub
         .withArgs(`${host}/api/dataverses/${alias}/contents`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.listDatasets(alias)
 
@@ -206,13 +210,15 @@ describe('DataverseClient', () => {
     })
 
     it('should return expected response', async () => {
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       const dataverseAlias = random.word()
       axiosPostStub
         .withArgs(`${host}/api/dataverses/${dataverseAlias}/datasets`, JSON.stringify(jsonFixture), { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.addDataset(dataverseAlias, jsonFixture)
 
@@ -283,7 +289,7 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
       }
       const dataverseAlias = random.word()
 
@@ -298,10 +304,6 @@ describe('DataverseClient', () => {
         contact: [],
         subject: [DatasetSubjects.AGRICULTURAL_SCIENCE]
       }
-
-      axiosGetStub
-        .withArgs(`${host}/api/dataverses/${dataverseAlias}/datasets`, JSON.stringify(mockDatasetInformation), { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
 
       const response = await client.addBasicDataset(dataverseAlias, datasetInformation)
 
@@ -360,12 +362,14 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const query = random.word()
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
         .withArgs(`${host}/api/search`)
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.search({ query })
 
@@ -417,15 +421,17 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const fileId: string = random.number().toString()
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
         .withArgs(`${host}/api/access/datafile/${fileId}`, {
           headers: { 'X-Dataverse-key': apiToken },
           responseType: 'arraybuffer'
         })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.getFile(fileId)
 
@@ -471,12 +477,14 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const fileId: string = random.number().toString()
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
         .withArgs(`${host}/api/files/${fileId}/metadata/`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.getFileMetadata(fileId)
 
@@ -521,12 +529,14 @@ describe('DataverseClient', () => {
 
       it('should return expected response', async () => {
         const fileId: string = random.number().toString()
+        const randomValue = random.word()
         const expectedResponse = {
-          ...mockResponse
+          ...mockResponse,
+          'test': randomValue
         }
         axiosGetStub
           .withArgs(`${host}/api/files/${fileId}/metadata/draft`, { headers: { 'X-Dataverse-key': apiToken } })
-          .resolves(mockResponse)
+          .resolves({ ...mockResponse, 'test': randomValue })
 
         const response = await client.getFileMetadata(fileId, true)
 
@@ -573,12 +583,14 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const datasetId: string = random.number().toString()
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
         .withArgs(`${host}/api/datasets/${datasetId}`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.getLatestDatasetInformation(datasetId)
 
@@ -594,6 +606,59 @@ describe('DataverseClient', () => {
       let error: DataverseException = undefined
 
       await client.getLatestDatasetInformation(datasetId).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
+    })
+  })
+
+  describe('getLatestDatasetInformationFromDOI', () => {
+    let doi: string
+
+    beforeEach(() => {
+      doi = `${random.number()}.${random.number()}/${random.word()}/${random.word()}`
+    })
+
+    it('should call axios with expected url', async () => {
+      await client.getLatestDatasetInformationFromDOI(doi)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/:persistentId?persistentId=doi:${doi}`, { headers: { 'X-Dataverse-key': apiToken } })
+    })
+
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+
+      await client.getLatestDatasetInformationFromDOI(doi)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/:persistentId?persistentId=doi:${doi}`, { headers: { 'X-Dataverse-key': '' } })
+    })
+
+    it('should return expected response', async () => {
+      const randomValue = random.word()
+      const expectedResponse = {
+        ...mockResponse,
+        'test': randomValue
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/datasets/:persistentId?persistentId=doi:${doi}`, { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves({ ...mockResponse, 'test': randomValue })
+
+      const response = await client.getLatestDatasetInformationFromDOI(doi)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    it('should throw expected error', async () => {
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+
+      let error: DataverseException = undefined
+
+      await client.getLatestDatasetInformationFromDOI(doi).catch(e => error = e)
 
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
@@ -623,12 +688,14 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const datasetId: string = random.number().toString()
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
         .withArgs(`${host}/api/datasets/${datasetId}/versions`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.getDatasetVersions(datasetId)
 
@@ -676,12 +743,14 @@ describe('DataverseClient', () => {
     it('should return expected response', async () => {
       const datasetId: string = random.number().toString()
       const version: string = random.number().toString()
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
         .withArgs(`${host}/api/datasets/${datasetId}/versions/${version}`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.getDatasetVersion(datasetId, version)
 
@@ -733,12 +802,14 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const datasetId: string = random.number().toString()
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
-        .withArgs(`${host}/api/datasets/${datasetId}/thumbnail`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .withArgs(`${host}/api/datasets/${datasetId}/thumbnail`, { headers: { 'X-Dataverse-key': apiToken }, responseType: 'arraybuffer' })
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.getDatasetThumbnail(datasetId)
 
@@ -770,7 +841,7 @@ describe('DataverseClient', () => {
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
         headers: { 'X-Dataverse-key': apiToken },
-        formData: { file: testImage },
+        formData: { file: imageBuffer },
         resolveWithFullResponse: true
       }
 
@@ -784,8 +855,8 @@ describe('DataverseClient', () => {
       const datasetId: string = random.number().toString()
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
-        headers: { 'X-Dataverse-key': ''},
-        formData: { file: testImage },
+        headers: { 'X-Dataverse-key': '' },
+        formData: { file: imageBuffer },
         resolveWithFullResponse: true
       }
       client = new DataverseClient(host)
@@ -797,26 +868,28 @@ describe('DataverseClient', () => {
     })
 
     it('should return expected response', async () => {
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       const datasetId: string = random.number().toString()
 
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
         headers: { 'X-Dataverse-key': apiToken },
-        formData: { file: testImage },
+        formData: { file: imageBuffer },
         resolveWithFullResponse: true
       }
 
-      requestPostStub.withArgs(expectedRequest).resolves(mockResponse)
+      requestPostStub.withArgs(expectedRequest).resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.uploadDatasetThumbnail(datasetId, imageBuffer)
 
       expect(response).to.be.deep.equal(expectedResponse)
     })
 
-    it('should throw expected error', async() => {
+    it('should throw expected error', async () => {
       const datasetId = random.word()
       const errorMessage = random.words()
       const errorCode = random.number()
@@ -854,12 +927,14 @@ describe('DataverseClient', () => {
 
     it('should return expected response', async () => {
       const alias = random.word()
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
         .withArgs(`${host}/api/dataverses/${alias}/assignments`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const result = await client.listDataverseRoleAssignments(alias)
 
@@ -931,12 +1006,14 @@ describe('DataverseClient', () => {
     it('should return expected response', async () => {
       const datasetId: string = random.number().toString()
       const metricType: DataverseMetricType = DataverseMetricType.DOWNLOADS_UNIQUE
+      const randomValue = random.word()
       const expectedResponse = {
-        ...mockResponse
+        ...mockResponse,
+        'test': randomValue
       }
       axiosGetStub
         .withArgs(`${host}/api/datasets/${datasetId}/makeDataCount/${metricType}`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves(mockResponse)
+        .resolves({ ...mockResponse, 'test': randomValue })
 
       const result = await client.getMetricByCountry(datasetId, metricType)
 
