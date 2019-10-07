@@ -34,6 +34,8 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 
 `public async getLatestDatasetInformation(datasetId: string): Promise<AxiosResponse> {`
 
+`public async getLatestDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {`
+
 `public async getDatasetVersions(datasetId: string): Promise<AxiosResponse> {`
 
 ```
