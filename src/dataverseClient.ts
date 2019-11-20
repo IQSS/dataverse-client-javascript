@@ -6,6 +6,7 @@ import { DataverseMetricType } from './@types/dataverseMetricType'
 import { BasicDatasetInformation } from './@types/basicDataset'
 import { DatasetUtil } from './utils/datasetUtil'
 import request from 'request-promise'
+import { DatasetVersionUpgradeType } from './@types/datasetVersionUpgradeType'
 
 export class DataverseClient {
   private readonly host: string
@@ -148,6 +149,11 @@ export class DataverseClient {
     return request.post(options).catch(error => {
       throw new DataverseException(error.response.statusCode, error.response.body ? JSON.parse(error.response.body).message : '')
     })
+  }
+
+  public async publishDataset(datasetId: string, versionUpgradeType: DatasetVersionUpgradeType = DatasetVersionUpgradeType.MAJOR): Promise<AxiosResponse> {
+    const url = `${this.host}/api/datasets/${datasetId}/actions/:publish?type=${versionUpgradeType}`
+    return this.postRequest(url, '')
   }
 
   private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders, responseType?: ResponseType } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
