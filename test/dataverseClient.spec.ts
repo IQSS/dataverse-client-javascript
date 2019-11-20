@@ -11,6 +11,7 @@ import { DatasetSubjects } from '../src/@types/datasetSubjects'
 import { BasicDatasetInformation } from '../src/@types/basicDataset'
 import { DatasetUtil } from '../src/utils/datasetUtil'
 import fs from 'fs'
+import { DatasetVersionUpgradeType } from '../src/@types/datasetVersionUpgradeType'
 
 describe('DataverseClient', () => {
   const sandbox: SinonSandbox = createSandbox()
@@ -1149,6 +1150,168 @@ describe('DataverseClient', () => {
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
       expect(error.errorCode).to.be.equal(errorCode)
+    })
+  })
+
+  describe('publishDataset', () => {
+    let datasetId: string
+
+    beforeEach(() => {
+      datasetId = random.number().toString()
+    })
+
+    describe('minor version upgrade', () => {
+      it('should call axios with expected url', async () => {
+        await client.publishDataset(datasetId, DatasetVersionUpgradeType.MINOR)
+
+        assert.calledOnce(axiosPostStub)
+        assert.calledWithExactly(axiosPostStub,
+          `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MINOR}`,
+          JSON.stringify(''),
+          { headers: { 'X-Dataverse-key': apiToken } })
+      })
+
+      it('should call axios with expected headers when no apiToken provided', async () => {
+        client = new DataverseClient(host)
+        await client.publishDataset(datasetId, DatasetVersionUpgradeType.MINOR)
+
+        assert.calledOnce(axiosPostStub)
+        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MINOR}`,
+          JSON.stringify(''),
+          { headers: { 'X-Dataverse-key': '' } })
+      })
+
+      it('should return expected response', async () => {
+        const randomValue = random.word()
+        const expectedResponse = {
+          ...mockResponse,
+          'test': randomValue
+        }
+        axiosPostStub
+          .withArgs(`${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MINOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
+          .resolves({ ...mockResponse, 'test': randomValue })
+
+        const response = await client.publishDataset(datasetId, DatasetVersionUpgradeType.MINOR)
+
+        expect(response).to.be.deep.eq(expectedResponse)
+      })
+
+      it('should throw expected error', async () => {
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosPostStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+
+        let error: DataverseException = undefined
+
+        await client.publishDataset(datasetId, DatasetVersionUpgradeType.MINOR).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
+    })
+
+    describe('major version upgrade', () => {
+      it('should call axios with expected url', async () => {
+        await client.publishDataset(datasetId, DatasetVersionUpgradeType.MAJOR)
+
+        assert.calledOnce(axiosPostStub)
+        assert.calledWithExactly(axiosPostStub,
+          `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`,
+          JSON.stringify(''),
+          { headers: { 'X-Dataverse-key': apiToken } })
+      })
+
+      it('should call axios with expected headers when no apiToken provided', async () => {
+        client = new DataverseClient(host)
+        await client.publishDataset(datasetId, DatasetVersionUpgradeType.MAJOR)
+
+        assert.calledOnce(axiosPostStub)
+        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`,
+          JSON.stringify(''),
+          { headers: { 'X-Dataverse-key': '' } })
+      })
+
+      it('should return expected response', async () => {
+        const randomValue = random.word()
+        const expectedResponse = {
+          ...mockResponse,
+          'test': randomValue
+        }
+        axiosPostStub
+          .withArgs(`${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
+          .resolves({ ...mockResponse, 'test': randomValue })
+
+        const response = await client.publishDataset(datasetId, DatasetVersionUpgradeType.MAJOR)
+
+        expect(response).to.be.deep.eq(expectedResponse)
+      })
+
+      it('should throw expected error', async () => {
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosPostStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+
+        let error: DataverseException = undefined
+
+        await client.publishDataset(datasetId, DatasetVersionUpgradeType.MAJOR).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
+    })
+
+    describe('missing version upgrade type', () => {
+      it('should call axios with expected url', async () => {
+
+        await client.publishDataset(datasetId)
+
+        assert.calledOnce(axiosPostStub)
+        assert.calledWithExactly(axiosPostStub,
+          `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`,
+          JSON.stringify(''),
+          { headers: { 'X-Dataverse-key': apiToken } })
+      })
+
+      it('should call axios with expected headers when no apiToken provided', async () => {
+        client = new DataverseClient(host)
+        await client.publishDataset(datasetId)
+
+        assert.calledOnce(axiosPostStub)
+        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`,
+          JSON.stringify(''),
+          { headers: { 'X-Dataverse-key': '' } })
+      })
+
+      it('should return expected response', async () => {
+        const randomValue = random.word()
+        const expectedResponse = {
+          ...mockResponse,
+          'test': randomValue
+        }
+        axiosPostStub
+          .withArgs(`${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
+          .resolves({ ...mockResponse, 'test': randomValue })
+
+        const response = await client.publishDataset(datasetId)
+
+        expect(response).to.be.deep.eq(expectedResponse)
+      })
+
+      it('should throw expected error', async () => {
+        const errorMessage = random.words()
+        const errorCode = random.number()
+        axiosPostStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+
+        let error: DataverseException = undefined
+
+        await client.publishDataset(datasetId).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(errorMessage)
+        expect(error.errorCode).to.be.equal(errorCode)
+      })
     })
   })
 })
