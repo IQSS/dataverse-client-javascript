@@ -51,6 +51,10 @@ http://demo.dataverse.org/api/datasets/389608/versions/1
 
 `public async getMetricByCountry(datasetId: string, metricType: DataverseMetricType, countryCode?: string, yearMonth?: string) {`
 
+`public async replaceFile(fileId: string, filename: string, fileBuffer: Buffer): Promise<any> {`
+
+`public async publishDataset(datasetId: string, versionUpgradeType: DatasetVersionUpgradeType = DatasetVersionUpgradeType.MAJOR): Promise<AxiosResponse> {`
+
 ## Build project
 
 In order to build the project, we need to run the following command:
