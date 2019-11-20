@@ -103,8 +103,8 @@ export class DataverseClient {
       resolveWithFullResponse: true
     }
 
-    return await request.post(options).catch(error => {
-      throw new DataverseException(error.response.statusCode, error.response.data.message)
+    return request.post(options).catch(error => {
+      throw new DataverseException(error.response.statusCode, error.response.body ? JSON.parse(error.response.body).message : '')
     })
   }
 
@@ -128,15 +128,37 @@ export class DataverseClient {
     return this.getRequest(url)
   }
 
+  public async replaceFile(fileId: string, filename: string, fileBuffer: Buffer): Promise<any> {
+    const url = `${this.host}/api/files/${fileId}/replace`
+
+    const options = {
+      url,
+      headers: this.getHeaders(),
+      formData: {
+        file: {
+          value: fileBuffer,
+          options: {
+            filename: filename
+          }
+        }
+      },
+      resolveWithFullResponse: true
+    }
+
+    return request.post(options).catch(error => {
+      throw new DataverseException(error.response.statusCode, error.response.body ? JSON.parse(error.response.body).message : '')
+    })
+  }
+
   private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders, responseType?: ResponseType } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.get(url, options).catch(error => {
-      throw new DataverseException(error.response.status, error.response.data.message)
+      throw new DataverseException(error.response.status, error.response.data ? error.response.data.message : '')
     })
   }
 
   private async postRequest(url: string, data: string | object, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.post(url, JSON.stringify(data), options).catch(error => {
-      throw new DataverseException(error.response.status, error.response.data.message)
+      throw new DataverseException(error.response.status, error.response.data ? error.response.data.message : '')
     })
   }
 

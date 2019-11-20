@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import axios from 'axios'
 import request from 'request-promise'
 import path from 'path'
-import { internet, random } from 'faker'
+import { internet, random, system } from 'faker'
 import { DataverseException } from '../src/exceptions/dataverseException'
 import { DataverseMetricType } from '../src/@types/dataverseMetricType'
 import { DatasetSubjects } from '../src/@types/datasetSubjects'
@@ -808,7 +808,10 @@ describe('DataverseClient', () => {
         'test': randomValue
       }
       axiosGetStub
-        .withArgs(`${host}/api/datasets/${datasetId}/thumbnail`, { headers: { 'X-Dataverse-key': apiToken }, responseType: 'arraybuffer' })
+        .withArgs(`${host}/api/datasets/${datasetId}/thumbnail`, {
+          headers: { 'X-Dataverse-key': apiToken },
+          responseType: 'arraybuffer'
+        })
         .resolves({ ...mockResponse, 'test': randomValue })
 
       const response = await client.getDatasetThumbnail(datasetId)
@@ -893,7 +896,7 @@ describe('DataverseClient', () => {
       const datasetId = random.word()
       const errorMessage = random.words()
       const errorCode = random.number()
-      requestPostStub.rejects({ response: { statusCode: errorCode, data: { message: errorMessage } } })
+      requestPostStub.rejects({ response: { statusCode: errorCode, body: JSON.stringify({ message: errorMessage }) } })
 
       let error: DataverseException = undefined
 
@@ -1067,6 +1070,81 @@ describe('DataverseClient', () => {
       let error: DataverseException = undefined
 
       await client.getMetricByCountry(datasetId, metricType).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
+    })
+  })
+
+  describe('replaceFile', () => {
+    const testFile = fs.readFileSync(path.resolve(__dirname, '../test/assets/test-file.csv'), 'base64')
+    const fileBuffer = Buffer.from(testFile, 'base64')
+
+    it('should call request with expected url', async () => {
+      const mockFileId: string = random.number().toString()
+      const mockFilename: string = system.fileName()
+
+      const expectedRequest = {
+        url: `${host}/api/files/${mockFileId}/replace`,
+        headers: { 'X-Dataverse-key': apiToken },
+        formData: {
+          file: {
+            value: fileBuffer,
+            options: {
+              filename: mockFilename
+            }
+          }
+        },
+        resolveWithFullResponse: true
+      }
+
+      await client.replaceFile(mockFileId, mockFilename, fileBuffer)
+
+      assert.calledOnce(requestPostStub)
+      assert.calledWithExactly(requestPostStub, expectedRequest)
+    })
+
+    it('should return expected response', async () => {
+      const mockFileId: string = random.number().toString()
+      const mockFilename: string = system.fileName()
+      const randomValue = random.word()
+      const expectedResponse = {
+        ...mockResponse,
+        'test': randomValue
+      }
+
+      const expectedRequest = {
+        url: `${host}/api/files/${mockFileId}/replace`,
+        headers: { 'X-Dataverse-key': apiToken },
+        formData: {
+          file: {
+            value: fileBuffer,
+            options: {
+              filename: mockFilename
+            }
+          }
+        },
+        resolveWithFullResponse: true
+      }
+
+      requestPostStub.withArgs(expectedRequest).resolves({ ...mockResponse, 'test': randomValue })
+
+      const response = await client.replaceFile(mockFileId, mockFilename, fileBuffer)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    it('should throw expected error', async () => {
+      const mockFileId: string = random.number().toString()
+      const mockFilename: string = system.fileName()
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      requestPostStub.rejects({ response: { statusCode: errorCode, body: JSON.stringify({ message: errorMessage }) } })
+
+      let error: DataverseException = undefined
+
+      await client.replaceFile(mockFileId, mockFilename, fileBuffer).catch(e => error = e)
 
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
