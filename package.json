@@ -1,6 +1,6 @@
 {
   "name": "js-dataverse",
-  "version": "1.0.29",
+  "version": "1.0.30",
   "description": "A Dataverse module for JavaScript/TypeScript",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
