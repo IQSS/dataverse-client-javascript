@@ -562,117 +562,108 @@ describe('DataverseClient', () => {
     })
   })
 
-  describe('getLatestPublishedDatasetInformation', () => {
-    let mockDatasetId: string
-
-    let getDatasetVersionStub: SinonStub
-
-    beforeEach(() => {
-      mockDatasetId = random.number().toString()
-
-      getDatasetVersionStub = sandbox.stub(DataverseClient.prototype, 'getDatasetVersion')
-    })
-
-    it('should call getDatasetVersion with expected input', async () => {
-      await client.getLatestPublishedDatasetInformation(mockDatasetId)
-
-      assert.calledOnce(getDatasetVersionStub)
-      assert.calledWithExactly(getDatasetVersionStub, mockDatasetId, ':latest-published')
-    })
-  })
-
   describe('getLatestDatasetInformation', () => {
-    let mockDatasetId: string
+    it('should call axios with expected url', async () => {
+      const datasetId: string = random.number().toString()
 
-    let getDatasetVersionStub: SinonStub
+      await client.getLatestDatasetInformation(datasetId)
 
-    beforeEach(() => {
-      mockDatasetId = random.number().toString()
-
-      getDatasetVersionStub = sandbox.stub(DataverseClient.prototype, 'getDatasetVersion')
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}`, { headers: { 'X-Dataverse-key': apiToken } })
     })
 
-    it('should call getDatasetVersion with expected input', async () => {
-      await client.getLatestDatasetInformation(mockDatasetId)
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      client = new DataverseClient(host)
+      const datasetId: string = random.number().toString()
 
-      assert.calledOnce(getDatasetVersionStub)
-      assert.calledWithExactly(getDatasetVersionStub, mockDatasetId, ':latest')
-    })
-  })
+      await client.getLatestDatasetInformation(datasetId)
 
-  describe('getDraftDatasetInformation', () => {
-    let mockDatasetId: string
-
-    let getDatasetVersionStub: SinonStub
-
-    beforeEach(() => {
-      mockDatasetId = random.number().toString()
-
-      getDatasetVersionStub = sandbox.stub(DataverseClient.prototype, 'getDatasetVersion')
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/${datasetId}`, { headers: { 'X-Dataverse-key': '' } })
     })
 
-    it('should call getDatasetVersion with expected input', async () => {
-      await client.getDraftDatasetInformation(mockDatasetId)
+    it('should return expected response', async () => {
+      const datasetId: string = random.number().toString()
+      const randomValue = random.word()
+      const expectedResponse = {
+        ...mockResponse,
+        'test': randomValue
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/datasets/${datasetId}`, { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves({ ...mockResponse, 'test': randomValue })
 
-      assert.calledOnce(getDatasetVersionStub)
-      assert.calledWithExactly(getDatasetVersionStub, mockDatasetId, ':draft')
-    })
-  })
+      const response = await client.getLatestDatasetInformation(datasetId)
 
-  describe('getLatestPublishedDatasetInformationFromDOI', () => {
-    let mockDatasetId: string
-
-    let getDatasetVersionFromDOIStub: SinonStub
-
-    beforeEach(() => {
-      mockDatasetId = random.number().toString()
-
-      getDatasetVersionFromDOIStub = sandbox.stub(DataverseClient.prototype, 'getDatasetVersionFromDOI')
+      expect(response).to.be.deep.equal(expectedResponse)
     })
 
-    it('should call getDatasetVersionFromDOI with expected input', async () => {
-      await client.getLatestPublishedDatasetInformationFromDOI(mockDatasetId)
+    it('should throw expected error', async () => {
+      const datasetId: string = random.number().toString()
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
 
-      assert.calledOnce(getDatasetVersionFromDOIStub)
-      assert.calledWithExactly(getDatasetVersionFromDOIStub, mockDatasetId, ':latest-published')
+      let error: DataverseException = undefined
+
+      await client.getLatestDatasetInformation(datasetId).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
     })
   })
 
   describe('getLatestDatasetInformationFromDOI', () => {
-    let mockDoi: string
-
-    let getDatasetVersionFromDOIStub: SinonStub
+    let doi: string
 
     beforeEach(() => {
-      mockDoi = `${random.number()}.${random.number()}/${random.word()}/${random.word()}`
-
-      getDatasetVersionFromDOIStub = sandbox.stub(DataverseClient.prototype, 'getDatasetVersionFromDOI')
+      doi = `${random.number()}.${random.number()}/${random.word()}/${random.word()}`
     })
 
-    it('should call getDatasetVersionFromDOI with expected input', async () => {
-      await client.getLatestDatasetInformationFromDOI(mockDoi)
+    it('should call axios with expected url', async () => {
+      await client.getLatestDatasetInformationFromDOI(doi)
 
-      assert.calledOnce(getDatasetVersionFromDOIStub)
-      assert.calledWithExactly(getDatasetVersionFromDOIStub, mockDoi, ':latest')
-    })
-  })
-
-  describe('getDraftDatasetInformationFromDOI', () => {
-    let mockDoi: string
-
-    let getDatasetVersionFromDOIStub: SinonStub
-
-    beforeEach(() => {
-      mockDoi = `${random.number()}.${random.number()}/${random.word()}/${random.word()}`
-
-      getDatasetVersionFromDOIStub = sandbox.stub(DataverseClient.prototype, 'getDatasetVersionFromDOI')
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/:persistentId?persistentId=doi:${doi}`, { headers: { 'X-Dataverse-key': apiToken } })
     })
 
-    it('should call getDatasetVersionFromDOI with expected input', async () => {
-      await client.getDraftDatasetInformationFromDOI(mockDoi)
+    it('should call axios with expected headers when no apiToken provided', async () => {
+      client = new DataverseClient(host)
 
-      assert.calledOnce(getDatasetVersionFromDOIStub)
-      assert.calledWithExactly(getDatasetVersionFromDOIStub, mockDoi, ':draft')
+      await client.getLatestDatasetInformationFromDOI(doi)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/:persistentId?persistentId=doi:${doi}`, { headers: { 'X-Dataverse-key': '' } })
+    })
+
+    it('should return expected response', async () => {
+      const randomValue = random.word()
+      const expectedResponse = {
+        ...mockResponse,
+        'test': randomValue
+      }
+      axiosGetStub
+        .withArgs(`${host}/api/datasets/:persistentId?persistentId=doi:${doi}`, { headers: { 'X-Dataverse-key': apiToken } })
+        .resolves({ ...mockResponse, 'test': randomValue })
+
+      const response = await client.getLatestDatasetInformationFromDOI(doi)
+
+      expect(response).to.be.deep.equal(expectedResponse)
+    })
+
+    it('should throw expected error', async () => {
+      const errorMessage = random.words()
+      const errorCode = random.number()
+      axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
+
+      let error: DataverseException = undefined
+
+      await client.getLatestDatasetInformationFromDOI(doi).catch(e => error = e)
+
+      expect(error).to.be.instanceOf(Error)
+      expect(error.message).to.be.equal(errorMessage)
+      expect(error.errorCode).to.be.equal(errorCode)
     })
   })
 
@@ -777,61 +768,6 @@ describe('DataverseClient', () => {
       let error: DataverseException = undefined
 
       await client.getDatasetVersion(datasetId, version).catch(e => error = e)
-
-      expect(error).to.be.instanceOf(Error)
-      expect(error.message).to.be.equal(errorMessage)
-      expect(error.errorCode).to.be.equal(errorCode)
-    })
-  })
-
-  describe('getDatasetVersionFromDOI', () => {
-    let mockDoi: string
-    let mockVersion: string
-
-    beforeEach(() => {
-      mockDoi = `${random.number()}.${random.number()}/${random.word()}/${random.word()}`
-      mockVersion = random.number().toString()
-    })
-
-    it('should call axios with expected url', async () => {
-      await client.getDatasetVersionFromDOI(mockDoi, mockVersion)
-
-      assert.calledOnce(axiosGetStub)
-      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/:persistentId/versions/${mockVersion}?persistentId=doi:${mockDoi}`, { headers: { 'X-Dataverse-key': apiToken } })
-    })
-
-    it('should call axios with expected headers when no apiToken provided', async () => {
-      client = new DataverseClient(host)
-
-      await client.getDatasetVersionFromDOI(mockDoi, mockVersion)
-
-      assert.calledOnce(axiosGetStub)
-      assert.calledWithExactly(axiosGetStub, `${host}/api/datasets/:persistentId/versions/${mockVersion}?persistentId=doi:${mockDoi}`, { headers: { 'X-Dataverse-key': '' } })
-    })
-
-    it('should return expected response', async () => {
-      const randomValue = random.word()
-      const expectedResponse = {
-        ...mockResponse,
-        'test': randomValue
-      }
-      axiosGetStub
-        .withArgs(`${host}/api/datasets/:persistentId/versions/${mockVersion}?persistentId=doi:${mockDoi}`, { headers: { 'X-Dataverse-key': apiToken } })
-        .resolves({ ...mockResponse, 'test': randomValue })
-
-      const response = await client.getDatasetVersionFromDOI(mockDoi, mockVersion)
-
-      expect(response).to.be.deep.equal(expectedResponse)
-    })
-
-    it('should throw expected error', async () => {
-      const errorMessage = random.words()
-      const errorCode = random.number()
-      axiosGetStub.rejects({ response: { status: errorCode, data: { message: errorMessage } } })
-
-      let error: DataverseException = undefined
-
-      await client.getDatasetVersionFromDOI(mockDoi, mockVersion).catch(e => error = e)
 
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)

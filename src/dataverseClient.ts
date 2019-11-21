@@ -7,7 +7,6 @@ import { BasicDatasetInformation } from './@types/basicDataset'
 import { DatasetUtil } from './utils/datasetUtil'
 import request from 'request-promise'
 import { DatasetVersionUpgradeType } from './@types/datasetVersionUpgradeType'
-import { DatasetVersionType } from './@types/datasetVersionType'
 
 export class DataverseClient {
   private readonly host: string
@@ -64,28 +63,14 @@ export class DataverseClient {
     return this.getRequest(url)
   }
 
-  public async getLatestPublishedDatasetInformation(datasetId: string): Promise<AxiosResponse> {
-    return this.getDatasetVersion(datasetId, DatasetVersionType.LATEST_PUBLISHED)
-  }
-
   public async getLatestDatasetInformation(datasetId: string): Promise<AxiosResponse> {
-    return this.getDatasetVersion(datasetId, DatasetVersionType.LATEST)
-  }
-
-  public async getDraftDatasetInformation(datasetId: string): Promise<AxiosResponse> {
-    return this.getDatasetVersion(datasetId, DatasetVersionType.DRAFT)
-  }
-
-  public async getLatestPublishedDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {
-    return this.getDatasetVersionFromDOI(doi, DatasetVersionType.LATEST_PUBLISHED)
+    const url = `${this.host}/api/datasets/${datasetId}`
+    return this.getRequest(url)
   }
 
   public async getLatestDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {
-    return this.getDatasetVersionFromDOI(doi, DatasetVersionType.LATEST)
-  }
-
-  public async getDraftDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {
-    return this.getDatasetVersionFromDOI(doi, DatasetVersionType.DRAFT)
+    const url = `${this.host}/api/datasets/:persistentId?persistentId=doi:${doi}`
+    return this.getRequest(url)
   }
 
   public async getDatasetVersions(datasetId: string): Promise<AxiosResponse> {
@@ -95,11 +80,6 @@ export class DataverseClient {
 
   public async getDatasetVersion(datasetId: string, version: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/datasets/${datasetId}/versions/${version}`
-    return this.getRequest(url)
-  }
-
-  public async getDatasetVersionFromDOI(doi: string, version: string): Promise<AxiosResponse> {
-    const url = `${this.host}/api/datasets/:persistentId/versions/${version}?persistentId=doi:${doi}`
     return this.getRequest(url)
   }
 
