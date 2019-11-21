@@ -32,9 +32,17 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 
 `public async getFileMetadata(fileId: string, draftVersion: boolean = false): Promise<AxiosResponse> {`
 
+`public async getLatestPublishedDatasetInformation(datasetId: string): Promise<AxiosResponse> {`
+
 `public async getLatestDatasetInformation(datasetId: string): Promise<AxiosResponse> {`
 
+`public async getDraftDatasetInformation(datasetId: string): Promise<AxiosResponse> {`
+
+`public async getLatestPublishedDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {`
+
 `public async getLatestDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {`
+
+`public async getDraftDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {`
 
 `public async getDatasetVersions(datasetId: string): Promise<AxiosResponse> {`
 
@@ -44,6 +52,8 @@ public async getDatasetVersion(datasetId: string, version: string): Promise<Axio
 Note: Version must be published, e.g.:
 http://demo.dataverse.org/api/datasets/389608/versions/1
 ```
+
+`public async getDatasetVersionFromDOI(doi: string, version: string): Promise<AxiosResponse> {`
 
 `public async listDataverseRoleAssignments(dataverseAlias: string): Promise<AxiosResponse> {`
 
