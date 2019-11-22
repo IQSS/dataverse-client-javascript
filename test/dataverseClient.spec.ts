@@ -359,7 +359,7 @@ describe('DataverseClient', () => {
       await client.searchOnlyPublished({ query: mockQuery, type, dataverseAlias: mockDataverseAlias })
 
       assert.calledOnce(searchStub)
-      assert.calledWithExactly(searchStub, expectedOptions, {})
+      assert.calledWithExactly(searchStub, expectedOptions, {'X-Dataverse-key': ''})
     })
   })
 

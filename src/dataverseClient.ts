@@ -52,7 +52,9 @@ export class DataverseClient {
   }
 
   public async searchOnlyPublished(options: SearchOptions): Promise<AxiosResponse> {
-    return this.search(options, {})
+    return this.search(options, {
+      'X-Dataverse-key': ''
+    })
   }
 
   public async getFile(fileId: string): Promise<AxiosResponse> {
