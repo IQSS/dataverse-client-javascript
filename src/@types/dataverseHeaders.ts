@@ -1,4 +1,4 @@
 export interface DataverseHeaders {
-  'X-Dataverse-key': string,
+  'X-Dataverse-key'?: string,
   'Content-Type'?: string
 }
