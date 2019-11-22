@@ -7,7 +7,7 @@ import { BasicDatasetInformation } from './@types/basicDataset'
 import { DatasetUtil } from './utils/datasetUtil'
 import request from 'request-promise'
 import { DatasetVersionUpgradeType } from './@types/datasetVersionUpgradeType'
-import { DatasetVersionType } from "./@types/datasetVersionType"
+import { DatasetVersionType } from './@types/datasetVersionType'
 
 export class DataverseClient {
   private readonly host: string
