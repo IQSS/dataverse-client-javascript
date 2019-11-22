@@ -28,11 +28,17 @@ const response = await client.getDataverseInformation('myDataverseAlias')
 
 `public async search(options: SearchOptions): Promise<AxiosResponse> {`
 
+`public async searchOnlyPublished(options: SearchOptions): Promise<AxiosResponse> {`
+
 `public async getFile(fileId: string): Promise<AxiosResponse> {`
 
 `public async getFileMetadata(fileId: string, draftVersion: boolean = false): Promise<AxiosResponse> {`
 
 `public async getLatestDatasetInformation(datasetId: string): Promise<AxiosResponse> {`
+
+`public async getLatestPublishedDatasetVersion(datasetId: string): Promise<AxiosResponse> {`
+
+`public async getDraftDatasetVersion(datasetId: string): Promise<AxiosResponse> {`
 
 `public async getLatestDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {`
 

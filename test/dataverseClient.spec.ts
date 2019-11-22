@@ -1,4 +1,4 @@
-import { DataverseClient, DataverseSearchOptions, SearchType } from '../src/index'
+import { DataverseClient, DataverseSearchOptions, SearchOptions, SearchType } from '../src/index'
 import { assert, createSandbox, SinonSandbox, SinonStub } from 'sinon'
 import { expect } from 'chai'
 import axios from 'axios'
@@ -338,6 +338,31 @@ describe('DataverseClient', () => {
     })
   })
 
+  describe('searchOnlyPublished', () => {
+    let searchStub: SinonStub
+
+    beforeEach(() => {
+      searchStub = sandbox
+        .stub(DataverseClient.prototype, 'search')
+    })
+
+    it('should call search with expected options', async () => {
+      const mockQuery = random.word()
+      const type: SearchType = SearchType.DATASET
+      const mockDataverseAlias = random.word()
+      const expectedOptions: SearchOptions = {
+        query: mockQuery,
+        dataverseAlias: mockDataverseAlias,
+        type
+      }
+
+      await client.searchOnlyPublished({ query: mockQuery, type, dataverseAlias: mockDataverseAlias })
+
+      assert.calledOnce(searchStub)
+      assert.calledWithExactly(searchStub, expectedOptions, {})
+    })
+  })
+
   describe('search', () => {
     it('should call axios with expected url and options', async () => {
       const query = random.word()
@@ -357,7 +382,10 @@ describe('DataverseClient', () => {
 
       assert.calledOnce(axiosGetStub)
       assert.calledWithExactly(axiosGetStub, `${host}/api/search`, {
-        params: expectedOptions
+        params: expectedOptions,
+        headers: {
+          'X-Dataverse-key': apiToken
+        }
       })
     })
 
@@ -611,6 +639,43 @@ describe('DataverseClient', () => {
       expect(error).to.be.instanceOf(Error)
       expect(error.message).to.be.equal(errorMessage)
       expect(error.errorCode).to.be.equal(errorCode)
+    })
+  })
+
+  describe('getLatestPublishedDatasetVersion', () => {
+    let mockDatasetId: string
+
+    let getDatasetVersionStub: SinonStub
+
+    beforeEach(() => {
+      mockDatasetId = random.number().toString()
+      getDatasetVersionStub = sandbox.stub(DataverseClient.prototype, 'getDatasetVersion')
+    })
+
+    it('should call get dataset version with expected input', async () => {
+      await client.getLatestPublishedDatasetVersion(mockDatasetId)
+
+      assert.calledOnce(getDatasetVersionStub)
+      assert.calledWithExactly(getDatasetVersionStub, mockDatasetId, ':latest-published')
+    })
+  })
+
+  describe('getDraftDatasetVersion', () => {
+    let mockDatasetId: string
+
+    let getDatasetVersionStub: SinonStub
+
+    beforeEach(() => {
+      mockDatasetId = random.number().toString()
+
+      getDatasetVersionStub = sandbox.stub(DataverseClient.prototype, 'getDatasetVersion')
+    })
+
+    it('should call get dataset version with expected input', async () => {
+      await client.getDraftDatasetVersion(mockDatasetId)
+
+      assert.calledOnce(getDatasetVersionStub)
+      assert.calledWithExactly(getDatasetVersionStub, mockDatasetId, ':draft')
     })
   })
 
