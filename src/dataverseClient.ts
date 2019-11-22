@@ -7,6 +7,7 @@ import { BasicDatasetInformation } from './@types/basicDataset'
 import { DatasetUtil } from './utils/datasetUtil'
 import request from 'request-promise'
 import { DatasetVersionUpgradeType } from './@types/datasetVersionUpgradeType'
+import { DatasetVersionType } from "./@types/datasetVersionType"
 
 export class DataverseClient {
   private readonly host: string
@@ -44,10 +45,14 @@ export class DataverseClient {
     })
   }
 
-  public async search(options: SearchOptions): Promise<AxiosResponse> {
+  public async search(options: SearchOptions, headers: DataverseHeaders = this.getHeaders()): Promise<AxiosResponse> {
     const url = `${this.host}/api/search`
     const requestOptions: DataverseSearchOptions = this.mapSearchOptions(options)
-    return this.getRequest(url, { params: requestOptions })
+    return this.getRequest(url, { params: requestOptions, headers: headers })
+  }
+
+  public async searchOnlyPublished(options: SearchOptions): Promise<AxiosResponse> {
+    return this.search(options, {})
   }
 
   public async getFile(fileId: string): Promise<AxiosResponse> {
@@ -66,6 +71,14 @@ export class DataverseClient {
   public async getLatestDatasetInformation(datasetId: string): Promise<AxiosResponse> {
     const url = `${this.host}/api/datasets/${datasetId}`
     return this.getRequest(url)
+  }
+
+  public async getLatestPublishedDatasetVersion(datasetId: string): Promise<AxiosResponse> {
+    return this.getDatasetVersion(datasetId, DatasetVersionType.LATEST_PUBLISHED)
+  }
+
+  public async getDraftDatasetVersion(datasetId: string): Promise<AxiosResponse> {
+    return this.getDatasetVersion(datasetId, DatasetVersionType.DRAFT)
   }
 
   public async getLatestDatasetInformationFromDOI(doi: string): Promise<AxiosResponse> {
