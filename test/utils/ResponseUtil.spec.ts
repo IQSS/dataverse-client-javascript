@@ -2,7 +2,7 @@ import { ResponseUtil } from '../../src/utils/ResponseUtil'
 import { random } from 'faker'
 
 describe('ResponseUtil', () => {
-  describe('getErrorMessage', () => {
+  describe('getErrorBody', () => {
     let mockMessage: string
 
     beforeEach(() => {
@@ -10,9 +10,9 @@ describe('ResponseUtil', () => {
     })
 
     it('should return expected message', () => {
-      const expectedResult: string = mockMessage
+      const expectedResult: string = JSON.stringify({ message: mockMessage })
 
-      const result: string = ResponseUtil.getErrorMessage(JSON.stringify({ message: mockMessage }))
+      const result: string = ResponseUtil.getErrorBody(JSON.stringify({ message: mockMessage }))
 
       expect(result).toEqual(expectedResult)
     })
