@@ -8,6 +8,7 @@ import { DatasetUtil } from './utils/datasetUtil'
 import request from 'request-promise'
 import { DatasetVersionUpgradeType } from './@types/datasetVersionUpgradeType'
 import { DatasetVersionType } from './@types/datasetVersionType'
+import { ResponseUtil } from './utils/ResponseUtil'
 
 export class DataverseClient {
   private readonly host: string
@@ -120,7 +121,7 @@ export class DataverseClient {
     }
 
     return request.post(options).catch(error => {
-      throw new DataverseException(error.response.statusCode, error.response.body ? JSON.parse(error.response.body).message : '')
+      throw new DataverseException(error.response.statusCode, ResponseUtil.getErrorMessage(error.response.body))
     })
   }
 
@@ -163,7 +164,7 @@ export class DataverseClient {
     }
 
     return request.post(options).catch(error => {
-      throw new DataverseException(error.response.statusCode, error.response.body ? error.response.body.message : '')
+      throw new DataverseException(error.response.statusCode, ResponseUtil.getErrorMessage(error.response.body))
     })
   }
 
