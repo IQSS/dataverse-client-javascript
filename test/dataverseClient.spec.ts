@@ -359,7 +359,7 @@ describe('DataverseClient', () => {
       await client.searchOnlyPublished({ query: mockQuery, type, dataverseAlias: mockDataverseAlias })
 
       assert.calledOnce(searchStub)
-      assert.calledWithExactly(searchStub, expectedOptions, {'X-Dataverse-key': ''})
+      assert.calledWithExactly(searchStub, expectedOptions, { 'X-Dataverse-key': '' })
     })
   })
 
@@ -1147,10 +1147,15 @@ describe('DataverseClient', () => {
     const testFile = fs.readFileSync(path.resolve(__dirname, '../test/assets/test-file.csv'), 'base64')
     const fileBuffer = Buffer.from(testFile, 'base64')
 
-    it('should call request with expected url', async () => {
-      const mockFileId: string = random.number().toString()
-      const mockFilename: string = system.fileName()
+    let mockFileId: string
+    let mockFilename: string
 
+    beforeEach(() => {
+      mockFileId = random.number().toString()
+      mockFilename = system.fileName()
+    })
+
+    it('should call request with expected input', async () => {
       const expectedRequest = {
         url: `${host}/api/files/${mockFileId}/replace`,
         headers: { 'X-Dataverse-key': apiToken },
@@ -1160,7 +1165,8 @@ describe('DataverseClient', () => {
             options: {
               filename: mockFilename
             }
-          }
+          },
+          jsonData: JSON.stringify({})
         },
         resolveWithFullResponse: true
       }
@@ -1171,9 +1177,39 @@ describe('DataverseClient', () => {
       assert.calledWithExactly(requestPostStub, expectedRequest)
     })
 
+    describe('with json data', () => {
+      it('should call request with expected input', async () => {
+        const mockDescription: string = random.words()
+
+        const expectedRequest = {
+          url: `${host}/api/files/${mockFileId}/replace`,
+          headers: { 'X-Dataverse-key': apiToken },
+          formData: {
+            file: {
+              value: fileBuffer,
+              options: {
+                filename: mockFilename
+              }
+            },
+            jsonData: JSON.stringify({
+              forceReplace: true,
+              description: mockDescription
+            })
+          },
+          resolveWithFullResponse: true
+        }
+
+        await client.replaceFile(mockFileId, mockFilename, fileBuffer, {
+          forceReplace: true,
+          description: mockDescription
+        })
+
+        assert.calledOnce(requestPostStub)
+        assert.calledWithExactly(requestPostStub, expectedRequest)
+      })
+    })
+
     it('should return expected response', async () => {
-      const mockFileId: string = random.number().toString()
-      const mockFilename: string = system.fileName()
       const randomValue = random.word()
       const expectedResponse = {
         ...mockResponse,
@@ -1189,7 +1225,8 @@ describe('DataverseClient', () => {
             options: {
               filename: mockFilename
             }
-          }
+          },
+          jsonData: JSON.stringify({})
         },
         resolveWithFullResponse: true
       }
@@ -1202,11 +1239,9 @@ describe('DataverseClient', () => {
     })
 
     it('should throw expected error', async () => {
-      const mockFileId: string = random.number().toString()
-      const mockFilename: string = system.fileName()
       const errorMessage = random.words()
       const errorCode = random.number()
-      requestPostStub.rejects({ response: { statusCode: errorCode, body: JSON.stringify({ message: errorMessage }) } })
+      requestPostStub.rejects({ response: { statusCode: errorCode, body: { message: errorMessage } } })
 
       let error: DataverseException = undefined
 
