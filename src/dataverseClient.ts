@@ -144,7 +144,7 @@ export class DataverseClient {
     return this.getRequest(url)
   }
 
-  public async replaceFile(fileId: string, filename: string, fileBuffer: Buffer): Promise<any> {
+  public async replaceFile(fileId: string, filename: string, fileBuffer: Buffer, jsonData: object = {}): Promise<any> {
     const url = `${this.host}/api/files/${fileId}/replace`
 
     const options = {
@@ -155,14 +155,15 @@ export class DataverseClient {
           value: fileBuffer,
           options: {
             filename: filename
-          }
-        }
+          },
+        },
+        jsonData: JSON.stringify(jsonData)
       },
       resolveWithFullResponse: true
     }
 
     return request.post(options).catch(error => {
-      throw new DataverseException(error.response.statusCode, error.response.body ? JSON.parse(error.response.body).message : '')
+      throw new DataverseException(error.response.statusCode, error.response.body ? error.response.body.message : '')
     })
   }
 
