@@ -1,5 +1,13 @@
 export class ResponseUtil {
-  public static getErrorBody(errorBody: string): string {
-    return errorBody ? errorBody : ''
+  public static getErrorMessage(errorBody: string): string {
+    let message: string
+    try {
+      message = JSON.parse(errorBody).message
+    }
+    catch {
+      message = ''
+    }
+
+    return message
   }
 }

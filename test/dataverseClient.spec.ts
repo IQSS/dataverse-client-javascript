@@ -30,7 +30,7 @@ describe('DataverseClient', () => {
   let requestPostStub: SinonStub
 
   let mapBasicDatasetInformationStub: SinonStub
-  let getErrorBodyStub: SinonStub
+  let getErrorMessageStub: SinonStub
 
   beforeEach(() => {
     apiToken = random.uuid()
@@ -65,7 +65,7 @@ describe('DataverseClient', () => {
     requestPostStub = sandbox.stub(request, 'post').resolves(mockResponse)
 
     mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
-    getErrorBodyStub = sandbox.stub(ResponseUtil, 'getErrorBody').returns(mockErrorMessage)
+    getErrorMessageStub = sandbox.stub(ResponseUtil, 'getErrorMessage').returns(mockErrorMessage)
   })
 
   afterEach(() => {
@@ -981,14 +981,14 @@ describe('DataverseClient', () => {
         })
       })
 
-      it('should call getErrorBody', async () => {
+      it('should call getErrorMessage', async () => {
         let error: DataverseException = undefined
 
         await client.uploadDatasetThumbnail(datasetId, imageBuffer).catch(e => error = e)
 
         expect(error).to.be.instanceOf(Error)
-        assert.calledOnce(getErrorBodyStub)
-        assert.calledWithExactly(getErrorBodyStub, mockBody)
+        assert.calledOnce(getErrorMessageStub)
+        assert.calledWithExactly(getErrorMessageStub, mockBody)
       })
 
       it('should throw expected error', async () => {
@@ -1282,14 +1282,14 @@ describe('DataverseClient', () => {
         })
       })
 
-      it('should call getErrorBody', async () => {
+      it('should call getErrorMessage', async () => {
         let error: DataverseException = undefined
 
         await client.replaceFile(mockFileId, mockFilename, fileBuffer).catch(e => error = e)
 
         expect(error).to.be.instanceOf(Error)
-        assert.calledOnce(getErrorBodyStub)
-        assert.calledWithExactly(getErrorBodyStub, mockBody)
+        assert.calledOnce(getErrorMessageStub)
+        assert.calledWithExactly(getErrorMessageStub, mockBody)
       })
 
       it('should throw expected error', async () => {
