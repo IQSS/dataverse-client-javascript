@@ -12,6 +12,7 @@ import { BasicDatasetInformation } from '../src/@types/basicDataset'
 import { DatasetUtil } from '../src/utils/datasetUtil'
 import fs from 'fs'
 import { DatasetVersionUpgradeType } from '../src/@types/datasetVersionUpgradeType'
+import { ResponseUtil } from '../src/utils/ResponseUtil'
 
 describe('DataverseClient', () => {
   const sandbox: SinonSandbox = createSandbox()
@@ -20,6 +21,7 @@ describe('DataverseClient', () => {
   let host: string
   let client: DataverseClient
 
+  let mockErrorMessage: string
   let mockResponse: object
   let mockDatasetInformation: object
 
@@ -28,12 +30,14 @@ describe('DataverseClient', () => {
   let requestPostStub: SinonStub
 
   let mapBasicDatasetInformationStub: SinonStub
+  let getErrorMessageStub: SinonStub
 
   beforeEach(() => {
     apiToken = random.uuid()
     host = internet.url()
     client = new DataverseClient(host, apiToken)
 
+    mockErrorMessage = random.words()
     mockResponse = {
       status: random.number(),
       data: {}
@@ -61,6 +65,7 @@ describe('DataverseClient', () => {
     requestPostStub = sandbox.stub(request, 'post').resolves(mockResponse)
 
     mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
+    getErrorMessageStub = sandbox.stub(ResponseUtil, 'getErrorMessage').returns(mockErrorMessage)
   })
 
   afterEach(() => {
@@ -905,8 +910,13 @@ describe('DataverseClient', () => {
     const testImage = fs.readFileSync(path.resolve(__dirname, '../test/assets/theam.png'), 'base64')
     const imageBuffer = Buffer.from(testImage, 'base64')
 
+    let datasetId: string
+
+    beforeEach(() => {
+      datasetId = random.number().toString()
+    })
+
     it('should call request with expected url', async () => {
-      const datasetId: string = random.number().toString()
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
         headers: { 'X-Dataverse-key': apiToken },
@@ -921,7 +931,6 @@ describe('DataverseClient', () => {
     })
 
     it('should call request with expected headers when no apiToken provided', async () => {
-      const datasetId: string = random.number().toString()
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
         headers: { 'X-Dataverse-key': '' },
@@ -942,7 +951,6 @@ describe('DataverseClient', () => {
         ...mockResponse,
         'test': randomValue
       }
-      const datasetId: string = random.number().toString()
 
       const expectedRequest = {
         url: `${host}/api/datasets/${datasetId}/thumbnail`,
@@ -958,19 +966,40 @@ describe('DataverseClient', () => {
       expect(response).to.be.deep.equal(expectedResponse)
     })
 
-    it('should throw expected error', async () => {
-      const datasetId = random.word()
-      const errorMessage = random.words()
-      const errorCode = random.number()
-      requestPostStub.rejects({ response: { statusCode: errorCode, body: JSON.stringify({ message: errorMessage }) } })
+    describe('on error', () => {
+      let mockErrorCode: number
+      let mockBody: string
 
-      let error: DataverseException = undefined
+      beforeEach(() => {
+        mockErrorCode = random.number()
+        mockBody = random.words()
+        requestPostStub.rejects({
+          response: {
+            statusCode: mockErrorCode,
+            body: mockBody
+          }
+        })
+      })
 
-      await client.uploadDatasetThumbnail(datasetId, imageBuffer).catch(e => error = e)
+      it('should call getErrorMessage', async () => {
+        let error: DataverseException = undefined
 
-      expect(error).to.be.instanceOf(Error)
-      expect(error.message).to.be.equal(errorMessage)
-      expect(error.errorCode).to.be.equal(errorCode)
+        await client.uploadDatasetThumbnail(datasetId, imageBuffer).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        assert.calledOnce(getErrorMessageStub)
+        assert.calledWithExactly(getErrorMessageStub, mockBody)
+      })
+
+      it('should throw expected error', async () => {
+        let error: DataverseException = undefined
+
+        await client.uploadDatasetThumbnail(datasetId, imageBuffer).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(mockErrorMessage)
+        expect(error.errorCode).to.be.equal(mockErrorCode)
+      })
     })
   })
 
@@ -1238,18 +1267,40 @@ describe('DataverseClient', () => {
       expect(response).to.be.deep.equal(expectedResponse)
     })
 
-    it('should throw expected error', async () => {
-      const errorMessage = random.words()
-      const errorCode = random.number()
-      requestPostStub.rejects({ response: { statusCode: errorCode, body: { message: errorMessage } } })
+    describe('on error', () => {
+      let mockErrorCode: number
+      let mockBody: string
 
-      let error: DataverseException = undefined
+      beforeEach(() => {
+        mockErrorCode = random.number()
+        mockBody = random.words()
+        requestPostStub.rejects({
+          response: {
+            statusCode: mockErrorCode,
+            body: mockBody
+          }
+        })
+      })
 
-      await client.replaceFile(mockFileId, mockFilename, fileBuffer).catch(e => error = e)
+      it('should call getErrorMessage', async () => {
+        let error: DataverseException = undefined
 
-      expect(error).to.be.instanceOf(Error)
-      expect(error.message).to.be.equal(errorMessage)
-      expect(error.errorCode).to.be.equal(errorCode)
+        await client.replaceFile(mockFileId, mockFilename, fileBuffer).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        assert.calledOnce(getErrorMessageStub)
+        assert.calledWithExactly(getErrorMessageStub, mockBody)
+      })
+
+      it('should throw expected error', async () => {
+        let error: DataverseException = undefined
+
+        await client.replaceFile(mockFileId, mockFilename, fileBuffer).catch(e => error = e)
+
+        expect(error).to.be.instanceOf(Error)
+        expect(error.message).to.be.equal(mockErrorMessage)
+        expect(error.errorCode).to.be.equal(mockErrorCode)
+      })
     })
   })
 
