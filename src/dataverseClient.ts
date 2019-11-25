@@ -58,8 +58,8 @@ export class DataverseClient {
     })
   }
 
-  public async getFile(fileId: string): Promise<AxiosResponse> {
-    const url = `${this.host}/api/access/datafile/${fileId}`
+  public async getFile(fileId: string, getOriginal = true): Promise<AxiosResponse> {
+    const url = `${this.host}/api/access/datafile/${fileId}${getOriginal ? '?format=original' : ''}`
     return this.getRequest(url, {
       headers: this.getHeaders(),
       responseType: 'arraybuffer'
