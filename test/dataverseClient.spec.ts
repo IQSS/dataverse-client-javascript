@@ -434,9 +434,23 @@ describe('DataverseClient', () => {
       await client.getFile(fileId)
 
       assert.calledOnce(axiosGetStub)
-      assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}`, {
+      assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}?format=original`, {
         headers: { 'X-Dataverse-key': apiToken },
         responseType: 'arraybuffer'
+      })
+    })
+
+    describe('get ingested file', () => {
+      it('should call axios with expected url', async () => {
+        const fileId: string = random.number().toString()
+
+        await client.getFile(fileId, false)
+
+        assert.calledOnce(axiosGetStub)
+        assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}`, {
+          headers: { 'X-Dataverse-key': apiToken },
+          responseType: 'arraybuffer'
+        })
       })
     })
 
@@ -447,7 +461,7 @@ describe('DataverseClient', () => {
       await client.getFile(fileId)
 
       assert.calledOnce(axiosGetStub)
-      assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}`, {
+      assert.calledWithExactly(axiosGetStub, `${host}/api/access/datafile/${fileId}?format=original`, {
         headers: { 'X-Dataverse-key': '' },
         responseType: 'arraybuffer'
       })
@@ -461,7 +475,7 @@ describe('DataverseClient', () => {
         'test': randomValue
       }
       axiosGetStub
-        .withArgs(`${host}/api/access/datafile/${fileId}`, {
+        .withArgs(`${host}/api/access/datafile/${fileId}?format=original`, {
           headers: { 'X-Dataverse-key': apiToken },
           responseType: 'arraybuffer'
         })
