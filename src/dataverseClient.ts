@@ -201,7 +201,8 @@ export class DataverseClient {
       order: options.order,
       'per_page': options.itemsPerPage,
       'show_entity_ids': options.showEntityIds,
-      'show_relevance': options.showRelevance
+      'show_relevance': options.showRelevance,
+      fq: options.fq
     }
   }
 }
