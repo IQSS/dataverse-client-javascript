@@ -372,6 +372,7 @@ describe('DataverseClient', () => {
     it('should call axios with expected url and options', async () => {
       const query = random.word()
       const type: SearchType = SearchType.DATASET
+      const fq = 'publicationStatus:Published'
       const expectedOptions: DataverseSearchOptions = {
         q: query,
         subtree: undefined,
@@ -381,9 +382,10 @@ describe('DataverseClient', () => {
         order: undefined,
         'per_page': undefined,
         'show_entity_ids': undefined,
-        'show_relevance': undefined
+        'show_relevance': undefined,
+        fq: fq
       }
-      await client.search({ query, type })
+      await client.search({ query, type, fq })
 
       assert.calledOnce(axiosGetStub)
       assert.calledWithExactly(axiosGetStub, `${host}/api/search`, {
