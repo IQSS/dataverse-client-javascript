@@ -27,6 +27,7 @@ describe('DataverseClient', () => {
 
   let axiosGetStub: SinonStub
   let axiosPostStub: SinonStub
+  let axiosPutStub: SinonStub
   let requestPostStub: SinonStub
 
   let mapBasicDatasetInformationStub: SinonStub
@@ -62,6 +63,7 @@ describe('DataverseClient', () => {
 
     axiosGetStub = sandbox.stub(axios, 'get').resolves(mockResponse)
     axiosPostStub = sandbox.stub(axios, 'post').resolves(mockResponse)
+    axiosPutStub = sandbox.stub(axios, 'put').resolves(mockResponse)
     requestPostStub = sandbox.stub(request, 'post').resolves(mockResponse)
 
     mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
@@ -1478,6 +1480,33 @@ describe('DataverseClient', () => {
         expect(error).to.be.instanceOf(Error)
         expect(error.message).to.be.equal(errorMessage)
         expect(error.errorCode).to.be.equal(errorCode)
+      })
+    })
+  })
+
+  describe('updateDataset()', () => {
+    it('should call axios with expected url', async () => {
+      const datasetId = random.number().toString()
+      const datasetInformation: BasicDatasetInformation = {
+        title: 's',
+        descriptions: [{ text: 'some ', date: '2019-09-09' }],
+        authors: [
+          {
+            fullname: 'tester tests'
+          }
+        ],
+        contact: [{ email: 'tai@theagilemonkeys.com', fullname: 'Tai Nguyen' }],
+        subject: [DatasetSubjects.AGRICULTURAL_SCIENCE]
+      }
+
+      await client.updateDataset(datasetId, datasetInformation)
+
+      assert.calledOnce(axiosPutStub)
+      assert.calledWithExactly(axiosPutStub, `${host}/api/datasets/:persistentId/versions/:draft?persistentId=${datasetId}`, {
+        headers: {
+          'X-Dataverse-key': apiToken,
+          'Content-Type': 'application/json'
+        }
       })
     })
   })

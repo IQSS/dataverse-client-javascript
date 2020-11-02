@@ -173,6 +173,18 @@ export class DataverseClient {
     return this.postRequest(url, '')
   }
 
+  public async updateDataset(datasetId: string, datasetInformation: BasicDatasetInformation): Promise<AxiosResponse> {
+    const url = `${this.host}/api/datasets/:persistentId/versions/:draft?persistentId=${datasetId}`
+    const payload: any = DatasetUtil.mapBasicDatasetInformation(datasetInformation)
+
+    return this.putRequest(url, payload.datasetVersion, {
+      headers: {
+        ...this.getHeaders(),
+        'Content-Type': 'application/json'
+      }
+    })
+  }
+
   private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders, responseType?: ResponseType } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.get(url, options).catch(error => {
       throw new DataverseException(error.response.status, error.response.data ? error.response.data.message : '')
@@ -181,6 +193,12 @@ export class DataverseClient {
 
   private async postRequest(url: string, data: string | object, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.post(url, JSON.stringify(data), options).catch(error => {
+      throw new DataverseException(error.response.status, error.response.data ? error.response.data.message : '')
+    })
+  }
+
+  private async putRequest(url: string, data: string | object, options: { params?: object, headers?: DataverseHeaders } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
+    return await axios.put(url, JSON.stringify(data), options).catch(error => {
       throw new DataverseException(error.response.status, error.response.data ? error.response.data.message : '')
     })
   }
