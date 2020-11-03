@@ -1502,7 +1502,8 @@ describe('DataverseClient', () => {
       await client.updateDataset(datasetId, datasetInformation)
 
       assert.calledOnce(axiosPutStub)
-      assert.calledWithExactly(axiosPutStub, `${host}/api/datasets/:persistentId/versions/:draft?persistentId=${datasetId}`, {
+      const payload: any = DatasetUtil.mapBasicDatasetInformation(datasetInformation)
+      assert.calledWithExactly(axiosPutStub, `${host}/api/datasets/:persistentId/versions/:draft?persistentId=${datasetId}`, JSON.stringify(payload.datasetVersion), {
         headers: {
           'X-Dataverse-key': apiToken,
           'Content-Type': 'application/json'
