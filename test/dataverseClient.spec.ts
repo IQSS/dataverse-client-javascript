@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import axios from 'axios'
 import request from 'request-promise'
 import path from 'path'
-import { internet, random, system } from 'faker'
+import { internet, random, system, name, date } from 'faker'
 import { DataverseException } from '../src/exceptions/dataverseException'
 import { DataverseMetricType } from '../src/@types/dataverseMetricType'
 import { DatasetSubjects } from '../src/@types/datasetSubjects'
@@ -27,7 +27,9 @@ describe('DataverseClient', () => {
 
   let axiosGetStub: SinonStub
   let axiosPostStub: SinonStub
+  let axiosPutStub: SinonStub
   let requestPostStub: SinonStub
+  let axiosDeleteStub: SinonStub
 
   let mapBasicDatasetInformationStub: SinonStub
   let getErrorMessageStub: SinonStub
@@ -62,7 +64,9 @@ describe('DataverseClient', () => {
 
     axiosGetStub = sandbox.stub(axios, 'get').resolves(mockResponse)
     axiosPostStub = sandbox.stub(axios, 'post').resolves(mockResponse)
+    axiosPutStub = sandbox.stub(axios, 'put').resolves(mockResponse)
     requestPostStub = sandbox.stub(request, 'post').resolves(mockResponse)
+    axiosDeleteStub = sandbox.stub(axios, 'delete').resolves(mockResponse)
 
     mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
     getErrorMessageStub = sandbox.stub(ResponseUtil, 'getErrorMessage').returns(mockErrorMessage)
@@ -1480,5 +1484,46 @@ describe('DataverseClient', () => {
         expect(error.errorCode).to.be.equal(errorCode)
       })
     })
+
   })
+
+  describe('updateDataset()', () => {
+    it('should call axios with expected url', async () => {
+      const datasetId = random.number().toString()
+      const datasetInformation: BasicDatasetInformation = {
+        title: random.words(),
+        descriptions: [{ text: random.words(), date: date.recent().toString() }],
+        authors: [
+          {
+            fullname: name.findName()
+          }
+        ],
+        contact: [{ email: internet.email(), fullname: name.findName() }],
+        subject: [DatasetSubjects.AGRICULTURAL_SCIENCE]
+      }
+
+      await client.updateDataset(datasetId, datasetInformation)
+
+      assert.calledOnce(axiosPutStub)
+      const payload: any = DatasetUtil.mapBasicDatasetInformation(datasetInformation)
+      assert.calledWithExactly(axiosPutStub, `${host}/api/datasets/:persistentId/versions/:draft?persistentId=${datasetId}`, JSON.stringify(payload.datasetVersion), {
+        headers: {
+          'X-Dataverse-key': apiToken,
+          'Content-Type': 'application/json'
+        }
+      })
+    })
+  })
+
+  describe('deleteDataset()', () => {
+    it('should call axios with expected url', async () => {
+      const datasetId: string = random.number().toString()
+
+      await client.deleteDataset(datasetId)
+
+      assert.calledOnce(axiosDeleteStub)
+      assert.calledWithExactly(axiosDeleteStub, `${host}/api/datasets/:persistentId/destroy/?persistentId=${datasetId}`, { headers: { 'X-Dataverse-key': apiToken } })
+    })
+  })
+
 })
