@@ -61,6 +61,8 @@ http://demo.dataverse.org/api/datasets/389608/versions/1
 
 `public async publishDataset(datasetId: string, versionUpgradeType: DatasetVersionUpgradeType = DatasetVersionUpgradeType.MAJOR): Promise<AxiosResponse> {`
 
+`public async updateDataset(datasetId: string, datasetInformation: BasicDatasetInformation): Promise<AxiosResponse> {`
+
 `public async deleteDataset(datasetId: string): Promise<AxiosResponse> {`
 
 ## Build project
