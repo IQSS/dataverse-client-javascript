@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import axios from 'axios'
 import request from 'request-promise'
 import path from 'path'
-import { internet, random, system } from 'faker'
+import { internet, random, system, name, date } from 'faker'
 import { DataverseException } from '../src/exceptions/dataverseException'
 import { DataverseMetricType } from '../src/@types/dataverseMetricType'
 import { DatasetSubjects } from '../src/@types/datasetSubjects'
@@ -1488,14 +1488,14 @@ describe('DataverseClient', () => {
     it('should call axios with expected url', async () => {
       const datasetId = random.number().toString()
       const datasetInformation: BasicDatasetInformation = {
-        title: 's',
-        descriptions: [{ text: 'some ', date: '2019-09-09' }],
+        title: random.words(),
+        descriptions: [{ text: random.words(), date: date.recent().toString() }],
         authors: [
           {
-            fullname: 'tester tests'
+            fullname: name.findName()
           }
         ],
-        contact: [{ email: 'tai@theagilemonkeys.com', fullname: 'Tai Nguyen' }],
+        contact: [{ email: internet.email(), fullname: name.findName() }],
         subject: [DatasetSubjects.AGRICULTURAL_SCIENCE]
       }
 
