@@ -63,6 +63,8 @@ http://demo.dataverse.org/api/datasets/389608/versions/1
 
 `public async updateDataset(datasetId: string, datasetInformation: BasicDatasetInformation): Promise<AxiosResponse> {`
 
+`public async deleteDataset(datasetId: string): Promise<AxiosResponse> {`
+
 ## Build project
 
 In order to build the project, we need to run the following command:

@@ -29,6 +29,7 @@ describe('DataverseClient', () => {
   let axiosPostStub: SinonStub
   let axiosPutStub: SinonStub
   let requestPostStub: SinonStub
+  let axiosDeleteStub: SinonStub
 
   let mapBasicDatasetInformationStub: SinonStub
   let getErrorMessageStub: SinonStub
@@ -65,6 +66,7 @@ describe('DataverseClient', () => {
     axiosPostStub = sandbox.stub(axios, 'post').resolves(mockResponse)
     axiosPutStub = sandbox.stub(axios, 'put').resolves(mockResponse)
     requestPostStub = sandbox.stub(request, 'post').resolves(mockResponse)
+    axiosDeleteStub = sandbox.stub(axios, 'delete').resolves(mockResponse)
 
     mapBasicDatasetInformationStub = sandbox.stub(DatasetUtil, 'mapBasicDatasetInformation').returns(mockDatasetInformation)
     getErrorMessageStub = sandbox.stub(ResponseUtil, 'getErrorMessage').returns(mockErrorMessage)
@@ -1482,6 +1484,7 @@ describe('DataverseClient', () => {
         expect(error.errorCode).to.be.equal(errorCode)
       })
     })
+
   })
 
   describe('updateDataset()', () => {
@@ -1511,4 +1514,16 @@ describe('DataverseClient', () => {
       })
     })
   })
+
+  describe('deleteDataset()', () => {
+    it('should call axios with expected url', async () => {
+      const datasetId: string = random.number().toString()
+
+      await client.deleteDataset(datasetId)
+
+      assert.calledOnce(axiosDeleteStub)
+      assert.calledWithExactly(axiosDeleteStub, `${host}/api/datasets/:persistentId/destroy/?persistentId=${datasetId}`, { headers: { 'X-Dataverse-key': apiToken } })
+    })
+  })
+
 })
