@@ -190,6 +190,14 @@ export class DataverseClient {
     return this.deleteRequest(url)
   }
 
+  public async getDatasetFiles(datasetId: string): Promise<AxiosResponse> {
+    const url = `${this.host}/api/access/dataset/:persistentId/?persistentId=${datasetId}`
+    return this.getRequest(url, {
+      headers: this.getHeaders(),
+      responseType: 'arraybuffer'
+    })
+  }
+
   private async getRequest(url: string, options: { params?: object, headers?: DataverseHeaders, responseType?: ResponseType } = { headers: this.getHeaders() }): Promise<AxiosResponse> {
     return await axios.get(url, options).catch(error => {
       throw new DataverseException(error.response.status, error.response.data ? error.response.data.message : '')

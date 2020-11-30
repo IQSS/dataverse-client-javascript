@@ -1526,4 +1526,18 @@ describe('DataverseClient', () => {
     })
   })
 
+  describe('getDatasetFiles()', () => {
+    it('should call axios with expected url', async () => {
+      const datasetId: string = random.number.toString()
+
+      await client.getDatasetFiles(datasetId)
+
+      assert.calledOnce(axiosGetStub)
+      assert.calledWithExactly(axiosGetStub, `${host}/api/access/dataset/:persistentId/?persistentId=${datasetId}`, {
+        headers: { 'X-Dataverse-key': apiToken },
+        responseType: 'arraybuffer'
+      })
+    })
+  })
+
 })
