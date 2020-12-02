@@ -1337,7 +1337,7 @@ describe('DataverseClient', () => {
 
         assert.calledOnce(axiosPostStub)
         assert.calledWithExactly(axiosPostStub,
-          `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MINOR}`,
+          `${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MINOR}`,
           JSON.stringify(''),
           { headers: { 'X-Dataverse-key': apiToken } })
       })
@@ -1347,7 +1347,7 @@ describe('DataverseClient', () => {
         await client.publishDataset(datasetId, DatasetVersionUpgradeType.MINOR)
 
         assert.calledOnce(axiosPostStub)
-        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MINOR}`,
+        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MINOR}`,
           JSON.stringify(''),
           { headers: { 'X-Dataverse-key': '' } })
       })
@@ -1359,7 +1359,7 @@ describe('DataverseClient', () => {
           'test': randomValue
         }
         axiosPostStub
-          .withArgs(`${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MINOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
+          .withArgs(`${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MINOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
           .resolves({ ...mockResponse, 'test': randomValue })
 
         const response = await client.publishDataset(datasetId, DatasetVersionUpgradeType.MINOR)
@@ -1388,7 +1388,7 @@ describe('DataverseClient', () => {
 
         assert.calledOnce(axiosPostStub)
         assert.calledWithExactly(axiosPostStub,
-          `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`,
+          `${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MAJOR}`,
           JSON.stringify(''),
           { headers: { 'X-Dataverse-key': apiToken } })
       })
@@ -1398,7 +1398,7 @@ describe('DataverseClient', () => {
         await client.publishDataset(datasetId, DatasetVersionUpgradeType.MAJOR)
 
         assert.calledOnce(axiosPostStub)
-        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`,
+        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MAJOR}`,
           JSON.stringify(''),
           { headers: { 'X-Dataverse-key': '' } })
       })
@@ -1410,7 +1410,7 @@ describe('DataverseClient', () => {
           'test': randomValue
         }
         axiosPostStub
-          .withArgs(`${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
+          .withArgs(`${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MAJOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
           .resolves({ ...mockResponse, 'test': randomValue })
 
         const response = await client.publishDataset(datasetId, DatasetVersionUpgradeType.MAJOR)
@@ -1440,7 +1440,7 @@ describe('DataverseClient', () => {
 
         assert.calledOnce(axiosPostStub)
         assert.calledWithExactly(axiosPostStub,
-          `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`,
+          `${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MAJOR}`,
           JSON.stringify(''),
           { headers: { 'X-Dataverse-key': apiToken } })
       })
@@ -1450,7 +1450,7 @@ describe('DataverseClient', () => {
         await client.publishDataset(datasetId)
 
         assert.calledOnce(axiosPostStub)
-        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`,
+        assert.calledWithExactly(axiosPostStub, `${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MAJOR}`,
           JSON.stringify(''),
           { headers: { 'X-Dataverse-key': '' } })
       })
@@ -1462,7 +1462,7 @@ describe('DataverseClient', () => {
           'test': randomValue
         }
         axiosPostStub
-          .withArgs(`${host}/api/datasets/${datasetId}/actions/:publish?type=${DatasetVersionUpgradeType.MAJOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
+          .withArgs(`${host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${DatasetVersionUpgradeType.MAJOR}`, JSON.stringify(''), { headers: { 'X-Dataverse-key': apiToken } })
           .resolves({ ...mockResponse, 'test': randomValue })
 
         const response = await client.publishDataset(datasetId)
