@@ -169,7 +169,7 @@ export class DataverseClient {
   }
 
   public async publishDataset(datasetId: string, versionUpgradeType: DatasetVersionUpgradeType = DatasetVersionUpgradeType.MAJOR): Promise<AxiosResponse> {
-    const url = `${this.host}/api/datasets/${datasetId}/actions/:publish?type=${versionUpgradeType}`
+    const url = `${this.host}/api/datasets/:persistentId/actions/:publish?persistentId=${datasetId}&type=${versionUpgradeType}`
     return this.postRequest(url, '')
   }
 
