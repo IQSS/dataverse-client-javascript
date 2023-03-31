@@ -1,4 +1,4 @@
-import { DataverseClient, DataverseSearchOptions, SearchOptions, SearchType } from '../src/index'
+import { DataverseClient, DataverseSearchOptions, SearchOptions, SearchType } from '../../src/index'
 import { assert, createSandbox, SinonSandbox, SinonStub } from 'sinon'
 import { expect } from 'chai'
 import axios from 'axios'
