@@ -1,7 +1,7 @@
 {
   "name": "js-dataverse",
   "version": "2.0.0",
-  "description": "A Dataverse module for JavaScript/TypeScript",
+  "description": "Dataverse API wrapper package for JavaScript/TypeScript-based applications",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
