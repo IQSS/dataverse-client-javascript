@@ -12,5 +12,5 @@ export enum DatasetSubjects {
   MEDICINE_HEALTH_AND_LIFE_SCIENCE = 'Medicine, Health and Life Sciences',
   PHYSICS = 'Physics',
   SOCIAL_SCIENCES = 'Social Sciences',
-  OTHER = 'Other'
+  OTHER = 'Other',
 }

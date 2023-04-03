@@ -10,5 +10,5 @@ export enum DataverseMetricType {
   DOWNLOADS_TOTAL_MACHINE = 'downloadsTotalMachine',
   DOWNLOADS_UNIQUE = 'downloadsUnique',
   DOWNLOADS_UNIQUE_REGULAR = 'downloadsUniqueRegular',
-  DOWNLOADS_UNIQUE_MACHINE = 'downloadsUniqueMachine'
+  DOWNLOADS_UNIQUE_MACHINE = 'downloadsUniqueMachine',
 }

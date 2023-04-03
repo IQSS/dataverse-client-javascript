@@ -1,35 +1,35 @@
 import {
   MetadataBlockField,
-  MetadataBlockFieldAuthor, MetadataBlockFieldContact,
-  MetadataBlockFieldDescription
-} from '../@types/metadataBlockField'
-import { FieldTypeClass } from '../@types/FieldTypeClass'
-import { BasicDatasetAuthor, BasicDatasetContact, BasicDatasetDescription } from '../@types/basicDataset'
-import { DatasetSubjects } from '../@types/datasetSubjects'
+  MetadataBlockFieldAuthor,
+  MetadataBlockFieldContact,
+  MetadataBlockFieldDescription,
+} from '../@types/metadataBlockField';
+import { FieldTypeClass } from '../@types/FieldTypeClass';
+import { BasicDatasetAuthor, BasicDatasetContact, BasicDatasetDescription } from '../@types/basicDataset';
+import { DatasetSubjects } from '../@types/datasetSubjects';
 
-export const METADATA_BLOCK_FIELD_TITLE = 'title'
-export const METADATA_BLOCK_FIELD_SUBTITLE = 'subtitle'
-export const METADATA_BLOCK_FIELD_AUTHOR = 'author'
-export const METADATA_BLOCK_FIELD_DS_DESCRIPTION = 'dsDescription'
-export const METADATA_BLOCK_FIELD_SUBJECT = 'subject'
-export const METADATA_BLOCK_FIELD_CONTACT = 'datasetContact'
-export const METADATA_BLOCK_FIELD_AUTHOR_FULLNAME = 'authorName'
-export const METADATA_BLOCK_FIELD_AUTHOR_AFFILIATION = 'authorAffiliation'
-export const METADATA_BLOCK_FIELD_CONTACT_EMAIL = 'datasetContactEmail'
-export const METADATA_BLOCK_FIELD_CONTACT_NAME = 'datasetContactName'
+export const METADATA_BLOCK_FIELD_TITLE = 'title';
+export const METADATA_BLOCK_FIELD_SUBTITLE = 'subtitle';
+export const METADATA_BLOCK_FIELD_AUTHOR = 'author';
+export const METADATA_BLOCK_FIELD_DS_DESCRIPTION = 'dsDescription';
+export const METADATA_BLOCK_FIELD_SUBJECT = 'subject';
+export const METADATA_BLOCK_FIELD_CONTACT = 'datasetContact';
+export const METADATA_BLOCK_FIELD_AUTHOR_FULLNAME = 'authorName';
+export const METADATA_BLOCK_FIELD_AUTHOR_AFFILIATION = 'authorAffiliation';
+export const METADATA_BLOCK_FIELD_CONTACT_EMAIL = 'datasetContactEmail';
+export const METADATA_BLOCK_FIELD_CONTACT_NAME = 'datasetContactName';
 
 export class MetadataBlocksUtil {
-
   public static createTitleField(title: string): MetadataBlockField {
-    return this.createField(METADATA_BLOCK_FIELD_TITLE, FieldTypeClass.PRIMITIVE.toString(), false, title)
+    return this.createField(METADATA_BLOCK_FIELD_TITLE, FieldTypeClass.PRIMITIVE.toString(), false, title);
   }
 
   public static createSubtitleField(subtitle: string): MetadataBlockField {
-    return this.createField(METADATA_BLOCK_FIELD_SUBTITLE, FieldTypeClass.PRIMITIVE.toString(), false, subtitle)
+    return this.createField(METADATA_BLOCK_FIELD_SUBTITLE, FieldTypeClass.PRIMITIVE.toString(), false, subtitle);
   }
 
   public static createAuthorField(basicDatasetAuthors: BasicDatasetAuthor[]): MetadataBlockField {
-    const authors: MetadataBlockFieldAuthor[] = []
+    const authors: MetadataBlockFieldAuthor[] = [];
 
     basicDatasetAuthors.forEach((basicAuthor: BasicDatasetAuthor) => {
       const author: MetadataBlockFieldAuthor = {
@@ -37,27 +37,27 @@ export class MetadataBlocksUtil {
           value: basicAuthor.fullname,
           typeClass: FieldTypeClass.PRIMITIVE,
           typeName: METADATA_BLOCK_FIELD_AUTHOR_FULLNAME,
-          multiple: false
-        }
-      }
+          multiple: false,
+        },
+      };
 
       if (basicAuthor.affiliation) {
         author.authorAffiliation = {
           value: basicAuthor.affiliation,
           typeClass: FieldTypeClass.PRIMITIVE,
           typeName: METADATA_BLOCK_FIELD_AUTHOR_AFFILIATION,
-          multiple: false
-        }
+          multiple: false,
+        };
       }
 
-      authors.push(author)
-    })
+      authors.push(author);
+    });
 
-    return this.createField(METADATA_BLOCK_FIELD_AUTHOR, FieldTypeClass.COMPOUND.toString(), true, authors)
+    return this.createField(METADATA_BLOCK_FIELD_AUTHOR, FieldTypeClass.COMPOUND.toString(), true, authors);
   }
 
   public static createDescriptionField(basicDescriptions: BasicDatasetDescription[]): MetadataBlockField {
-    const descriptions: MetadataBlockFieldDescription[] = []
+    const descriptions: MetadataBlockFieldDescription[] = [];
 
     basicDescriptions.forEach((description: BasicDatasetDescription) => {
       descriptions.push({
@@ -65,43 +65,53 @@ export class MetadataBlocksUtil {
           typeName: 'dsDescriptionValue',
           typeClass: FieldTypeClass.PRIMITIVE.toString(),
           multiple: false,
-          value: description.text
+          value: description.text,
         },
         dsDescriptionDate: {
           typeName: 'dsDescriptionDate',
           typeClass: FieldTypeClass.PRIMITIVE.toString(),
           multiple: false,
-          value: description.date
-        }
-      })
-    })
+          value: description.date,
+        },
+      });
+    });
 
-    return this.createField(METADATA_BLOCK_FIELD_DS_DESCRIPTION, FieldTypeClass.COMPOUND.toString(), true, descriptions)
+    return this.createField(
+      METADATA_BLOCK_FIELD_DS_DESCRIPTION,
+      FieldTypeClass.COMPOUND.toString(),
+      true,
+      descriptions,
+    );
   }
 
   public static createSubjectField(basicSubjects: DatasetSubjects[]): MetadataBlockField {
-    const subjects: string[] = []
+    const subjects: string[] = [];
 
-    basicSubjects.forEach(subject => {
-      subjects.push(subject.toString())
-    })
+    basicSubjects.forEach((subject) => {
+      subjects.push(subject.toString());
+    });
 
-    return this.createField(METADATA_BLOCK_FIELD_SUBJECT, FieldTypeClass.CONTROLLED_VOCABULARY.toString(), true, subjects)
+    return this.createField(
+      METADATA_BLOCK_FIELD_SUBJECT,
+      FieldTypeClass.CONTROLLED_VOCABULARY.toString(),
+      true,
+      subjects,
+    );
   }
 
   public static createContactField(basicContacts: BasicDatasetContact[]): MetadataBlockField {
-    const contacts: MetadataBlockFieldContact[] = []
+    const contacts: MetadataBlockFieldContact[] = [];
 
-    basicContacts.forEach(contact => {
-      const input: MetadataBlockFieldContact = {}
+    basicContacts.forEach((contact) => {
+      const input: MetadataBlockFieldContact = {};
 
       if (contact.email) {
         input.datasetContactEmail = {
           typeClass: FieldTypeClass.PRIMITIVE,
           multiple: false,
           typeName: METADATA_BLOCK_FIELD_CONTACT_EMAIL,
-          value: contact.email
-        }
+          value: contact.email,
+        };
       }
 
       if (contact.fullname) {
@@ -109,14 +119,14 @@ export class MetadataBlocksUtil {
           typeClass: FieldTypeClass.PRIMITIVE,
           multiple: false,
           typeName: METADATA_BLOCK_FIELD_CONTACT_NAME,
-          value: contact.fullname
-        }
+          value: contact.fullname,
+        };
       }
 
-      contacts.push(input)
-    })
+      contacts.push(input);
+    });
 
-    return this.createField(METADATA_BLOCK_FIELD_CONTACT, FieldTypeClass.COMPOUND.toString(), true, contacts)
+    return this.createField(METADATA_BLOCK_FIELD_CONTACT, FieldTypeClass.COMPOUND.toString(), true, contacts);
   }
 
   private static createField(typeName: string, typeClass: string, multiple: boolean, value: any): MetadataBlockField {
@@ -124,7 +134,7 @@ export class MetadataBlocksUtil {
       typeName: typeName,
       typeClass: typeClass,
       multiple: multiple,
-      value: value
-    }
+      value: value,
+    };
   }
 }

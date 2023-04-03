@@ -1,21 +1,21 @@
 export interface MetadataBlockField {
-  typeName: string,
-  typeClass: string,
-  multiple: boolean,
-  value: string | MetadataBlockField[]
+  typeName: string;
+  typeClass: string;
+  multiple: boolean;
+  value: string | MetadataBlockField[];
 }
 
 export interface MetadataBlockFieldAuthor {
-  authorName: MetadataBlockField,
-  authorAffiliation?: MetadataBlockField
+  authorName: MetadataBlockField;
+  authorAffiliation?: MetadataBlockField;
 }
 
 export interface MetadataBlockFieldDescription {
-  dsDescriptionValue: MetadataBlockField,
-  dsDescriptionDate?: MetadataBlockField
+  dsDescriptionValue: MetadataBlockField;
+  dsDescriptionDate?: MetadataBlockField;
 }
 
 export interface MetadataBlockFieldContact {
-  datasetContactEmail?: MetadataBlockField,
-  datasetContactName?: MetadataBlockField
+  datasetContactEmail?: MetadataBlockField;
+  datasetContactName?: MetadataBlockField;
 }
