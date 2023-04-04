@@ -33,7 +33,15 @@ describe('getDataverseVersion', () => {
   });
 
   test('should return error result on error response', async () => {
-    const axiosGetStub = sandbox.stub(axios, 'get').rejects({ response: { status: 1, data: { message: 'test' } } });
+    const testErrorResponse = {
+      response: {
+        status: 1,
+        data: {
+          message: 'test',
+        },
+      },
+    };
+    const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
 
     let error: ReadError = undefined;
     await sut.getDataverseVersion().catch((e) => (error = e));
