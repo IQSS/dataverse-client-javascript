@@ -10,8 +10,10 @@
   "scripts": {
     "build": "tsc",
     "publish": "tsc && npm publish",
-    "test": "jest --watchAll",
-    "test:coverage": "jest --coverage --watchAll",
+    "test": "jest -c jest.config.js",
+    "test:unit": "jest -c jest.config.unit.js",
+    "test:integration": "jest -c jest.config.integration.js",
+    "test:coverage": "jest --coverage -c jest.config.js",
     "format": "prettier --write \"src/**/*.(js|ts)\"",
     "lint": "eslint src --ext .js,.ts",
     "lint:fix": "eslint src --fix --ext .js,.ts"
