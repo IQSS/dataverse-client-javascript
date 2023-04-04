@@ -5,8 +5,9 @@ import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 
 describe('getDataverseVersion', () => {
+  const testApiUrl = 'https://test.dataverse.org/api/v1';
   const sandbox: SinonSandbox = createSandbox();
-  const sut: DataverseInfoRepository = new DataverseInfoRepository();
+  const sut: DataverseInfoRepository = new DataverseInfoRepository(testApiUrl);
 
   afterEach(() => {
     sandbox.restore();
@@ -27,7 +28,7 @@ describe('getDataverseVersion', () => {
 
     const actual = await sut.getDataverseVersion();
 
-    assert.calledWithExactly(axiosGetStub, 'https://demo.dataverse.org/api/v1/info/version');
+    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/info/version`);
     assert.match(actual, testDataverseVersion);
   });
 
@@ -36,9 +37,8 @@ describe('getDataverseVersion', () => {
 
     let error: ReadError = undefined;
     await sut.getDataverseVersion().catch((e) => (error = e));
-    
 
-    assert.calledWithExactly(axiosGetStub, 'https://demo.dataverse.org/api/v1/info/version');
+    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/info/version`);
     expect(error).to.be.instanceOf(Error);
   });
 });
