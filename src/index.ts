@@ -1,1 +1,1 @@
-export * from './info'
+require('dotenv').config();
