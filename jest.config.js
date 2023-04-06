@@ -6,6 +6,4 @@ module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.ts$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   coveragePathIgnorePatterns: ['testHelpers'],
-  // Temporarily ignore old tests
-  modulePathIgnorePatterns: ['<rootDir>/test/old'],
 };
