@@ -6,6 +6,7 @@ describe('getDataverseVersion', () => {
 
   test('should return Dataverse version', async () => {
     const actual = await sut.getDataverseVersion();
-    expect(typeof actual).toBe('string');
+    expect(typeof actual.number).toBe('string');
+    expect(typeof actual.build).toBe('string');
   });
 });

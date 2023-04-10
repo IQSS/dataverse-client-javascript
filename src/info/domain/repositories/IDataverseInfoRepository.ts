@@ -1,3 +1,5 @@
+import { DataverseVersion } from '../models/DataverseVersion';
+
 export interface IDataverseInfoRepository {
-  getDataverseVersion(): Promise<string>;
+  getDataverseVersion(): Promise<DataverseVersion>;
 }

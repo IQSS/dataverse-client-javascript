@@ -14,13 +14,14 @@ describe('getDataverseVersion', () => {
   });
 
   test('should return Dataverse version on successful response', async () => {
-    const testDataverseVersion = '5.13';
+    const testVersionNumber = '5.13';
+    const testVersionBuild = 'testBuild';
     const testSuccessfulResponse = {
       data: {
         status: 'OK',
         data: {
-          version: testDataverseVersion,
-          build: 'test',
+          version: testVersionNumber,
+          build: testVersionBuild,
         },
       },
     };
@@ -29,7 +30,8 @@ describe('getDataverseVersion', () => {
     const actual = await sut.getDataverseVersion();
 
     assert.calledWithExactly(axiosGetStub, `${testApiUrl}/info/version`);
-    assert.match(actual, testDataverseVersion);
+    assert.match(actual.number, testVersionNumber);
+    assert.match(actual.build, testVersionBuild);
   });
 
   test('should return error result on error response', async () => {
