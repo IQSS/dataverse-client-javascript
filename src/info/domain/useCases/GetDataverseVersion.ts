@@ -1,4 +1,3 @@
-import { Result } from '../../../core/domain/useCases/Result';
 import { UseCase } from '../../../core/domain/useCases/UseCase';
 import { IDataverseInfoRepository } from '../repositories/IDataverseInfoRepository';
 
@@ -9,12 +8,7 @@ export class GetDataverseVersion implements UseCase<string> {
     this.dataverseInfoRepository = dataverseInfoRepository;
   }
 
-  async execute(): Promise<Result<string>> {
-    try {
-      const dataverseVersion = await this.dataverseInfoRepository.getDataverseVersion();
-      return Result.success(dataverseVersion);
-    } catch (error) {
-      return Result.error(error.message);
-    }
+  async execute(): Promise<string> {
+    return await this.dataverseInfoRepository.getDataverseVersion();
   }
 }

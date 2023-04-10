@@ -18,17 +18,18 @@ describe('execute', () => {
 
     const actual = await sut.execute();
 
-    assert.match(actual.isSuccess, true);
-    assert.match(actual.getValue(), testDataverseVersion);
+    assert.match(actual, testDataverseVersion);
   });
 
   test('should return error result on repository error', async () => {
     const dataverseInfoRepositoryStub = <IDataverseInfoRepository>{};
-    dataverseInfoRepositoryStub.getDataverseVersion = sandbox.stub().throwsException(new ReadError());
+    const testReadError = new ReadError();
+    dataverseInfoRepositoryStub.getDataverseVersion = sandbox.stub().throwsException(testReadError);
     const sut = new GetDataverseVersion(dataverseInfoRepositoryStub);
 
-    const actual = await sut.execute();
+    let actualError: ReadError = undefined;
+    await sut.execute().catch((e) => (actualError = e));
 
-    assert.match(actual.isFailure, true);
+    assert.match(actualError, testReadError);
   });
 });
