@@ -2,7 +2,9 @@
 
 [![npm](https://img.shields.io/npm/v/js-dataverse.svg)](https://www.npmjs.com/package/js-dataverse)
 
-A JavaScript/TypeScript client for [Dataverse](http://guides.dataverse.org/en/latest/api/).
+A JavaScript/TypeScript API wrapper for [Dataverse](http://guides.dataverse.org/en/latest/api/).
+
+This package is built using `node v19`.
 
 ## NPM
 
@@ -12,7 +14,7 @@ Module available as `js-dataverse` at https://www.npmjs.com/package/js-dataverse
 
 In order to build the project, we need to run the following command:
 
-`yarn build` or `npm run build`
+`npm run build`
 
 the build generated will be placed in `dist` folder.
 
@@ -22,41 +24,39 @@ the build generated will be placed in `dist` folder.
 
 Make sure that you install all the project dependencies
 
-`yarn install` or `npm install`
-
-Keep consistent, whether you use yarn or npm
+`npm install`
 
 ### Run all tests
 
-`yarn test` or `npm run test`
+`npm run test`
 
 ### Run unit tests
 
-`yarn test:unit` or `npm run test:unit`
+`npm run test:unit`
 
 ### Run integration tests
 
-`yarn test:integration` or `npm run test:integration`
+`npm run test:integration`
 
 ### Run test coverage
 
-`yarn test:coverage` or `npm run test:coverage`
+`npm run test:coverage`
 
 ## Format and lint
 
 ### Run formatter
 
-`yarn format` or `npm run format`
+`npm run format`
 
 ### Run linter
 
 Running a linting check on the code:
 
-`yarn lint` or `npm run lint`
+`npm run lint`
 
 Fix linting checks on the code:
 
-`yarn lint:fix` or `npm run lint:fix`
+`npm run lint:fix`
 
 ## Publishing new version
 
