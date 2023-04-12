@@ -1,4 +1,4 @@
-# What steps does it take to reproduce the issue?
+## What steps does it take to reproduce the issue?
 
 ## When does this issue occur?
 
@@ -10,7 +10,7 @@
 
 ## Any related open or closed issues to this bug report?
 
-# Screenshots:
+## Screenshots:
 
 No matter the issue, screenshots are always welcome.
 

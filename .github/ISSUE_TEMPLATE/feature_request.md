@@ -1,4 +1,4 @@
-## Overview of the Feature Request
+## Overview of the feature request
 
 ## What inspired the request?
 
