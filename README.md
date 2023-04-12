@@ -4,11 +4,17 @@
 
 A JavaScript/TypeScript API wrapper for [Dataverse](http://guides.dataverse.org/en/latest/api/).
 
-This package is built using `node v19`.
-
 ## NPM
 
 Module available as `js-dataverse` at https://www.npmjs.com/package/js-dataverse
+
+## Getting Started
+
+This package is built using `node v19`, so it is recommended to use that version.
+
+Make sure that you install all the project dependencies:
+
+`npm install`
 
 ## Build project
 
@@ -19,12 +25,6 @@ In order to build the project, we need to run the following command:
 the build generated will be placed in `dist` folder.
 
 ## Tests
-
-### Pre-requisites
-
-Make sure that you install all the project dependencies
-
-`npm install`
 
 ### Run all tests
 
