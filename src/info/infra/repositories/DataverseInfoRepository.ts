@@ -4,11 +4,7 @@ import { ReadError } from '../../../core/domain/repositories/ReadError';
 import { DataverseVersion } from '../../domain/models/DataverseVersion';
 
 export class DataverseInfoRepository implements IDataverseInfoRepository {
-  private apiUrl: string;
-
-  constructor(apiUrl: string) {
-    this.apiUrl = apiUrl;
-  }
+  constructor(private readonly apiUrl: string) {}
 
   public async getDataverseVersion(): Promise<DataverseVersion> {
     const response = await axios.get(`${this.apiUrl}/info/version`).catch((error) => {
