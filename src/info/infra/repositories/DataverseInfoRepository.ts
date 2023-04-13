@@ -7,10 +7,16 @@ export class DataverseInfoRepository implements IDataverseInfoRepository {
   constructor(private readonly apiUrl: string) {}
 
   public async getDataverseVersion(): Promise<DataverseVersion> {
-    const response = await axios.get(`${this.apiUrl}/info/version`).catch((error) => {
-      throw new ReadError(error.response.status + error.response.data ? ': ' + error.response.data.message : '');
-    });
-    return this.getVersionFromResponse(response);
+    let datasetVersion;
+    await axios
+      .get(`${this.apiUrl}/info/version`)
+      .then((response) => {
+        datasetVersion = this.getVersionFromResponse(response);
+      })
+      .catch((error) => {
+        throw new ReadError(error.response.status + error.response.data ? ': ' + error.response.data.message : '');
+      });
+    return datasetVersion;
   }
 
   private getVersionFromResponse(response: AxiosResponse): DataverseVersion {
