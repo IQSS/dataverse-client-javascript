@@ -20,7 +20,7 @@ describe('getCurrentAuthenticatedUser', () => {
       data: {
         status: 'OK',
         data: {
-          id: 1,
+          id: testAuthenticatedUser.id,
           persistentUserId: testAuthenticatedUser.persistentUserId,
           identifier: testAuthenticatedUser.identifier,
           displayName: testAuthenticatedUser.displayName,
