@@ -37,10 +37,8 @@ describe('getDataverseVersion', () => {
   test('should return error result on error response', async () => {
     const testErrorResponse = {
       response: {
-        status: 1,
-        data: {
-          message: 'test',
-        },
+        status: 'ERROR',
+        message: 'test',
       },
     };
     const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);

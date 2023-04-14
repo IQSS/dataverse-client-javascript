@@ -1,17 +1,18 @@
+import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
 import { IDataverseInfoRepository } from '../../domain/repositories/IDataverseInfoRepository';
-import axios, { AxiosResponse } from 'axios';
-import { ReadError } from '../../../core/domain/repositories/ReadError';
 import { DataverseVersion } from '../../domain/models/DataverseVersion';
+import { AxiosResponse } from 'axios';
 
-export class DataverseInfoRepository implements IDataverseInfoRepository {
-  constructor(private readonly apiUrl: string) {}
+export class DataverseInfoRepository extends ApiRepository implements IDataverseInfoRepository {
+  constructor(apiUrl: string) {
+    super(apiUrl);
+  }
 
   public async getDataverseVersion(): Promise<DataverseVersion> {
-    return await axios
-      .get(`${this.apiUrl}/info/version`)
+    return this.doGet('/info/version')
       .then((response) => this.getVersionFromResponse(response))
       .catch((error) => {
-        throw new ReadError(error.response.status + error.response.data ? ': ' + error.response.data.message : '');
+        throw error;
       });
   }
 
