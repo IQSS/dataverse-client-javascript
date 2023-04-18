@@ -9,8 +9,8 @@ export abstract class ApiRepository {
       /* TODO: 
         We set { withCredentials: true } to send the JSESSIONID cookie in the request for API authentication. 
         This is required, along with the session auth feature flag enabled in the backend, to be able to authenticate using the JSESSIONID cookie.
-        Auth mechanisms like this must be configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth)
-        For 2.0.0, we must also support API Key authentication to be backwards compatible and offer the package for purposes other than SPA MVP.
+        Auth mechanisms like this must be configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth).
+        For 2.0.0, we must also support API key auth to be backwards compatible and support use cases other than SPA MVP.
       */
       .get(`${this.apiUrl}${apiEndpoint}`, { withCredentials: true })
       .then((response) => response)
