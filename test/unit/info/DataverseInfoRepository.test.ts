@@ -29,7 +29,7 @@ describe('getDataverseVersion', () => {
 
     const actual = await sut.getDataverseVersion();
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/info/version`);
+    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/info/version`, { withCredentials: true });
     assert.match(actual.number, testVersionNumber);
     assert.match(actual.build, testVersionBuild);
   });
@@ -46,7 +46,7 @@ describe('getDataverseVersion', () => {
     let error: ReadError = undefined;
     await sut.getDataverseVersion().catch((e) => (error = e));
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/info/version`);
+    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/info/version`, { withCredentials: true });
     expect(error).to.be.instanceOf(Error);
   });
 });

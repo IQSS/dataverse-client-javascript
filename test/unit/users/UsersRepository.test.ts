@@ -40,7 +40,7 @@ describe('getCurrentAuthenticatedUser', () => {
 
     const actual = await sut.getCurrentAuthenticatedUser();
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`);
+    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, { withCredentials: true });
     assert.match(actual, testAuthenticatedUser);
   });
 
@@ -56,7 +56,7 @@ describe('getCurrentAuthenticatedUser', () => {
     let error: ReadError = undefined;
     await sut.getCurrentAuthenticatedUser().catch((e) => (error = e));
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`);
+    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, { withCredentials: true });
     expect(error).to.be.instanceOf(Error);
   });
 });
