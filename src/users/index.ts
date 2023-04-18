@@ -4,3 +4,4 @@ import { GetCurrentAuthenticatedUser } from './domain/useCases/GetCurrentAuthent
 const getCurrentAuthenticatedUser = new GetCurrentAuthenticatedUser(new UsersRepository(process.env.DATAVERSE_API_URL));
 
 export { getCurrentAuthenticatedUser };
+export { AuthenticatedUser } from './domain/models/AuthenticatedUser';
