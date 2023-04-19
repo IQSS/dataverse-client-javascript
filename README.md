@@ -70,4 +70,4 @@ Automated publishing of versions could be automated when merging to master. Belo
 
 ## Contributing
 
-[If you are interested in contributing, please click here](/CONTRIBUTING.md)
+We love contributors! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
