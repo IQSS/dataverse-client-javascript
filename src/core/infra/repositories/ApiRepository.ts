@@ -1,9 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
 import { ReadError } from '../../domain/repositories/ReadError';
+import { ApiConfig } from './ApiConfig';
 
 export abstract class ApiRepository {
-  constructor(private readonly apiUrl: string) {}
-
   public async doGet(apiEndpoint: string): Promise<AxiosResponse> {
     return await axios
       /* TODO: 
@@ -12,7 +11,7 @@ export abstract class ApiRepository {
         Auth mechanisms like this must be configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth).
         For 2.0.0, we must also support API key auth to be backwards compatible and support use cases other than SPA MVP.
       */
-      .get(`${this.apiUrl}${apiEndpoint}`, { withCredentials: true })
+      .get(`${ApiConfig.DATAVERSE_API_URL}${apiEndpoint}`, { withCredentials: true })
       .then((response) => response)
       .catch((error) => {
         throw new ReadError(

@@ -4,11 +4,14 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { createAuthenticatedUser } from '../../testHelpers/users/authenticatedUserHelper';
+import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
 
 describe('getCurrentAuthenticatedUser', () => {
-  const testApiUrl = 'https://test.dataverse.org/api/v1';
   const sandbox: SinonSandbox = createSandbox();
-  const sut: UsersRepository = new UsersRepository(testApiUrl);
+  const sut: UsersRepository = new UsersRepository();
+  const testApiUrl = 'https://test.dataverse.org/api/v1';
+
+  ApiConfig.init(testApiUrl);
 
   afterEach(() => {
     sandbox.restore();

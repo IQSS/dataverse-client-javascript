@@ -3,11 +3,14 @@ import { assert, createSandbox, SinonSandbox } from 'sinon';
 import axios from 'axios';
 import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
+import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
 
 describe('getDataverseVersion', () => {
-  const testApiUrl = 'https://test.dataverse.org/api/v1';
   const sandbox: SinonSandbox = createSandbox();
-  const sut: DataverseInfoRepository = new DataverseInfoRepository(testApiUrl);
+  const sut: DataverseInfoRepository = new DataverseInfoRepository();
+  const testApiUrl = 'https://test.dataverse.org/api/v1';
+
+  ApiConfig.init(testApiUrl);
 
   afterEach(() => {
     sandbox.restore();

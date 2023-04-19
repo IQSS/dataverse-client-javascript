@@ -4,10 +4,6 @@ import { AuthenticatedUser } from '../../domain/models/AuthenticatedUser';
 import { AxiosResponse } from 'axios';
 
 export class UsersRepository extends ApiRepository implements IUsersRepository {
-  constructor(apiUrl: string) {
-    super(apiUrl);
-  }
-
   public async getCurrentAuthenticatedUser(): Promise<AuthenticatedUser> {
     return this.doGet('/users/:me')
       .then((response) => this.getAuthenticatedUserFromResponse(response))
