@@ -1,21 +1,13 @@
-## Description
-<Description of the pull request>
+## What this PR does / why we need it:
 
-## Changes
-<A list of the changes that have been made>
+## Which issue(s) this PR closes:
 
-## Tests
-<A brief description of how the functionality has been tested>
+- Closes #
 
-## Checklist
-[] The project builds
-[] The project passes lint checks
-[] The project passes format checks
-[] The project passes unit tests
-[] I've manually tested the functionality
+## Special notes for your reviewer:
 
-## Screenshots
-<Screenshots of new functionality if available>
+## Suggestions on how to test this:
 
-## Additional information
+## Is there a release notes update needed for this change?:
 
+## Additional documentation:

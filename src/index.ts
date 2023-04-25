@@ -1,2 +1,2 @@
-export * from './dataverseClient'
-export * from './@types/searchOptions'
+export * from './core';
+export * from './info';
