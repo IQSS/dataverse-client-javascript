@@ -23,7 +23,10 @@ export abstract class ApiRepository {
 
   public async doPost(apiEndpoint: string, data: string | object): Promise<AxiosResponse> {
     return await axios
-      .post(this.buildRequestUrl(apiEndpoint), JSON.stringify(data), { withCredentials: true })
+      .post(this.buildRequestUrl(apiEndpoint), JSON.stringify(data), {
+        withCredentials: true,
+        headers: { 'Content-Type': 'application/json' },
+      })
       .then((response) => response)
       .catch((error) => {
         throw new WriteError(

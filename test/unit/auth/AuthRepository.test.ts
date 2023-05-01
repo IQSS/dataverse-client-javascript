@@ -29,7 +29,10 @@ describe('logout', () => {
 
     await sut.logout();
 
-    assert.calledWithExactly(axiosPostStub, `${testApiUrl}/logout`, JSON.stringify(''), { withCredentials: true });
+    assert.calledWithExactly(axiosPostStub, `${testApiUrl}/logout`, JSON.stringify(''), {
+      withCredentials: true,
+      headers: { 'Content-Type': 'application/json' },
+    });
   });
 
   test('should return error result on error response', async () => {
@@ -44,7 +47,10 @@ describe('logout', () => {
     let error: WriteError = undefined;
     await sut.logout().catch((e) => (error = e));
 
-    assert.calledWithExactly(axiosPostStub, `${testApiUrl}/logout`, JSON.stringify(''), { withCredentials: true });
+    assert.calledWithExactly(axiosPostStub, `${testApiUrl}/logout`, JSON.stringify(''), {
+      withCredentials: true,
+      headers: { 'Content-Type': 'application/json' },
+    });
     expect(error).to.be.instanceOf(Error);
   });
 });
