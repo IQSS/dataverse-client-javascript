@@ -5,7 +5,7 @@ import { AxiosResponse } from 'axios';
 
 export class UsersRepository extends ApiRepository implements IUsersRepository {
   public async getCurrentAuthenticatedUser(): Promise<AuthenticatedUser> {
-    return this.doGet('/users/:me')
+    return this.doGet('/users/:me', true)
       .then((response) => this.getAuthenticatedUserFromResponse(response))
       .catch((error) => {
         throw error;
