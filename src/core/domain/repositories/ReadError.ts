@@ -1,9 +1,7 @@
-export class ReadError extends Error {
+import { RepositoryError } from './RepositoryError';
+
+export class ReadError extends RepositoryError {
   constructor(reason?: string) {
-    let message = 'There was an error when reading the resource.';
-    if (reason) {
-      message += ` Reason was: ${reason}`;
-    }
-    super(message);
+    super('There was an error when reading the resource.', reason);
   }
 }
