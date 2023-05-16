@@ -14,12 +14,14 @@ describe('execute', () => {
   test('should return dataset on repository success', async () => {
     const testDataset = createDataset();
     const datasetsRepositoryStub = <IDatasetsRepository>{};
-    datasetsRepositoryStub.getDataset = sandbox.stub().returns(testDataset);
+    const getDatasetStub = sandbox.stub().returns(testDataset);
+    datasetsRepositoryStub.getDataset = getDatasetStub;
     const sut = new GetDataset(datasetsRepositoryStub);
 
-    const actual = await sut.execute();
+    const actual = await sut.execute(null, '1', null);
 
     assert.match(actual, testDataset);
+    assert.calledWithExactly(getDatasetStub, null, '1', null);
   });
 
   test('should return error result on repository error', async () => {

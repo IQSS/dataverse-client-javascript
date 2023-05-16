@@ -14,7 +14,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async getDataset(
     datasetId?: string,
     datasetPersistentId?: string,
-    datasetVersionId?: string,
+    datasetVersionId?: number,
   ): Promise<Dataset> {
     console.log(datasetId + datasetPersistentId + datasetVersionId);
     throw new Error('Method not implemented.');
