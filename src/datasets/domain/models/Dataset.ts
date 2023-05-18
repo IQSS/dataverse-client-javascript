@@ -17,10 +17,10 @@ export interface DatasetVersionInfo {
 }
 
 export enum DatasetVersionState {
-  DRAFT,
-  RELEASED,
-  ARCHIVED,
-  DEACCESSIONED,
+  DRAFT = 'DRAFT',
+  RELEASED = 'RELEASED',
+  ARCHIVED = 'ARCHIVED',
+  DEACCESSIONED = 'DEACCESSIONED',
 }
 
 export interface DatasetLicense {
@@ -35,6 +35,6 @@ export interface DatasetMetadataBlock {
 
 export type DatasetMetadataFields = Record<string, DatasetMetadataFieldValue>;
 
-export type DatasetMetadataFieldValue = string | DatasetMetadataSubField[];
+export type DatasetMetadataFieldValue = string | string[] | DatasetMetadataSubField | DatasetMetadataSubField[];
 
 export type DatasetMetadataSubField = Record<string, string>;

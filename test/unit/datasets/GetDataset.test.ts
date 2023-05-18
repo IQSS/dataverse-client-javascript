@@ -1,7 +1,7 @@
 import { GetDataset } from '../../../src/datasets/domain/useCases/GetDataset';
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository';
 import { assert, createSandbox, SinonSandbox } from 'sinon';
-import { createDataset } from '../../testHelpers/datasets/datasetHelper';
+import { createDatasetModel } from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 
 describe('execute', () => {
@@ -12,7 +12,7 @@ describe('execute', () => {
   });
 
   test('should return dataset on repository success', async () => {
-    const testDataset = createDataset();
+    const testDataset = createDatasetModel();
     const datasetsRepositoryStub = <IDatasetsRepository>{};
     const getDatasetStub = sandbox.stub().returns(testDataset);
     datasetsRepositoryStub.getDataset = getDatasetStub;

@@ -11,7 +11,7 @@ describe('execute', () => {
   });
 
   test('should return successful result with field names on repository success', async () => {
-    const testFieldNames = ['test1','test2'];
+    const testFieldNames = ['test1', 'test2'];
     const datasetsRepositoryStub = <IDatasetsRepository>{};
     datasetsRepositoryStub.getDatasetSummaryFieldNames = sandbox.stub().returns(testFieldNames);
     const sut = new GetDatasetSummaryFieldNames(datasetsRepositoryStub);

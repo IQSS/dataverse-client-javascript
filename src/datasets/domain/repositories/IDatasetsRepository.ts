@@ -2,5 +2,5 @@ import { Dataset } from '../models/Dataset';
 
 export interface IDatasetsRepository {
   getDatasetSummaryFieldNames(): Promise<string[]>;
-  getDataset(datasetId?: string, datasetPersistentId?: string, datasetVersionId?: number): Promise<Dataset>;
+  getDataset(datasetId?: number, datasetPersistentId?: string, datasetVersionId?: number): Promise<Dataset>;
 }
