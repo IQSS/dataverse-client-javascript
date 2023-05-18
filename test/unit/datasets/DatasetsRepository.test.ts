@@ -5,6 +5,7 @@ import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
 import { createDatasetModel, createDatasetVersionPayload } from '../../testHelpers/datasets/datasetHelper';
+import { MissingParameterError } from '../../../src/core/domain/repositories/MissingParameterError';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -118,6 +119,30 @@ describe('DatasetsRepository', () => {
         },
       );
       assert.match(actual, testDatasetModel);
+    });
+
+    test('should return error on repository read error', async () => {
+      const testErrorResponse = {
+        response: {
+          status: 'ERROR',
+          message: 'test',
+        },
+      };
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+
+      let error: ReadError = undefined;
+      await sut.getDataset(testDatasetModel.id, null, null).catch((e) => (error = e));
+
+      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}`, {
+        withCredentials: true,
+      });
+      expect(error).to.be.instanceOf(Error);
+    });
+
+    test('should return error when parameters are missing', async () => {
+      let error: MissingParameterError = undefined;
+      await sut.getDataset(null, null, null).catch((e) => (error = e));
+      expect(error).to.be.instanceOf(Error);
     });
   });
 });
