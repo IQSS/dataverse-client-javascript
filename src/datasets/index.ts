@@ -1,9 +1,13 @@
 import { DatasetsRepository } from './infra/repositories/DatasetsRepository';
 import { GetDatasetSummaryFieldNames } from './domain/useCases/GetDatasetSummaryFieldNames';
+import { GetDataset } from './domain/useCases/GetDataset';
 
-const getDatasetSummaryFieldNames = new GetDatasetSummaryFieldNames(new DatasetsRepository());
+const datasetsRepository = new DatasetsRepository();
 
-export { getDatasetSummaryFieldNames };
+const getDatasetSummaryFieldNames = new GetDatasetSummaryFieldNames(datasetsRepository);
+const getDataset = new GetDataset(datasetsRepository);
+
+export { getDatasetSummaryFieldNames, getDataset };
 export {
   Dataset,
   DatasetVersionInfo,
