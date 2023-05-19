@@ -1,8 +1,12 @@
 import { Dataset, DatasetVersionState } from '../../../src/datasets/domain/models/Dataset';
+import { NodeHtmlMarkdown } from 'node-html-markdown';
 
 const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z';
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z';
 const DATASET_RELEASE_TIME_STR = '2023-05-15T08:21:03Z';
+
+const DATASET_HTML_DESCRIPTION =
+  '<div><h1 class="test-class-to-ignore">Title 1</h1><p>Test paragraph 1</p><p>Test paragraph 2</p><p>Hello world</p><h2>Title 2</h2><h3>Title 3</h3></div>';
 
 export const createDatasetModel = (): Dataset => {
   return {
@@ -37,6 +41,11 @@ export const createDatasetModel = (): Dataset => {
             },
           ],
           subject: ['Subject1', 'Subject2'],
+          dsDescription: [
+            {
+              dsDescriptionValue: NodeHtmlMarkdown.translate(DATASET_HTML_DESCRIPTION),
+            },
+          ],
         },
       },
     ],
@@ -105,6 +114,21 @@ export const createDatasetVersionPayload = (): any => {
             multiple: true,
             typeClass: 'controlledVocabulary',
             value: ['Subject1', 'Subject2'],
+          },
+          {
+            typeName: 'dsDescription',
+            multiple: true,
+            typeClass: 'compound',
+            value: [
+              {
+                dsDescriptionValue: {
+                  typeName: 'dsDescriptionValue',
+                  multiple: false,
+                  typeClass: 'primitive',
+                  value: DATASET_HTML_DESCRIPTION,
+                },
+              },
+            ],
           },
         ],
       },

@@ -7,6 +7,7 @@ import {
   DatasetMetadataFieldValue,
 } from '../../../domain/models/Dataset';
 import { AxiosResponse } from 'axios';
+import { NodeHtmlMarkdown } from 'node-html-markdown';
 
 export const transformVersionResponseToDataset = (response: AxiosResponse): Dataset => {
   const versionPayload = response.data;
@@ -67,21 +68,29 @@ const transformPayloadToDatasetMetadataFieldValue = (metadataFieldValuePayload: 
   if (Array.isArray(metadataFieldValuePayload)) {
     const isArrayOfObjects = typeof metadataFieldValuePayload[0] === 'object';
     if (!isArrayOfObjects) {
-      metadataFieldValue = metadataFieldValuePayload;
+      const datasetMetadataSubfields: string[] = [];
+      metadataFieldValuePayload.forEach(function (metadataValuePayload) {
+        datasetMetadataSubfields.push(transformHtmlToMarkdown(metadataValuePayload));
+      });
+      metadataFieldValue = datasetMetadataSubfields;
     } else {
       const datasetMetadataSubfields: DatasetMetadataSubField[] = [];
       metadataFieldValuePayload.forEach(function (metadataSubFieldValuePayload) {
         const subFieldKeys = Object.keys(metadataSubFieldValuePayload);
         const record: DatasetMetadataSubField = {};
         for (let subFieldKey of subFieldKeys) {
-          record[subFieldKey] = metadataSubFieldValuePayload[subFieldKey].value;
+          record[subFieldKey] = transformHtmlToMarkdown(metadataSubFieldValuePayload[subFieldKey].value);
         }
         datasetMetadataSubfields.push(record);
       });
       metadataFieldValue = datasetMetadataSubfields;
     }
   } else {
-    metadataFieldValue = metadataFieldValuePayload;
+    metadataFieldValue = transformHtmlToMarkdown(metadataFieldValuePayload);
   }
   return metadataFieldValue;
+};
+
+const transformHtmlToMarkdown = (source: string): string => {
+  return NodeHtmlMarkdown.translate(source);
 };
