@@ -10,6 +10,11 @@ import { MissingParameterError } from '../../../src/core/domain/repositories/Mis
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: DatasetsRepository = new DatasetsRepository();
+  const testVersionSuccessfulResponse = {
+    status: 'OK',
+    data: createDatasetVersionPayload(),
+  };
+  const testDatasetModel = createDatasetModel();
   const testApiUrl = 'https://test.dataverse.org/api/v1';
 
   ApiConfig.init(testApiUrl);
@@ -59,11 +64,6 @@ describe('DatasetsRepository', () => {
         latestVersion: createDatasetVersionPayload(),
       },
     };
-    const testVersionSuccessfulResponse = {
-      status: 'OK',
-      data: createDatasetVersionPayload(),
-    };
-    const testDatasetModel = createDatasetModel();
 
     test('should return Dataset when providing id, no version, and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testLatestVersionSuccessfulResponse);
@@ -142,6 +142,55 @@ describe('DatasetsRepository', () => {
     test('should return error when parameters are missing', async () => {
       let error: MissingParameterError = undefined;
       await sut.getDataset(null, null, null).catch((e) => (error = e));
+      expect(error).to.be.instanceOf(Error);
+    });
+  });
+
+  describe('getPrivateUrlDataset', () => {
+    const testToken = 'testToken';
+
+    test('should return Dataset when providing anonymized field value and response is successful', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
+
+      const testAnonymizedFieldValue = 'testValue';
+      const actual = await sut.getPrivateUrlDataset(testToken, 'testValue');
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}?anonymizedFieldValue=${testAnonymizedFieldValue}`,
+        {
+          withCredentials: false,
+        },
+      );
+      assert.match(actual, testDatasetModel);
+    });
+
+    test('should return Dataset when not providing anonymized field value and response is successful', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
+
+      const actual = await sut.getPrivateUrlDataset(testToken, null);
+
+      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`, {
+        withCredentials: false,
+      });
+      assert.match(actual, testDatasetModel);
+    });
+
+    test('should return error on repository read error', async () => {
+      const testErrorResponse = {
+        response: {
+          status: 'ERROR',
+          message: 'test',
+        },
+      };
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+
+      let error: ReadError = undefined;
+      await sut.getPrivateUrlDataset(testToken, null).catch((e) => (error = e));
+
+      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`, {
+        withCredentials: false,
+      });
       expect(error).to.be.instanceOf(Error);
     });
   });

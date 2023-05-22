@@ -30,6 +30,18 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     }
   }
 
+  public async getPrivateUrlDataset(token: string, anonymizedFieldValue?: string): Promise<Dataset> {
+    let apiEndpoint = `/datasets/privateUrlDatasetVersion/${token}`;
+    if (anonymizedFieldValue != null) {
+      apiEndpoint = apiEndpoint + `?anonymizedFieldValue=${anonymizedFieldValue}`;
+    }
+    return this.doGet(apiEndpoint)
+      .then((response) => transformVersionResponseToDataset(response))
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   private async getDatasetById(datasetId: number, datasetVersionId?: number): Promise<Dataset> {
     if (datasetVersionId == null) {
       return this.getDatasetLatestVersion(`/datasets/${datasetId}`);
