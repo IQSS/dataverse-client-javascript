@@ -1,0 +1,51 @@
+name: deploy_pr
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 19
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+  publish-gpr:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 19
+          registry-url: https://npm.pkg.github.com/
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build
+
+      - name: Update package version
+        run: npm version '${{ github.event.number }}.${{ github.run_number }}.0' --no-git-tag-version
+
+      - name: Publish package
+        run: |
+          echo "$(jq '.publishConfig.registry = "https://npm.pkg.github.com"' package.json)" > package.json
+          echo "$( jq '.name = "@gportas/dataverse-client-javascript"' package.json )" > package.json
+          npm publish --@gportas:registry=https://npm.pkg.github.com
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
