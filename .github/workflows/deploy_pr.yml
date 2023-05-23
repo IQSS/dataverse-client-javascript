@@ -45,7 +45,7 @@ jobs:
       - name: Publish package
         run: |
           echo "$(jq '.publishConfig.registry = "https://npm.pkg.github.com"' package.json)" > package.json
-          echo "$( jq '.name = "@gportas/dataverse-client-javascript"' package.json )" > package.json
-          npm publish --@gportas:registry=https://npm.pkg.github.com
+          echo "$( jq '.name = "@IQSS/dataverse-client-javascript"' package.json )" > package.json
+          npm publish --@IQSS:registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
