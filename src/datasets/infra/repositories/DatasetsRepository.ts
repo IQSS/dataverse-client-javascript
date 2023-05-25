@@ -21,9 +21,9 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     datasetPersistentId?: string,
     datasetVersionId?: number,
   ): Promise<Dataset> {
-    if (datasetId != null) {
+    if (datasetId != undefined) {
       return this.getDatasetById(datasetId, datasetVersionId);
-    } else if (datasetPersistentId != null) {
+    } else if (datasetPersistentId != undefined) {
       return this.getDatasetByPersistentId(datasetPersistentId, datasetVersionId);
     } else {
       throw new MissingParameterError('Dataset ID or Persistent ID should be provided to getDataset operation');

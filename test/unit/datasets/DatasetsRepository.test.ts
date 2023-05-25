@@ -68,7 +68,7 @@ describe('DatasetsRepository', () => {
     test('should return Dataset when providing id, no version, and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testLatestVersionSuccessfulResponse);
 
-      const actual = await sut.getDataset(testDatasetModel.id, null, null);
+      const actual = await sut.getDataset(testDatasetModel.id, undefined, undefined);
 
       assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}`, {
         withCredentials: true,
@@ -79,7 +79,7 @@ describe('DatasetsRepository', () => {
     test('should return Dataset when providing id, version, and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
 
-      const actual = await sut.getDataset(testDatasetModel.id, null, testDatasetModel.versionId);
+      const actual = await sut.getDataset(testDatasetModel.id, undefined, testDatasetModel.versionId);
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -94,7 +94,7 @@ describe('DatasetsRepository', () => {
     test('should return Dataset when providing persistent id, no version, and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testLatestVersionSuccessfulResponse);
 
-      const actual = await sut.getDataset(null, testDatasetModel.persistentId, null);
+      const actual = await sut.getDataset(undefined, testDatasetModel.persistentId, undefined);
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -109,7 +109,7 @@ describe('DatasetsRepository', () => {
     test('should return Dataset when providing id, version, and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
 
-      const actual = await sut.getDataset(null, testDatasetModel.persistentId, testDatasetModel.versionId);
+      const actual = await sut.getDataset(undefined, testDatasetModel.persistentId, testDatasetModel.versionId);
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -131,7 +131,7 @@ describe('DatasetsRepository', () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
 
       let error: ReadError = undefined;
-      await sut.getDataset(testDatasetModel.id, null, null).catch((e) => (error = e));
+      await sut.getDataset(testDatasetModel.id, undefined, undefined).catch((e) => (error = e));
 
       assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}`, {
         withCredentials: true,
@@ -141,7 +141,7 @@ describe('DatasetsRepository', () => {
 
     test('should return error when parameters are missing', async () => {
       let error: MissingParameterError = undefined;
-      await sut.getDataset(null, null, null).catch((e) => (error = e));
+      await sut.getDataset(undefined, undefined, undefined).catch((e) => (error = e));
       expect(error).to.be.instanceOf(Error);
     });
   });
@@ -168,7 +168,7 @@ describe('DatasetsRepository', () => {
     test('should return Dataset when not providing anonymized field value and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
 
-      const actual = await sut.getPrivateUrlDataset(testToken, null);
+      const actual = await sut.getPrivateUrlDataset(testToken, undefined);
 
       assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`, {
         withCredentials: false,
@@ -186,7 +186,7 @@ describe('DatasetsRepository', () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
 
       let error: ReadError = undefined;
-      await sut.getPrivateUrlDataset(testToken, null).catch((e) => (error = e));
+      await sut.getPrivateUrlDataset(testToken, undefined).catch((e) => (error = e));
 
       assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`, {
         withCredentials: false,

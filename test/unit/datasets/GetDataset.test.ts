@@ -18,10 +18,10 @@ describe('execute', () => {
     datasetsRepositoryStub.getDataset = getDatasetStub;
     const sut = new GetDataset(datasetsRepositoryStub);
 
-    const actual = await sut.execute(null, '1', null);
+    const actual = await sut.execute(undefined, '1', undefined);
 
     assert.match(actual, testDataset);
-    assert.calledWithExactly(getDatasetStub, null, '1', null);
+    assert.calledWithExactly(getDatasetStub, undefined, '1', undefined);
   });
 
   test('should return error result on repository error', async () => {
