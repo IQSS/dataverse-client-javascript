@@ -9,18 +9,10 @@ import { createDatasetModel, createDatasetVersionPayload } from '../../testHelpe
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: DatasetsRepository = new DatasetsRepository();
-  const testVersionSuccessfulResponse = {
+  const testDatasetVersionSuccessfulResponse = {
     data: {
       status: 'OK',
       data: createDatasetVersionPayload(),
-    },
-  };
-  const testLatestVersionSuccessfulResponse = {
-    data: {
-      status: 'OK',
-      data: {
-        latestVersion: createDatasetVersionPayload(),
-      },
     },
   };
   const testErrorResponse = {
@@ -74,20 +66,20 @@ describe('DatasetsRepository', () => {
 
   describe('getDatasetById', () => {
     test('should return Dataset when providing id, no version, and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testLatestVersionSuccessfulResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
       const actual = await sut.getDatasetById(testDatasetModel.id);
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}`, {
+      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest`, {
         withCredentials: true,
       });
       assert.match(actual, testDatasetModel);
     });
 
     test('should return Dataset when providing id, version, and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
-      const actual = await sut.getDatasetById(testDatasetModel.id, testDatasetModel.versionId);
+      const actual = await sut.getDatasetById(testDatasetModel.id, String(testDatasetModel.versionId));
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -105,7 +97,7 @@ describe('DatasetsRepository', () => {
       let error: ReadError = undefined;
       await sut.getDatasetById(testDatasetModel.id).catch((e) => (error = e));
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}`, {
+      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest`, {
         withCredentials: true,
       });
       expect(error).to.be.instanceOf(Error);
@@ -114,13 +106,13 @@ describe('DatasetsRepository', () => {
 
   describe('getDatasetByPersistentId', () => {
     test('should return Dataset when providing persistent id, no version, and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testLatestVersionSuccessfulResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
       const actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId);
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/:persistentId?persistentId=${testDatasetModel.persistentId}`,
+        `${testApiUrl}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
         {
           withCredentials: true,
         },
@@ -129,9 +121,9 @@ describe('DatasetsRepository', () => {
     });
 
     test('should return Dataset when providing persistent id, version, and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
-      const actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId, testDatasetModel.versionId);
+      const actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId, String(testDatasetModel.versionId));
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -151,7 +143,7 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/:persistentId?persistentId=${testDatasetModel.persistentId}`,
+        `${testApiUrl}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
         {
           withCredentials: true,
         },
@@ -164,7 +156,7 @@ describe('DatasetsRepository', () => {
     const testToken = 'testToken';
 
     test('should return Dataset when providing anonymized field value and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
       const testAnonymizedFieldValue = 'testValue';
       const actual = await sut.getPrivateUrlDataset(testToken, 'testValue');
@@ -180,7 +172,7 @@ describe('DatasetsRepository', () => {
     });
 
     test('should return Dataset when not providing anonymized field value and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testVersionSuccessfulResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
       const actual = await sut.getPrivateUrlDataset(testToken, undefined);
 

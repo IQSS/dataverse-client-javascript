@@ -16,11 +16,6 @@ export const transformVersionResponseToDataset = (response: AxiosResponse): Data
   return transformVersionPayloadToDataset(versionPayload);
 };
 
-export const transformLatestVersionResponseToDataset = (response: AxiosResponse): Dataset => {
-  const versionPayload = response.data.data.latestVersion;
-  return transformVersionPayloadToDataset(versionPayload);
-};
-
 const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
   return {
     id: versionPayload.datasetId,

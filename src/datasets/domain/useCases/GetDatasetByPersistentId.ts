@@ -9,7 +9,7 @@ export class GetDatasetByPersistentId implements UseCase<Dataset> {
     this.datasetsRepository = datasetsRepository;
   }
 
-  async execute(datasetPersistentId: string, datasetVersionId?: number): Promise<Dataset> {
+  async execute(datasetPersistentId: string, datasetVersionId?: string): Promise<Dataset> {
     return await this.datasetsRepository.getDatasetByPersistentId(datasetPersistentId, datasetVersionId);
   }
 }
