@@ -41,15 +41,12 @@ const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
 };
 
 const transformPayloadToDatasetMetadataBlocks = (metadataBlocksPayload: any): DatasetMetadataBlock[] => {
-  const metadataBlockKeys = Object.keys(metadataBlocksPayload);
-  const datasetMetadataBlocks: DatasetMetadataBlock[] = [];
-  for (let metadataBlockKey of metadataBlockKeys) {
-    datasetMetadataBlocks.push({
+  return Object.keys(metadataBlocksPayload).map((metadataBlockKey) => {
+    return {
       name: metadataBlockKey,
       fields: transformPayloadToDatasetMetadataFields(metadataBlocksPayload[metadataBlockKey].fields),
-    });
-  }
-  return datasetMetadataBlocks;
+    };
+  });
 };
 
 const transformPayloadToDatasetMetadataFields = (metadataFieldsPayload: any): DatasetMetadataFields => {
@@ -68,11 +65,7 @@ const transformPayloadToDatasetMetadataFieldValue = (metadataFieldValuePayload: 
   if (Array.isArray(metadataFieldValuePayload)) {
     const isArrayOfObjects = typeof metadataFieldValuePayload[0] === 'object';
     if (!isArrayOfObjects) {
-      const datasetMetadataSubfields: string[] = [];
-      metadataFieldValuePayload.forEach(function (metadataValuePayload) {
-        datasetMetadataSubfields.push(transformHtmlToMarkdown(metadataValuePayload));
-      });
-      metadataFieldValue = datasetMetadataSubfields;
+      metadataFieldValue = metadataFieldValuePayload.map(transformHtmlToMarkdown);
     } else {
       const datasetMetadataSubfields: DatasetMetadataSubField[] = [];
       metadataFieldValuePayload.forEach(function (metadataSubFieldValuePayload) {
