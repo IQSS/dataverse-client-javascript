@@ -1,4 +1,4 @@
-import { GetDataset } from '../../../src/datasets/domain/useCases/GetDataset';
+import { GetDatasetById } from '../../../src/datasets/domain/useCases/GetDatasetById';
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository';
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { createDatasetModel } from '../../testHelpers/datasets/datasetHelper';
@@ -15,23 +15,23 @@ describe('execute', () => {
     const testDataset = createDatasetModel();
     const datasetsRepositoryStub = <IDatasetsRepository>{};
     const getDatasetStub = sandbox.stub().returns(testDataset);
-    datasetsRepositoryStub.getDataset = getDatasetStub;
-    const sut = new GetDataset(datasetsRepositoryStub);
+    datasetsRepositoryStub.getDatasetById = getDatasetStub;
+    const sut = new GetDatasetById(datasetsRepositoryStub);
 
-    const actual = await sut.execute(undefined, '1', undefined);
+    const actual = await sut.execute(1);
 
     assert.match(actual, testDataset);
-    assert.calledWithExactly(getDatasetStub, undefined, '1', undefined);
+    assert.calledWithExactly(getDatasetStub, 1, undefined);
   });
 
   test('should return error result on repository error', async () => {
     const datasetsRepositoryStub = <IDatasetsRepository>{};
     const testReadError = new ReadError();
-    datasetsRepositoryStub.getDataset = sandbox.stub().throwsException(testReadError);
-    const sut = new GetDataset(datasetsRepositoryStub);
+    datasetsRepositoryStub.getDatasetById = sandbox.stub().throwsException(testReadError);
+    const sut = new GetDatasetById(datasetsRepositoryStub);
 
     let actualError: ReadError = undefined;
-    await sut.execute().catch((e) => (actualError = e));
+    await sut.execute(1).catch((e) => (actualError = e));
 
     assert.match(actualError, testReadError);
   });

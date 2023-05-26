@@ -1,7 +1,6 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository';
 import { Dataset } from '../../domain/models/Dataset';
-import { MissingParameterError } from '../../../core/domain/repositories/MissingParameterError';
 import {
   transformVersionResponseToDataset,
   transformLatestVersionResponseToDataset,
@@ -16,23 +15,9 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async getDataset(
-    datasetId?: number,
-    datasetPersistentId?: string,
-    datasetVersionId?: number,
-  ): Promise<Dataset> {
-    if (datasetId != undefined) {
-      return this.getDatasetById(datasetId, datasetVersionId);
-    } else if (datasetPersistentId != undefined) {
-      return this.getDatasetByPersistentId(datasetPersistentId, datasetVersionId);
-    } else {
-      throw new MissingParameterError('Dataset ID or Persistent ID should be provided to getDataset operation');
-    }
-  }
-
   public async getPrivateUrlDataset(token: string, anonymizedFieldValue?: string): Promise<Dataset> {
     let apiEndpoint = `/datasets/privateUrlDatasetVersion/${token}`;
-    if (anonymizedFieldValue != null) {
+    if (anonymizedFieldValue !== undefined) {
       apiEndpoint = apiEndpoint + `?anonymizedFieldValue=${anonymizedFieldValue}`;
     }
     return this.doGet(apiEndpoint)
@@ -42,16 +27,16 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  private async getDatasetById(datasetId: number, datasetVersionId?: number): Promise<Dataset> {
-    if (datasetVersionId == null) {
+  public async getDatasetById(datasetId: number, datasetVersionId?: number): Promise<Dataset> {
+    if (datasetVersionId === undefined) {
       return this.getDatasetLatestVersion(`/datasets/${datasetId}`);
     } else {
       return this.getDatasetParticularVersion(`/datasets/${datasetId}/versions/${datasetVersionId}`);
     }
   }
 
-  private async getDatasetByPersistentId(datasetPersistentId: string, datasetVersionId?: number): Promise<Dataset> {
-    if (datasetVersionId == null) {
+  public async getDatasetByPersistentId(datasetPersistentId: string, datasetVersionId?: number): Promise<Dataset> {
+    if (datasetVersionId === undefined) {
       return this.getDatasetLatestVersion(`/datasets/:persistentId?persistentId=${datasetPersistentId}`);
     } else {
       return this.getDatasetParticularVersion(

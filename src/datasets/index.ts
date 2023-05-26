@@ -1,15 +1,17 @@
 import { DatasetsRepository } from './infra/repositories/DatasetsRepository';
 import { GetDatasetSummaryFieldNames } from './domain/useCases/GetDatasetSummaryFieldNames';
-import { GetDataset } from './domain/useCases/GetDataset';
+import { GetDatasetById } from './domain/useCases/GetDatasetById';
+import { GetDatasetByPersistentId } from './domain/useCases/GetDatasetByPersistentId';
 import { GetPrivateUrlDataset } from './domain/useCases/GetPrivateUrlDataset';
 
 const datasetsRepository = new DatasetsRepository();
 
 const getDatasetSummaryFieldNames = new GetDatasetSummaryFieldNames(datasetsRepository);
-const getDataset = new GetDataset(datasetsRepository);
+const getDatasetById = new GetDatasetById(datasetsRepository);
+const getDatasetByPersistentId = new GetDatasetByPersistentId(datasetsRepository);
 const getPrivateUrlDataset = new GetPrivateUrlDataset(datasetsRepository);
 
-export { getDatasetSummaryFieldNames, getDataset, getPrivateUrlDataset };
+export { getDatasetSummaryFieldNames, getDatasetById, getDatasetByPersistentId, getPrivateUrlDataset };
 export {
   Dataset,
   DatasetVersionInfo,
