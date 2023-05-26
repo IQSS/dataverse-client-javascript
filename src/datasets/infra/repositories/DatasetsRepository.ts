@@ -45,6 +45,22 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     }
   }
 
+  public async getDatasetCitation(
+    datasetId: number,
+    anonymizedAccess: boolean = false,
+    datasetVersionId?: string,
+  ): Promise<string> {
+    let version = ':latest';
+    if (datasetVersionId !== undefined) {
+      version = datasetVersionId;
+    }
+    return this.doGet(`/datasets/${datasetId}/versions/${version}/citation?anonymizedAccess=${anonymizedAccess}`, true)
+      .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   private async getDatasetLatestVersion(endpoint: string): Promise<Dataset> {
     return this.doGet(endpoint, true)
       .then((response) => transformLatestVersionResponseToDataset(response))

@@ -202,4 +202,48 @@ describe('DatasetsRepository', () => {
       expect(error).to.be.instanceOf(Error);
     });
   });
+
+  describe('getDatasetCitation', () => {
+    const testDatasetId = 1;
+
+    test('should return citation when response is successful', async () => {
+      const testCitation = 'test citation';
+      const testCitationSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: {
+            message: testCitation,
+          },
+        },
+      };
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testCitationSuccessfulResponse);
+
+      const actual = await sut.getDatasetCitation(testDatasetId, false, undefined);
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${testApiUrl}/datasets/${testDatasetId}/versions/:latest/citation?anonymizedAccess=false`,
+        {
+          withCredentials: true,
+        },
+      );
+      assert.match(actual, testCitation);
+    });
+
+    test('should return error on repository read error', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+
+      let error: ReadError = undefined;
+      await sut.getDatasetCitation(1, false, undefined).catch((e) => (error = e));
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${testApiUrl}/datasets/${testDatasetId}/versions/:latest/citation?anonymizedAccess=false`,
+        {
+          withCredentials: true,
+        },
+      );
+      expect(error).to.be.instanceOf(Error);
+    });
+  });
 });
