@@ -1,5 +1,7 @@
 import { Dataset, DatasetVersionState } from '../../../src/datasets/domain/models/Dataset';
-import { NodeHtmlMarkdown } from 'node-html-markdown';
+import TurndownService from 'turndown';
+
+const turndownService = new TurndownService();
 
 const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z';
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z';
@@ -44,7 +46,7 @@ export const createDatasetModel = (): Dataset => {
           subject: ['Subject1', 'Subject2'],
           dsDescription: [
             {
-              dsDescriptionValue: NodeHtmlMarkdown.translate(DATASET_HTML_DESCRIPTION),
+              dsDescriptionValue: turndownService.turndown(DATASET_HTML_DESCRIPTION),
             },
           ],
         },
@@ -64,7 +66,11 @@ export const createDatasetVersionPayload = (): any => {
     lastUpdateTime: DATASET_UPDATE_TIME_STR,
     releaseTime: DATASET_RELEASE_TIME_STR,
     createTime: DATASET_CREATE_TIME_STR,
-    license: { name: 'CC0 1.0', uri: 'https://creativecommons.org/publicdomain/zero/1.0/', iconUri: 'https://licensebuttons.net/p/zero/1.0/88x31.png' },
+    license: {
+      name: 'CC0 1.0',
+      uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      iconUri: 'https://licensebuttons.net/p/zero/1.0/88x31.png',
+    },
     metadataBlocks: {
       citation: {
         name: 'citation',
