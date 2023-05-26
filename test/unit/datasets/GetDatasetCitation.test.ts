@@ -14,15 +14,15 @@ describe('execute', () => {
   test('should return successful result with citation on repository success', async () => {
     const testCitation = 'test citation';
     const datasetsRepositoryStub = <IDatasetsRepository>{};
-    const getDatasetCitationByPersistentIdStub = sandbox.stub().returns(testCitation);
-    datasetsRepositoryStub.getDatasetCitation = getDatasetCitationByPersistentIdStub;
+    const getDatasetCitationStub = sandbox.stub().returns(testCitation);
+    datasetsRepositoryStub.getDatasetCitation = getDatasetCitationStub;
 
     const sut = new GetDatasetCitation(datasetsRepositoryStub);
 
     const actual = await sut.execute(testId);
 
     assert.match(actual, testCitation);
-    assert.calledWithExactly(getDatasetCitationByPersistentIdStub, testId, false, undefined);
+    assert.calledWithExactly(getDatasetCitationStub, testId, false, undefined);
   });
 
   test('should return error result on repository error', async () => {

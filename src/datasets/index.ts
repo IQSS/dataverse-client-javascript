@@ -11,14 +11,14 @@ const getDatasetSummaryFieldNames = new GetDatasetSummaryFieldNames(datasetsRepo
 const getDatasetById = new GetDatasetById(datasetsRepository);
 const getDatasetByPersistentId = new GetDatasetByPersistentId(datasetsRepository);
 const getPrivateUrlDataset = new GetPrivateUrlDataset(datasetsRepository);
-const getDatasetCitationByPersistentId = new GetDatasetCitation(datasetsRepository);
+const getDatasetCitation = new GetDatasetCitation(datasetsRepository);
 
 export {
   getDatasetSummaryFieldNames,
   getDatasetById,
   getDatasetByPersistentId,
   getPrivateUrlDataset,
-  getDatasetCitationByPersistentId,
+  getDatasetCitation,
 };
 export {
   Dataset,
