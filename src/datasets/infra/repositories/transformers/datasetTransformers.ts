@@ -10,12 +10,12 @@ import { AxiosResponse } from 'axios';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
 
 export const transformVersionResponseToDataset = (response: AxiosResponse): Dataset => {
-  const versionPayload = response.data;
+  const versionPayload = response.data.data;
   return transformVersionPayloadToDataset(versionPayload);
 };
 
 export const transformLatestVersionResponseToDataset = (response: AxiosResponse): Dataset => {
-  const versionPayload = response.data.latestVersion;
+  const versionPayload = response.data.data.latestVersion;
   return transformVersionPayloadToDataset(versionPayload);
 };
 

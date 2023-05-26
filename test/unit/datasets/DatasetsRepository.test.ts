@@ -10,13 +10,17 @@ describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: DatasetsRepository = new DatasetsRepository();
   const testVersionSuccessfulResponse = {
-    status: 'OK',
-    data: createDatasetVersionPayload(),
+    data: {
+      status: 'OK',
+      data: createDatasetVersionPayload(),
+    },
   };
   const testLatestVersionSuccessfulResponse = {
-    status: 'OK',
     data: {
-      latestVersion: createDatasetVersionPayload(),
+      status: 'OK',
+      data: {
+        latestVersion: createDatasetVersionPayload(),
+      },
     },
   };
   const testErrorResponse = {
@@ -145,9 +149,13 @@ describe('DatasetsRepository', () => {
       let error: ReadError = undefined;
       await sut.getDatasetByPersistentId(testDatasetModel.persistentId).catch((e) => (error = e));
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/:persistentId?persistentId=${testDatasetModel.persistentId}`, {
-        withCredentials: true,
-      });
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${testApiUrl}/datasets/:persistentId?persistentId=${testDatasetModel.persistentId}`,
+        {
+          withCredentials: true,
+        },
+      );
       expect(error).to.be.instanceOf(Error);
     });
   });
