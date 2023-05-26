@@ -26,6 +26,7 @@ export enum DatasetVersionState {
 export interface DatasetLicense {
   name: string;
   uri: string;
+  iconUri?: string;
 }
 
 export interface DatasetMetadataBlock {

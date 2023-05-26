@@ -35,6 +35,7 @@ const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
     license: {
       name: versionPayload.license.name,
       uri: versionPayload.license.uri,
+      iconUri: versionPayload.license.iconUri,
     },
     metadataBlocks: transformPayloadToDatasetMetadataBlocks(versionPayload.metadataBlocks),
   };
