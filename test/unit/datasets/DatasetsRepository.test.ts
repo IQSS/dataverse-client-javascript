@@ -155,15 +155,14 @@ describe('DatasetsRepository', () => {
   describe('getPrivateUrlDataset', () => {
     const testToken = 'testToken';
 
-    test('should return Dataset when providing anonymized field value and response is successful', async () => {
+    test('should return Dataset when response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
-      const testAnonymizedFieldValue = 'testValue';
-      const actual = await sut.getPrivateUrlDataset(testToken, 'testValue');
+      const actual = await sut.getPrivateUrlDataset(testToken);
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}?anonymizedFieldValue=${testAnonymizedFieldValue}`,
+        `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`,
         {
           withCredentials: false,
         },
@@ -171,22 +170,11 @@ describe('DatasetsRepository', () => {
       assert.match(actual, testDatasetModel);
     });
 
-    test('should return Dataset when not providing anonymized field value and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
-
-      const actual = await sut.getPrivateUrlDataset(testToken, undefined);
-
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`, {
-        withCredentials: false,
-      });
-      assert.match(actual, testDatasetModel);
-    });
-
     test('should return error on repository read error', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
 
       let error: ReadError = undefined;
-      await sut.getPrivateUrlDataset(testToken, undefined).catch((e) => (error = e));
+      await sut.getPrivateUrlDataset(testToken).catch((e) => (error = e));
 
       assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`, {
         withCredentials: false,

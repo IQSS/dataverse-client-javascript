@@ -9,7 +9,7 @@ export class GetPrivateUrlDataset implements UseCase<Dataset> {
     this.datasetsRepository = datasetsRepository;
   }
 
-  async execute(token: string, anonymizedFieldValue?: string): Promise<Dataset> {
-    return await this.datasetsRepository.getPrivateUrlDataset(token, anonymizedFieldValue);
+  async execute(token: string): Promise<Dataset> {
+    return await this.datasetsRepository.getPrivateUrlDataset(token);
   }
 }

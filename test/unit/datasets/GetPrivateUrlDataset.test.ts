@@ -19,10 +19,10 @@ describe('execute', () => {
     datasetsRepositoryStub.getPrivateUrlDataset = getDatasetStub;
     const sut = new GetPrivateUrlDataset(datasetsRepositoryStub);
 
-    const actual = await sut.execute(testToken, null);
+    const actual = await sut.execute(testToken);
 
     assert.match(actual, testDataset);
-    assert.calledWithExactly(getDatasetStub, testToken, null);
+    assert.calledWithExactly(getDatasetStub, testToken);
   });
 
   test('should return error result on repository error', async () => {
@@ -32,7 +32,7 @@ describe('execute', () => {
     const sut = new GetPrivateUrlDataset(datasetsRepositoryStub);
 
     let actualError: ReadError = undefined;
-    await sut.execute(testToken, null).catch((e) => (actualError = e));
+    await sut.execute(testToken).catch((e) => (actualError = e));
 
     assert.match(actualError, testReadError);
   });
