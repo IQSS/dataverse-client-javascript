@@ -194,11 +194,11 @@ describe('DatasetsRepository', () => {
     test('should return citation when response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testCitationSuccessfulResponse);
 
-      const actual = await sut.getDatasetCitation(testDatasetModel.id, false, undefined);
+      const actual = await sut.getDatasetCitation(testDatasetModel.id, undefined);
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest/citation?anonymizedAccess=false`,
+        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
         {
           withCredentials: true,
         },
@@ -210,11 +210,11 @@ describe('DatasetsRepository', () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
 
       let error: ReadError = undefined;
-      await sut.getDatasetCitation(1, false, undefined).catch((e) => (error = e));
+      await sut.getDatasetCitation(1, undefined).catch((e) => (error = e));
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest/citation?anonymizedAccess=false`,
+        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
         {
           withCredentials: true,
         },

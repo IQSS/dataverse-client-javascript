@@ -5,6 +5,6 @@ export interface IDatasetsRepository {
   getDatasetById(datasetId: number, datasetVersionId?: string): Promise<Dataset>;
   getDatasetByPersistentId(datasetPersistentId: string, datasetVersionId?: string): Promise<Dataset>;
   getPrivateUrlDataset(token: string): Promise<Dataset>;
-  getDatasetCitation(datasetId: number, anonymizedAccess: boolean, datasetVersionId?: string): Promise<string>;
+  getDatasetCitation(datasetId: number, datasetVersionId?: string): Promise<string>;
   getPrivateUrlDatasetCitation(token: string): Promise<string>;
 }

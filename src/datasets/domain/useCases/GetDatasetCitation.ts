@@ -8,7 +8,7 @@ export class GetDatasetCitation implements UseCase<string> {
     this.datasetsRepository = datasetsRepository;
   }
 
-  async execute(datasetId: number, datasetVersionId?: string, anonymizedAccess: boolean = false): Promise<string> {
-    return await this.datasetsRepository.getDatasetCitation(datasetId, anonymizedAccess, datasetVersionId);
+  async execute(datasetId: number, datasetVersionId?: string): Promise<string> {
+    return await this.datasetsRepository.getDatasetCitation(datasetId, datasetVersionId);
   }
 }

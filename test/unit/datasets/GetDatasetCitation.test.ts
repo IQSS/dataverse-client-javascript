@@ -22,7 +22,7 @@ describe('execute', () => {
     const actual = await sut.execute(testId);
 
     assert.match(actual, testCitation);
-    assert.calledWithExactly(getDatasetCitationStub, testId, false, undefined);
+    assert.calledWithExactly(getDatasetCitationStub, testId, undefined);
   });
 
   test('should return error result on repository error', async () => {
