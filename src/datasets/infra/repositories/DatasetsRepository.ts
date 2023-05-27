@@ -63,4 +63,12 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error;
       });
   }
+
+  public async getPrivateUrlDatasetCitation(token: string): Promise<string> {
+    return this.doGet(`/datasets/privateUrlDatasetVersion/${token}/citation`)
+      .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error;
+      });
+  }
 }

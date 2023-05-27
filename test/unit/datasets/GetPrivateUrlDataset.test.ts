@@ -6,7 +6,7 @@ import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 
 describe('execute', () => {
   const sandbox: SinonSandbox = createSandbox();
-  const testToken = 'token';
+  const testPrivateUrlToken = 'token';
 
   afterEach(() => {
     sandbox.restore();
@@ -19,10 +19,10 @@ describe('execute', () => {
     datasetsRepositoryStub.getPrivateUrlDataset = getDatasetStub;
     const sut = new GetPrivateUrlDataset(datasetsRepositoryStub);
 
-    const actual = await sut.execute(testToken);
+    const actual = await sut.execute(testPrivateUrlToken);
 
     assert.match(actual, testDataset);
-    assert.calledWithExactly(getDatasetStub, testToken);
+    assert.calledWithExactly(getDatasetStub, testPrivateUrlToken);
   });
 
   test('should return error result on repository error', async () => {
@@ -32,7 +32,7 @@ describe('execute', () => {
     const sut = new GetPrivateUrlDataset(datasetsRepositoryStub);
 
     let actualError: ReadError = undefined;
-    await sut.execute(testToken).catch((e) => (actualError = e));
+    await sut.execute(testPrivateUrlToken).catch((e) => (actualError = e));
 
     assert.match(actualError, testReadError);
   });

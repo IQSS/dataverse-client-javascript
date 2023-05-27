@@ -15,12 +15,22 @@ describe('DatasetsRepository', () => {
       data: createDatasetVersionPayload(),
     },
   };
+  const testCitation = 'test citation';
+  const testCitationSuccessfulResponse = {
+    data: {
+      status: 'OK',
+      data: {
+        message: testCitation,
+      },
+    },
+  };
   const testErrorResponse = {
     response: {
       status: 'ERROR',
       message: 'test',
     },
   };
+  const testPrivateUrlToken = 'testToken';
   const testDatasetModel = createDatasetModel();
   const testApiUrl = 'https://test.dataverse.org/api/v1';
 
@@ -123,7 +133,10 @@ describe('DatasetsRepository', () => {
     test('should return Dataset when providing persistent id, version, and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
-      const actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId, String(testDatasetModel.versionId));
+      const actual = await sut.getDatasetByPersistentId(
+        testDatasetModel.persistentId,
+        String(testDatasetModel.versionId),
+      );
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -153,20 +166,14 @@ describe('DatasetsRepository', () => {
   });
 
   describe('getPrivateUrlDataset', () => {
-    const testToken = 'testToken';
-
     test('should return Dataset when response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
-      const actual = await sut.getPrivateUrlDataset(testToken);
+      const actual = await sut.getPrivateUrlDataset(testPrivateUrlToken);
 
-      assert.calledWithExactly(
-        axiosGetStub,
-        `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`,
-        {
-          withCredentials: false,
-        },
-      );
+      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`, {
+        withCredentials: false,
+      });
       assert.match(actual, testDatasetModel);
     });
 
@@ -174,9 +181,9 @@ describe('DatasetsRepository', () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
 
       let error: ReadError = undefined;
-      await sut.getPrivateUrlDataset(testToken).catch((e) => (error = e));
+      await sut.getPrivateUrlDataset(testPrivateUrlToken).catch((e) => (error = e));
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testToken}`, {
+      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`, {
         withCredentials: false,
       });
       expect(error).to.be.instanceOf(Error);
@@ -184,25 +191,14 @@ describe('DatasetsRepository', () => {
   });
 
   describe('getDatasetCitation', () => {
-    const testDatasetId = 1;
-
     test('should return citation when response is successful', async () => {
-      const testCitation = 'test citation';
-      const testCitationSuccessfulResponse = {
-        data: {
-          status: 'OK',
-          data: {
-            message: testCitation,
-          },
-        },
-      };
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testCitationSuccessfulResponse);
 
-      const actual = await sut.getDatasetCitation(testDatasetId, false, undefined);
+      const actual = await sut.getDatasetCitation(testDatasetModel.id, false, undefined);
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetId}/versions/:latest/citation?anonymizedAccess=false`,
+        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest/citation?anonymizedAccess=false`,
         {
           withCredentials: true,
         },
@@ -218,9 +214,42 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetId}/versions/:latest/citation?anonymizedAccess=false`,
+        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest/citation?anonymizedAccess=false`,
         {
           withCredentials: true,
+        },
+      );
+      expect(error).to.be.instanceOf(Error);
+    });
+  });
+
+  describe('getPrivateUrlDatasetCitation', () => {
+    test('should return citation when response is successful', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testCitationSuccessfulResponse);
+
+      const actual = await sut.getPrivateUrlDatasetCitation(testPrivateUrlToken);
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${testApiUrl}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
+        {
+          withCredentials: false,
+        },
+      );
+      assert.match(actual, testCitation);
+    });
+
+    test('should return error on repository read error', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+
+      let error: ReadError = undefined;
+      await sut.getPrivateUrlDatasetCitation(testPrivateUrlToken).catch((e) => (error = e));
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${testApiUrl}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
+        {
+          withCredentials: false,
         },
       );
       expect(error).to.be.instanceOf(Error);
