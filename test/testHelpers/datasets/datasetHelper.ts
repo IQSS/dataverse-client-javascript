@@ -1,4 +1,4 @@
-import { Dataset, DatasetVersionState } from '../../../src/datasets/domain/models/Dataset';
+import { Dataset, DatasetVersionState, DatasetLicense } from '../../../src/datasets/domain/models/Dataset';
 import TurndownService from 'turndown';
 
 const turndownService = new TurndownService();
@@ -10,8 +10,8 @@ const DATASET_RELEASE_TIME_STR = '2023-05-15T08:21:03Z';
 const DATASET_HTML_DESCRIPTION =
   '<div><h1 class="test-class-to-ignore">Title 1</h1><p>Test paragraph 1</p><p>Test paragraph 2</p><p>Hello world</p><h2>Title 2</h2><h3>Title 3</h3></div>';
 
-export const createDatasetModel = (): Dataset => {
-  return {
+export const createDatasetModel = (license?: DatasetLicense): Dataset => {
+  let datasetModel: Dataset = {
     id: 1,
     persistentId: 'doi:10.5072/FK2/HC6KTB',
     versionId: 19,
@@ -22,11 +22,6 @@ export const createDatasetModel = (): Dataset => {
       createTime: new Date(DATASET_CREATE_TIME_STR),
       lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
       releaseTime: new Date(DATASET_RELEASE_TIME_STR),
-    },
-    license: {
-      name: 'CC0 1.0',
-      uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
-      iconUri: 'https://licensebuttons.net/p/zero/1.0/88x31.png',
     },
     metadataBlocks: [
       {
@@ -53,10 +48,14 @@ export const createDatasetModel = (): Dataset => {
       },
     ],
   };
+  if (license !== undefined) {
+    datasetModel.license = license;
+  }
+  return datasetModel;
 };
 
-export const createDatasetVersionPayload = (): any => {
-  return {
+export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
+  let datasetPayload: any = {
     id: 19,
     datasetId: 1,
     datasetPersistentId: 'doi:10.5072/FK2/HC6KTB',
@@ -142,4 +141,19 @@ export const createDatasetVersionPayload = (): any => {
     },
     files: [],
   };
+  if (license !== undefined) {
+    datasetPayload.license = license;
+  }
+  return datasetPayload;
+};
+
+export const createDatasetLicenseModel = (withIconUri: boolean = true): DatasetLicense => {
+  let datasetLicense: DatasetLicense = {
+    name: 'CC0 1.0',
+    uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
+  };
+  if (withIconUri) {
+    datasetLicense.iconUri = 'https://licensebuttons.net/p/zero/1.0/88x31.png';
+  }
+  return datasetLicense;
 };

@@ -3,7 +3,7 @@ export interface Dataset {
   persistentId: string;
   versionId: number;
   versionInfo: DatasetVersionInfo;
-  license: DatasetLicense;
+  license?: DatasetLicense;
   metadataBlocks: DatasetMetadataBlock[];
 }
 

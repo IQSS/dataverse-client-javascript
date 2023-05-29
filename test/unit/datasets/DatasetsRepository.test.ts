@@ -4,7 +4,11 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
-import { createDatasetModel, createDatasetVersionPayload } from '../../testHelpers/datasets/datasetHelper';
+import {
+  createDatasetModel,
+  createDatasetVersionPayload,
+  createDatasetLicenseModel,
+} from '../../testHelpers/datasets/datasetHelper';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -99,6 +103,50 @@ describe('DatasetsRepository', () => {
         },
       );
       assert.match(actual, testDatasetModel);
+    });
+
+    test('should return Dataset when providing id, version, and response with license is successful', async () => {
+      const testDatasetLicense = createDatasetLicenseModel();
+      const testDatasetVersionWithLicenseSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: createDatasetVersionPayload(testDatasetLicense),
+        },
+      };
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionWithLicenseSuccessfulResponse);
+
+      const actual = await sut.getDatasetById(testDatasetModel.id, String(testDatasetModel.versionId));
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
+        {
+          withCredentials: true,
+        },
+      );
+      assert.match(actual, createDatasetModel(testDatasetLicense));
+    });
+
+    test('should return Dataset when providing id, version, and response with license without icon URI is successful', async () => {
+      const testDatasetLicenseWithoutIconUri = createDatasetLicenseModel(false);
+      const testDatasetVersionWithLicenseSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: createDatasetVersionPayload(testDatasetLicenseWithoutIconUri),
+        },
+      };
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionWithLicenseSuccessfulResponse);
+
+      const actual = await sut.getDatasetById(testDatasetModel.id, String(testDatasetModel.versionId));
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
+        {
+          withCredentials: true,
+        },
+      );
+      assert.match(actual, createDatasetModel(testDatasetLicenseWithoutIconUri));
     });
 
     test('should return error on repository read error', async () => {

@@ -5,6 +5,7 @@ import {
   DatasetMetadataBlock,
   DatasetMetadataSubField,
   DatasetMetadataFieldValue,
+  DatasetLicense,
 } from '../../../domain/models/Dataset';
 import { AxiosResponse } from 'axios';
 import TurndownService from 'turndown';
@@ -17,7 +18,7 @@ export const transformVersionResponseToDataset = (response: AxiosResponse): Data
 };
 
 const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
-  return {
+  let datasetModel: Dataset = {
     id: versionPayload.datasetId,
     persistentId: versionPayload.datasetPersistentId,
     versionId: versionPayload.id,
@@ -29,13 +30,23 @@ const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
       lastUpdateTime: new Date(versionPayload.lastUpdateTime),
       releaseTime: new Date(versionPayload.releaseTime),
     },
-    license: {
-      name: versionPayload.license.name,
-      uri: versionPayload.license.uri,
-      iconUri: versionPayload.license.iconUri,
-    },
     metadataBlocks: transformPayloadToDatasetMetadataBlocks(versionPayload.metadataBlocks),
   };
+  if (versionPayload.hasOwnProperty('license')) {
+    datasetModel.license = transformPayloadToDatasetLicense(versionPayload.license);
+  }
+  return datasetModel;
+};
+
+const transformPayloadToDatasetLicense = (licensePayload: any): DatasetLicense => {
+  let datasetLicense: DatasetLicense = {
+    name: licensePayload.name,
+    uri: licensePayload.uri,
+  };
+  if (licensePayload.hasOwnProperty('iconUri')) {
+    datasetLicense.iconUri = licensePayload.iconUri;
+  }
+  return datasetLicense;
 };
 
 const transformPayloadToDatasetMetadataBlocks = (metadataBlocksPayload: any): DatasetMetadataBlock[] => {
