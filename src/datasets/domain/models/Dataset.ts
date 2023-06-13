@@ -35,48 +35,50 @@ export interface DatasetMetadataBlock {
   name: string;
   fields: DatasetMetadataFields;
 }
+export const ANONYMIZED_FIELD_VALUE = 'withheld'
+type AnonymizedField = typeof ANONYMIZED_FIELD_VALUE
 
 export type DatasetMetadataFields = Record<string, DatasetMetadataFieldValue>;
 
-export type DatasetMetadataFieldValue = string | string[] | DatasetMetadataSubField | DatasetMetadataSubField[];
+export type DatasetMetadataFieldValue = string | string[] | DatasetMetadataSubField | DatasetMetadataSubField[] | AnonymizedField;
 
-export type DatasetMetadataSubField = Record<string, string>;
+export type DatasetMetadataSubField = Record<string, string>
 
 export interface CitationMetadataBlock extends DatasetMetadataBlock {
   name: 'citation';
   fields: {
     title: string;
-    author: Author[];
-    datasetContact: DatasetContact[];
-    dsDescription: DatasetDescription[];
-    subject: string[];
+    author: Author[] | AnonymizedField;
+    datasetContact: DatasetContact[] | AnonymizedField;
+    dsDescription: DatasetDescription[] | AnonymizedField;
+    subject: string[] | AnonymizedField;
     subtitle?: string;
     alternativeTitle?: string;
     alternativeURL?: string;
-    otherId?: OtherId[];
-    keyword?: Keyword[];
-    topicClassification?: TopicClassification[];
-    publication?: Publication[];
+    otherId?: OtherId[] | AnonymizedField;
+    keyword?: Keyword[] | AnonymizedField;
+    topicClassification?: TopicClassification[] | AnonymizedField;
+    publication?: Publication[] | AnonymizedField;
     notesText?: string;
-    language?: string[];
-    producer?: Producer[];
+    language?: string[] | AnonymizedField;
+    producer?: Producer[] | AnonymizedField;
     productionDate?: string;
-    productionPlace?: string[];
-    contributor?: Contributor[];
-    grantNumber?: GrantNumber[];
-    distributor?: Distributor[];
+    productionPlace?: string[] | AnonymizedField;
+    contributor?: Contributor[] | AnonymizedField;
+    grantNumber?: GrantNumber[] | AnonymizedField;
+    distributor?: Distributor[] | AnonymizedField;
     distributionDate?: string;
     depositor?: string;
     dateOfDeposit?: string;
-    timePeriodCovered?: TimePeriodCovered[];
-    dateOfCollection?: DateOfCollection[];
-    kindOfData?: string[];
-    series?: Series[];
-    software?: Software[];
-    relatedMaterial?: string[];
-    relatedDatasets?: string[];
-    otherReferences?: string[];
-    dataSources?: string[];
+    timePeriodCovered?: TimePeriodCovered[] | AnonymizedField;
+    dateOfCollection?: DateOfCollection[] | AnonymizedField;
+    kindOfData?: string[] | AnonymizedField;
+    series?: Series[] | AnonymizedField;
+    software?: Software[] | AnonymizedField;
+    relatedMaterial?: string[] | AnonymizedField;
+    relatedDatasets?: string[] | AnonymizedField;
+    otherReferences?: string[] | AnonymizedField;
+    dataSources?: string[] | AnonymizedField;
     originOfSources?: string;
     characteristicOfSources?: string;
     accessToSources?: string;
