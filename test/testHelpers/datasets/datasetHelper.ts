@@ -11,7 +11,7 @@ const DATASET_HTML_DESCRIPTION =
   '<div><h1 class="test-class-to-ignore">Title 1</h1><p>Test paragraph 1</p><p>Test paragraph 2</p><p>Hello world</p><h2>Title 2</h2><h3>Title 3</h3></div>';
 
 export const createDatasetModel = (license?: DatasetLicense): Dataset => {
-  let datasetModel: Dataset = {
+  const datasetModel: Dataset = {
     id: 1,
     persistentId: 'doi:10.5072/FK2/HC6KTB',
     versionId: 19,
@@ -43,6 +43,11 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
             {
               dsDescriptionValue: turndownService.turndown(DATASET_HTML_DESCRIPTION),
             },
+          ], datasetContact: [
+            {
+              datasetContactName:  'Admin, Dataverse',
+              datasetContactEmail: 'someemail@test.com'
+            },
           ],
         },
       },
@@ -55,7 +60,7 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
 };
 
 export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
-  let datasetPayload: any = {
+  const datasetPayload: any = {
     id: 19,
     datasetId: 1,
     datasetPersistentId: 'doi:10.5072/FK2/HC6KTB',
@@ -136,6 +141,27 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
               },
             ],
           },
+          {
+            typeName: "datasetContact",
+            multiple: true,
+            typeClass: "compound",
+            value: [
+              {
+                datasetContactName: {
+                  typeName: "datasetContactName",
+                  multiple: false,
+                  typeClass: "primitive",
+                  value: 'Admin, Dataverse',
+                },
+                datasetContactEmail: {
+                  typeName: "datasetContactEmail",
+                  multiple: false,
+                  typeClass: "primitive",
+                  value: 'someemail@test.com'
+                }
+              }
+            ]
+          },
         ],
       },
     },
@@ -148,7 +174,7 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
 };
 
 export const createDatasetLicenseModel = (withIconUri: boolean = true): DatasetLicense => {
-  let datasetLicense: DatasetLicense = {
+  const datasetLicense: DatasetLicense = {
     name: 'CC0 1.0',
     uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
   };
