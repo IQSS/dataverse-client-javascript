@@ -4,7 +4,7 @@ export interface Dataset {
   versionId: number;
   versionInfo: DatasetVersionInfo;
   license?: DatasetLicense;
-  metadataBlocks: MetadataBlocks;
+  metadataBlocks: DatasetMetadataBlocks;
 }
 
 export interface DatasetVersionInfo {
@@ -29,20 +29,25 @@ export interface DatasetLicense {
   iconUri?: string;
 }
 
-export type MetadataBlocks = [CitationMetadataBlock, ...DatasetMetadataBlock[]];
+export type DatasetMetadataBlocks = [CitationMetadataBlock, ...DatasetMetadataBlock[]];
 
 export interface DatasetMetadataBlock {
   name: string;
   fields: DatasetMetadataFields;
 }
-export const ANONYMIZED_FIELD_VALUE = 'withheld'
-type AnonymizedField = typeof ANONYMIZED_FIELD_VALUE
+export const ANONYMIZED_FIELD_VALUE = 'withheld';
+type AnonymizedField = typeof ANONYMIZED_FIELD_VALUE;
 
 export type DatasetMetadataFields = Record<string, DatasetMetadataFieldValue>;
 
-export type DatasetMetadataFieldValue = string | string[] | DatasetMetadataSubField | DatasetMetadataSubField[] | AnonymizedField;
+export type DatasetMetadataFieldValue =
+  | string
+  | string[]
+  | DatasetMetadataSubField
+  | DatasetMetadataSubField[]
+  | AnonymizedField;
 
-export type DatasetMetadataSubField = Record<string, string>
+export type DatasetMetadataSubField = Record<string, string>;
 
 export interface CitationMetadataBlock extends DatasetMetadataBlock {
   name: 'citation';

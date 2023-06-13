@@ -28,6 +28,7 @@ export {
   DatasetVersionInfo,
   DatasetVersionState,
   DatasetLicense,
+  DatasetMetadataBlocks,
   DatasetMetadataBlock,
   DatasetMetadataFields,
   DatasetMetadataFieldValue,

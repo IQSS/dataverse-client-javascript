@@ -5,7 +5,7 @@ import {
   DatasetMetadataSubField,
   DatasetMetadataFieldValue,
   DatasetLicense,
-  MetadataBlocks,
+  DatasetMetadataBlocks,
 } from '../../../domain/models/Dataset';
 import { AxiosResponse } from 'axios';
 import TurndownService from 'turndown';
@@ -50,13 +50,13 @@ const transformPayloadToDatasetLicense = (licensePayload: any): DatasetLicense =
   return datasetLicense;
 };
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformPayloadToDatasetMetadataBlocks = (metadataBlocksPayload: any): MetadataBlocks => {
+const transformPayloadToDatasetMetadataBlocks = (metadataBlocksPayload: any): DatasetMetadataBlocks => {
   return Object.keys(metadataBlocksPayload).map((metadataBlockKey) => {
     return {
       name: metadataBlockKey,
       fields: transformPayloadToDatasetMetadataFields(metadataBlocksPayload[metadataBlockKey].fields),
     };
-  }) as MetadataBlocks;
+  }) as DatasetMetadataBlocks;
 };
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToDatasetMetadataFields = (metadataFieldsPayload: any): DatasetMetadataFields => {
