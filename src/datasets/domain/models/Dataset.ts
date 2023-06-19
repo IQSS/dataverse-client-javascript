@@ -4,6 +4,9 @@ export interface Dataset {
   versionId: number;
   versionInfo: DatasetVersionInfo;
   license?: DatasetLicense;
+  alternativePersistentId?: string;
+  publicationDate?: string;
+  citationDate?: string;
   metadataBlocks: DatasetMetadataBlocks;
 }
 

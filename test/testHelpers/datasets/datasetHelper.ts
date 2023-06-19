@@ -23,6 +23,7 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
       lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
       releaseTime: new Date(DATASET_RELEASE_TIME_STR),
     },
+    publicationDate: '2023-05-15',
     metadataBlocks: [
       {
         name: 'citation',
@@ -43,10 +44,11 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
             {
               dsDescriptionValue: turndownService.turndown(DATASET_HTML_DESCRIPTION),
             },
-          ], datasetContact: [
+          ],
+          datasetContact: [
             {
-              datasetContactName:  'Admin, Dataverse',
-              datasetContactEmail: 'someemail@test.com'
+              datasetContactName: 'Admin, Dataverse',
+              datasetContactEmail: 'someemail@test.com',
             },
           ],
         },
@@ -70,6 +72,7 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
     lastUpdateTime: DATASET_UPDATE_TIME_STR,
     releaseTime: DATASET_RELEASE_TIME_STR,
     createTime: DATASET_CREATE_TIME_STR,
+    publicationDate: '2023-05-15',
     license: {
       name: 'CC0 1.0',
       uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
@@ -142,25 +145,25 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
             ],
           },
           {
-            typeName: "datasetContact",
+            typeName: 'datasetContact',
             multiple: true,
-            typeClass: "compound",
+            typeClass: 'compound',
             value: [
               {
                 datasetContactName: {
-                  typeName: "datasetContactName",
+                  typeName: 'datasetContactName',
                   multiple: false,
-                  typeClass: "primitive",
+                  typeClass: 'primitive',
                   value: 'Admin, Dataverse',
                 },
                 datasetContactEmail: {
-                  typeName: "datasetContactEmail",
+                  typeName: 'datasetContactEmail',
                   multiple: false,
-                  typeClass: "primitive",
-                  value: 'someemail@test.com'
-                }
-              }
-            ]
+                  typeClass: 'primitive',
+                  value: 'someemail@test.com',
+                },
+              },
+            ],
           },
         ],
       },
