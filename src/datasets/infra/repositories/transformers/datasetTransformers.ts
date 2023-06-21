@@ -35,6 +35,15 @@ const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
   if ('license' in versionPayload) {
     datasetModel.license = transformPayloadToDatasetLicense(versionPayload.license);
   }
+  if ('alternativePersistentId' in versionPayload) {
+    datasetModel.alternativePersistentId = versionPayload.alternativePersistentId;
+  }
+  if ('publicationDate' in versionPayload) {
+    datasetModel.publicationDate = versionPayload.publicationDate;
+  }
+  if ('citationDate' in versionPayload) {
+    datasetModel.citationDate = versionPayload.citationDate;
+  }
   return datasetModel;
 };
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
