@@ -2,10 +2,10 @@ export interface MetadataBlock {
   id: number;
   name: string;
   displayName: string;
-  metadataFields: MetadataField[];
+  metadataFields: Record<string, MetadataFieldInfo>;
 }
 
-export interface MetadataField {
+export interface MetadataFieldInfo {
   name: string;
   displayName: string;
   title: string;
@@ -15,4 +15,5 @@ export interface MetadataField {
   multiple: boolean;
   isControlledVocabulary: boolean;
   displayFormat: string;
+  childMetadataFields?: Record<string, MetadataFieldInfo>;
 }
