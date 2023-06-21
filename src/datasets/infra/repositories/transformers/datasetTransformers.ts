@@ -2,10 +2,10 @@ import {
   Dataset,
   DatasetVersionState,
   DatasetMetadataFields,
-  DatasetMetadataBlock,
   DatasetMetadataSubField,
   DatasetMetadataFieldValue,
   DatasetLicense,
+  DatasetMetadataBlocks,
 } from '../../../domain/models/Dataset';
 import { AxiosResponse } from 'axios';
 import TurndownService from 'turndown';
@@ -16,9 +16,9 @@ export const transformVersionResponseToDataset = (response: AxiosResponse): Data
   const versionPayload = response.data.data;
   return transformVersionPayloadToDataset(versionPayload);
 };
-
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
-  let datasetModel: Dataset = {
+  const datasetModel: Dataset = {
     id: versionPayload.datasetId,
     persistentId: versionPayload.datasetPersistentId,
     versionId: versionPayload.id,
@@ -32,43 +32,44 @@ const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
     },
     metadataBlocks: transformPayloadToDatasetMetadataBlocks(versionPayload.metadataBlocks),
   };
-  if (versionPayload.hasOwnProperty('license')) {
+  if ('license' in versionPayload) {
     datasetModel.license = transformPayloadToDatasetLicense(versionPayload.license);
   }
   return datasetModel;
 };
-
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToDatasetLicense = (licensePayload: any): DatasetLicense => {
-  let datasetLicense: DatasetLicense = {
+  const datasetLicense: DatasetLicense = {
     name: licensePayload.name,
     uri: licensePayload.uri,
   };
-  if (licensePayload.hasOwnProperty('iconUri')) {
+
+  if ('iconUri' in licensePayload) {
     datasetLicense.iconUri = licensePayload.iconUri;
   }
   return datasetLicense;
 };
-
-const transformPayloadToDatasetMetadataBlocks = (metadataBlocksPayload: any): DatasetMetadataBlock[] => {
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+const transformPayloadToDatasetMetadataBlocks = (metadataBlocksPayload: any): DatasetMetadataBlocks => {
   return Object.keys(metadataBlocksPayload).map((metadataBlockKey) => {
     return {
       name: metadataBlockKey,
       fields: transformPayloadToDatasetMetadataFields(metadataBlocksPayload[metadataBlockKey].fields),
     };
-  });
+  }) as DatasetMetadataBlocks;
 };
-
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToDatasetMetadataFields = (metadataFieldsPayload: any): DatasetMetadataFields => {
   const metadataFieldKeys = Object.keys(metadataFieldsPayload);
   const metadataFields: DatasetMetadataFields = {};
-  for (let metadataFieldKey of metadataFieldKeys) {
+  for (const metadataFieldKey of metadataFieldKeys) {
     const metadataField = metadataFieldsPayload[metadataFieldKey];
     const metadataFieldTypeName = metadataField.typeName;
     metadataFields[metadataFieldTypeName] = transformPayloadToDatasetMetadataFieldValue(metadataField.value);
   }
   return metadataFields;
 };
-
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToDatasetMetadataFieldValue = (metadataFieldValuePayload: any): DatasetMetadataFieldValue => {
   let metadataFieldValue: DatasetMetadataFieldValue;
   if (Array.isArray(metadataFieldValuePayload)) {
@@ -80,7 +81,7 @@ const transformPayloadToDatasetMetadataFieldValue = (metadataFieldValuePayload: 
       metadataFieldValuePayload.forEach(function (metadataSubFieldValuePayload) {
         const subFieldKeys = Object.keys(metadataSubFieldValuePayload);
         const record: DatasetMetadataSubField = {};
-        for (let subFieldKey of subFieldKeys) {
+        for (const subFieldKey of subFieldKeys) {
           record[subFieldKey] = transformHtmlToMarkdown(metadataSubFieldValuePayload[subFieldKey].value);
         }
         datasetMetadataSubfields.push(record);

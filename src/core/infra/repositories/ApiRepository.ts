@@ -10,7 +10,7 @@ import { WriteError } from '../../domain/repositories/WriteError';
   For 2.0.0, we must also support API key auth to be backwards compatible and support use cases other than SPA MVP.
 */
 export abstract class ApiRepository {
-  public async doGet(apiEndpoint: string, withCredentials: boolean = false): Promise<AxiosResponse> {
+  public async doGet(apiEndpoint: string, withCredentials = false): Promise<AxiosResponse> {
     return await axios
       .get(this.buildRequestUrl(apiEndpoint), { withCredentials: withCredentials })
       .then((response) => response)
