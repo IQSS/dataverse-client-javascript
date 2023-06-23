@@ -1,7 +1,3 @@
-/**
- * @jest-environment ./test/integration/environment/integration-test-environment.js
- */
-
 import { DataverseInfoRepository } from '../../../src/info/infra/repositories/DataverseInfoRepository';
 import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
 
