@@ -5,19 +5,13 @@ import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { createAuthenticatedUser } from '../../testHelpers/users/authenticatedUserHelper';
 import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
+import { TestConstants } from '../../testHelpers/TestConstants';
 
 describe('getCurrentAuthenticatedUser', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: UsersRepository = new UsersRepository();
-  const testApiUrl = 'https://test.dataverse.org/api/v1';
-  const expectedRequestConfig = {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Dataverse-Key': 'dummyApiKey',
-    },
-  };
 
-  ApiConfig.init(testApiUrl, DataverseApiAuthMechanism.API_KEY, 'dummyApiKey');
+  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, 'dummyApiKey');
 
   afterEach(() => {
     sandbox.restore();
@@ -49,23 +43,25 @@ describe('getCurrentAuthenticatedUser', () => {
 
     const actual = await sut.getCurrentAuthenticatedUser();
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, expectedRequestConfig);
+    assert.calledWithExactly(
+      axiosGetStub,
+      `${TestConstants.TEST_API_URL}/users/:me`,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+    );
     assert.match(actual, testAuthenticatedUser);
   });
 
   test('should return error result on error response', async () => {
-    const testErrorResponse = {
-      response: {
-        status: 'ERROR',
-        message: 'test',
-      },
-    };
-    const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+    const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
     let error: ReadError = undefined;
     await sut.getCurrentAuthenticatedUser().catch((e) => (error = e));
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, expectedRequestConfig);
+    assert.calledWithExactly(
+      axiosGetStub,
+      `${TestConstants.TEST_API_URL}/users/:me`,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+    );
     expect(error).to.be.instanceOf(Error);
   });
 });

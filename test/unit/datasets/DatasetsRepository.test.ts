@@ -54,7 +54,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/summaryFieldNames`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testFieldNames);
     });
@@ -68,7 +68,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/summaryFieldNames`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -83,7 +83,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -96,7 +96,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -116,7 +116,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, createDatasetModel(testDatasetLicense));
     });
@@ -136,7 +136,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, createDatasetModel(testDatasetLicenseWithoutIconUri));
     });
@@ -150,7 +150,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -165,7 +165,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -181,7 +181,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetModel.versionId}?persistentId=${testDatasetModel.persistentId}`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -195,7 +195,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -210,7 +210,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -224,7 +224,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -239,7 +239,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testCitation);
     });
@@ -253,7 +253,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -268,7 +268,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testCitation);
     });
@@ -282,7 +282,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
-        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });

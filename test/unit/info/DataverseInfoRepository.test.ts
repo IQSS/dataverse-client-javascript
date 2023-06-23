@@ -35,7 +35,7 @@ describe('getDataverseVersion', () => {
     assert.calledWithExactly(
       axiosGetStub,
       `${TestConstants.TEST_API_URL}/info/version`,
-      TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+      TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
     );
     assert.match(actual.number, testVersionNumber);
     assert.match(actual.build, testVersionBuild);
@@ -50,7 +50,7 @@ describe('getDataverseVersion', () => {
     assert.calledWithExactly(
       axiosGetStub,
       `${TestConstants.TEST_API_URL}/info/version`,
-      TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+      TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
     );
     expect(error).to.be.instanceOf(Error);
   });

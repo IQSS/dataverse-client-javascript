@@ -7,13 +7,13 @@ export class TestConstants {
       message: 'test',
     },
   };
-  static readonly TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG = {
+  static readonly TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG = {
     headers: {
       'Content-Type': 'application/json',
       'X-Dataverse-Key': TestConstants.TEST_DUMMY_API_KEY,
     },
   };
-  static readonly TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG = {
+  static readonly TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG = {
     headers: {
       'Content-Type': 'application/json',
     },

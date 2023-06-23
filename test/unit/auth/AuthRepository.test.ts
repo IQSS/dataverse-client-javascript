@@ -33,7 +33,7 @@ describe('logout', () => {
       axiosPostStub,
       `${TestConstants.TEST_API_URL}/logout`,
       JSON.stringify(''),
-      TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
     );
   });
 
@@ -47,7 +47,7 @@ describe('logout', () => {
       axiosPostStub,
       `${TestConstants.TEST_API_URL}/logout`,
       JSON.stringify(''),
-      TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
     );
     expect(error).to.be.instanceOf(Error);
   });
