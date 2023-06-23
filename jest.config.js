@@ -6,4 +6,5 @@ module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.ts$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   coveragePathIgnorePatterns: ['node_modules', 'testHelpers'],
+  globalSetup: '<rootDir>/test/integration/environment/setup.js',
 };

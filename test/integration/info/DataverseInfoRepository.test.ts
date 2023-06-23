@@ -1,10 +1,11 @@
 import { DataverseInfoRepository } from '../../../src/info/infra/repositories/DataverseInfoRepository';
-import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
+import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
+import { TestConstants } from '../../testHelpers/TestConstants';
 
 describe('getDataverseVersion', () => {
   const sut: DataverseInfoRepository = new DataverseInfoRepository();
 
-  ApiConfig.init('http://localhost:8080/api/v1');
+  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY);
 
   test('should return Dataverse version', async () => {
     const actual = await sut.getDataverseVersion();

@@ -4,14 +4,20 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { createAuthenticatedUser } from '../../testHelpers/users/authenticatedUserHelper';
-import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
+import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 
 describe('getCurrentAuthenticatedUser', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: UsersRepository = new UsersRepository();
   const testApiUrl = 'https://test.dataverse.org/api/v1';
+  const expectedRequestConfig = {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Dataverse-Key': 'dummyApiKey',
+    },
+  };
 
-  ApiConfig.init(testApiUrl);
+  ApiConfig.init(testApiUrl, DataverseApiAuthMechanism.API_KEY, 'dummyApiKey');
 
   afterEach(() => {
     sandbox.restore();
@@ -43,7 +49,7 @@ describe('getCurrentAuthenticatedUser', () => {
 
     const actual = await sut.getCurrentAuthenticatedUser();
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, { withCredentials: true });
+    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, expectedRequestConfig);
     assert.match(actual, testAuthenticatedUser);
   });
 
@@ -59,7 +65,7 @@ describe('getCurrentAuthenticatedUser', () => {
     let error: ReadError = undefined;
     await sut.getCurrentAuthenticatedUser().catch((e) => (error = e));
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, { withCredentials: true });
+    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, expectedRequestConfig);
     expect(error).to.be.instanceOf(Error);
   });
 });

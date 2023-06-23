@@ -3,12 +3,13 @@ import { assert, createSandbox, SinonSandbox } from 'sinon';
 import axios from 'axios';
 import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
-import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
+import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import {
   createDatasetModel,
   createDatasetVersionPayload,
   createDatasetLicenseModel,
 } from '../../testHelpers/datasets/datasetHelper';
+import { TestConstants } from '../../testHelpers/TestConstants';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -28,17 +29,10 @@ describe('DatasetsRepository', () => {
       },
     },
   };
-  const testErrorResponse = {
-    response: {
-      status: 'ERROR',
-      message: 'test',
-    },
-  };
   const testPrivateUrlToken = 'testToken';
   const testDatasetModel = createDatasetModel();
-  const testApiUrl = 'https://test.dataverse.org/api/v1';
 
-  ApiConfig.init(testApiUrl);
+  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
 
   afterEach(() => {
     sandbox.restore();
@@ -57,23 +51,25 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetSummaryFieldNames();
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/summaryFieldNames`, { withCredentials: false });
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${TestConstants.TEST_API_URL}/datasets/summaryFieldNames`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+      );
       assert.match(actual, testFieldNames);
     });
 
     test('should return error result on error response', async () => {
-      const testErrorResponse = {
-        response: {
-          status: 'ERROR',
-          message: 'test',
-        },
-      };
-      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
       await sut.getDatasetSummaryFieldNames().catch((e) => (error = e));
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/summaryFieldNames`, { withCredentials: false });
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${TestConstants.TEST_API_URL}/datasets/summaryFieldNames`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+      );
       expect(error).to.be.instanceOf(Error);
     });
   });
@@ -84,9 +80,11 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetById(testDatasetModel.id);
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest`, {
-        withCredentials: true,
-      });
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+      );
       assert.match(actual, testDatasetModel);
     });
 
@@ -97,10 +95,8 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        {
-          withCredentials: true,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -119,10 +115,8 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        {
-          withCredentials: true,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, createDatasetModel(testDatasetLicense));
     });
@@ -141,23 +135,23 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        {
-          withCredentials: true,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, createDatasetModel(testDatasetLicenseWithoutIconUri));
     });
 
     test('should return error on repository read error', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
       await sut.getDatasetById(testDatasetModel.id).catch((e) => (error = e));
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest`, {
-        withCredentials: true,
-      });
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
+      );
       expect(error).to.be.instanceOf(Error);
     });
   });
@@ -170,10 +164,8 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
-        {
-          withCredentials: true,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -188,26 +180,22 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/:persistentId/versions/${testDatasetModel.versionId}?persistentId=${testDatasetModel.persistentId}`,
-        {
-          withCredentials: true,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetModel.versionId}?persistentId=${testDatasetModel.persistentId}`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testDatasetModel);
     });
 
     test('should return error on repository read error', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
       await sut.getDatasetByPersistentId(testDatasetModel.persistentId).catch((e) => (error = e));
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
-        {
-          withCredentials: true,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -219,21 +207,25 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getPrivateUrlDataset(testPrivateUrlToken);
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`, {
-        withCredentials: false,
-      });
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+      );
       assert.match(actual, testDatasetModel);
     });
 
     test('should return error on repository read error', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
       await sut.getPrivateUrlDataset(testPrivateUrlToken).catch((e) => (error = e));
 
-      assert.calledWithExactly(axiosGetStub, `${testApiUrl}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`, {
-        withCredentials: false,
-      });
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
+      );
       expect(error).to.be.instanceOf(Error);
     });
   });
@@ -246,26 +238,22 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
-        {
-          withCredentials: true,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testCitation);
     });
 
     test('should return error on repository read error', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
       await sut.getDatasetCitation(1, undefined).catch((e) => (error = e));
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
-        {
-          withCredentials: true,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_AUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -279,26 +267,22 @@ describe('DatasetsRepository', () => {
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
-        {
-          withCredentials: false,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       assert.match(actual, testCitation);
     });
 
     test('should return error on repository read error', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
       await sut.getPrivateUrlDatasetCitation(testPrivateUrlToken).catch((e) => (error = e));
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${testApiUrl}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
-        {
-          withCredentials: false,
-        },
+        `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
+        TestConstants.TEST_EXPECTED_SUCCESSFUL_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
     });
