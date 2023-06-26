@@ -11,7 +11,6 @@ services:
       - DATAVERSE_DB_HOST=postgres
       - DATAVERSE_DB_PASSWORD=secret
       - DATAVERSE_DB_USER=${DATAVERSE_DB_USER}
-      - DATAVERSE_FEATURE_API_SESSION_AUTH=1
     ports:
       - '8080:8080'
     networks:
