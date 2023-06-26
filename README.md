@@ -40,6 +40,12 @@ the build generated will be placed in `dist` folder.
 
 `npm run test:integration`
 
+#### Configure the integration testing environment
+
+The integration testing environment is implemented with Test Containers and Docker Compose. The environment uses different environment variables, defined in a .env file, available in the _test/integration/environment_ folder.
+
+These environment variables can be updated as needed for integration testing. For example, we can specify the image tag, corresponding to the Dataverse branch to test, through the DATAVERSE_BRANCH_NAME variable.
+
 ### Run test coverage
 
 `npm run test:coverage`
