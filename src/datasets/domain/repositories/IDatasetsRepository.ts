@@ -1,4 +1,6 @@
 import { Dataset } from '../models/Dataset';
+import { DatasetFileOrderCriteria } from './DatasetFileOrderCriteria';
+import { File } from '../../../files';
 
 export interface IDatasetsRepository {
   getDatasetSummaryFieldNames(): Promise<string[]>;
@@ -7,4 +9,11 @@ export interface IDatasetsRepository {
   getPrivateUrlDataset(token: string): Promise<Dataset>;
   getDatasetCitation(datasetId: number, datasetVersionId?: string): Promise<string>;
   getPrivateUrlDatasetCitation(token: string): Promise<string>;
+  getDatasetFiles(
+    datasetId: string,
+    datasetVersionId?: string,
+    limit?: number,
+    offset?: number,
+    orderCriteria?: DatasetFileOrderCriteria,
+  ): Promise<File[]>;
 }
