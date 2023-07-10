@@ -11,7 +11,9 @@ describe('getCurrentAuthenticatedUser', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: UsersRepository = new UsersRepository();
 
-  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, 'dummyApiKey');
+  beforeEach(() => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
+  });
 
   afterEach(() => {
     sandbox.restore();
@@ -40,14 +42,29 @@ describe('getCurrentAuthenticatedUser', () => {
       },
     };
     const axiosGetStub = sandbox.stub(axios, 'get').resolves(testSuccessfulResponse);
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/users/:me`;
 
-    const actual = await sut.getCurrentAuthenticatedUser();
+    // API Key auth
+    let actual = await sut.getCurrentAuthenticatedUser();
 
     assert.calledWithExactly(
       axiosGetStub,
-      `${TestConstants.TEST_API_URL}/users/:me`,
-      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+      expectedApiEndpoint,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
     );
+
+    assert.match(actual, testAuthenticatedUser);
+
+    // Session cookie auth
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+    actual = await sut.getCurrentAuthenticatedUser();
+
+    assert.calledWithExactly(
+      axiosGetStub,
+      expectedApiEndpoint,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+    );
+
     assert.match(actual, testAuthenticatedUser);
   });
 
@@ -60,7 +77,7 @@ describe('getCurrentAuthenticatedUser', () => {
     assert.calledWithExactly(
       axiosGetStub,
       `${TestConstants.TEST_API_URL}/users/:me`,
-      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
     );
     expect(error).to.be.instanceOf(Error);
   });
