@@ -27,7 +27,7 @@ export abstract class ApiRepository {
   }
 
   private buildRequestConfig(authRequired: boolean): AxiosRequestConfig {
-    let requestConfig: AxiosRequestConfig = {
+    const requestConfig: AxiosRequestConfig = {
       headers: { 'Content-Type': 'application/json' },
     };
     if (!authRequired) {
@@ -41,8 +41,10 @@ export abstract class ApiRepository {
           Auth mechanisms like this are configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth).
         */
         requestConfig.withCredentials = true;
+        break;
       case DataverseApiAuthMechanism.API_KEY:
         requestConfig.headers['X-Dataverse-Key'] = ApiConfig.dataverseApiKey;
+        break;
     }
     return requestConfig;
   }

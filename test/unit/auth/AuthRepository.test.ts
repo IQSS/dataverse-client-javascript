@@ -10,7 +10,9 @@ describe('logout', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: AuthRepository = new AuthRepository();
 
-  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
+  beforeEach(() => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
+  })
 
   afterEach(() => {
     sandbox.restore();
@@ -26,14 +28,28 @@ describe('logout', () => {
       },
     };
     const axiosPostStub = sandbox.stub(axios, 'post').resolves(testSuccessfulResponse);
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/logout`
 
+    // API Key auth
     await sut.logout();
 
     assert.calledWithExactly(
       axiosPostStub,
-      `${TestConstants.TEST_API_URL}/logout`,
+      expectedApiEndpoint,
       JSON.stringify(''),
-      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+    );
+
+    // Session cookie auth
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+    
+    await sut.logout();
+
+    assert.calledWithExactly(
+      axiosPostStub,
+      expectedApiEndpoint,
+      JSON.stringify(''),
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
     );
   });
 
@@ -47,7 +63,7 @@ describe('logout', () => {
       axiosPostStub,
       `${TestConstants.TEST_API_URL}/logout`,
       JSON.stringify(''),
-      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
     );
     expect(error).to.be.instanceOf(Error);
   });
