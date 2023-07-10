@@ -32,7 +32,9 @@ describe('DatasetsRepository', () => {
   const testPrivateUrlToken = 'testToken';
   const testDatasetModel = createDatasetModel();
 
-  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
+  beforeEach(() => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
+  });
 
   afterEach(() => {
     sandbox.restore();
@@ -77,13 +79,25 @@ describe('DatasetsRepository', () => {
   describe('getDatasetById', () => {
     test('should return Dataset when providing id, no version, and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`;
 
-      const actual = await sut.getDatasetById(testDatasetModel.id);
+      // API Key auth
+      let actual = await sut.getDatasetById(testDatasetModel.id);
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+      assert.match(actual, testDatasetModel);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+      actual = await sut.getDatasetById(testDatasetModel.id);
+      assert.calledWithExactly(
+        axiosGetStub,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -96,7 +110,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -116,7 +130,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       assert.match(actual, createDatasetModel(testDatasetLicense));
     });
@@ -136,7 +150,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       assert.match(actual, createDatasetModel(testDatasetLicenseWithoutIconUri));
     });
@@ -150,7 +164,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -159,13 +173,27 @@ describe('DatasetsRepository', () => {
   describe('getDatasetByPersistentId', () => {
     test('should return Dataset when providing persistent id, no version, and response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`;
 
-      const actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId);
+      // API Key auth
+      let actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId);
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+      assert.match(actual, testDatasetModel);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId);
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -181,7 +209,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetModel.versionId}?persistentId=${testDatasetModel.persistentId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       assert.match(actual, testDatasetModel);
     });
@@ -195,7 +223,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       expect(error).to.be.instanceOf(Error);
     });
@@ -233,13 +261,27 @@ describe('DatasetsRepository', () => {
   describe('getDatasetCitation', () => {
     test('should return citation when response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testCitationSuccessfulResponse);
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest/citation`;
 
-      const actual = await sut.getDatasetCitation(testDatasetModel.id, undefined);
+      // API Key auth
+      let actual = await sut.getDatasetCitation(testDatasetModel.id, undefined);
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+      assert.match(actual, testCitation);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      actual = await sut.getDatasetCitation(testDatasetModel.id, undefined);
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
       );
       assert.match(actual, testCitation);
     });
@@ -253,7 +295,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest/citation`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       expect(error).to.be.instanceOf(Error);
     });
