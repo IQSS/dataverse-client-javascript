@@ -2,8 +2,6 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository';
 import { Dataset } from '../../domain/models/Dataset';
 import { transformVersionResponseToDataset } from './transformers/datasetTransformers';
-import { File } from '../../../files';
-import { DatasetFileOrderCriteria } from '../../domain/repositories/DatasetFileOrderCriteria';
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   DATASET_VERSION_LATEST = ':latest';
@@ -65,17 +63,5 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .catch((error) => {
         throw error;
       });
-  }
-
-  public async getDatasetFiles(
-    datasetId: string,
-    datasetVersionId?: string,
-    limit?: number,
-    offset?: number,
-    orderCriteria?: DatasetFileOrderCriteria,
-  ): Promise<File[]> {
-    throw new Error(
-      `Method not implemented. Params: ${datasetId} ${datasetVersionId} ${limit} ${offset} ${orderCriteria}`,
-    );
   }
 }

@@ -1,4 +1,4 @@
-export enum DatasetFileOrderCriteria {
+export enum FileOrderCriteria {
   NAME_AZ = 'NameAZ',
   NAME_ZA = 'NameZA',
   NEWEST = 'Newest',
