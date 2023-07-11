@@ -4,9 +4,9 @@ import { ReadError } from '../../domain/repositories/ReadError';
 import { WriteError } from '../../domain/repositories/WriteError';
 
 export abstract class ApiRepository {
-  public async doGet(apiEndpoint: string, authRequired = false): Promise<AxiosResponse> {
+  public async doGet(apiEndpoint: string, authRequired = false, queryParams: object = {}): Promise<AxiosResponse> {
     return await axios
-      .get(this.buildRequestUrl(apiEndpoint), this.buildRequestConfig(authRequired))
+      .get(this.buildRequestUrl(apiEndpoint), this.buildRequestConfig(authRequired, queryParams))
       .then((response) => response)
       .catch((error) => {
         throw new ReadError(
@@ -15,9 +15,9 @@ export abstract class ApiRepository {
       });
   }
 
-  public async doPost(apiEndpoint: string, data: string | object): Promise<AxiosResponse> {
+  public async doPost(apiEndpoint: string, data: string | object, queryParams: object = {}): Promise<AxiosResponse> {
     return await axios
-      .post(this.buildRequestUrl(apiEndpoint), JSON.stringify(data), this.buildRequestConfig(true))
+      .post(this.buildRequestUrl(apiEndpoint), JSON.stringify(data), this.buildRequestConfig(true, queryParams))
       .then((response) => response)
       .catch((error) => {
         throw new WriteError(
@@ -26,8 +26,9 @@ export abstract class ApiRepository {
       });
   }
 
-  private buildRequestConfig(authRequired: boolean): AxiosRequestConfig {
+  private buildRequestConfig(authRequired: boolean, queryParams: object): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
+      params: queryParams,
       headers: { 'Content-Type': 'application/json' },
     };
     if (!authRequired) {
