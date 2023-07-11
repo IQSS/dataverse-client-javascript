@@ -3,6 +3,7 @@ import { IFilesRepository } from '../../../src/files/domain/repositories/IFilesR
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { File } from '../../../src/files/domain/models/File';
+import { createFileModel } from '../../testHelpers/files/filesHelper';
 
 describe('execute', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -12,7 +13,7 @@ describe('execute', () => {
   });
 
   test('should return files on repository success', async () => {
-    const testFiles : File[] = [];
+    const testFiles : File[] = [createFileModel()];
     const filesRepositoryStub = <IFilesRepository>{};
     const getFilesByDatasetIdStub = sandbox.stub().returns(testFiles);
     filesRepositoryStub.getFilesByDatasetId = getFilesByDatasetIdStub;
