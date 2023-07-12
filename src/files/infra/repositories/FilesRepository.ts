@@ -2,6 +2,7 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository';
 import { FileOrderCriteria } from '../../domain/models/FileOrderCriteria';
 import { File } from '../../domain/models/File';
+import { transformFilesResponseToFiles } from './transformers/fileTransformers';
 
 export interface GetFilesQueryParams {
   limit?: number;
@@ -43,7 +44,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       queryParams.orderCriteria = orderCriteria.toString();
     }
     return this.doGet(endpoint, true, queryParams)
-      .then(() => [])
+      .then((response) => transformFilesResponseToFiles(response))
       .catch((error) => {
         throw error;
       });

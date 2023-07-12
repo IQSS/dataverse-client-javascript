@@ -6,18 +6,19 @@ import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import { TestConstants } from '../../testHelpers/TestConstants';
 import { FileOrderCriteria } from '../../../src/files/domain/models/FileOrderCriteria';
+import { createFilePayload, createFileModel } from '../../testHelpers/files/filesHelper';
 
 describe('FilesRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: FilesRepository = new FilesRepository();
-  // TODO: Add actual file payload
   const testFilesSuccessfulResponse = {
     data: {
       status: 'OK',
-      data: [{}],
+      data: [createFilePayload()],
     },
   };
   const testDatasetId = 1;
+  const testFile = createFileModel();
 
   beforeEach(() => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
@@ -38,7 +39,7 @@ describe('FilesRepository', () => {
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/:latest/files`,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
-      assert.match(actual, []);
+      assert.match(actual, [testFile]);
     });
 
     test('should return files when providing id, optional params, and response is successful', async () => {
@@ -48,7 +49,7 @@ describe('FilesRepository', () => {
       const testLimit = 10;
       const testOffset = 20;
       const testFileOrderCriteria = FileOrderCriteria.NEWEST;
-      
+
       const actual = await sut.getFilesByDatasetId(
         testDatasetId,
         testVersionId,
@@ -71,7 +72,7 @@ describe('FilesRepository', () => {
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testVersionId}/files`,
         expectedRequestConfig,
       );
-      assert.match(actual, []);
+      assert.match(actual, [testFile]);
     });
 
     test('should return error result on error response', async () => {
