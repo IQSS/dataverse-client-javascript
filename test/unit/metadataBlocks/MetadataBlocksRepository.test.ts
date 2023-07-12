@@ -3,19 +3,21 @@ import { assert, createSandbox, SinonSandbox } from 'sinon';
 import axios from 'axios';
 import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
-import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
+import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import {
   createMetadataBlockModel,
   createMetadataBlockPayload,
 } from '../../testHelpers/metadataBlocks/metadataBlockHelper';
+import { TestConstants } from '../../testHelpers/TestConstants';
 
 describe('getMetadataBlockByName', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: MetadataBlocksRepository = new MetadataBlocksRepository();
-  const testApiUrl = 'https://test.dataverse.org/api/v1';
   const testMetadataBlockName = 'test';
 
-  ApiConfig.init(testApiUrl);
+  beforeEach(() => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
+  });
 
   afterEach(() => {
     sandbox.restore();
@@ -30,11 +32,13 @@ describe('getMetadataBlockByName', () => {
     };
     const axiosGetStub = sandbox.stub(axios, 'get').resolves(testSuccessfulResponse);
 
-    const actual = await sut.getMetadataBlockByName(testMetadataBlockName);
+    let actual = await sut.getMetadataBlockByName(testMetadataBlockName);
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/metadatablocks/${testMetadataBlockName}`, {
-      withCredentials: false,
-    });
+    assert.calledWithExactly(
+      axiosGetStub,
+      `${TestConstants.TEST_API_URL}/metadatablocks/${testMetadataBlockName}`,
+      TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
+    );
     assert.match(actual, createMetadataBlockModel());
   });
 
@@ -50,9 +54,11 @@ describe('getMetadataBlockByName', () => {
     let error: ReadError = undefined;
     await sut.getMetadataBlockByName(testMetadataBlockName).catch((e) => (error = e));
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/metadatablocks/${testMetadataBlockName}`, {
-      withCredentials: false,
-    });
+    assert.calledWithExactly(
+      axiosGetStub,
+      `${TestConstants.TEST_API_URL}/metadatablocks/${testMetadataBlockName}`,
+      TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
+    );
     expect(error).to.be.instanceOf(Error);
   });
 });
