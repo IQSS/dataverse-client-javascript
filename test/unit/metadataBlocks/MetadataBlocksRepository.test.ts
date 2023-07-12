@@ -32,7 +32,7 @@ describe('getMetadataBlockByName', () => {
     };
     const axiosGetStub = sandbox.stub(axios, 'get').resolves(testSuccessfulResponse);
 
-    let actual = await sut.getMetadataBlockByName(testMetadataBlockName);
+    const actual = await sut.getMetadataBlockByName(testMetadataBlockName);
 
     assert.calledWithExactly(
       axiosGetStub,
