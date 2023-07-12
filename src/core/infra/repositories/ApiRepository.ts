@@ -1,18 +1,12 @@
-import axios, { AxiosResponse } from 'axios';
-import { ApiConfig } from './ApiConfig';
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
+import { ApiConfig, DataverseApiAuthMechanism } from './ApiConfig';
 import { ReadError } from '../../domain/repositories/ReadError';
 import { WriteError } from '../../domain/repositories/WriteError';
 
-/* TODO: 
-  We set { withCredentials: true } to send the JSESSIONID cookie in the requests for API authentication. 
-  This is required, along with the session auth feature flag enabled in the backend, to be able to authenticate using the JSESSIONID cookie.
-  Auth mechanisms like this must be configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth).
-  For 2.0.0, we must also support API key auth to be backwards compatible and support use cases other than SPA MVP.
-*/
 export abstract class ApiRepository {
-  public async doGet(apiEndpoint: string, withCredentials = false): Promise<AxiosResponse> {
+  public async doGet(apiEndpoint: string, authRequired = false): Promise<AxiosResponse> {
     return await axios
-      .get(this.buildRequestUrl(apiEndpoint), { withCredentials: withCredentials })
+      .get(this.buildRequestUrl(apiEndpoint), this.buildRequestConfig(authRequired))
       .then((response) => response)
       .catch((error) => {
         throw new ReadError(
@@ -23,10 +17,7 @@ export abstract class ApiRepository {
 
   public async doPost(apiEndpoint: string, data: string | object): Promise<AxiosResponse> {
     return await axios
-      .post(this.buildRequestUrl(apiEndpoint), JSON.stringify(data), {
-        withCredentials: true,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      .post(this.buildRequestUrl(apiEndpoint), JSON.stringify(data), this.buildRequestConfig(true))
       .then((response) => response)
       .catch((error) => {
         throw new WriteError(
@@ -35,7 +26,30 @@ export abstract class ApiRepository {
       });
   }
 
+  private buildRequestConfig(authRequired: boolean): AxiosRequestConfig {
+    const requestConfig: AxiosRequestConfig = {
+      headers: { 'Content-Type': 'application/json' },
+    };
+    if (!authRequired) {
+      return requestConfig;
+    }
+    switch (ApiConfig.dataverseApiAuthMechanism) {
+      case DataverseApiAuthMechanism.SESSION_COOKIE:
+        /*
+          We set { withCredentials: true } to send the JSESSIONID cookie in the requests for API authentication. 
+          This is required, along with the session auth feature flag enabled in the backend, to be able to authenticate using the JSESSIONID cookie.
+          Auth mechanisms like this are configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth).
+        */
+        requestConfig.withCredentials = true;
+        break;
+      case DataverseApiAuthMechanism.API_KEY:
+        requestConfig.headers['X-Dataverse-Key'] = ApiConfig.dataverseApiKey;
+        break;
+    }
+    return requestConfig;
+  }
+
   private buildRequestUrl(apiEndpoint: string): string {
-    return `${ApiConfig.DATAVERSE_API_URL}${apiEndpoint}`;
+    return `${ApiConfig.dataverseApiUrl}${apiEndpoint}`;
   }
 }

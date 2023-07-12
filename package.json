@@ -42,7 +42,8 @@
     "chai": "^4.3.7",
     "prettier": "^2.8.4",
     "ts-jest": "^29.0.5",
-    "sinon": "^15.0.3"
+    "sinon": "^15.0.3",
+    "testcontainers": "^9.9.1"
   },
   "dependencies": {
     "@types/node": "^18.15.11",

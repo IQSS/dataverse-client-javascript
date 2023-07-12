@@ -40,6 +40,16 @@ the build generated will be placed in `dist` folder.
 
 `npm run test:integration`
 
+#### Configure the integration testing environment
+
+The integration testing environment is implemented with Test Containers and Docker Compose. The environment uses different environment variables, defined in a .env file, available in the _test/integration/environment_ folder.
+
+These environment variables can be updated as needed for integration testing. For example, we can specify the Dataverse image registry and tag, to point to the particular Dataverse image to test.
+
+- To test images generated in Dataverse PRs: Set `ghcr.io` as the image registry (DATAVERSE_IMAGE_REGISTRY) and the source branch name of a particular PR as the image tag (DATAVERSE_IMAGE_TAG).
+
+- To test the Dataverse develop branch: Set `docker.io` as the image registry (DATAVERSE_IMAGE_REGISTRY) and `unstable` as the image tag (DATAVERSE_IMAGE_TAG).
+
 ### Run test coverage
 
 `npm run test:coverage`

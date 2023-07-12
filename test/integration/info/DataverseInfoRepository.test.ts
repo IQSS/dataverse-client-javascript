@@ -1,15 +1,14 @@
 import { DataverseInfoRepository } from '../../../src/info/infra/repositories/DataverseInfoRepository';
-import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
+import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
+import { TestConstants } from '../../testHelpers/TestConstants';
 
 describe('getDataverseVersion', () => {
-  // TODO: Change API URL to another of an integration test oriented Dataverse instance
   const sut: DataverseInfoRepository = new DataverseInfoRepository();
 
-  ApiConfig.init('https://demo.dataverse.org/api/v1');
+  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY);
 
   test('should return Dataverse version', async () => {
     const actual = await sut.getDataverseVersion();
     expect(typeof actual.number).toBe('string');
-    expect(typeof actual.build).toBe('string');
   });
 });

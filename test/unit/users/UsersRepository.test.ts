@@ -4,14 +4,16 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { createAuthenticatedUser } from '../../testHelpers/users/authenticatedUserHelper';
-import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
+import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
+import { TestConstants } from '../../testHelpers/TestConstants';
 
 describe('getCurrentAuthenticatedUser', () => {
   const sandbox: SinonSandbox = createSandbox();
   const sut: UsersRepository = new UsersRepository();
-  const testApiUrl = 'https://test.dataverse.org/api/v1';
 
-  ApiConfig.init(testApiUrl);
+  beforeEach(() => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
+  });
 
   afterEach(() => {
     sandbox.restore();
@@ -40,26 +42,43 @@ describe('getCurrentAuthenticatedUser', () => {
       },
     };
     const axiosGetStub = sandbox.stub(axios, 'get').resolves(testSuccessfulResponse);
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/users/:me`;
 
-    const actual = await sut.getCurrentAuthenticatedUser();
+    // API Key auth
+    let actual = await sut.getCurrentAuthenticatedUser();
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, { withCredentials: true });
+    assert.calledWithExactly(
+      axiosGetStub,
+      expectedApiEndpoint,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+    );
+
+    assert.match(actual, testAuthenticatedUser);
+
+    // Session cookie auth
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+    actual = await sut.getCurrentAuthenticatedUser();
+
+    assert.calledWithExactly(
+      axiosGetStub,
+      expectedApiEndpoint,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+    );
+
     assert.match(actual, testAuthenticatedUser);
   });
 
   test('should return error result on error response', async () => {
-    const testErrorResponse = {
-      response: {
-        status: 'ERROR',
-        message: 'test',
-      },
-    };
-    const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse);
+    const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
     let error: ReadError = undefined;
     await sut.getCurrentAuthenticatedUser().catch((e) => (error = e));
 
-    assert.calledWithExactly(axiosGetStub, `${testApiUrl}/users/:me`, { withCredentials: true });
+    assert.calledWithExactly(
+      axiosGetStub,
+      `${TestConstants.TEST_API_URL}/users/:me`,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+    );
     expect(error).to.be.instanceOf(Error);
   });
 });

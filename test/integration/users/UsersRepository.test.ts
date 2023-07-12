@@ -1,23 +1,26 @@
 import { UsersRepository } from '../../../src/users/infra/repositories/UsersRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { assert } from 'sinon';
-import { ApiConfig } from '../../../src/core/infra/repositories/ApiConfig';
+import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
+import { TestConstants } from '../../testHelpers/TestConstants';
 
 describe('getCurrentAuthenticatedUser', () => {
-  // TODO: Change API URL to another of an integration test oriented Dataverse instance
   const sut: UsersRepository = new UsersRepository();
 
-  ApiConfig.init('https://demo.dataverse.org/api/v1');
+  test('should return error when authentication is not valid', async () => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, 'invalidApiKey');
 
-  test('should return error when authentication is not provided', async () => {
     let error: ReadError = undefined;
     await sut.getCurrentAuthenticatedUser().catch((e) => (error = e));
 
-    assert.match(
-      error.message,
-      'There was an error when reading the resource. Reason was: [400] User with token null not found.',
-    );
+    assert.match(error.message, 'There was an error when reading the resource. Reason was: [401] Bad API key');
   });
 
-  // TODO: Add more test cases once the integration test environment is established
+  test('should return authenticated user when valid authentication is provided', async () => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
+
+    const actual = await sut.getCurrentAuthenticatedUser();
+
+    assert.match(actual.firstName, 'Dataverse');
+  });
 });

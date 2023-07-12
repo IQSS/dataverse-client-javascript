@@ -1,0 +1,95 @@
+version: '2.4'
+
+services:
+  test_dataverse:
+    container_name: 'test_dataverse'
+    hostname: dataverse
+    image: ${DATAVERSE_IMAGE_REGISTRY}/gdcc/dataverse:${DATAVERSE_IMAGE_TAG}
+    restart: on-failure
+    user: payara
+    environment:
+      - DATAVERSE_DB_HOST=postgres
+      - DATAVERSE_DB_PASSWORD=secret
+      - DATAVERSE_DB_USER=${DATAVERSE_DB_USER}
+    ports:
+      - '8080:8080'
+    networks:
+      - dataverse
+    depends_on:
+      - test_postgres
+      - test_solr
+    tmpfs:
+      - /dumps:mode=770,size=2052M,uid=1000,gid=1000
+      - /tmp:mode=770,size=2052M,uid=1000,gid=1000
+    mem_limit: 2147483648 # 2 GiB
+    mem_reservation: 1024m
+    privileged: false
+
+  test_dataverse_bootstrap:
+    container_name: 'test_dataverse_bootstrap'
+    image: gdcc/configbaker:unstable
+    restart: 'no'
+    environment:
+      - TIMEOUT=${DATAVERSE_BOOTSTRAP_TIMEOUT}
+    command:
+      - bootstrap.sh
+      - dev
+    networks:
+      - dataverse
+
+  test_postgres:
+    container_name: 'test_postgres'
+    hostname: postgres
+    image: postgres:${POSTGRES_VERSION}
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=${DATAVERSE_DB_USER}
+      - POSTGRES_PASSWORD=secret
+    expose:
+      - '5432'
+    networks:
+      - dataverse
+
+  test_solr_initializer:
+    container_name: 'test_solr_initializer'
+    image: gdcc/configbaker:unstable
+    restart: 'no'
+    command:
+      - sh
+      - -c
+      - 'fix-fs-perms.sh solr && cp -a /template/* /solr-template'
+
+  test_solr:
+    container_name: 'test_solr'
+    hostname: 'solr'
+    image: solr:${SOLR_VERSION}
+    depends_on:
+      - test_solr_initializer
+    restart: on-failure
+    expose:
+      - '8983'
+    networks:
+      - dataverse
+    command:
+      - 'solr-precreate'
+      - 'collection1'
+      - '/template'
+
+  test_smtp:
+    container_name: 'test_smtp'
+    hostname: 'smtp'
+    image: maildev/maildev:2.0.5
+    restart: on-failure
+    expose:
+      - '25' # smtp server
+    environment:
+      - MAILDEV_SMTP_PORT=25
+      - MAILDEV_MAIL_DIRECTORY=/mail
+    networks:
+      - dataverse
+    tmpfs:
+      - /mail:mode=770,size=128M,uid=1000,gid=1000
+
+networks:
+  dataverse:
+    driver: bridge
