@@ -1,5 +1,8 @@
 import { Dataset, DatasetVersionState, DatasetLicense } from '../../../src/datasets/domain/models/Dataset';
 import TurndownService from 'turndown';
+import axios, { AxiosResponse } from 'axios';
+import { TestConstants } from '../TestConstants';
+import datasetJson from './test-dataset.json';
 
 const turndownService = new TurndownService();
 
@@ -11,6 +14,10 @@ const DATASET_PUBLICATION_DATE_STR = '2023-05-15';
 
 const DATASET_HTML_DESCRIPTION =
   '<div><h1 class="test-class-to-ignore">Title 1</h1><p>Test paragraph 1</p><p>Test paragraph 2</p><p>Hello world</p><h2>Title 2</h2><h3>Title 3</h3></div>';
+
+const DATAVERSE_API_REQUEST_HEADERS = {
+  headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY },
+};
 
 export const createDatasetModel = (license?: DatasetLicense): Dataset => {
   const datasetModel: Dataset = {
@@ -187,4 +194,20 @@ export const createDatasetLicenseModel = (withIconUri: boolean = true): DatasetL
     datasetLicense.iconUri = 'https://licensebuttons.net/p/zero/1.0/88x31.png';
   }
   return datasetLicense;
+};
+
+export const createDatasetViaApi = async (): Promise<AxiosResponse> => {
+  return await axios.post(
+    `${TestConstants.TEST_API_URL}/dataverses/root/datasets`,
+    datasetJson,
+    DATAVERSE_API_REQUEST_HEADERS,
+  );
+};
+
+export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosResponse> => {
+  return await axios.post(
+    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,
+    {},
+    DATAVERSE_API_REQUEST_HEADERS,
+  );
 };
