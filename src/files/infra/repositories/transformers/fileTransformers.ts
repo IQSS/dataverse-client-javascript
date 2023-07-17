@@ -1,10 +1,10 @@
-import { File } from '../../../domain/models/File';
+import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File';
 import { AxiosResponse } from 'axios';
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export const transformFilesResponseToFiles = (response: AxiosResponse): File[] => {
   const files: File[] = [];
   const filesPayload = response.data.data;
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   filesPayload.forEach(function (filePayload: any) {
     files.push(transformFilePayloadToFile(filePayload));
   });
@@ -17,78 +17,47 @@ const transformFilePayloadToFile = (filePayload: any): File => {
     id: filePayload.dataFile.id,
     persistentId: filePayload.dataFile.persistentId,
     name: filePayload.dataFile.filename,
-    pidURL: filePayload.dataFile.pidURL,
+    ...(filePayload.dataFile.pidURL && { pidURL: filePayload.dataFile.pidURL }),
     sizeBytes: filePayload.dataFile.filesize,
-    version: 1,
-    description: filePayload.dataFile.description,
-    //
-    restricted: false,
-    contentType: 'image/png',
-    storageIdentifier: 'local://18945a85439-9fa52783e5cb',
-    rootDataFileId: 4,
-    previousDataFileId: 4,
-    md5: '29e413e0c881e17314ce8116fed4d1a7',
-    checksum: {
-      type: 'md5',
-      value: '29e413e0c881e17314ce8116fed4d1a7',
-    },
-    metadataId: 4,
-    creationDate: new Date('2023-07-11'),
+    version: filePayload.version,
+    ...(filePayload.dataFile.description && { description: filePayload.dataFile.description }),
+    restricted: filePayload.dataFile.restricted,
+    ...(filePayload.dataFile.directoryLabel && { directoryLabel: filePayload.dataFile.directoryLabel }),
+    ...(filePayload.dataFile.datasetVersionId && { datasetVersionId: filePayload.dataFile.datasetVersionId }),
+    ...(filePayload.dataFile.categories && { categories: filePayload.dataFile.categories }),
+    contentType: filePayload.dataFile.contentType,
+    ...(filePayload.dataFile.embargo && { embargo: transformEmbargoPayloadToEmbargo(filePayload.dataFile.embargo) }),
+    ...(filePayload.dataFile.storageIdentifier && { storageIdentifier: filePayload.dataFile.storageIdentifier }),
+    ...(filePayload.dataFile.originalFormat && { originalFormat: filePayload.dataFile.originalFormat }),
+    ...(filePayload.dataFile.originalFormatLabel && { originalFormatLabel: filePayload.dataFile.originalFormatLabel }),
+    ...(filePayload.dataFile.originalSize && { originalSize: filePayload.dataFile.originalSize }),
+    ...(filePayload.dataFile.originalName && { originalName: filePayload.dataFile.originalName }),
+    ...(filePayload.dataFile.UNF && { UNF: filePayload.dataFile.UNF }),
+    ...(filePayload.dataFile.rootDataFileId && { rootDataFileId: filePayload.dataFile.rootDataFileId }),
+    ...(filePayload.dataFile.previousDataFileId && { previousDataFileId: filePayload.dataFile.previousDataFileId }),
+    ...(filePayload.dataFile.md5 && { md5: filePayload.dataFile.md5 }),
+    ...(filePayload.dataFile.checksum && {
+      checksum: transformChecksumPayloadToChecksum(filePayload.dataFile.checksum),
+    }),
+    ...(filePayload.dataFile.fileMetadataId && { metadataId: filePayload.dataFile.fileMetadataId }),
+    ...(filePayload.dataFile.tabularTags && { tabularTags: filePayload.dataFile.tabularTags }),
+    ...(filePayload.dataFile.creationDate && { creationDate: new Date(filePayload.dataFile.creationDate) }),
+    ...(filePayload.dataFile.publicationDate && { publicationDate: new Date(filePayload.dataFile.publicationDate) }),
   };
 };
 
-// MODEL
-// id: number;
-// persistentId: string;
-// name: string;
-// pidURL?: string;
-// sizeBytes: number;
-// version: number;
-// description?: string;
-// restricted: boolean;
-// directoryLabel?: string;
-// datasetVersionId?: number;
-// categories?: string[];
-// contentType: string;
-// embargo?: FileEmbargo;
-// storageIdentifier?: string;
-// originalFormat?: string;
-// originalFormatLabel?: string;
-// originalSize?: number;
-// originalName?: string;
-// UNF?: string;
-// rootDataFileId?: number;
-// previousDataFileId?: number;
-// md5?: string;
-// checksum?: FileChecksum;
-// metadataId?: number;
-// tabularTags?: string[];
-// creationDate?: Date;
-// publicationDate?: Date;
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+const transformEmbargoPayloadToEmbargo = (embargoPayload: any): FileEmbargo => {
+  return {
+    dateAvailable: new Date(embargoPayload.dateAvailable),
+    ...(embargoPayload.reason && { reason: embargoPayload.reason }),
+  };
+};
 
-// PAYLOAD
-// {
-//   label: 'test',
-//   restricted: false,
-//   version: 1,
-//   datasetVersionId: 2,
-//   dataFile: {
-//     id: 5,
-//     persistentId: '',
-//     filename: 'test',
-//     contentType: 'image/png',
-//     filesize: 127426,
-//     restricted: false,
-//     storageIdentifier: 'local://18945a85439-9fa52783e5cb',
-//     rootDataFileId: 4,
-//     previousDataFileId: 4,
-//     md5: '29e413e0c881e17314ce8116fed4d1a7',
-//     checksum: {
-//       type: 'MD5',
-//       value: '29e413e0c881e17314ce8116fed4d1a7',
-//     },
-//     fileMetadataId: 4,
-//     creationDate: '2023-07-11',
-//     varGroups: [],
-//   },
-// };
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+const transformChecksumPayloadToChecksum = (checksumPayload: any): FileChecksum => {
+  return {
+    type: checksumPayload.type,
+    value: checksumPayload.value,
+  };
+};

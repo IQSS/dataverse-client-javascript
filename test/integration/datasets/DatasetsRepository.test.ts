@@ -10,9 +10,8 @@ describe('DatasetsRepository', () => {
   const createdTestDatasetId = 2;
   const nonExistentTestDatasetId = 100;
 
-  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
-
   beforeAll(async () => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
     // We update timeout due to experienced timeout errors
     jest.setTimeout(10000);
     await createDatasetViaApi()

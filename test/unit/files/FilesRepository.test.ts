@@ -32,14 +32,30 @@ describe('FilesRepository', () => {
     test('should return files on successful response', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFilesSuccessfulResponse);
 
-      const actual = await sut.getFilesByDatasetId(testDatasetId);
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/:latest/files`;
+      const expectedFiles = [testFile];
+
+      // API Key auth
+      let actual = await sut.getFilesByDatasetId(testDatasetId);
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/:latest/files`,
+        expectedApiEndpoint,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
-      assert.match(actual, [testFile]);
+      assert.match(actual, expectedFiles);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      actual = await sut.getFilesByDatasetId(testDatasetId);
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+      );
+      assert.match(actual, expectedFiles);
     });
 
     test('should return files when providing id, optional params, and response is successful', async () => {

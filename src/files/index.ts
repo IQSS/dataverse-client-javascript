@@ -6,5 +6,5 @@ const getFilesByDatasetId = new GetFilesByDatasetId(filesRepository);
 
 export { getFilesByDatasetId };
 
-export { File } from './domain/models/File';
+export { File, FileEmbargo, FileChecksum } from './domain/models/File';
 export { FileOrderCriteria } from './domain/models/FileOrderCriteria';
