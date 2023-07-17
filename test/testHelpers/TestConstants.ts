@@ -27,4 +27,5 @@ export class TestConstants {
       'Content-Type': 'application/json',
     },
   };
+  static readonly TEST_CREATED_DATASET_ID = 2;
 }

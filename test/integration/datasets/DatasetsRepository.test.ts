@@ -7,7 +7,6 @@ import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository();
-  const createdTestDatasetId = 2;
   const nonExistentTestDatasetId = 100;
 
   beforeAll(async () => {
@@ -36,13 +35,13 @@ describe('DatasetsRepository', () => {
 
   describe('getDatasetById', () => {
     test('should return dataset when it exists filtering by id', async () => {
-      const actual = await sut.getDatasetById(createdTestDatasetId);
-      expect(actual.id).toBe(createdTestDatasetId);
+      const actual = await sut.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
+      expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
     });
 
     test('should return dataset when it exists filtering by id and version id', async () => {
-      const actual = await sut.getDatasetById(createdTestDatasetId, ':draft');
-      expect(actual.id).toBe(createdTestDatasetId);
+      const actual = await sut.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID, ':draft');
+      expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
     });
 
     test('should return error when dataset does not exist', async () => {
@@ -58,15 +57,15 @@ describe('DatasetsRepository', () => {
 
   describe('getDatasetByPersistentId', () => {
     test('should return dataset when it exists filtering by persistent id', async () => {
-      const createdDataset = await sut.getDatasetById(createdTestDatasetId);
+      const createdDataset = await sut.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
       const actual = await sut.getDatasetByPersistentId(createdDataset.persistentId);
-      expect(actual.id).toBe(createdTestDatasetId);
+      expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
     });
 
     test('should return dataset when it exists filtering by persistent id and version id', async () => {
-      const createdDataset = await sut.getDatasetById(createdTestDatasetId);
+      const createdDataset = await sut.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
       const actual = await sut.getDatasetByPersistentId(createdDataset.persistentId, ':draft');
-      expect(actual.id).toBe(createdTestDatasetId);
+      expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
     });
 
     test('should return error when dataset does not exist', async () => {
@@ -84,7 +83,7 @@ describe('DatasetsRepository', () => {
 
   describe('getDatasetCitation', () => {
     test('should return citation when dataset exists', async () => {
-      const actualDatasetCitation = await sut.getDatasetCitation(createdTestDatasetId);
+      const actualDatasetCitation = await sut.getDatasetCitation(TestConstants.TEST_CREATED_DATASET_ID);
       expect(typeof actualDatasetCitation).toBe('string');
     });
 
@@ -106,7 +105,7 @@ describe('DatasetsRepository', () => {
     let privateUrlToken: string = undefined;
 
     beforeAll(async () => {
-      await createPrivateUrlViaApi(createdTestDatasetId)
+      await createPrivateUrlViaApi(TestConstants.TEST_CREATED_DATASET_ID)
         .then((response) => {
           privateUrlToken = response.data.data.token;
         })
@@ -119,7 +118,7 @@ describe('DatasetsRepository', () => {
       test('should return dataset when token is valid', async () => {
         const actual = await sut.getPrivateUrlDataset(privateUrlToken);
 
-        expect(actual.id).toBe(createdTestDatasetId);
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
       });
 
       test('should return error when token is not valid', async () => {

@@ -1,4 +1,6 @@
 import { File } from '../../../src/files/domain/models/File';
+import axios, { AxiosResponse } from 'axios';
+import { TestConstants } from '../TestConstants';
 
 export const createFileModel = (): File => {
   return {
@@ -55,4 +57,12 @@ export const createFilePayload = (): any => {
       },
     },
   };
+};
+
+export const uploadFileViaApi = async (datasetId: number, fileName: string): Promise<AxiosResponse> => {
+  let formData = new FormData();
+  formData.append('file', fileName);
+  return await axios.post(`${TestConstants.TEST_API_URL}/datasets/${datasetId}/add`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data', 'X-Dataverse-Key': process.env.TEST_API_KEY },
+  });
 };
