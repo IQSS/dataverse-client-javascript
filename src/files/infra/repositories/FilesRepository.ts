@@ -11,9 +11,6 @@ export interface GetFilesQueryParams {
 }
 
 export class FilesRepository extends ApiRepository implements IFilesRepository {
-  // TODO Shared with DatasetsRepository so move somewhere
-  DATASET_VERSION_LATEST = ':latest';
-
   public async getFilesByDatasetId(
     datasetId: number,
     datasetVersionId?: string,
@@ -25,6 +22,24 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       datasetVersionId = this.DATASET_VERSION_LATEST;
     }
     return this.getFiles(`/datasets/${datasetId}/versions/${datasetVersionId}/files`, limit, offset, orderCriteria);
+  }
+
+  public async getFilesByDatasetPersistentId(
+    datasetPersistentId: string,
+    datasetVersionId?: string,
+    limit?: number,
+    offset?: number,
+    orderCriteria?: FileOrderCriteria,
+  ): Promise<File[]> {
+    if (datasetVersionId === undefined) {
+      datasetVersionId = this.DATASET_VERSION_LATEST;
+    }
+    return this.getFiles(
+      `/datasets/:persistentId/versions/${datasetVersionId}/files?persistentId=${datasetPersistentId}`,
+      limit,
+      offset,
+      orderCriteria,
+    );
   }
 
   private async getFiles(

@@ -9,4 +9,12 @@ export interface IFilesRepository {
     offset?: number,
     orderCriteria?: FileOrderCriteria,
   ): Promise<File[]>;
+
+  getFilesByDatasetPersistentId(
+    datasetPersistentId: string,
+    datasetVersionId?: string,
+    limit?: number,
+    offset?: number,
+    orderCriteria?: FileOrderCriteria,
+  ): Promise<File[]>;
 }

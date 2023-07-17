@@ -4,8 +4,6 @@ import { Dataset } from '../../domain/models/Dataset';
 import { transformVersionResponseToDataset } from './transformers/datasetTransformers';
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
-  DATASET_VERSION_LATEST = ':latest';
-
   public async getDatasetSummaryFieldNames(): Promise<string[]> {
     return this.doGet('/datasets/summaryFieldNames')
       .then((response) => response.data.data)
