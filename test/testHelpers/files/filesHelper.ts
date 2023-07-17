@@ -38,7 +38,6 @@ export const createFilePayload = (): any => {
       filename: 'test',
       contentType: 'image/png',
       filesize: 127426,
-      restricted: false,
       storageIdentifier: 'local://18945a85439-9fa52783e5cb',
       rootDataFileId: 4,
       previousDataFileId: 4,
