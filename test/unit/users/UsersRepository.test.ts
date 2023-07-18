@@ -62,7 +62,7 @@ describe('getCurrentAuthenticatedUser', () => {
     assert.calledWithExactly(
       axiosGetStub,
       expectedApiEndpoint,
-      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
     );
 
     assert.match(actual, testAuthenticatedUser);
