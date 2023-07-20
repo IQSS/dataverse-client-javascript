@@ -11,18 +11,11 @@ describe('DatasetsRepository', () => {
 
   beforeAll(async () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
-    // We update timeout due to experienced timeout errors
-    jest.setTimeout(10000);
     await createDatasetViaApi()
       .then()
       .catch(() => {
         fail('Tests beforeAll(): Error while creating test Dataset');
       });
-  });
-
-  afterAll(async () => {
-    // We update timeout back to original default value
-    jest.setTimeout(5000);
   });
 
   describe('getDatasetSummaryFieldNames', () => {
