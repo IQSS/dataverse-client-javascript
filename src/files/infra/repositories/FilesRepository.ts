@@ -42,6 +42,20 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     );
   }
 
+  public async getFileGuestbookResponsesCount(fileId: number | string): Promise<number> {
+    let endpoint;
+    if (typeof fileId === 'number') {
+      endpoint = `/files/${fileId}/guestbookResponses/count`;
+    } else {
+      endpoint = `/files/:persistentId/guestbookResponses/count?persistentId=${fileId}`;
+    }
+    return this.doGet(endpoint, true)
+      .then((response) => response.data.data.message as number)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   private async getFiles(
     endpoint: string,
     limit?: number,

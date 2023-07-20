@@ -72,6 +72,8 @@ describe('FilesRepository', () => {
       assert.match(actual[1].name, testFile2Name);
       assert.match(actual[2].name, testFile1Name);
     });
+
+    // TODO: Error test
   });
 
   describe('getFilesByDatasetPersistentId', () => {
@@ -107,5 +109,18 @@ describe('FilesRepository', () => {
       assert.match(actual[1].name, testFile2Name);
       assert.match(actual[2].name, testFile1Name);
     });
+
+    // TODO: Error test
+  });
+
+  describe('getFileGuestbookResponsesCount', () => {
+    test('should return count filtering by file id', async () => {
+      const currentTestFiles = await sut.getFilesByDatasetId(TestConstants.TEST_CREATED_DATASET_ID);
+      const testFile = currentTestFiles[0];
+      const actual = await sut.getFileGuestbookResponsesCount(testFile.id);
+      assert.match(actual, 0);
+    });
+
+    // TODO: Error test
   });
 });

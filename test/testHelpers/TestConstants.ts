@@ -1,6 +1,7 @@
 export class TestConstants {
   static readonly TEST_API_URL = 'http://localhost:8080/api/v1';
   static readonly TEST_DUMMY_API_KEY = 'dummyApiKey';
+  static readonly TEST_DUMMY_PERSISTENT_ID = 'doi:11.1111/AA1/AA1AAA';
   static readonly TEST_ERROR_RESPONSE = {
     response: {
       status: 'ERROR',

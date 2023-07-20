@@ -17,4 +17,6 @@ export interface IFilesRepository {
     offset?: number,
     orderCriteria?: FileOrderCriteria,
   ): Promise<File[]>;
+
+  getFileGuestbookResponsesCount(fileId: number | string): Promise<number>;
 }
