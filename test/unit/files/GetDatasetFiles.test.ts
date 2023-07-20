@@ -1,4 +1,4 @@
-import { GetFilesByDatasetPersistentId } from '../../../src/files/domain/useCases/GetFilesByDatasetPersistentId';
+import { GetDatasetFiles } from '../../../src/files/domain/useCases/GetDatasetFiles';
 import { IFilesRepository } from '../../../src/files/domain/repositories/IFilesRepository';
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
@@ -15,24 +15,24 @@ describe('execute', () => {
   test('should return files on repository success', async () => {
     const testFiles: File[] = [createFileModel()];
     const filesRepositoryStub = <IFilesRepository>{};
-    const getFilesByDatasetPersistentIdStub = sandbox.stub().returns(testFiles);
-    filesRepositoryStub.getFilesByDatasetPersistentId = getFilesByDatasetPersistentIdStub;
-    const sut = new GetFilesByDatasetPersistentId(filesRepositoryStub);
+    const getDatasetFilesStub = sandbox.stub().returns(testFiles);
+    filesRepositoryStub.getDatasetFiles = getDatasetFilesStub;
+    const sut = new GetDatasetFiles(filesRepositoryStub);
 
-    const actual = await sut.execute('test');
+    const actual = await sut.execute(1);
 
     assert.match(actual, testFiles);
-    assert.calledWithExactly(getFilesByDatasetPersistentIdStub, 'test', undefined, undefined, undefined, undefined);
+    assert.calledWithExactly(getDatasetFilesStub, 1, undefined, undefined, undefined, undefined);
   });
 
   test('should return error result on repository error', async () => {
     const filesRepositoryStub = <IFilesRepository>{};
     const testReadError = new ReadError();
-    filesRepositoryStub.getFilesByDatasetPersistentId = sandbox.stub().throwsException(testReadError);
-    const sut = new GetFilesByDatasetPersistentId(filesRepositoryStub);
+    filesRepositoryStub.getDatasetFiles = sandbox.stub().throwsException(testReadError);
+    const sut = new GetDatasetFiles(filesRepositoryStub);
 
     let actualError: ReadError = undefined;
-    await sut.execute('test').catch((e) => (actualError = e));
+    await sut.execute(1).catch((e: ReadError) => (actualError = e));
 
     assert.match(actualError, testReadError);
   });

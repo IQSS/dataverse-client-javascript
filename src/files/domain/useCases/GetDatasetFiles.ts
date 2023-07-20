@@ -3,7 +3,7 @@ import { FileOrderCriteria } from '../models/FileOrderCriteria';
 import { IFilesRepository } from '../repositories/IFilesRepository';
 import { File } from '../models/File';
 
-export class GetFilesByDatasetPersistentId implements UseCase<File[]> {
+export class GetDatasetFiles implements UseCase<File[]> {
   private filesRepository: IFilesRepository;
 
   constructor(filesRepository: IFilesRepository) {
@@ -11,18 +11,12 @@ export class GetFilesByDatasetPersistentId implements UseCase<File[]> {
   }
 
   async execute(
-    datasetPersistentId: string,
+    datasetId: number | string,
     datasetVersionId?: string,
     limit?: number,
     offset?: number,
     orderCriteria?: FileOrderCriteria,
   ): Promise<File[]> {
-    return await this.filesRepository.getFilesByDatasetPersistentId(
-      datasetPersistentId,
-      datasetVersionId,
-      limit,
-      offset,
-      orderCriteria,
-    );
+    return await this.filesRepository.getDatasetFiles(datasetId, datasetVersionId, limit, offset, orderCriteria);
   }
 }

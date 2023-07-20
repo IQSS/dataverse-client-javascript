@@ -11,8 +11,8 @@ export interface GetFilesQueryParams {
 }
 
 export class FilesRepository extends ApiRepository implements IFilesRepository {
-  public async getFilesByDatasetId(
-    datasetId: number,
+  public async getDatasetFiles(
+    datasetId: number | string,
     datasetVersionId?: string,
     limit?: number,
     offset?: number,
@@ -21,25 +21,13 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     if (datasetVersionId === undefined) {
       datasetVersionId = this.DATASET_VERSION_LATEST;
     }
-    return this.getFiles(`/datasets/${datasetId}/versions/${datasetVersionId}/files`, limit, offset, orderCriteria);
-  }
-
-  public async getFilesByDatasetPersistentId(
-    datasetPersistentId: string,
-    datasetVersionId?: string,
-    limit?: number,
-    offset?: number,
-    orderCriteria?: FileOrderCriteria,
-  ): Promise<File[]> {
-    if (datasetVersionId === undefined) {
-      datasetVersionId = this.DATASET_VERSION_LATEST;
+    let endpoint;
+    if (typeof datasetId === 'number') {
+      endpoint = `/datasets/${datasetId}/versions/${datasetVersionId}/files`;
+    } else {
+      endpoint = `/datasets/:persistentId/versions/${datasetVersionId}/files?persistentId=${datasetId}`;
     }
-    return this.getFiles(
-      `/datasets/:persistentId/versions/${datasetVersionId}/files?persistentId=${datasetPersistentId}`,
-      limit,
-      offset,
-      orderCriteria,
-    );
+    return this.getFiles(endpoint, limit, offset, orderCriteria);
   }
 
   public async getFileGuestbookResponsesCount(fileId: number | string): Promise<number> {
