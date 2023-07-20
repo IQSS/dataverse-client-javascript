@@ -92,7 +92,7 @@ describe('FilesRepository', () => {
       const datasetRepository = new DatasetsRepository();
 
       test('should return all files filtering by persistent id', async () => {
-        const testDataset = await datasetRepository.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
+        const testDataset = await datasetRepository.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
         const actual = await sut.getDatasetFiles(testDataset.persistentId);
         assert.match(actual.length, 3);
         assert.match(actual[0].name, testFile1Name);
@@ -101,14 +101,14 @@ describe('FilesRepository', () => {
       });
 
       test('should return correct files filtering by persistent id and paginating', async () => {
-        const testDataset = await datasetRepository.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
+        const testDataset = await datasetRepository.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
         const actual = await sut.getDatasetFiles(testDataset.persistentId, undefined, 2, 2, undefined);
         assert.match(actual.length, 1);
         assert.match(actual[0].name, testFile3Name);
       });
 
       test('should return correct files filtering by persistent id and applying order criteria', async () => {
-        const testDataset = await datasetRepository.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
+        const testDataset = await datasetRepository.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
         let actual = await sut.getDatasetFiles(
           testDataset.persistentId,
           undefined,

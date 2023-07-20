@@ -26,51 +26,52 @@ describe('DatasetsRepository', () => {
     });
   });
 
-  describe('getDatasetById', () => {
-    test('should return dataset when it exists filtering by id', async () => {
-      const actual = await sut.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
-      expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+  describe('getDataset', () => {
+    describe('by numeric id', () => {
+      test('should return dataset when it exists filtering by id', async () => {
+        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+      });
+
+      test('should return dataset when it exists filtering by id and version id', async () => {
+        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, ':draft');
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+      });
+
+      test('should return error when dataset does not exist', async () => {
+        let error: ReadError = undefined;
+        await sut.getDataset(nonExistentTestDatasetId).catch((e) => (error = e));
+
+        assert.match(
+          error.message,
+          `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
+        );
+      });
     });
+    describe('by persistent id', () => {
+      test('should return dataset when it exists filtering by persistent id', async () => {
+        const createdDataset = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
+        const actual = await sut.getDataset(createdDataset.persistentId);
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+      });
 
-    test('should return dataset when it exists filtering by id and version id', async () => {
-      const actual = await sut.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID, ':draft');
-      expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
-    });
+      test('should return dataset when it exists filtering by persistent id and version id', async () => {
+        const createdDataset = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
+        const actual = await sut.getDataset(createdDataset.persistentId, ':draft');
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+      });
 
-    test('should return error when dataset does not exist', async () => {
-      let error: ReadError = undefined;
-      await sut.getDatasetById(nonExistentTestDatasetId).catch((e) => (error = e));
+      test('should return error when dataset does not exist', async () => {
+        let error: ReadError = undefined;
 
-      assert.match(
-        error.message,
-        `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
-      );
-    });
-  });
+        const testWrongPersistentId = 'wrongPersistentId';
+        await sut.getDataset(testWrongPersistentId).catch((e) => (error = e));
 
-  describe('getDatasetByPersistentId', () => {
-    test('should return dataset when it exists filtering by persistent id', async () => {
-      const createdDataset = await sut.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
-      const actual = await sut.getDatasetByPersistentId(createdDataset.persistentId);
-      expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
-    });
-
-    test('should return dataset when it exists filtering by persistent id and version id', async () => {
-      const createdDataset = await sut.getDatasetById(TestConstants.TEST_CREATED_DATASET_ID);
-      const actual = await sut.getDatasetByPersistentId(createdDataset.persistentId, ':draft');
-      expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
-    });
-
-    test('should return error when dataset does not exist', async () => {
-      let error: ReadError = undefined;
-
-      const testWrongPersistentId = 'wrongPersistentId';
-      await sut.getDatasetByPersistentId(testWrongPersistentId).catch((e) => (error = e));
-
-      assert.match(
-        error.message,
-        `There was an error when reading the resource. Reason was: [404] Dataset with Persistent ID ${testWrongPersistentId} not found.`,
-      );
+        assert.match(
+          error.message,
+          `There was an error when reading the resource. Reason was: [404] Dataset with Persistent ID ${testWrongPersistentId} not found.`,
+        );
+      });
     });
   });
 

@@ -76,156 +76,154 @@ describe('DatasetsRepository', () => {
     });
   });
 
-  describe('getDatasetById', () => {
-    test('should return Dataset when providing id, no version, and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
-      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`;
+  describe('getDataset', () => {
+    describe('by numeric id', () => {
+      test('should return Dataset when providing id, no version, and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`;
 
-      // API Key auth
-      let actual = await sut.getDatasetById(testDatasetModel.id);
+        // API Key auth
+        let actual = await sut.getDataset(testDatasetModel.id);
 
-      assert.calledWithExactly(
-        axiosGetStub,
-        expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-      );
-      assert.match(actual, testDatasetModel);
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testDatasetModel);
 
-      // Session cookie auth
-      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
-      actual = await sut.getDatasetById(testDatasetModel.id);
-      assert.calledWithExactly(
-        axiosGetStub,
-        expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
-      );
-      assert.match(actual, testDatasetModel);
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+        actual = await sut.getDataset(testDatasetModel.id);
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, testDatasetModel);
+      });
+
+      test('should return Dataset when providing id, version, and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
+
+        const actual = await sut.getDataset(testDatasetModel.id, String(testDatasetModel.versionId));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testDatasetModel);
+      });
+
+      test('should return Dataset when providing id, version, and response with license is successful', async () => {
+        const testDatasetLicense = createDatasetLicenseModel();
+        const testDatasetVersionWithLicenseSuccessfulResponse = {
+          data: {
+            status: 'OK',
+            data: createDatasetVersionPayload(testDatasetLicense),
+          },
+        };
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionWithLicenseSuccessfulResponse);
+
+        const actual = await sut.getDataset(testDatasetModel.id, String(testDatasetModel.versionId));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, createDatasetModel(testDatasetLicense));
+      });
+
+      test('should return Dataset when providing id, version, and response with license without icon URI is successful', async () => {
+        const testDatasetLicenseWithoutIconUri = createDatasetLicenseModel(false);
+        const testDatasetVersionWithLicenseSuccessfulResponse = {
+          data: {
+            status: 'OK',
+            data: createDatasetVersionPayload(testDatasetLicenseWithoutIconUri),
+          },
+        };
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionWithLicenseSuccessfulResponse);
+
+        const actual = await sut.getDataset(testDatasetModel.id, String(testDatasetModel.versionId));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, createDatasetModel(testDatasetLicenseWithoutIconUri));
+      });
+
+      test('should return error on repository read error', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getDataset(testDatasetModel.id).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
     });
+    describe('by persistent id', () => {
+      test('should return Dataset when providing persistent id, no version, and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`;
 
-    test('should return Dataset when providing id, version, and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
+        // API Key auth
+        let actual = await sut.getDataset(testDatasetModel.persistentId);
 
-      const actual = await sut.getDatasetById(testDatasetModel.id, String(testDatasetModel.versionId));
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testDatasetModel);
 
-      assert.calledWithExactly(
-        axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-      );
-      assert.match(actual, testDatasetModel);
-    });
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-    test('should return Dataset when providing id, version, and response with license is successful', async () => {
-      const testDatasetLicense = createDatasetLicenseModel();
-      const testDatasetVersionWithLicenseSuccessfulResponse = {
-        data: {
-          status: 'OK',
-          data: createDatasetVersionPayload(testDatasetLicense),
-        },
-      };
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionWithLicenseSuccessfulResponse);
+        actual = await sut.getDataset(testDatasetModel.persistentId);
 
-      const actual = await sut.getDatasetById(testDatasetModel.id, String(testDatasetModel.versionId));
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, testDatasetModel);
+      });
 
-      assert.calledWithExactly(
-        axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-      );
-      assert.match(actual, createDatasetModel(testDatasetLicense));
-    });
+      test('should return Dataset when providing persistent id, version, and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
 
-    test('should return Dataset when providing id, version, and response with license without icon URI is successful', async () => {
-      const testDatasetLicenseWithoutIconUri = createDatasetLicenseModel(false);
-      const testDatasetVersionWithLicenseSuccessfulResponse = {
-        data: {
-          status: 'OK',
-          data: createDatasetVersionPayload(testDatasetLicenseWithoutIconUri),
-        },
-      };
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionWithLicenseSuccessfulResponse);
+        const actual = await sut.getDataset(testDatasetModel.persistentId, String(testDatasetModel.versionId));
 
-      const actual = await sut.getDatasetById(testDatasetModel.id, String(testDatasetModel.versionId));
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetModel.versionId}?persistentId=${testDatasetModel.persistentId}`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testDatasetModel);
+      });
 
-      assert.calledWithExactly(
-        axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testDatasetModel.versionId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-      );
-      assert.match(actual, createDatasetModel(testDatasetLicenseWithoutIconUri));
-    });
+      test('should return error on repository read error', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
-    test('should return error on repository read error', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+        let error: ReadError = undefined;
+        await sut.getDataset(testDatasetModel.persistentId).catch((e) => (error = e));
 
-      let error: ReadError = undefined;
-      await sut.getDatasetById(testDatasetModel.id).catch((e) => (error = e));
-
-      assert.calledWithExactly(
-        axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/:latest`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-      );
-      expect(error).to.be.instanceOf(Error);
-    });
-  });
-
-  describe('getDatasetByPersistentId', () => {
-    test('should return Dataset when providing persistent id, no version, and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
-      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`;
-
-      // API Key auth
-      let actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId);
-
-      assert.calledWithExactly(
-        axiosGetStub,
-        expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-      );
-      assert.match(actual, testDatasetModel);
-
-      // Session cookie auth
-      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
-
-      actual = await sut.getDatasetByPersistentId(testDatasetModel.persistentId);
-
-      assert.calledWithExactly(
-        axiosGetStub,
-        expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
-      );
-      assert.match(actual, testDatasetModel);
-    });
-
-    test('should return Dataset when providing persistent id, version, and response is successful', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetVersionSuccessfulResponse);
-
-      const actual = await sut.getDatasetByPersistentId(
-        testDatasetModel.persistentId,
-        String(testDatasetModel.versionId),
-      );
-
-      assert.calledWithExactly(
-        axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetModel.versionId}?persistentId=${testDatasetModel.persistentId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-      );
-      assert.match(actual, testDatasetModel);
-    });
-
-    test('should return error on repository read error', async () => {
-      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
-
-      let error: ReadError = undefined;
-      await sut.getDatasetByPersistentId(testDatasetModel.persistentId).catch((e) => (error = e));
-
-      assert.calledWithExactly(
-        axiosGetStub,
-        `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-      );
-      expect(error).to.be.instanceOf(Error);
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/:latest?persistentId=${testDatasetModel.persistentId}`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
     });
   });
 

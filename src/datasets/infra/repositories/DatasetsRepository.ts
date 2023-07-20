@@ -20,20 +20,21 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async getDatasetById(datasetId: number, datasetVersionId?: string): Promise<Dataset> {
+  public async getDataset(datasetId: number | string, datasetVersionId?: string): Promise<Dataset> {
     if (datasetVersionId === undefined) {
       datasetVersionId = this.DATASET_VERSION_LATEST;
     }
-    return this.getDatasetVersion(`/datasets/${datasetId}/versions/${datasetVersionId}`);
-  }
-
-  public async getDatasetByPersistentId(datasetPersistentId: string, datasetVersionId?: string): Promise<Dataset> {
-    if (datasetVersionId === undefined) {
-      datasetVersionId = this.DATASET_VERSION_LATEST;
+    let endpoint;
+    if (typeof datasetId === 'number') {
+      endpoint = `/datasets/${datasetId}/versions/${datasetVersionId}`;
+    } else {
+      endpoint = `/datasets/:persistentId/versions/${datasetVersionId}?persistentId=${datasetId}`;
     }
-    return this.getDatasetVersion(
-      `/datasets/:persistentId/versions/${datasetVersionId}?persistentId=${datasetPersistentId}`,
-    );
+    return this.doGet(endpoint, true)
+      .then((response) => transformVersionResponseToDataset(response))
+      .catch((error) => {
+        throw error;
+      });
   }
 
   public async getDatasetCitation(datasetId: number, datasetVersionId?: string): Promise<string> {
@@ -42,14 +43,6 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     }
     return this.doGet(`/datasets/${datasetId}/versions/${datasetVersionId}/citation`, true)
       .then((response) => response.data.data.message)
-      .catch((error) => {
-        throw error;
-      });
-  }
-
-  private async getDatasetVersion(endpoint: string): Promise<Dataset> {
-    return this.doGet(endpoint, true)
-      .then((response) => transformVersionResponseToDataset(response))
       .catch((error) => {
         throw error;
       });
