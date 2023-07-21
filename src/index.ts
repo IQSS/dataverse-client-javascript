@@ -4,3 +4,4 @@ export * from './users';
 export * from './auth';
 export * from './datasets';
 export * from './metadataBlocks';
+export * from './files';

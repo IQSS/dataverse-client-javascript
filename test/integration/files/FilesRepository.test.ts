@@ -15,6 +15,8 @@ describe('FilesRepository', () => {
   const testFile2Name = 'test-file-2.txt';
   const testFile3Name = 'test-file-3.txt';
 
+  const nonExistentFiledId = 200;
+
   beforeAll(async () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
     await createDatasetViaApi()
@@ -147,8 +149,27 @@ describe('FilesRepository', () => {
     test('should return error when file does not exist', async () => {
       let error: ReadError = undefined;
 
-      const nonExistentFiledId = 200;
       await sut.getFileGuestbookResponsesCount(nonExistentFiledId).catch((e) => (error = e));
+
+      assert.match(
+        error.message,
+        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
+      );
+    });
+  });
+
+  describe('canFileBeDownloaded', () => {
+    test('should return result filtering by file id', async () => {
+      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
+      const testFile = currentTestFiles[0];
+      const actual = await sut.canFileBeDownloaded(testFile.id);
+      assert.match(actual, true);
+    });
+
+    test('should return error when file does not exist', async () => {
+      let error: ReadError = undefined;
+
+      await sut.canFileBeDownloaded(nonExistentFiledId).catch((e) => (error = e));
 
       assert.match(
         error.message,

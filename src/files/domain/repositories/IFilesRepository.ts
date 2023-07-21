@@ -11,4 +11,6 @@ export interface IFilesRepository {
   ): Promise<File[]>;
 
   getFileGuestbookResponsesCount(fileId: number | string): Promise<number>;
+
+  canFileBeDownloaded(fileId: number | string): Promise<boolean>;
 }

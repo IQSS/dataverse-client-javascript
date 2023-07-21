@@ -27,7 +27,21 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     } else {
       endpoint = `/datasets/:persistentId/versions/${datasetVersionId}/files?persistentId=${datasetId}`;
     }
-    return this.getFiles(endpoint, limit, offset, orderCriteria);
+    const queryParams: GetFilesQueryParams = {};
+    if (limit !== undefined) {
+      queryParams.limit = limit;
+    }
+    if (offset !== undefined) {
+      queryParams.offset = offset;
+    }
+    if (orderCriteria !== undefined) {
+      queryParams.orderCriteria = orderCriteria.toString();
+    }
+    return this.doGet(endpoint, true, queryParams)
+      .then((response) => transformFilesResponseToFiles(response))
+      .catch((error) => {
+        throw error;
+      });
   }
 
   public async getFileGuestbookResponsesCount(fileId: number | string): Promise<number> {
@@ -44,24 +58,15 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
-  private async getFiles(
-    endpoint: string,
-    limit?: number,
-    offset?: number,
-    orderCriteria?: FileOrderCriteria,
-  ): Promise<File[]> {
-    const queryParams: GetFilesQueryParams = {};
-    if (limit !== undefined) {
-      queryParams.limit = limit;
+  public async canFileBeDownloaded(fileId: string | number): Promise<boolean> {
+    let endpoint;
+    if (typeof fileId === 'number') {
+      endpoint = `/files/${fileId}/canBeDownloaded`;
+    } else {
+      endpoint = `/files/:persistentId/canBeDownloaded?persistentId=${fileId}`;
     }
-    if (offset !== undefined) {
-      queryParams.offset = offset;
-    }
-    if (orderCriteria !== undefined) {
-      queryParams.orderCriteria = orderCriteria.toString();
-    }
-    return this.doGet(endpoint, true, queryParams)
-      .then((response) => transformFilesResponseToFiles(response))
+    return this.doGet(endpoint, true)
+      .then((response) => response.data.data as boolean)
       .catch((error) => {
         throw error;
       });
