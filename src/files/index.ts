@@ -24,4 +24,13 @@ export {
 export { File, FileEmbargo, FileChecksum } from './domain/models/File';
 export { FileOrderCriteria } from './domain/models/FileOrderCriteria';
 export { FileThumbnailClass } from './domain/models/FileThumbnailClass';
-export { FileDataTable } from './domain/models/FileDataTable';
+export {
+  FileDataTable,
+  FileDataVariable,
+  FileDataVariableMetadata,
+  FileDataVariableInvalidRanges,
+  FileDataVariableSummaryStatistics,
+  FileDataVariableCategory,
+  FileDataVariableIntervalType,
+  FileDataVariableFormatType,
+} from './domain/models/FileDataTable';

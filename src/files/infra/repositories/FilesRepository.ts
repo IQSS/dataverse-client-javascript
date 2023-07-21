@@ -89,6 +89,16 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   public async getFileDataTables(fileId: string | number): Promise<FileDataTable[]> {
-    throw new Error(`Method not implemented. Param ${fileId}`);
+    let endpoint;
+    if (typeof fileId === 'number') {
+      endpoint = `/files/${fileId}/dataTables`;
+    } else {
+      endpoint = `/files/:persistentId/dataTables?persistentId=${fileId}`;
+    }
+    return this.doGet(endpoint, true)
+      .then((response) => transformDataTablesResponseToDataTables(response))
+      .catch((error) => {
+        throw error;
+      });
   }
 }
