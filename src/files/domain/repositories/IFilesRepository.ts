@@ -1,5 +1,6 @@
 import { FileOrderCriteria } from '../models/FileOrderCriteria';
 import { File } from '../models/File';
+import { FileThumbnailClass } from '../models/FileThumbnailClass';
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -13,4 +14,6 @@ export interface IFilesRepository {
   getFileGuestbookResponsesCount(fileId: number | string): Promise<number>;
 
   canFileBeDownloaded(fileId: number | string): Promise<boolean>;
+
+  getFileThumbnailClass(fileId: number | string): Promise<FileThumbnailClass>;
 }

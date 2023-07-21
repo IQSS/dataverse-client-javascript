@@ -3,6 +3,7 @@ import { IFilesRepository } from '../../domain/repositories/IFilesRepository';
 import { FileOrderCriteria } from '../../domain/models/FileOrderCriteria';
 import { File } from '../../domain/models/File';
 import { transformFilesResponseToFiles } from './transformers/fileTransformers';
+import { FileThumbnailClass } from '../../domain/models/FileThumbnailClass';
 
 export interface GetFilesQueryParams {
   limit?: number;
@@ -67,6 +68,20 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     }
     return this.doGet(endpoint, true)
       .then((response) => response.data.data as boolean)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  public async getFileThumbnailClass(fileId: string | number): Promise<FileThumbnailClass> {
+    let endpoint;
+    if (typeof fileId === 'number') {
+      endpoint = `/files/${fileId}/thumbnailClass`;
+    } else {
+      endpoint = `/files/:persistentId/thumbnailClass?persistentId=${fileId}`;
+    }
+    return this.doGet(endpoint, true)
+      .then((response) => response.data.data.message as FileThumbnailClass)
       .catch((error) => {
         throw error;
       });
