@@ -4,6 +4,7 @@ import { FileOrderCriteria } from '../../domain/models/FileOrderCriteria';
 import { File } from '../../domain/models/File';
 import { transformFilesResponseToFiles } from './transformers/fileTransformers';
 import { FileThumbnailClass } from '../../domain/models/FileThumbnailClass';
+import { FileDataTable } from '../../domain/models/FileDataTable';
 
 export interface GetFilesQueryParams {
   limit?: number;
@@ -85,5 +86,9 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       .catch((error) => {
         throw error;
       });
+  }
+
+  public async getFileDataTables(fileId: string | number): Promise<FileDataTable[]> {
+    throw new Error(`Method not implemented. Param ${fileId}`);
   }
 }
