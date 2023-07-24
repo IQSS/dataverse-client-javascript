@@ -29,7 +29,7 @@ export {
   FileDataVariable,
   FileDataVariableMetadata,
   FileDataVariableInvalidRanges,
-  FileDataVariableSummaryStatistics,
+  FileDataVariableCategoryMetadata,
   FileDataVariableCategory,
   FileDataVariableIntervalType,
   FileDataVariableFormatType,
