@@ -12,9 +12,10 @@ import { FileThumbnailClass } from '../../../src/files/domain/models/FileThumbna
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
 
-  const testFile1Name = 'test-file-1.txt';
-  const testFile2Name = 'test-file-2.txt';
-  const testFile3Name = 'test-file-3.txt';
+  const testTextFile1Name = 'test-file-1.txt';
+  const testTextFile2Name = 'test-file-2.txt';
+  const testTextFile3Name = 'test-file-3.txt';
+  const testTabFile4Name = 'test-file-4.tab';
 
   const nonExistentFiledId = 200;
 
@@ -26,25 +27,32 @@ describe('FilesRepository', () => {
         fail('Test beforeAll(): Error while creating test Dataset');
       });
     // Uploading test file 1
-    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testFile1Name)
+    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testTextFile1Name)
       .then()
       .catch((e) => {
         console.log(e);
-        fail(`Tests beforeAll(): Error while uploading file ${testFile1Name}`);
+        fail(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`);
       });
     // Uploading test file 2
-    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testFile2Name)
+    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testTextFile2Name)
       .then()
       .catch((e) => {
         console.log(e);
-        fail(`Tests beforeAll(): Error while uploading file ${testFile2Name}`);
+        fail(`Tests beforeAll(): Error while uploading file ${testTextFile2Name}`);
       });
     // Uploading test file 3
-    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testFile3Name)
+    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testTextFile3Name)
       .then()
       .catch((e) => {
         console.log(e);
-        fail(`Tests beforeAll(): Error while uploading file ${testFile3Name}`);
+        fail(`Tests beforeAll(): Error while uploading file ${testTextFile3Name}`);
+      });
+    // Uploading test file 4
+    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testTabFile4Name)
+      .then()
+      .catch((e) => {
+        console.log(e);
+        fail(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`);
       });
   });
 
@@ -52,16 +60,17 @@ describe('FilesRepository', () => {
     describe('by numeric id', () => {
       test('should return all files filtering by dataset id', async () => {
         const actual = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
-        assert.match(actual.length, 3);
-        assert.match(actual[0].name, testFile1Name);
-        assert.match(actual[1].name, testFile2Name);
-        assert.match(actual[2].name, testFile3Name);
+        assert.match(actual.length, 4);
+        assert.match(actual[0].name, testTextFile1Name);
+        assert.match(actual[1].name, testTextFile2Name);
+        assert.match(actual[2].name, testTextFile3Name);
+        assert.match(actual[3].name, testTabFile4Name);
       });
 
       test('should return correct files filtering by dataset id and paginating', async () => {
-        const actual = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, undefined, 2, 2, undefined);
+        const actual = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, undefined, 3, 3, undefined);
         assert.match(actual.length, 1);
-        assert.match(actual[0].name, testFile3Name);
+        assert.match(actual[0].name, testTabFile4Name);
       });
 
       test('should return correct files filtering by dataset id and applying order criteria', async () => {
@@ -72,10 +81,11 @@ describe('FilesRepository', () => {
           undefined,
           FileOrderCriteria.NEWEST,
         );
-        assert.match(actual.length, 3);
-        assert.match(actual[0].name, testFile3Name);
-        assert.match(actual[1].name, testFile2Name);
-        assert.match(actual[2].name, testFile1Name);
+        assert.match(actual.length, 4);
+        assert.match(actual[0].name, testTabFile4Name);
+        assert.match(actual[1].name, testTextFile3Name);
+        assert.match(actual[2].name, testTextFile2Name);
+        assert.match(actual[3].name, testTextFile1Name);
       });
 
       test('should return error when dataset does not exist', async () => {
@@ -97,17 +107,18 @@ describe('FilesRepository', () => {
       test('should return all files filtering by persistent id', async () => {
         const testDataset = await datasetRepository.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
         const actual = await sut.getDatasetFiles(testDataset.persistentId);
-        assert.match(actual.length, 3);
-        assert.match(actual[0].name, testFile1Name);
-        assert.match(actual[1].name, testFile2Name);
-        assert.match(actual[2].name, testFile3Name);
+        assert.match(actual.length, 4);
+        assert.match(actual[0].name, testTextFile1Name);
+        assert.match(actual[1].name, testTextFile2Name);
+        assert.match(actual[2].name, testTextFile3Name);
+        assert.match(actual[3].name, testTabFile4Name);
       });
 
       test('should return correct files filtering by persistent id and paginating', async () => {
         const testDataset = await datasetRepository.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
-        const actual = await sut.getDatasetFiles(testDataset.persistentId, undefined, 2, 2, undefined);
+        const actual = await sut.getDatasetFiles(testDataset.persistentId, undefined, 3, 3, undefined);
         assert.match(actual.length, 1);
-        assert.match(actual[0].name, testFile3Name);
+        assert.match(actual[0].name, testTabFile4Name);
       });
 
       test('should return correct files filtering by persistent id and applying order criteria', async () => {
@@ -119,10 +130,11 @@ describe('FilesRepository', () => {
           undefined,
           FileOrderCriteria.NEWEST,
         );
-        assert.match(actual.length, 3);
-        assert.match(actual[0].name, testFile3Name);
-        assert.match(actual[1].name, testFile2Name);
-        assert.match(actual[2].name, testFile1Name);
+        assert.match(actual.length, 4);
+        assert.match(actual[0].name, testTabFile4Name);
+        assert.match(actual[1].name, testTextFile3Name);
+        assert.match(actual[2].name, testTextFile2Name);
+        assert.match(actual[3].name, testTextFile1Name);
       });
 
       test('should return error when dataset does not exist', async () => {
@@ -191,6 +203,40 @@ describe('FilesRepository', () => {
       let error: ReadError = undefined;
 
       await sut.getFileThumbnailClass(nonExistentFiledId).catch((e) => (error = e));
+
+      assert.match(
+        error.message,
+        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
+      );
+    });
+  });
+
+  describe('getFileDataTables', () => {
+    test('should return data tables filtering by tabular file id', async () => {
+      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
+      const testFile = currentTestFiles[3];
+      const actual = await sut.getFileDataTables(testFile.id);
+      assert.match(actual[0].varQuantity, 1);
+    });
+
+    test('should return error when file is not tabular', async () => {
+      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
+      const testFile = currentTestFiles[0];
+
+      let error: ReadError = undefined;
+
+      await sut.getFileDataTables(testFile.id).catch((e) => (error = e));
+
+      assert.match(
+        error.message,
+        'There was an error when reading the resource. Reason was: [400] This operation is only available for tabular files.',
+      );
+    });
+
+    test('should return error when file does not exist', async () => {
+      let error: ReadError = undefined;
+
+      await sut.getFileDataTables(nonExistentFiledId).catch((e) => (error = e));
 
       assert.match(
         error.message,
