@@ -8,6 +8,7 @@ import { TestConstants } from '../../testHelpers/TestConstants';
 import { FileOrderCriteria } from '../../../src/files/domain/models/FileOrderCriteria';
 import { createFilePayload, createFileModel } from '../../testHelpers/files/filesHelper';
 import { FileThumbnailClass } from '../../../src/files/domain/models/FileThumbnailClass';
+import { createFileDataTablePayload, createFileDataTableModel } from '../../testHelpers/files/fileDataTablesHelper';
 
 describe('FilesRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -472,6 +473,102 @@ describe('FilesRepository', () => {
         assert.calledWithExactly(
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/files/:persistentId/thumbnailClass?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+  });
+
+  describe('getFileDataTables', () => {
+    const expectedDataTables = [createFileDataTableModel()];
+    const testGetFileDataTablesResponse = {
+      data: {
+        status: 'OK',
+        data: [createFileDataTablePayload()],
+      },
+    };
+
+    describe('by numeric id', () => {
+      test('should return data tables when providing id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testGetFileDataTablesResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/dataTables`;
+
+        // API Key auth
+        let actual = await sut.getFileDataTables(testFile.id);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, expectedDataTables);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getFileDataTables(testFile.id);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, expectedDataTables);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getFileDataTables(testFile.id).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/files/${testFile.id}/dataTables`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+
+    describe('by persistent id', () => {
+      test('should return data tables when providing persistent id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testGetFileDataTablesResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId/dataTables?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
+
+        // API Key auth
+        let actual = await sut.getFileDataTables(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, expectedDataTables);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getFileDataTables(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, expectedDataTables);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getFileDataTables(TestConstants.TEST_DUMMY_PERSISTENT_ID).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/files/:persistentId/dataTables?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
         );
         expect(error).to.be.instanceOf(Error);

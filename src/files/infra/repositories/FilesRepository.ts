@@ -5,6 +5,7 @@ import { File } from '../../domain/models/File';
 import { transformFilesResponseToFiles } from './transformers/fileTransformers';
 import { FileThumbnailClass } from '../../domain/models/FileThumbnailClass';
 import { FileDataTable } from '../../domain/models/FileDataTable';
+import { transformDataTablesResponseToDataTables } from './transformers/fileDataTableTransformers';
 
 export interface GetFilesQueryParams {
   limit?: number;
