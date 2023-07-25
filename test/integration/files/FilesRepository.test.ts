@@ -216,7 +216,7 @@ describe('FilesRepository', () => {
       const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
       const testFile = currentTestFiles[3];
       const actual = await sut.getFileDataTables(testFile.id);
-      assert.match(actual[0].varQuantity, 1);
+      assert.match(actual[0].varQuantity, 3);
     });
 
     test('should return error when file is not tabular', async () => {
