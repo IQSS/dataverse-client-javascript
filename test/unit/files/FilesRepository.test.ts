@@ -8,6 +8,7 @@ import { TestConstants } from '../../testHelpers/TestConstants';
 import { FileOrderCriteria } from '../../../src/files/domain/models/FileOrderCriteria';
 import { createFilePayload, createFileModel } from '../../testHelpers/files/filesHelper';
 import { createFileDataTablePayload, createFileDataTableModel } from '../../testHelpers/files/fileDataTablesHelper';
+import { createFileUserPermissionsModel } from '../../testHelpers/files/fileUserPermissionsHelper';
 
 describe('FilesRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -278,6 +279,101 @@ describe('FilesRepository', () => {
         assert.calledWithExactly(
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/files/:persistentId/downloadCount?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+  });
+
+  describe('getFileUserPermissions', () => {
+    const testFileUserPermissions = createFileUserPermissionsModel();
+    const testFileUserPermissionsResponse = {
+      data: {
+        status: 'OK',
+        data: testFileUserPermissions,
+      },
+    };
+
+    describe('by numeric id', () => {
+      test('should return file user permissions when providing id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileUserPermissionsResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/access/datafile/${testFile.id}/userPermissions`;
+
+        // API Key auth
+        let actual = await sut.getFileUserPermissions(testFile.id);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testFileUserPermissions);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getFileUserPermissions(testFile.id);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, testFileUserPermissions);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getFileUserPermissions(testFile.id).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/access/datafile/${testFile.id}/userPermissions`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+
+    describe('by persistent id', () => {
+      test('should return file user permissions when providing persistent id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileUserPermissionsResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/access/datafile/:persistentId/userPermissions?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
+        // API Key auth
+        let actual = await sut.getFileUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testFileUserPermissions);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getFileUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, testFileUserPermissions);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getFileUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/access/datafile/:persistentId/userPermissions?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
         );
         expect(error).to.be.instanceOf(Error);

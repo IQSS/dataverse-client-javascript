@@ -1,6 +1,7 @@
 import { FileOrderCriteria } from '../models/FileOrderCriteria';
 import { File } from '../models/File';
 import { FileDataTable } from '../models/FileDataTable';
+import { FileUserPermissions } from '../models/FileUserPermissions';
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -12,6 +13,8 @@ export interface IFilesRepository {
   ): Promise<File[]>;
 
   getFileDownloadCount(fileId: number | string): Promise<number>;
+
+  getFileUserPermissions(fileId: number | string): Promise<FileUserPermissions>;
 
   getFileDataTables(fileId: number | string): Promise<FileDataTable[]>;
 }

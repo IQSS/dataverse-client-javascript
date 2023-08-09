@@ -170,6 +170,27 @@ describe('FilesRepository', () => {
     });
   });
 
+  describe('getFileUserPermissions', () => {
+    test('should return user permissions filtering by file id', async () => {
+      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
+      const testFile = currentTestFiles[0];
+      const actual = await sut.getFileUserPermissions(testFile.id);
+      assert.match(actual.canDownloadFile, true);
+      assert.match(actual.canEditOwnerDataset, true);
+    });
+
+    test('should return error when file does not exist', async () => {
+      let error: ReadError = undefined;
+
+      await sut.getFileUserPermissions(nonExistentFiledId).catch((e) => (error = e));
+
+      assert.match(
+        error.message,
+        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
+      );
+    });
+  });
+
   describe('getFileDataTables', () => {
     test('should return data tables filtering by tabular file id', async () => {
       const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);

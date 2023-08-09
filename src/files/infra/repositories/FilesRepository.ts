@@ -5,6 +5,8 @@ import { File } from '../../domain/models/File';
 import { transformFilesResponseToFiles } from './transformers/fileTransformers';
 import { FileDataTable } from '../../domain/models/FileDataTable';
 import { transformDataTablesResponseToDataTables } from './transformers/fileDataTableTransformers';
+import { FileUserPermissions } from '../../domain/models/FileUserPermissions';
+import { transformFileUserPermissionsResponseToFileUserPermissions } from './transformers/fileUserPermissionsTransformers';
 
 export interface GetFilesQueryParams {
   limit?: number;
@@ -55,6 +57,20 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     }
     return this.doGet(endpoint, true)
       .then((response) => response.data.data.message as number)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  public async getFileUserPermissions(fileId: number | string): Promise<FileUserPermissions> {
+    let endpoint;
+    if (typeof fileId === 'number') {
+      endpoint = `/access/datafile/${fileId}/userPermissions`;
+    } else {
+      endpoint = `/access/datafile/:persistentId/userPermissions?persistentId=${fileId}`;
+    }
+    return this.doGet(endpoint, true)
+      .then((response) => transformFileUserPermissionsResponseToFileUserPermissions(response))
       .catch((error) => {
         throw error;
       });

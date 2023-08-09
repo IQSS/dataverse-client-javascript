@@ -9,7 +9,7 @@ export class GetFileDataTables implements UseCase<FileDataTable[]> {
     this.filesRepository = filesRepository;
   }
 
-  async execute(datasetId: number | string): Promise<FileDataTable[]> {
-    return await this.filesRepository.getFileDataTables(datasetId);
+  async execute(fileId: number | string): Promise<FileDataTable[]> {
+    return await this.filesRepository.getFileDataTables(fileId);
   }
 }
