@@ -47,12 +47,12 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
-  public async getFileGuestbookResponsesCount(fileId: number | string): Promise<number> {
+  public async getFileDownloadCount(fileId: number | string): Promise<number> {
     let endpoint;
     if (typeof fileId === 'number') {
-      endpoint = `/files/${fileId}/guestbookResponses/count`;
+      endpoint = `/files/${fileId}/downloadCount`;
     } else {
-      endpoint = `/files/:persistentId/guestbookResponses/count?persistentId=${fileId}`;
+      endpoint = `/files/:persistentId/downloadCount?persistentId=${fileId}`;
     }
     return this.doGet(endpoint, true)
       .then((response) => response.data.data.message as number)

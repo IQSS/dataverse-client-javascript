@@ -188,9 +188,9 @@ describe('FilesRepository', () => {
     });
   });
 
-  describe('getFileGuestbookResponsesCount', () => {
+  describe('getFileDownloadCount', () => {
     const testCount = 1;
-    const testFileGuestbookResponseCountResponse = {
+    const testFileDownloadCountResponse = {
       data: {
         status: 'OK',
         data: {
@@ -201,11 +201,11 @@ describe('FilesRepository', () => {
 
     describe('by numeric id', () => {
       test('should return count when providing id and response is successful', async () => {
-        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileGuestbookResponseCountResponse);
-        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/guestbookResponses/count`;
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileDownloadCountResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/downloadCount`;
 
         // API Key auth
-        let actual = await sut.getFileGuestbookResponsesCount(testFile.id);
+        let actual = await sut.getFileDownloadCount(testFile.id);
 
         assert.calledWithExactly(
           axiosGetStub,
@@ -217,7 +217,7 @@ describe('FilesRepository', () => {
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-        actual = await sut.getFileGuestbookResponsesCount(testFile.id);
+        actual = await sut.getFileDownloadCount(testFile.id);
 
         assert.calledWithExactly(
           axiosGetStub,
@@ -231,11 +231,11 @@ describe('FilesRepository', () => {
         const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
         let error: ReadError = undefined;
-        await sut.getFileGuestbookResponsesCount(testFile.id).catch((e) => (error = e));
+        await sut.getFileDownloadCount(testFile.id).catch((e) => (error = e));
 
         assert.calledWithExactly(
           axiosGetStub,
-          `${TestConstants.TEST_API_URL}/files/${testFile.id}/guestbookResponses/count`,
+          `${TestConstants.TEST_API_URL}/files/${testFile.id}/downloadCount`,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
         );
         expect(error).to.be.instanceOf(Error);
@@ -244,11 +244,11 @@ describe('FilesRepository', () => {
 
     describe('by persistent id', () => {
       test('should return count when providing persistent id and response is successful', async () => {
-        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileGuestbookResponseCountResponse);
-        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId/guestbookResponses/count?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileDownloadCountResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId/downloadCount?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
 
         // API Key auth
-        let actual = await sut.getFileGuestbookResponsesCount(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+        let actual = await sut.getFileDownloadCount(TestConstants.TEST_DUMMY_PERSISTENT_ID);
 
         assert.calledWithExactly(
           axiosGetStub,
@@ -260,7 +260,7 @@ describe('FilesRepository', () => {
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-        actual = await sut.getFileGuestbookResponsesCount(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+        actual = await sut.getFileDownloadCount(TestConstants.TEST_DUMMY_PERSISTENT_ID);
 
         assert.calledWithExactly(
           axiosGetStub,
@@ -274,11 +274,11 @@ describe('FilesRepository', () => {
         const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
         let error: ReadError = undefined;
-        await sut.getFileGuestbookResponsesCount(TestConstants.TEST_DUMMY_PERSISTENT_ID).catch((e) => (error = e));
+        await sut.getFileDownloadCount(TestConstants.TEST_DUMMY_PERSISTENT_ID).catch((e) => (error = e));
 
         assert.calledWithExactly(
           axiosGetStub,
-          `${TestConstants.TEST_API_URL}/files/:persistentId/guestbookResponses/count?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
+          `${TestConstants.TEST_API_URL}/files/:persistentId/downloadCount?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
         );
         expect(error).to.be.instanceOf(Error);

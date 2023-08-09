@@ -151,18 +151,18 @@ describe('FilesRepository', () => {
     });
   });
 
-  describe('getFileGuestbookResponsesCount', () => {
+  describe('getFileDownloadCount', () => {
     test('should return count filtering by file id', async () => {
       const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
       const testFile = currentTestFiles[0];
-      const actual = await sut.getFileGuestbookResponsesCount(testFile.id);
+      const actual = await sut.getFileDownloadCount(testFile.id);
       assert.match(actual, 0);
     });
 
     test('should return error when file does not exist', async () => {
       let error: ReadError = undefined;
 
-      await sut.getFileGuestbookResponsesCount(nonExistentFiledId).catch((e) => (error = e));
+      await sut.getFileDownloadCount(nonExistentFiledId).catch((e) => (error = e));
 
       assert.match(
         error.message,

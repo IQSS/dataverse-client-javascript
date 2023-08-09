@@ -12,7 +12,7 @@ export interface IFilesRepository {
     orderCriteria?: FileOrderCriteria,
   ): Promise<File[]>;
 
-  getFileGuestbookResponsesCount(fileId: number | string): Promise<number>;
+  getFileDownloadCount(fileId: number | string): Promise<number>;
 
   canFileBeDownloaded(fileId: number | string): Promise<boolean>;
 

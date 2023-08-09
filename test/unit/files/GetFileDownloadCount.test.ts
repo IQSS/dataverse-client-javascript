@@ -1,4 +1,4 @@
-import { GetFileGuestbookResponsesCount } from '../../../src/files/domain/useCases/GetFileGuestbookResponsesCount';
+import { GetFileDownloadCount } from '../../../src/files/domain/useCases/GetFileDownloadCount';
 import { IFilesRepository } from '../../../src/files/domain/repositories/IFilesRepository';
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
@@ -16,8 +16,8 @@ describe('execute', () => {
   test('should return count on repository success filtering by id', async () => {
     const filesRepositoryStub = <IFilesRepository>{};
     const getFileGuestbookResponsesCountStub = sandbox.stub().returns(testCount);
-    filesRepositoryStub.getFileGuestbookResponsesCount = getFileGuestbookResponsesCountStub;
-    const sut = new GetFileGuestbookResponsesCount(filesRepositoryStub);
+    filesRepositoryStub.getFileDownloadCount = getFileGuestbookResponsesCountStub;
+    const sut = new GetFileDownloadCount(filesRepositoryStub);
 
     const actual = await sut.execute(testFileId);
 
@@ -28,8 +28,8 @@ describe('execute', () => {
   test('should return count on repository success filtering by persistent id', async () => {
     const filesRepositoryStub = <IFilesRepository>{};
     const getFileGuestbookResponsesCountStub = sandbox.stub().returns(testCount);
-    filesRepositoryStub.getFileGuestbookResponsesCount = getFileGuestbookResponsesCountStub;
-    const sut = new GetFileGuestbookResponsesCount(filesRepositoryStub);
+    filesRepositoryStub.getFileDownloadCount = getFileGuestbookResponsesCountStub;
+    const sut = new GetFileDownloadCount(filesRepositoryStub);
 
     const actual = await sut.execute(TestConstants.TEST_DUMMY_PERSISTENT_ID);
 
@@ -40,8 +40,8 @@ describe('execute', () => {
   test('should return error result on repository error', async () => {
     const filesRepositoryStub = <IFilesRepository>{};
     const testReadError = new ReadError();
-    filesRepositoryStub.getFileGuestbookResponsesCount = sandbox.stub().throwsException(testReadError);
-    const sut = new GetFileGuestbookResponsesCount(filesRepositoryStub);
+    filesRepositoryStub.getFileDownloadCount = sandbox.stub().throwsException(testReadError);
+    const sut = new GetFileDownloadCount(filesRepositoryStub);
 
     let actualError: ReadError = undefined;
     await sut.execute(testFileId).catch((e) => (actualError = e));
