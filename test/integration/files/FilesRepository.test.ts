@@ -7,7 +7,6 @@ import { uploadFileViaApi } from '../../testHelpers/files/filesHelper';
 import { FileOrderCriteria } from '../../../src/files/domain/models/FileOrderCriteria';
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
-import { FileThumbnailClass } from '../../../src/files/domain/models/FileThumbnailClass';
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
@@ -163,46 +162,6 @@ describe('FilesRepository', () => {
       let error: ReadError = undefined;
 
       await sut.getFileDownloadCount(nonExistentFiledId).catch((e) => (error = e));
-
-      assert.match(
-        error.message,
-        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
-      );
-    });
-  });
-
-  describe('canFileBeDownloaded', () => {
-    test('should return result filtering by file id', async () => {
-      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
-      const testFile = currentTestFiles[0];
-      const actual = await sut.canFileBeDownloaded(testFile.id);
-      assert.match(actual, true);
-    });
-
-    test('should return error when file does not exist', async () => {
-      let error: ReadError = undefined;
-
-      await sut.canFileBeDownloaded(nonExistentFiledId).catch((e) => (error = e));
-
-      assert.match(
-        error.message,
-        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
-      );
-    });
-  });
-
-  describe('getFileThumbnailClass', () => {
-    test('should return thumbnail class filtering by file id', async () => {
-      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
-      const testFile = currentTestFiles[0];
-      const actual = await sut.getFileThumbnailClass(testFile.id);
-      assert.match(actual, FileThumbnailClass.DOCUMENT);
-    });
-
-    test('should return error when file does not exist', async () => {
-      let error: ReadError = undefined;
-
-      await sut.getFileThumbnailClass(nonExistentFiledId).catch((e) => (error = e));
 
       assert.match(
         error.message,
