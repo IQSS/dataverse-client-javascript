@@ -9,6 +9,7 @@ import { FileOrderCriteria } from '../../../src/files/domain/models/FileOrderCri
 import { createFilePayload, createFileModel } from '../../testHelpers/files/filesHelper';
 import { createFileDataTablePayload, createFileDataTableModel } from '../../testHelpers/files/fileDataTablesHelper';
 import { createFileUserPermissionsModel } from '../../testHelpers/files/fileUserPermissionsHelper';
+import { FileCriteria, FileAccessStatus } from '../../../src/files/domain/models/FileCriteria';
 
 describe('FilesRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -30,6 +31,26 @@ describe('FilesRepository', () => {
   });
 
   describe('getDatasetFiles', () => {
+    const testVersionId = ':draft';
+    const testLimit = 10;
+    const testOffset = 20;
+    const testCategory = 'testCategory';
+    const testContentType = 'testContentType';
+    const testFileCriteria = new FileCriteria()
+      .withOrderCriteria(FileOrderCriteria.NAME_ZA)
+      .withCategoryName(testCategory)
+      .withContentType(testContentType)
+      .withAccessStatus(FileAccessStatus.PUBLIC);
+
+    const expectedRequestParams = {
+      limit: testLimit,
+      offset: testOffset,
+      orderCriteria: testFileCriteria.orderCriteria.toString(),
+      categoryName: testFileCriteria.categoryName,
+      contentType: testFileCriteria.contentType,
+      accessStatus: testFileCriteria.accessStatus.toString(),
+    };
+
     describe('by numeric id', () => {
       const testDatasetId = 1;
 
@@ -65,25 +86,10 @@ describe('FilesRepository', () => {
       test('should return files when providing id, optional params, and response is successful', async () => {
         const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFilesSuccessfulResponse);
 
-        const testVersionId = ':draft';
-        const testLimit = 10;
-        const testOffset = 20;
-        const testFileOrderCriteria = FileOrderCriteria.NEWEST;
-
-        const actual = await sut.getDatasetFiles(
-          testDatasetId,
-          testVersionId,
-          testLimit,
-          testOffset,
-          testFileOrderCriteria,
-        );
+        const actual = await sut.getDatasetFiles(testDatasetId, testVersionId, testLimit, testOffset, testFileCriteria);
 
         const expectedRequestConfig = {
-          params: {
-            limit: testLimit,
-            offset: testOffset,
-            orderCriteria: testFileOrderCriteria.toString(),
-          },
+          params: expectedRequestParams,
           headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
         };
 
@@ -142,25 +148,16 @@ describe('FilesRepository', () => {
       test('should return files when providing persistent id, optional params, and response is successful', async () => {
         const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFilesSuccessfulResponse);
 
-        const testVersionId = ':draft';
-        const testLimit = 10;
-        const testOffset = 20;
-        const testFileOrderCriteria = FileOrderCriteria.NEWEST;
-
         const actual = await sut.getDatasetFiles(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testVersionId,
           testLimit,
           testOffset,
-          testFileOrderCriteria,
+          testFileCriteria,
         );
 
         const expectedRequestConfig = {
-          params: {
-            limit: testLimit,
-            offset: testOffset,
-            orderCriteria: testFileOrderCriteria.toString(),
-          },
+          params: expectedRequestParams,
           headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
         };
 

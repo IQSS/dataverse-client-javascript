@@ -7,6 +7,7 @@ import { uploadFileViaApi } from '../../testHelpers/files/filesHelper';
 import { FileOrderCriteria } from '../../../src/files/domain/models/FileOrderCriteria';
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
+import { FileCriteria } from '../../../src/files/domain/models/FileCriteria';
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
@@ -78,7 +79,7 @@ describe('FilesRepository', () => {
           undefined,
           undefined,
           undefined,
-          FileOrderCriteria.NEWEST,
+          new FileCriteria().withOrderCriteria(FileOrderCriteria.NEWEST),
         );
         assert.match(actual.length, 4);
         assert.match(actual[0].name, testTabFile4Name);
@@ -127,7 +128,7 @@ describe('FilesRepository', () => {
           undefined,
           undefined,
           undefined,
-          FileOrderCriteria.NEWEST,
+          new FileCriteria().withOrderCriteria(FileOrderCriteria.NEWEST),
         );
         assert.match(actual.length, 4);
         assert.match(actual[0].name, testTabFile4Name);

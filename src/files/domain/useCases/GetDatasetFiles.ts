@@ -1,7 +1,7 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { FileOrderCriteria } from '../models/FileOrderCriteria';
 import { IFilesRepository } from '../repositories/IFilesRepository';
 import { File } from '../models/File';
+import { FileCriteria } from '../models/FileCriteria';
 
 export class GetDatasetFiles implements UseCase<File[]> {
   private filesRepository: IFilesRepository;
@@ -15,8 +15,8 @@ export class GetDatasetFiles implements UseCase<File[]> {
     datasetVersionId?: string,
     limit?: number,
     offset?: number,
-    orderCriteria?: FileOrderCriteria,
+    fileCriteria?: FileCriteria,
   ): Promise<File[]> {
-    return await this.filesRepository.getDatasetFiles(datasetId, datasetVersionId, limit, offset, orderCriteria);
+    return await this.filesRepository.getDatasetFiles(datasetId, datasetVersionId, limit, offset, fileCriteria);
   }
 }

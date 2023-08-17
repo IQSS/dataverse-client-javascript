@@ -1,17 +1,21 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository';
-import { FileOrderCriteria } from '../../domain/models/FileOrderCriteria';
 import { File } from '../../domain/models/File';
 import { transformFilesResponseToFiles } from './transformers/fileTransformers';
 import { FileDataTable } from '../../domain/models/FileDataTable';
 import { transformDataTablesResponseToDataTables } from './transformers/fileDataTableTransformers';
 import { FileUserPermissions } from '../../domain/models/FileUserPermissions';
 import { transformFileUserPermissionsResponseToFileUserPermissions } from './transformers/fileUserPermissionsTransformers';
+import { FileCriteria } from '../../domain/models/FileCriteria';
 
 export interface GetFilesQueryParams {
   limit?: number;
   offset?: number;
   orderCriteria?: string;
+  contentType?: string;
+  accessStatus?: string;
+  categoryName?: string;
+  searchText?: string;
 }
 
 export class FilesRepository extends ApiRepository implements IFilesRepository {
@@ -20,7 +24,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     datasetVersionId?: string,
     limit?: number,
     offset?: number,
-    orderCriteria?: FileOrderCriteria,
+    fileCriteria?: FileCriteria,
   ): Promise<File[]> {
     if (datasetVersionId === undefined) {
       datasetVersionId = this.DATASET_VERSION_LATEST;
@@ -38,8 +42,8 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     if (offset !== undefined) {
       queryParams.offset = offset;
     }
-    if (orderCriteria !== undefined) {
-      queryParams.orderCriteria = orderCriteria.toString();
+    if (fileCriteria !== undefined) {
+      this.applyFileCriteriaToQueryParams(queryParams, fileCriteria);
     }
     return this.doGet(endpoint, true, queryParams)
       .then((response) => transformFilesResponseToFiles(response))
@@ -88,5 +92,23 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       .catch((error) => {
         throw error;
       });
+  }
+
+  private applyFileCriteriaToQueryParams(queryParams: GetFilesQueryParams, fileCriteria: FileCriteria) {
+    if (fileCriteria.accessStatus !== undefined) {
+      queryParams.accessStatus = fileCriteria.accessStatus.toString();
+    }
+    if (fileCriteria.categoryName !== undefined) {
+      queryParams.categoryName = fileCriteria.categoryName;
+    }
+    if (fileCriteria.contentType !== undefined) {
+      queryParams.contentType = fileCriteria.contentType;
+    }
+    if (fileCriteria.searchText !== undefined) {
+      queryParams.searchText = fileCriteria.searchText;
+    }
+    if (fileCriteria.orderCriteria !== undefined) {
+      queryParams.orderCriteria = fileCriteria.orderCriteria.toString();
+    }
   }
 }
