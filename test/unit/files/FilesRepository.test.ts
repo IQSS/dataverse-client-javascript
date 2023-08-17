@@ -5,11 +5,10 @@ import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import { TestConstants } from '../../testHelpers/TestConstants';
-import { FileOrderCriteria } from '../../../src/files/domain/models/FileOrderCriteria';
 import { createFilePayload, createFileModel } from '../../testHelpers/files/filesHelper';
 import { createFileDataTablePayload, createFileDataTableModel } from '../../testHelpers/files/fileDataTablesHelper';
 import { createFileUserPermissionsModel } from '../../testHelpers/files/fileUserPermissionsHelper';
-import { FileCriteria, FileAccessStatus } from '../../../src/files/domain/models/FileCriteria';
+import { FileCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
 
 describe('FilesRepository', () => {
   const sandbox: SinonSandbox = createSandbox();

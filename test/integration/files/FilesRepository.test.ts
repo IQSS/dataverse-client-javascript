@@ -4,10 +4,9 @@ import { assert } from 'sinon';
 import { TestConstants } from '../../testHelpers/TestConstants';
 import { createDatasetViaApi } from '../../testHelpers/datasets/datasetHelper';
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper';
-import { FileOrderCriteria } from '../../../src/files/domain/models/FileOrderCriteria';
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
-import { FileCriteria } from '../../../src/files/domain/models/FileCriteria';
+import { FileCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
@@ -57,6 +56,11 @@ describe('FilesRepository', () => {
   });
 
   describe('getDatasetFiles', () => {
+    const testFileCriteria = new FileCriteria()
+      .withOrderCriteria(FileOrderCriteria.NEWEST)
+      .withContentType('text/plain')
+      .withAccessStatus(FileAccessStatus.PUBLIC);
+
     describe('by numeric id', () => {
       test('should return all files filtering by dataset id', async () => {
         const actual = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID);
@@ -73,19 +77,18 @@ describe('FilesRepository', () => {
         assert.match(actual[0].name, testTabFile4Name);
       });
 
-      test('should return correct files filtering by dataset id and applying order criteria', async () => {
+      test('should return correct files filtering by dataset id and applying file criteria', async () => {
         let actual = await sut.getDatasetFiles(
           TestConstants.TEST_CREATED_DATASET_ID,
           undefined,
           undefined,
           undefined,
-          new FileCriteria().withOrderCriteria(FileOrderCriteria.NEWEST),
+          testFileCriteria,
         );
-        assert.match(actual.length, 4);
-        assert.match(actual[0].name, testTabFile4Name);
-        assert.match(actual[1].name, testTextFile3Name);
-        assert.match(actual[2].name, testTextFile2Name);
-        assert.match(actual[3].name, testTextFile1Name);
+        assert.match(actual.length, 3);
+        assert.match(actual[0].name, testTextFile3Name);
+        assert.match(actual[1].name, testTextFile2Name);
+        assert.match(actual[2].name, testTextFile1Name);
       });
 
       test('should return error when dataset does not exist', async () => {
@@ -121,20 +124,19 @@ describe('FilesRepository', () => {
         assert.match(actual[0].name, testTabFile4Name);
       });
 
-      test('should return correct files filtering by persistent id and applying order criteria', async () => {
+      test('should return correct files filtering by persistent id and applying file criteria', async () => {
         const testDataset = await datasetRepository.getDataset(TestConstants.TEST_CREATED_DATASET_ID);
         let actual = await sut.getDatasetFiles(
           testDataset.persistentId,
           undefined,
           undefined,
           undefined,
-          new FileCriteria().withOrderCriteria(FileOrderCriteria.NEWEST),
+          testFileCriteria,
         );
-        assert.match(actual.length, 4);
-        assert.match(actual[0].name, testTabFile4Name);
-        assert.match(actual[1].name, testTextFile3Name);
-        assert.match(actual[2].name, testTextFile2Name);
-        assert.match(actual[3].name, testTextFile1Name);
+        assert.match(actual.length, 3);
+        assert.match(actual[0].name, testTextFile3Name);
+        assert.match(actual[1].name, testTextFile2Name);
+        assert.match(actual[2].name, testTextFile1Name);
       });
 
       test('should return error when dataset does not exist', async () => {
