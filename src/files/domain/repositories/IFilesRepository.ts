@@ -6,7 +6,7 @@ import { FileCriteria } from '../models/FileCriteria';
 export interface IFilesRepository {
   getDatasetFiles(
     datasetId: number | string,
-    datasetVersionId?: string,
+    datasetVersionId: string,
     limit?: number,
     offset?: number,
     fileCriteria?: FileCriteria,

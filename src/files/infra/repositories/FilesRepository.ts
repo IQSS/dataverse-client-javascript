@@ -21,14 +21,11 @@ export interface GetFilesQueryParams {
 export class FilesRepository extends ApiRepository implements IFilesRepository {
   public async getDatasetFiles(
     datasetId: number | string,
-    datasetVersionId?: string,
+    datasetVersionId: string,
     limit?: number,
     offset?: number,
     fileCriteria?: FileCriteria,
   ): Promise<File[]> {
-    if (datasetVersionId === undefined) {
-      datasetVersionId = this.DATASET_VERSION_LATEST;
-    }
     let endpoint;
     if (typeof datasetId === 'number') {
       endpoint = `/datasets/${datasetId}/versions/${datasetVersionId}/files`;

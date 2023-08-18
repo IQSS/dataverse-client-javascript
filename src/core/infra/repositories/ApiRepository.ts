@@ -4,8 +4,6 @@ import { ReadError } from '../../domain/repositories/ReadError';
 import { WriteError } from '../../domain/repositories/WriteError';
 
 export abstract class ApiRepository {
-  DATASET_VERSION_LATEST = ':latest';
-
   public async doGet(apiEndpoint: string, authRequired = false, queryParams: object = {}): Promise<AxiosResponse> {
     return await axios
       .get(this.buildRequestUrl(apiEndpoint), this.buildRequestConfig(authRequired, queryParams))

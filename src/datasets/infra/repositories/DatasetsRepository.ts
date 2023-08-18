@@ -20,10 +20,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async getDataset(datasetId: number | string, datasetVersionId?: string): Promise<Dataset> {
-    if (datasetVersionId === undefined) {
-      datasetVersionId = this.DATASET_VERSION_LATEST;
-    }
+  public async getDataset(datasetId: number | string, datasetVersionId: string): Promise<Dataset> {
     let endpoint;
     if (typeof datasetId === 'number') {
       endpoint = `/datasets/${datasetId}/versions/${datasetVersionId}`;
@@ -37,10 +34,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async getDatasetCitation(datasetId: number, datasetVersionId?: string): Promise<string> {
-    if (datasetVersionId === undefined) {
-      datasetVersionId = this.DATASET_VERSION_LATEST;
-    }
+  public async getDatasetCitation(datasetId: number, datasetVersionId: string): Promise<string> {
     return this.doGet(`/datasets/${datasetId}/versions/${datasetVersionId}/citation`, true)
       .then((response) => response.data.data.message)
       .catch((error) => {
