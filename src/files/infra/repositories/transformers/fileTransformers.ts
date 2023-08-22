@@ -22,6 +22,7 @@ const transformFilePayloadToFile = (filePayload: any): File => {
     version: filePayload.version,
     ...(filePayload.dataFile.description && { description: filePayload.dataFile.description }),
     restricted: filePayload.restricted,
+    latestRestricted: filePayload.dataFile.restricted,
     ...(filePayload.dataFile.directoryLabel && { directoryLabel: filePayload.dataFile.directoryLabel }),
     ...(filePayload.dataFile.datasetVersionId && { datasetVersionId: filePayload.dataFile.datasetVersionId }),
     ...(filePayload.dataFile.categories && { categories: filePayload.dataFile.categories }),
