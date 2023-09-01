@@ -7,6 +7,7 @@ import { transformDataTablesResponseToDataTables } from './transformers/fileData
 import { FileUserPermissions } from '../../domain/models/FileUserPermissions';
 import { transformFileUserPermissionsResponseToFileUserPermissions } from './transformers/fileUserPermissionsTransformers';
 import { FileCriteria } from '../../domain/models/FileCriteria';
+import { FileCounts } from '../../domain/models/FileCounts';
 
 export interface GetFilesQueryParams {
   limit?: number;
@@ -47,6 +48,10 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       .catch((error) => {
         throw error;
       });
+  }
+
+  getDatasetFileCounts(datasetId: string | number, datasetVersionId: string): Promise<FileCounts> {
+    throw new Error('Method not implemented. Params' + datasetId + ' ' + datasetVersionId);
   }
 
   public async getFileDownloadCount(fileId: number | string): Promise<number> {
