@@ -18,7 +18,12 @@ export { getDatasetFiles, getFileDownloadCount, getFileUserPermissions, getFileD
 export { File, FileEmbargo, FileChecksum } from './domain/models/File';
 export { FileUserPermissions } from './domain/models/FileUserPermissions';
 export { FileCriteria, FileOrderCriteria, FileAccessStatus } from './domain/models/FileCriteria';
-export { FileCounts, FileContentTypeCount, FileAccessStatusCount, FileCategoryCount } from './domain/models/FileCounts';
+export {
+  FileCounts,
+  FileContentTypeCount,
+  FileAccessStatusCount,
+  FileCategoryNameCount,
+} from './domain/models/FileCounts';
 export {
   FileDataTable,
   FileDataVariable,

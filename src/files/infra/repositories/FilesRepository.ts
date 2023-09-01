@@ -8,6 +8,7 @@ import { FileUserPermissions } from '../../domain/models/FileUserPermissions';
 import { transformFileUserPermissionsResponseToFileUserPermissions } from './transformers/fileUserPermissionsTransformers';
 import { FileCriteria } from '../../domain/models/FileCriteria';
 import { FileCounts } from '../../domain/models/FileCounts';
+import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
 
 export interface GetFilesQueryParams {
   limit?: number;
@@ -50,8 +51,18 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
-  getDatasetFileCounts(datasetId: string | number, datasetVersionId: string): Promise<FileCounts> {
-    throw new Error('Method not implemented. Params' + datasetId + ' ' + datasetVersionId);
+  public async getDatasetFileCounts(datasetId: string | number, datasetVersionId: string): Promise<FileCounts> {
+    let endpoint;
+    if (typeof datasetId === 'number') {
+      endpoint = `/datasets/${datasetId}/versions/${datasetVersionId}/files/counts`;
+    } else {
+      endpoint = `/datasets/:persistentId/versions/${datasetVersionId}/files/counts?persistentId=${datasetId}`;
+    }
+    return this.doGet(endpoint, true)
+      .then((response) => transformFileCountsResponseToFileCounts(response))
+      .catch((error) => {
+        throw error;
+      });
   }
 
   public async getFileDownloadCount(fileId: number | string): Promise<number> {

@@ -1,6 +1,7 @@
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository';
 import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import { assert } from 'sinon';
+import { expect } from 'chai';
 import { TestConstants } from '../../testHelpers/TestConstants';
 import { createDatasetViaApi } from '../../testHelpers/datasets/datasetHelper';
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper';
@@ -8,6 +9,7 @@ import { DatasetsRepository } from '../../../src/datasets/infra/repositories/Dat
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { FileCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
 import { DatasetNotNumberedVersion } from '../../../src/datasets';
+import { FileCounts } from '../../../src/files/domain/models/FileCounts';
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
@@ -20,6 +22,8 @@ describe('FilesRepository', () => {
   const nonExistentFiledId = 200;
 
   const latestDatasetVersionId = DatasetNotNumberedVersion.LATEST;
+
+  const datasetRepository = new DatasetsRepository();
 
   beforeAll(async () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
@@ -114,8 +118,6 @@ describe('FilesRepository', () => {
     });
 
     describe('by persistent id', () => {
-      const datasetRepository = new DatasetsRepository();
-
       test('should return all files filtering by persistent id and version id', async () => {
         const testDataset = await datasetRepository.getDataset(
           TestConstants.TEST_CREATED_DATASET_ID,
@@ -168,6 +170,49 @@ describe('FilesRepository', () => {
           `There was an error when reading the resource. Reason was: [404] Dataset with Persistent ID ${testWrongPersistentId} not found.`,
         );
       });
+    });
+  });
+
+  describe('getDatasetFileCounts', () => {
+    const expectedFileCounts: FileCounts = {
+      total: 4,
+      perContentType: [
+        {
+          contentType: 'text/plain',
+          count: 3,
+        },
+        {
+          contentType: 'text/tab-separated-values',
+          count: 1,
+        },
+      ],
+      perAccessStatus: [
+        {
+          accessStatus: FileAccessStatus.PUBLIC,
+          count: 4,
+        },
+      ],
+      perCategoryName: [],
+    };
+
+    test('should return file count filtering by numeric id', async () => {
+      const actual = await sut.getDatasetFileCounts(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+      assert.match(actual.total, expectedFileCounts.total);
+      expect(actual.perContentType).to.have.deep.members(expectedFileCounts.perContentType);
+      expect(actual.perAccessStatus).to.have.deep.members(expectedFileCounts.perAccessStatus);
+      expect(actual.perCategoryName).to.have.deep.members(expectedFileCounts.perCategoryName);
+    });
+
+    test('should return file count filtering by persistent id', async () => {
+      const testDataset = await datasetRepository.getDataset(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+      );
+      const actual = await sut.getDatasetFileCounts(testDataset.persistentId, latestDatasetVersionId);
+      assert.match(actual.total, expectedFileCounts.total);
+      expect(actual.perContentType).to.have.deep.members(expectedFileCounts.perContentType);
+      expect(actual.perAccessStatus).to.have.deep.members(expectedFileCounts.perAccessStatus);
+      expect(actual.perCategoryName).to.have.deep.members(expectedFileCounts.perCategoryName);
     });
   });
 

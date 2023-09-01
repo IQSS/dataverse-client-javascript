@@ -2,9 +2,9 @@ import { FileAccessStatus } from './FileCriteria';
 
 export interface FileCounts {
   total: number;
-  perFileContentType: FileContentTypeCount[];
+  perContentType: FileContentTypeCount[];
   perAccessStatus: FileAccessStatusCount[];
-  perCategoryTag: FileCategoryCount[];
+  perCategoryName: FileCategoryNameCount[];
 }
 
 export interface FileContentTypeCount {
@@ -17,7 +17,7 @@ export interface FileAccessStatusCount {
   count: number;
 }
 
-export interface FileCategoryCount {
-  category: string;
+export interface FileCategoryNameCount {
+  categoryName: string;
   count: number;
 }

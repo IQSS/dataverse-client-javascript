@@ -4,7 +4,7 @@ import { FileAccessStatus } from '../../../src/files/domain/models/FileCriteria'
 export const createFileCountsModel = (): FileCounts => {
   return {
     total: 4,
-    perFileContentType: [
+    perContentType: [
       {
         contentType: 'text/plain',
         count: 4,
@@ -20,11 +20,27 @@ export const createFileCountsModel = (): FileCounts => {
         count: 1,
       },
     ],
-    perCategoryTag: [
+    perCategoryName: [
       {
-        category: 'testCategory',
+        categoryName: 'testCategory',
         count: 2,
       },
     ],
+  };
+};
+
+export const createFileCountsPayload = (): any => {
+  return {
+    total: 4,
+    perContentType: {
+      'text/plain': 4,
+    },
+    perAccessStatus: {
+      Public: 3,
+      Restricted: 1,
+    },
+    perCategoryName: {
+      testCategory: 2,
+    },
   };
 };
