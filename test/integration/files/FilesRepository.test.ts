@@ -4,7 +4,7 @@ import { assert } from 'sinon';
 import { expect } from 'chai';
 import { TestConstants } from '../../testHelpers/TestConstants';
 import { createDatasetViaApi } from '../../testHelpers/datasets/datasetHelper';
-import { uploadFileViaApi } from '../../testHelpers/files/filesHelper';
+import { uploadFileViaApi, setFileCategoriesViaApi } from '../../testHelpers/files/filesHelper';
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { FileCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
@@ -18,6 +18,7 @@ describe('FilesRepository', () => {
   const testTextFile2Name = 'test-file-2.txt';
   const testTextFile3Name = 'test-file-3.txt';
   const testTabFile4Name = 'test-file-4.tab';
+  const testCategoryName = 'testCategory';
 
   const nonExistentFiledId = 200;
 
@@ -59,6 +60,15 @@ describe('FilesRepository', () => {
       .catch((e) => {
         console.log(e);
         fail(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`);
+      });
+    // Categorize one of the uploaded test files
+    const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+    const testFile = currentTestFiles[0];
+    setFileCategoriesViaApi(testFile.id, [testCategoryName])
+      .then()
+      .catch((e) => {
+        console.log(e);
+        fail(`Tests beforeAll(): Error while setting file categories to ${testFile.name}`);
       });
   });
 
@@ -192,7 +202,12 @@ describe('FilesRepository', () => {
           count: 4,
         },
       ],
-      perCategoryName: [],
+      perCategoryName: [
+        {
+          categoryName: testCategoryName,
+          count: 1,
+        },
+      ],
     };
 
     test('should return file count filtering by numeric id', async () => {
