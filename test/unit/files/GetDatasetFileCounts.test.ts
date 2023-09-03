@@ -13,7 +13,7 @@ describe('execute', () => {
     sandbox.restore();
   });
 
-  test('should return files on repository success', async () => {
+  test('should return file counts on repository success', async () => {
     const testFileCounts: FileCounts = createFileCountsModel();
     const filesRepositoryStub = <IFilesRepository>{};
     const getDatasetFileCountsStub = sandbox.stub().returns(testFileCounts);
