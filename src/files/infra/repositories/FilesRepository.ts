@@ -21,6 +21,10 @@ export interface GetFilesQueryParams {
 }
 
 export class FilesRepository extends ApiRepository implements IFilesRepository {
+  private readonly datasetsResourceName: string = 'datasets';
+  private readonly filesResourceName: string = 'files';
+  private readonly accessResourceName: string = 'access/datafile';
+
   public async getDatasetFiles(
     datasetId: number | string,
     datasetVersionId: string,
@@ -28,12 +32,6 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     offset?: number,
     fileCriteria?: FileCriteria,
   ): Promise<File[]> {
-    let endpoint;
-    if (typeof datasetId === 'number') {
-      endpoint = `/datasets/${datasetId}/versions/${datasetVersionId}/files`;
-    } else {
-      endpoint = `/datasets/:persistentId/versions/${datasetVersionId}/files?persistentId=${datasetId}`;
-    }
     const queryParams: GetFilesQueryParams = {};
     if (limit !== undefined) {
       queryParams.limit = limit;
@@ -44,7 +42,11 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     if (fileCriteria !== undefined) {
       this.applyFileCriteriaToQueryParams(queryParams, fileCriteria);
     }
-    return this.doGet(endpoint, true, queryParams)
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/files`, datasetId),
+      true,
+      queryParams,
+    )
       .then((response) => transformFilesResponseToFiles(response))
       .catch((error) => {
         throw error;
@@ -52,13 +54,10 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   public async getDatasetFileCounts(datasetId: string | number, datasetVersionId: string): Promise<FileCounts> {
-    let endpoint;
-    if (typeof datasetId === 'number') {
-      endpoint = `/datasets/${datasetId}/versions/${datasetVersionId}/files/counts`;
-    } else {
-      endpoint = `/datasets/:persistentId/versions/${datasetVersionId}/files/counts?persistentId=${datasetId}`;
-    }
-    return this.doGet(endpoint, true)
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/files/counts`, datasetId),
+      true,
+    )
       .then((response) => transformFileCountsResponseToFileCounts(response))
       .catch((error) => {
         throw error;
@@ -66,13 +65,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   public async getFileDownloadCount(fileId: number | string): Promise<number> {
-    let endpoint;
-    if (typeof fileId === 'number') {
-      endpoint = `/files/${fileId}/downloadCount`;
-    } else {
-      endpoint = `/files/:persistentId/downloadCount?persistentId=${fileId}`;
-    }
-    return this.doGet(endpoint, true)
+    return this.doGet(this.buildApiEndpoint(this.filesResourceName, `downloadCount`, fileId), true)
       .then((response) => response.data.data.message as number)
       .catch((error) => {
         throw error;
@@ -80,13 +73,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   public async getFileUserPermissions(fileId: number | string): Promise<FileUserPermissions> {
-    let endpoint;
-    if (typeof fileId === 'number') {
-      endpoint = `/access/datafile/${fileId}/userPermissions`;
-    } else {
-      endpoint = `/access/datafile/:persistentId/userPermissions?persistentId=${fileId}`;
-    }
-    return this.doGet(endpoint, true)
+    return this.doGet(this.buildApiEndpoint(this.accessResourceName, `userPermissions`, fileId), true)
       .then((response) => transformFileUserPermissionsResponseToFileUserPermissions(response))
       .catch((error) => {
         throw error;
@@ -94,13 +81,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   public async getFileDataTables(fileId: string | number): Promise<FileDataTable[]> {
-    let endpoint;
-    if (typeof fileId === 'number') {
-      endpoint = `/files/${fileId}/dataTables`;
-    } else {
-      endpoint = `/files/:persistentId/dataTables?persistentId=${fileId}`;
-    }
-    return this.doGet(endpoint, true)
+    return this.doGet(this.buildApiEndpoint(this.filesResourceName, `dataTables`, fileId), true)
       .then((response) => transformDataTablesResponseToDataTables(response))
       .catch((error) => {
         throw error;
