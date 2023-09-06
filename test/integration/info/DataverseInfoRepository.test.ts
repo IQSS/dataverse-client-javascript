@@ -2,13 +2,24 @@ import { DataverseInfoRepository } from '../../../src/info/infra/repositories/Da
 import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import { TestConstants } from '../../testHelpers/TestConstants';
 
-describe('getDataverseVersion', () => {
+describe('DataverseInfoRepository', () => {
   const sut: DataverseInfoRepository = new DataverseInfoRepository();
 
-  ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY);
+  beforeAll(async () => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
+  });
 
-  test('should return Dataverse version', async () => {
-    const actual = await sut.getDataverseVersion();
-    expect(typeof actual.number).toBe('string');
+  describe('getDataverseVersion', () => {
+    test('should return Dataverse version', async () => {
+      const actual = await sut.getDataverseVersion();
+      expect(typeof actual.number).toBe('string');
+    });
+  });
+
+  describe('getZipDownloadLimit', () => {
+    test('should return zip download limit', async () => {
+      const actual = await sut.getZipDownloadLimit();
+      expect(typeof actual).toBe('number');
+    });
   });
 });

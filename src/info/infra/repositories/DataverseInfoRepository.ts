@@ -4,9 +4,19 @@ import { DataverseVersion } from '../../domain/models/DataverseVersion';
 import { AxiosResponse } from 'axios';
 
 export class DataverseInfoRepository extends ApiRepository implements IDataverseInfoRepository {
+  private readonly infoResourceName: string = 'info';
+
   public async getDataverseVersion(): Promise<DataverseVersion> {
-    return this.doGet('/info/version')
+    return this.doGet(`/${this.infoResourceName}/version`)
       .then((response) => this.getVersionFromResponse(response))
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  public async getZipDownloadLimit(): Promise<number> {
+    return this.doGet(`/${this.infoResourceName}/zipDownloadLimit`)
+      .then((response) => response.data.data as number)
       .catch((error) => {
         throw error;
       });
