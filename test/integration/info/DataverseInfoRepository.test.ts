@@ -22,4 +22,11 @@ describe('DataverseInfoRepository', () => {
       expect(typeof actual).toBe('number');
     });
   });
+
+  describe('isEmbargoEnabled', () => {
+    test('should return boolean result', async () => {
+      const actual = await sut.isEmbargoEnabled();
+      expect(typeof actual).toBe('boolean');
+    });
+  });
 });

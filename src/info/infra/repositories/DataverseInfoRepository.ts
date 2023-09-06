@@ -22,6 +22,14 @@ export class DataverseInfoRepository extends ApiRepository implements IDataverse
       });
   }
 
+  public async isEmbargoEnabled(): Promise<boolean> {
+    return this.doGet(`/${this.infoResourceName}/embargoEnabled`)
+      .then((response) => response.data.data as boolean)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   private getVersionFromResponse(response: AxiosResponse): DataverseVersion {
     const responseData = response.data.data;
     return {

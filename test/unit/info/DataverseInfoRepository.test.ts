@@ -94,4 +94,40 @@ describe('DataverseInfoRepository', () => {
       expect(error).to.be.instanceOf(Error);
     });
   });
+
+  describe('isEmbargoEnabled', () => {
+    test('should return boolean result on successful response', async () => {
+      const testResult = true;
+      const testSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: testResult,
+        },
+      };
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testSuccessfulResponse);
+
+      const actual = await sut.isEmbargoEnabled();
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${TestConstants.TEST_API_URL}/info/embargoEnabled`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
+      );
+      assert.match(actual, testResult);
+    });
+
+    test('should return error result on error response', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+      let error: ReadError = undefined;
+      await sut.isEmbargoEnabled().catch((e) => (error = e));
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        `${TestConstants.TEST_API_URL}/info/embargoEnabled`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
+      );
+      expect(error).to.be.instanceOf(Error);
+    });
+  });
 });
