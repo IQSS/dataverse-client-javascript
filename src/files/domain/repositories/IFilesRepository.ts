@@ -1,15 +1,15 @@
-import { FileOrderCriteria } from '../models/FileOrderCriteria';
 import { File } from '../models/File';
 import { FileDataTable } from '../models/FileDataTable';
 import { FileUserPermissions } from '../models/FileUserPermissions';
+import { FileCriteria } from '../models/FileCriteria';
 
 export interface IFilesRepository {
   getDatasetFiles(
     datasetId: number | string,
-    datasetVersionId?: string,
+    datasetVersionId: string,
     limit?: number,
     offset?: number,
-    orderCriteria?: FileOrderCriteria,
+    fileCriteria?: FileCriteria,
   ): Promise<File[]>;
 
   getFileDownloadCount(fileId: number | string): Promise<number>;

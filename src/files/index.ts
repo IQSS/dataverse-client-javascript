@@ -14,7 +14,8 @@ const getFileDataTables = new GetFileDataTables(filesRepository);
 export { getDatasetFiles, getFileDownloadCount, getFileUserPermissions, getFileDataTables };
 
 export { File, FileEmbargo, FileChecksum } from './domain/models/File';
-export { FileOrderCriteria } from './domain/models/FileOrderCriteria';
+export { FileUserPermissions } from './domain/models/FileUserPermissions';
+export { FileCriteria, FileOrderCriteria, FileAccessStatus } from './domain/models/FileCriteria';
 export {
   FileDataTable,
   FileDataVariable,

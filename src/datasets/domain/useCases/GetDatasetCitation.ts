@@ -1,5 +1,6 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase';
 import { IDatasetsRepository } from '../repositories/IDatasetsRepository';
+import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion';
 
 export class GetDatasetCitation implements UseCase<string> {
   private datasetsRepository: IDatasetsRepository;
@@ -8,7 +9,10 @@ export class GetDatasetCitation implements UseCase<string> {
     this.datasetsRepository = datasetsRepository;
   }
 
-  async execute(datasetId: number, datasetVersionId?: string): Promise<string> {
+  async execute(
+    datasetId: number,
+    datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
+  ): Promise<string> {
     return await this.datasetsRepository.getDatasetCitation(datasetId, datasetVersionId);
   }
 }

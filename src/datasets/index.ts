@@ -20,6 +20,7 @@ export {
   getDatasetCitation,
   getPrivateUrlDatasetCitation,
 };
+export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion';
 export {
   Dataset,
   DatasetVersionInfo,

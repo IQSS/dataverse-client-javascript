@@ -3,6 +3,7 @@ import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/I
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { createDatasetModel } from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
+import { DatasetNotNumberedVersion } from '../../../src/datasets/domain/models/DatasetNotNumberedVersion';
 
 describe('execute', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -21,7 +22,7 @@ describe('execute', () => {
     const actual = await sut.execute(1);
 
     assert.match(actual, testDataset);
-    assert.calledWithExactly(getDatasetStub, 1, undefined);
+    assert.calledWithExactly(getDatasetStub, 1, DatasetNotNumberedVersion.LATEST);
   });
 
   test('should return error result on repository error', async () => {

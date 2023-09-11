@@ -7,6 +7,7 @@ export interface File {
   version: number;
   description?: string;
   restricted: boolean;
+  latestRestricted: boolean;
   directoryLabel?: string;
   datasetVersionId?: number;
   categories?: string[];
