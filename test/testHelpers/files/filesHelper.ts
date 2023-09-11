@@ -73,3 +73,10 @@ export const uploadFileViaApi = async (datasetId: number, fileName: string): Pro
     },
   });
 };
+
+export const setFileCategoriesViaApi = async (fileId: number, fileCategoryNames: string[]): Promise<AxiosResponse> => {
+  const data = { categories: fileCategoryNames };
+  return await axios.post(`${TestConstants.TEST_API_URL}/files/${fileId}/metadata/categories`, JSON.stringify(data), {
+    headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY },
+  });
+};

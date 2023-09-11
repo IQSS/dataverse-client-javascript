@@ -2,6 +2,7 @@ import { File } from '../models/File';
 import { FileDataTable } from '../models/FileDataTable';
 import { FileUserPermissions } from '../models/FileUserPermissions';
 import { FileCriteria } from '../models/FileCriteria';
+import { FileCounts } from '../models/FileCounts';
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -11,6 +12,8 @@ export interface IFilesRepository {
     offset?: number,
     fileCriteria?: FileCriteria,
   ): Promise<File[]>;
+
+  getDatasetFileCounts(datasetId: number | string, datasetVersionId: string): Promise<FileCounts>;
 
   getFileDownloadCount(fileId: number | string): Promise<number>;
 

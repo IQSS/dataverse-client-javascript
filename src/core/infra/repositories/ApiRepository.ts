@@ -26,6 +26,18 @@ export abstract class ApiRepository {
       });
   }
 
+  protected buildApiEndpoint(resourceName: string, operation: string, resourceId: number | string = undefined) {
+    let endpoint;
+    if (typeof resourceId === 'number') {
+      endpoint = `/${resourceName}/${resourceId}/${operation}`;
+    } else if (typeof resourceId === 'string') {
+      endpoint = `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`;
+    } else {
+      endpoint = `/${resourceName}/${operation}`;
+    }
+    return endpoint;
+  }
+
   private buildRequestConfig(authRequired: boolean, queryParams: object): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
       params: queryParams,
