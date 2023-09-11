@@ -1,14 +1,14 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase';
 import { IDataverseInfoRepository } from '../repositories/IDataverseInfoRepository';
 
-export class IsEmbargoEnabled implements UseCase<boolean> {
+export class GetMaxEmbargoDurationInMonths implements UseCase<number> {
   private dataverseInfoRepository: IDataverseInfoRepository;
 
   constructor(dataverseInfoRepository: IDataverseInfoRepository) {
     this.dataverseInfoRepository = dataverseInfoRepository;
   }
 
-  async execute(): Promise<boolean> {
-    return await this.dataverseInfoRepository.isEmbargoEnabled();
+  async execute(): Promise<number> {
+    return await this.dataverseInfoRepository.getMaxEmbargoDurationInMonths();
   }
 }

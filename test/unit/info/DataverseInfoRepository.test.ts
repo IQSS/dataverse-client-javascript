@@ -95,36 +95,38 @@ describe('DataverseInfoRepository', () => {
     });
   });
 
-  describe('isEmbargoEnabled', () => {
-    test('should return boolean result on successful response', async () => {
-      const testResult = true;
+  describe('getMaxEmbargoDurationInMonths', () => {
+    test('should return duration on successful response', async () => {
+      const testDuration = 12;
       const testSuccessfulResponse = {
         data: {
           status: 'OK',
-          data: testResult,
+          data: {
+            message: testDuration.toString(),
+          },
         },
       };
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testSuccessfulResponse);
 
-      const actual = await sut.isEmbargoEnabled();
+      const actual = await sut.getMaxEmbargoDurationInMonths();
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${TestConstants.TEST_API_URL}/info/embargoEnabled`,
+        `${TestConstants.TEST_API_URL}/info/settings/:MaxEmbargoDurationInMonths`,
         TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
-      assert.match(actual, testResult);
+      assert.match(actual, testDuration);
     });
 
     test('should return error result on error response', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
-      await sut.isEmbargoEnabled().catch((e) => (error = e));
+      await sut.getMaxEmbargoDurationInMonths().catch((e) => (error = e));
 
       assert.calledWithExactly(
         axiosGetStub,
-        `${TestConstants.TEST_API_URL}/info/embargoEnabled`,
+        `${TestConstants.TEST_API_URL}/info/settings/:MaxEmbargoDurationInMonths`,
         TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);

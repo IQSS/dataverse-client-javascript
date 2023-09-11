@@ -1,6 +1,10 @@
 import { DataverseInfoRepository } from '../../../src/info/infra/repositories/DataverseInfoRepository';
 import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import { TestConstants } from '../../testHelpers/TestConstants';
+import { setMaxEmbargoDurationInMonthsViaApi } from '../../testHelpers/info/infoHelper';
+import { ReadError } from '../../../src/core/domain/repositories/ReadError';
+import { assert } from 'sinon';
+import { fail } from 'assert';
 
 describe('DataverseInfoRepository', () => {
   const sut: DataverseInfoRepository = new DataverseInfoRepository();
@@ -23,10 +27,25 @@ describe('DataverseInfoRepository', () => {
     });
   });
 
-  describe('isEmbargoEnabled', () => {
-    test('should return boolean result', async () => {
-      const actual = await sut.isEmbargoEnabled();
-      expect(typeof actual).toBe('boolean');
+  describe('getMaxEmbargoDurationInMonths', () => {
+    test('should return error or duration depending on whether the setting exists or not', async () => {
+      // The setting does not exist
+      let error: ReadError = undefined;
+      await sut.getMaxEmbargoDurationInMonths().catch((e) => (error = e));
+      assert.match(
+        error.message,
+        'There was an error when reading the resource. Reason was: [404] Setting :MaxEmbargoDurationInMonths not found',
+      );
+
+      // The setting exists
+      const testMaxEmbargoDurationInMonths = 12;
+      await setMaxEmbargoDurationInMonthsViaApi(testMaxEmbargoDurationInMonths)
+        .then()
+        .catch(() => {
+          fail('Test getMaxEmbargoDurationInMonths: Error while setting :MaxEmbargoDurationInMonths');
+        });
+      const actual = await sut.getMaxEmbargoDurationInMonths();
+      assert.match(actual, testMaxEmbargoDurationInMonths);
     });
   });
 });

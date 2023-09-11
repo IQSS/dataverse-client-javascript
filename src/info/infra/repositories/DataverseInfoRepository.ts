@@ -7,7 +7,7 @@ export class DataverseInfoRepository extends ApiRepository implements IDataverse
   private readonly infoResourceName: string = 'info';
 
   public async getDataverseVersion(): Promise<DataverseVersion> {
-    return this.doGet(`/${this.infoResourceName}/version`)
+    return this.doGet(this.buildApiEndpoint(this.infoResourceName, `version`))
       .then((response) => this.getVersionFromResponse(response))
       .catch((error) => {
         throw error;
@@ -15,16 +15,16 @@ export class DataverseInfoRepository extends ApiRepository implements IDataverse
   }
 
   public async getZipDownloadLimit(): Promise<number> {
-    return this.doGet(`/${this.infoResourceName}/zipDownloadLimit`)
+    return this.doGet(this.buildApiEndpoint(this.infoResourceName, `zipDownloadLimit`))
       .then((response) => response.data.data as number)
       .catch((error) => {
         throw error;
       });
   }
 
-  public async isEmbargoEnabled(): Promise<boolean> {
-    return this.doGet(`/${this.infoResourceName}/embargoEnabled`)
-      .then((response) => response.data.data as boolean)
+  public async getMaxEmbargoDurationInMonths(): Promise<number> {
+    return this.doGet(this.buildApiEndpoint(this.infoResourceName, `settings/:MaxEmbargoDurationInMonths`))
+      .then((response) => response.data.data.message as number)
       .catch((error) => {
         throw error;
       });
