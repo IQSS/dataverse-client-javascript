@@ -15,6 +15,8 @@ export interface IFilesRepository {
 
   getDatasetFileCounts(datasetId: number | string, datasetVersionId: string): Promise<FileCounts>;
 
+  getDatasetFilesTotalDownloadSize(datasetId: number | string, datasetVersionId: string): Promise<number>;
+
   getFileDownloadCount(fileId: number | string): Promise<number>;
 
   getFileUserPermissions(fileId: number | string): Promise<FileUserPermissions>;

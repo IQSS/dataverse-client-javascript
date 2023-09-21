@@ -64,6 +64,11 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
+  public async getDatasetFilesTotalDownloadSize(datasetId: number | string, datasetVersionId: string): Promise<number> {
+    console.log('getDatasetFilesTotalDownloadSize', datasetId, datasetVersionId)
+    return 0;
+  }
+
   public async getFileDownloadCount(fileId: number | string): Promise<number> {
     return this.doGet(this.buildApiEndpoint(this.filesResourceName, `downloadCount`, fileId), true)
       .then((response) => response.data.data.message as number)
