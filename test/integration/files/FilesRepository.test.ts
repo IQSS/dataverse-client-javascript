@@ -231,6 +231,26 @@ describe('FilesRepository', () => {
     });
   });
 
+  describe('getDatasetFilesTotalDownloadSize', () => {
+    const expectedTotalDownloadSize = 173; // 173 bytes
+    test('should return total download size filtering by numeric id', async () => {
+      const actual = await sut.getDatasetFilesTotalDownloadSize(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+      );
+      assert.match(actual, expectedTotalDownloadSize);
+    });
+
+    test('should return total download size filtering by persistent id', async () => {
+      const testDataset = await datasetRepository.getDataset(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+      );
+      const actual = await sut.getDatasetFilesTotalDownloadSize(testDataset.persistentId, latestDatasetVersionId);
+      assert.match(actual, expectedTotalDownloadSize);
+    });
+  })
+
   describe('getFileDownloadCount', () => {
     test('should return count filtering by file id and version id', async () => {
       const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);

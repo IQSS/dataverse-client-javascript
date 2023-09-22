@@ -11,6 +11,7 @@ import { createFileUserPermissionsModel } from '../../testHelpers/files/fileUser
 import { FileCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
 import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { createFileCountsModel, createFileCountsPayload } from '../../testHelpers/files/fileCountsHelper';
+import {createFilesTotalDownloadSizePayload} from "../../testHelpers/files/filesTotalDownloadSizeHelper";
 
 describe('FilesRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -284,6 +285,104 @@ describe('FilesRepository', () => {
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetVersionId}/files/counts?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+  });
+
+  describe('getDatasetFilesTotalDownloadSize', () => {
+    const testFilesTotalDownloadSizeSuccessfulResponse = {
+      data: {
+        status: 'OK',
+        data: createFilesTotalDownloadSizePayload(),
+      },
+    };
+    const expectedSize = 173;
+
+    describe('by numeric id and version id', () => {
+      test('should return files total download size when providing id, version id, and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFilesTotalDownloadSizeSuccessfulResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/downloadsize`;
+
+        // API Key auth
+        let actual = await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId);
+
+        assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, expectedSize);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId);
+
+        assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, expectedSize);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+            axiosGetStub,
+            `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/downloadsize`,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+
+    describe('by persistent id', () => {
+      test('should return files total download size when providing persistent id, version id, and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFilesTotalDownloadSizeSuccessfulResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetVersionId}/downloadsize?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
+
+        // API Key auth
+        let actual = await sut.getDatasetFilesTotalDownloadSize(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId);
+
+        assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, expectedSize);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getDatasetFilesTotalDownloadSize(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId);
+
+        assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, expectedSize);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut
+            .getDatasetFilesTotalDownloadSize(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId)
+            .catch((e) => (error = e));
+
+        assert.calledWithExactly(
+            axiosGetStub,
+            `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetVersionId}/downloadsize?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
         );
         expect(error).to.be.instanceOf(Error);
       });

@@ -9,6 +9,7 @@ import { transformFileUserPermissionsResponseToFileUserPermissions } from './tra
 import { FileCriteria } from '../../domain/models/FileCriteria';
 import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
+import {transformFilesTotalDownloadSizeResponseToNumber} from "./transformers/filesTotalDownloadSizeTransformer";
 
 export interface GetFilesQueryParams {
   limit?: number;
@@ -65,8 +66,14 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   public async getDatasetFilesTotalDownloadSize(datasetId: number | string, datasetVersionId: string): Promise<number> {
-    console.log('getDatasetFilesTotalDownloadSize', datasetId, datasetVersionId)
-    return 0;
+    return this.doGet(
+        this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/downloadsize`, datasetId),
+        true,
+    )
+        .then((response) => transformFilesTotalDownloadSizeResponseToNumber(response))
+        .catch((error) => {
+          throw error;
+        });
   }
 
   public async getFileDownloadCount(fileId: number | string): Promise<number> {
