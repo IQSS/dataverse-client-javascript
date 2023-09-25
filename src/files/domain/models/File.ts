@@ -27,6 +27,9 @@ export interface File {
   tabularTags?: string[];
   creationDate?: Date;
   publicationDate?: Date;
+  deleted: boolean;
+  tabularData: boolean;
+  fileAccessRequest?: boolean;
 }
 
 export interface FileEmbargo {

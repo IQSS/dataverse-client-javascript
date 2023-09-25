@@ -301,7 +301,7 @@ describe('FilesRepository', () => {
 
       assert.match(
         error.message,
-        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
+        `There was an error when reading the resource. Reason was: [404] File not found for given id.`,
       );
     });
   });

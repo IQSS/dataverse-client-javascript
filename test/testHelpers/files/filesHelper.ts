@@ -27,6 +27,9 @@ export const createFileModel = (): File => {
       type: 'MD5',
       value: '29e413e0c881e17314ce8116fed4d1a7',
     },
+    deleted: false,
+    tabularData: false,
+    fileAccessRequest: true,
   };
 };
 
@@ -58,6 +61,9 @@ export const createFilePayload = (): any => {
         type: 'MD5',
         value: '29e413e0c881e17314ce8116fed4d1a7',
       },
+      deleted: false,
+      tabularData: false,
+      fileAccessRequest: true,
     },
   };
 };
