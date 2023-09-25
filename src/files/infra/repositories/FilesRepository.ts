@@ -57,10 +57,17 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
-  public async getDatasetFileCounts(datasetId: string | number, datasetVersionId: string): Promise<FileCounts> {
+  public async getDatasetFileCounts(
+    datasetId: string | number,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+  ): Promise<FileCounts> {
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/files/counts`, datasetId),
       true,
+      {
+        includeDeaccessioned: includeDeaccessioned,
+      },
     )
       .then((response) => transformFileCountsResponseToFileCounts(response))
       .catch((error) => {

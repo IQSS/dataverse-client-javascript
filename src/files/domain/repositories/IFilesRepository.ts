@@ -14,7 +14,11 @@ export interface IFilesRepository {
     fileCriteria?: FileCriteria,
   ): Promise<File[]>;
 
-  getDatasetFileCounts(datasetId: number | string, datasetVersionId: string): Promise<FileCounts>;
+  getDatasetFileCounts(
+    datasetId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+  ): Promise<FileCounts>;
 
   getFileDownloadCount(fileId: number | string): Promise<number>;
 

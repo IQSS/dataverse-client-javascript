@@ -225,7 +225,11 @@ describe('FilesRepository', () => {
     };
 
     test('should return file count filtering by numeric id', async () => {
-      const actual = await sut.getDatasetFileCounts(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+      const actual = await sut.getDatasetFileCounts(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+      );
       assert.match(actual.total, expectedFileCounts.total);
       expect(actual.perContentType).to.have.deep.members(expectedFileCounts.perContentType);
       expect(actual.perAccessStatus).to.have.deep.members(expectedFileCounts.perAccessStatus);
@@ -237,7 +241,7 @@ describe('FilesRepository', () => {
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
       );
-      const actual = await sut.getDatasetFileCounts(testDataset.persistentId, latestDatasetVersionId);
+      const actual = await sut.getDatasetFileCounts(testDataset.persistentId, latestDatasetVersionId, false);
       assert.match(actual.total, expectedFileCounts.total);
       expect(actual.perContentType).to.have.deep.members(expectedFileCounts.perContentType);
       expect(actual.perAccessStatus).to.have.deep.members(expectedFileCounts.perAccessStatus);
