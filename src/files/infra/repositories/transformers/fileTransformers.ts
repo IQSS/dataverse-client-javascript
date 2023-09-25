@@ -44,7 +44,6 @@ const transformFilePayloadToFile = (filePayload: any): File => {
     ...(filePayload.dataFile.tabularTags && { tabularTags: filePayload.dataFile.tabularTags }),
     ...(filePayload.dataFile.creationDate && { creationDate: new Date(filePayload.dataFile.creationDate) }),
     ...(filePayload.dataFile.publicationDate && { publicationDate: new Date(filePayload.dataFile.publicationDate) }),
-    ...(filePayload.dataFile.publicationDate && { publicationDate: new Date(filePayload.dataFile.publicationDate) }),
     deleted: filePayload.dataFile.deleted,
     tabularData: filePayload.dataFile.tabularData,
     ...(filePayload.dataFile.fileAccessRequest && { fileAccessRequest: filePayload.dataFile.fileAccessRequest }),
