@@ -12,6 +12,7 @@ export interface File {
   datasetVersionId?: number;
   categories?: string[];
   contentType: string;
+  friendlyType: string;
   embargo?: FileEmbargo;
   storageIdentifier?: string;
   originalFormat?: string;

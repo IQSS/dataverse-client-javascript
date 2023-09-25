@@ -27,6 +27,7 @@ const transformFilePayloadToFile = (filePayload: any): File => {
     ...(filePayload.dataFile.datasetVersionId && { datasetVersionId: filePayload.dataFile.datasetVersionId }),
     ...(filePayload.dataFile.categories && { categories: filePayload.dataFile.categories }),
     contentType: filePayload.dataFile.contentType,
+    friendlyType: filePayload.dataFile.friendlyType,
     ...(filePayload.dataFile.embargo && { embargo: transformEmbargoPayloadToEmbargo(filePayload.dataFile.embargo) }),
     ...(filePayload.dataFile.storageIdentifier && { storageIdentifier: filePayload.dataFile.storageIdentifier }),
     ...(filePayload.dataFile.originalFormat && { originalFormat: filePayload.dataFile.originalFormat }),
