@@ -11,6 +11,7 @@ import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
 
 export interface GetFilesQueryParams {
+  includeDeaccessioned: boolean;
   limit?: number;
   offset?: number;
   orderCriteria?: string;
@@ -28,11 +29,14 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   public async getDatasetFiles(
     datasetId: number | string,
     datasetVersionId: string,
+    includeDeaccessioned: boolean,
     limit?: number,
     offset?: number,
     fileCriteria?: FileCriteria,
   ): Promise<File[]> {
-    const queryParams: GetFilesQueryParams = {};
+    const queryParams: GetFilesQueryParams = {
+      includeDeaccessioned: includeDeaccessioned,
+    };
     if (limit !== undefined) {
       queryParams.limit = limit;
     }

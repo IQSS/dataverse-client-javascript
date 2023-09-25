@@ -8,6 +8,7 @@ export interface IFilesRepository {
   getDatasetFiles(
     datasetId: number | string,
     datasetVersionId: string,
+    includeDeaccessioned: boolean,
     limit?: number,
     offset?: number,
     fileCriteria?: FileCriteria,

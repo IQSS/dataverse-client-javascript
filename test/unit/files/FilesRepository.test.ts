@@ -45,7 +45,8 @@ describe('FilesRepository', () => {
       .withContentType(testContentType)
       .withAccessStatus(FileAccessStatus.PUBLIC);
 
-    const expectedRequestParams = {
+    const expectedRequestParamsWithOptional = {
+      includeDeaccessioned: false,
       limit: testLimit,
       offset: testOffset,
       orderCriteria: testFileCriteria.orderCriteria.toString(),
@@ -53,6 +54,20 @@ describe('FilesRepository', () => {
       contentType: testFileCriteria.contentType,
       accessStatus: testFileCriteria.accessStatus.toString(),
     };
+    const expectedRequestConfigApiKeyWithOptional = {
+      params: expectedRequestParamsWithOptional,
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+    };
+    const expectedRequestConfigApiKey = {
+      params: { includeDeaccessioned: false },
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+    };
+    const expectedRequestConfigSessionCookie = {
+      params: { includeDeaccessioned: false },
+      withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+    };
+
     const expectedFiles = [testFile];
 
     describe('by numeric id and version id', () => {
@@ -61,25 +76,17 @@ describe('FilesRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/files`;
 
         // API Key auth
-        let actual = await sut.getDatasetFiles(testDatasetId, testDatasetVersionId);
+        let actual = await sut.getDatasetFiles(testDatasetId, testDatasetVersionId, false);
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
         assert.match(actual, expectedFiles);
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-        actual = await sut.getDatasetFiles(testDatasetId, testDatasetVersionId);
+        actual = await sut.getDatasetFiles(testDatasetId, testDatasetVersionId, false);
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
         assert.match(actual, expectedFiles);
       });
 
@@ -89,20 +96,16 @@ describe('FilesRepository', () => {
         const actual = await sut.getDatasetFiles(
           testDatasetId,
           testDatasetVersionId,
+          false,
           testLimit,
           testOffset,
           testFileCriteria,
         );
 
-        const expectedRequestConfig = {
-          params: expectedRequestParams,
-          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
-        };
-
         assert.calledWithExactly(
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/files`,
-          expectedRequestConfig,
+          expectedRequestConfigApiKeyWithOptional,
         );
         assert.match(actual, [testFile]);
       });
@@ -111,12 +114,12 @@ describe('FilesRepository', () => {
         const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
         let error: ReadError = undefined;
-        await sut.getDatasetFiles(testDatasetId, testDatasetVersionId).catch((e) => (error = e));
+        await sut.getDatasetFiles(testDatasetId, testDatasetVersionId, false).catch((e) => (error = e));
 
         assert.calledWithExactly(
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/files`,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+          expectedRequestConfigApiKey,
         );
         expect(error).to.be.instanceOf(Error);
       });
@@ -128,25 +131,17 @@ describe('FilesRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetVersionId}/files?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
 
         // API Key auth
-        let actual = await sut.getDatasetFiles(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId);
+        let actual = await sut.getDatasetFiles(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId, false);
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
         assert.match(actual, expectedFiles);
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-        actual = await sut.getDatasetFiles(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId);
+        actual = await sut.getDatasetFiles(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId, false);
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
         assert.match(actual, expectedFiles);
       });
 
@@ -156,20 +151,16 @@ describe('FilesRepository', () => {
         const actual = await sut.getDatasetFiles(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
+          false,
           testLimit,
           testOffset,
           testFileCriteria,
         );
 
-        const expectedRequestConfig = {
-          params: expectedRequestParams,
-          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
-        };
-
         assert.calledWithExactly(
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetVersionId}/files?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
-          expectedRequestConfig,
+          expectedRequestConfigApiKeyWithOptional,
         );
         assert.match(actual, [testFile]);
       });
@@ -179,13 +170,13 @@ describe('FilesRepository', () => {
 
         let error: ReadError = undefined;
         await sut
-          .getDatasetFiles(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId)
+          .getDatasetFiles(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId, false)
           .catch((e) => (error = e));
 
         assert.calledWithExactly(
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetVersionId}/files?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+          expectedRequestConfigApiKey,
         );
         expect(error).to.be.instanceOf(Error);
       });
