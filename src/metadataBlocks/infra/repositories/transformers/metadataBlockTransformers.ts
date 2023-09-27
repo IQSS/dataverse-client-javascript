@@ -3,7 +3,7 @@ import { MetadataBlock, MetadataFieldInfo } from '../../../domain/models/Metadat
 
 export const transformMetadataBlockResponseToMetadataBlock = (response: AxiosResponse): MetadataBlock => {
   const metadataBlockPayload = response.data.data;
-  const metadataFields: Record<string, MetadataFieldInfo> = {};
+  let metadataFields: Record<string, MetadataFieldInfo> = {};
   const metadataBlockFieldsPayload = metadataBlockPayload.fields;
   Object.keys(metadataBlockFieldsPayload).map((metadataFieldKey) => {
     const metadataFieldInfoPayload = metadataBlockFieldsPayload[metadataFieldKey];
@@ -19,9 +19,9 @@ export const transformMetadataBlockResponseToMetadataBlock = (response: AxiosRes
 
 const transformPayloadMetadataFieldInfo = (
   metadataFieldInfoPayload: any,
-  isChild = false,
+  isChild: boolean = false,
 ): MetadataFieldInfo => {
-  const metadataFieldInfo: MetadataFieldInfo = {
+  let metadataFieldInfo: MetadataFieldInfo = {
     name: metadataFieldInfoPayload.name,
     displayName: metadataFieldInfoPayload.displayName,
     title: metadataFieldInfoPayload.title,
@@ -32,9 +32,9 @@ const transformPayloadMetadataFieldInfo = (
     isControlledVocabulary: metadataFieldInfoPayload.isControlledVocabulary,
     displayFormat: metadataFieldInfoPayload.displayFormat,
   };
-  if (!isChild && metadataFieldInfoPayload.hasOwn('childFields')) {
+  if (!isChild && metadataFieldInfoPayload.hasOwnProperty('childFields')) {
     const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields;
-    const childMetadataFields: Record<string, MetadataFieldInfo> = {};
+    let childMetadataFields: Record<string, MetadataFieldInfo> = {};
     Object.keys(childMetadataFieldsPayload).map((metadataFieldKey) => {
       childMetadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(
         childMetadataFieldsPayload[metadataFieldKey],
