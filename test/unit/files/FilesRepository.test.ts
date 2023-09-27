@@ -299,6 +299,15 @@ describe('FilesRepository', () => {
       },
     };
     const expectedSize = 173;
+    const expectedRequestConfigApiKey = {
+      params: { ignoreOriginalTabularSize: false },
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+    };
+    const expectedRequestConfigSessionCookie = {
+      params: { ignoreOriginalTabularSize: false },
+      withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+    };
 
     describe('by numeric id and version id', () => {
       test('should return files total download size when providing id, version id, and response is successful', async () => {
@@ -306,25 +315,17 @@ describe('FilesRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/downloadsize`;
 
         // API Key auth
-        let actual = await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId);
+        let actual = await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId, false);
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
         assert.match(actual, expectedSize);
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-        actual = await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId);
+        actual = await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId, false);
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
         assert.match(actual, expectedSize);
       });
 
@@ -332,12 +333,14 @@ describe('FilesRepository', () => {
         const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
         let error: ReadError = undefined;
-        await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId).catch((e) => (error = e));
+        await sut
+          .getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId, false)
+          .catch((e) => (error = e));
 
         assert.calledWithExactly(
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/downloadsize`,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+          expectedRequestConfigApiKey,
         );
         expect(error).to.be.instanceOf(Error);
       });
@@ -352,13 +355,10 @@ describe('FilesRepository', () => {
         let actual = await sut.getDatasetFilesTotalDownloadSize(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
+          false,
         );
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
         assert.match(actual, expectedSize);
 
         // Session cookie auth
@@ -367,13 +367,10 @@ describe('FilesRepository', () => {
         actual = await sut.getDatasetFilesTotalDownloadSize(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
+          false,
         );
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
         assert.match(actual, expectedSize);
       });
 
@@ -382,13 +379,13 @@ describe('FilesRepository', () => {
 
         let error: ReadError = undefined;
         await sut
-          .getDatasetFilesTotalDownloadSize(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId)
+          .getDatasetFilesTotalDownloadSize(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId, false)
           .catch((e) => (error = e));
 
         assert.calledWithExactly(
           axiosGetStub,
           `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/${testDatasetVersionId}/downloadsize?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+          expectedRequestConfigApiKey,
         );
         expect(error).to.be.instanceOf(Error);
       });

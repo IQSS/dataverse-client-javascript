@@ -15,7 +15,11 @@ export interface IFilesRepository {
 
   getDatasetFileCounts(datasetId: number | string, datasetVersionId: string): Promise<FileCounts>;
 
-  getDatasetFilesTotalDownloadSize(datasetId: number | string, datasetVersionId: string): Promise<number>;
+  getDatasetFilesTotalDownloadSize(
+    datasetId: number | string,
+    datasetVersionId: string,
+    ignoreOriginalTabularSize: boolean,
+  ): Promise<number>;
 
   getFileDownloadCount(fileId: number | string): Promise<number>;
 

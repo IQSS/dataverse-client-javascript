@@ -12,7 +12,12 @@ export class GetDatasetFilesTotalDownloadSize implements UseCase<number> {
   async execute(
     datasetId: number | string,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
+    ignoreOriginalTabularSize: boolean = false,
   ): Promise<number> {
-    return await this.filesRepository.getDatasetFilesTotalDownloadSize(datasetId, datasetVersionId);
+    return await this.filesRepository.getDatasetFilesTotalDownloadSize(
+      datasetId,
+      datasetVersionId,
+      ignoreOriginalTabularSize,
+    );
   }
 }

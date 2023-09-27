@@ -21,7 +21,7 @@ describe('execute', () => {
     const actual = await sut.execute(1);
 
     assert.match(actual, testDatasetTotalDownloadSize);
-    assert.calledWithExactly(getDatasetTotalDownloadSizeStub, 1, DatasetNotNumberedVersion.LATEST);
+    assert.calledWithExactly(getDatasetTotalDownloadSizeStub, 1, DatasetNotNumberedVersion.LATEST, false);
   });
 
   test('should return dataset files total download size given a dataset id and version', async () => {
@@ -33,7 +33,7 @@ describe('execute', () => {
     const actual = await sut.execute(1, '1.0');
 
     assert.match(actual, testDatasetTotalDownloadSize);
-    assert.calledWithExactly(getDatasetTotalDownloadSizeStub, 1, '1.0');
+    assert.calledWithExactly(getDatasetTotalDownloadSizeStub, 1, '1.0', false);
   });
 
   test('should return error result on repository error', async () => {

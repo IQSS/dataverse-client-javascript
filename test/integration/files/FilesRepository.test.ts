@@ -233,20 +233,22 @@ describe('FilesRepository', () => {
 
   describe('getDatasetFilesTotalDownloadSize', () => {
     const expectedTotalDownloadSize = 173; // 173 bytes
-    test('should return total download size filtering by numeric id', async () => {
+
+    test('should return total download size filtering by numeric id and ignoring original tabular size', async () => {
       const actual = await sut.getDatasetFilesTotalDownloadSize(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
+        true,
       );
       assert.match(actual, expectedTotalDownloadSize);
     });
 
-    test('should return total download size filtering by persistent id', async () => {
+    test('should return total download size filtering by persistent id and ignoring original tabular size', async () => {
       const testDataset = await datasetRepository.getDataset(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
       );
-      const actual = await sut.getDatasetFilesTotalDownloadSize(testDataset.persistentId, latestDatasetVersionId);
+      const actual = await sut.getDatasetFilesTotalDownloadSize(testDataset.persistentId, latestDatasetVersionId, true);
       assert.match(actual, expectedTotalDownloadSize);
     });
   });
