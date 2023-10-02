@@ -13,6 +13,7 @@ export const createFileModel = (): File => {
     restricted: false,
     latestRestricted: false,
     contentType: 'image/png',
+    friendlyType: 'PNG Image',
     storageIdentifier: 'local://18945a85439-9fa52783e5cb',
     rootDataFileId: 4,
     previousDataFileId: 4,
@@ -27,6 +28,9 @@ export const createFileModel = (): File => {
       type: 'MD5',
       value: '29e413e0c881e17314ce8116fed4d1a7',
     },
+    deleted: false,
+    tabularData: false,
+    fileAccessRequest: true,
   };
 };
 
@@ -41,6 +45,7 @@ export const createFilePayload = (): any => {
       persistentId: '',
       filename: 'test',
       contentType: 'image/png',
+      friendlyType: 'PNG Image',
       filesize: 127426,
       storageIdentifier: 'local://18945a85439-9fa52783e5cb',
       restricted: false,
@@ -58,6 +63,9 @@ export const createFilePayload = (): any => {
         type: 'MD5',
         value: '29e413e0c881e17314ce8116fed4d1a7',
       },
+      deleted: false,
+      tabularData: false,
+      fileAccessRequest: true,
     },
   };
 };
