@@ -1,6 +1,6 @@
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { IFilesRepository } from '../../../src/files/domain/repositories/IFilesRepository';
-import { DatasetNotNumberedVersion, ReadError } from '../../../src';
+import { DatasetNotNumberedVersion, ReadError, FileDownloadSizeMode } from '../../../src';
 import { GetDatasetFilesTotalDownloadSize } from '../../../src/files/domain/useCases/GetDatasetFilesTotalDownloadSize';
 
 describe('execute', () => {
@@ -21,19 +21,24 @@ describe('execute', () => {
     const actual = await sut.execute(1);
 
     assert.match(actual, testDatasetTotalDownloadSize);
-    assert.calledWithExactly(getDatasetTotalDownloadSizeStub, 1, DatasetNotNumberedVersion.LATEST, false);
+    assert.calledWithExactly(
+      getDatasetTotalDownloadSizeStub,
+      1,
+      DatasetNotNumberedVersion.LATEST,
+      FileDownloadSizeMode.ALL,
+    );
   });
 
-  test('should return dataset files total download size given a dataset id and version', async () => {
+  test('should return dataset files total download size given a dataset id, version and file download size mode', async () => {
     const filesRepositoryStub = <IFilesRepository>{};
     const getDatasetTotalDownloadSizeStub = sandbox.stub().returns(testDatasetTotalDownloadSize);
     filesRepositoryStub.getDatasetFilesTotalDownloadSize = getDatasetTotalDownloadSizeStub;
     const sut = new GetDatasetFilesTotalDownloadSize(filesRepositoryStub);
 
-    const actual = await sut.execute(1, '1.0');
+    const actual = await sut.execute(1, '1.0', FileDownloadSizeMode.ARCHIVAL);
 
     assert.match(actual, testDatasetTotalDownloadSize);
-    assert.calledWithExactly(getDatasetTotalDownloadSizeStub, 1, '1.0', false);
+    assert.calledWithExactly(getDatasetTotalDownloadSizeStub, 1, '1.0', FileDownloadSizeMode.ARCHIVAL);
   });
 
   test('should return error result on repository error', async () => {

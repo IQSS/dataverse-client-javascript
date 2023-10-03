@@ -3,6 +3,7 @@ import { FileDataTable } from '../models/FileDataTable';
 import { FileUserPermissions } from '../models/FileUserPermissions';
 import { FileCriteria } from '../models/FileCriteria';
 import { FileCounts } from '../models/FileCounts';
+import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode';
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -23,7 +24,7 @@ export interface IFilesRepository {
   getDatasetFilesTotalDownloadSize(
     datasetId: number | string,
     datasetVersionId: string,
-    ignoreOriginalTabularSize: boolean,
+    fileDownloadSizeMode: FileDownloadSizeMode,
   ): Promise<number>;
 
   getFileDownloadCount(fileId: number | string): Promise<number>;

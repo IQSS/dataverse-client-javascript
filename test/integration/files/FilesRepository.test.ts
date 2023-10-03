@@ -10,6 +10,7 @@ import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { FileCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
 import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { FileCounts } from '../../../src/files/domain/models/FileCounts';
+import { FileDownloadSizeMode } from '../../../src';
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
@@ -250,13 +251,13 @@ describe('FilesRepository', () => {
   });
 
   describe('getDatasetFilesTotalDownloadSize', () => {
-    const expectedTotalDownloadSize = 173; // 173 bytes
+    const expectedTotalDownloadSize = 193; // 193 bytes
 
     test('should return total download size filtering by numeric id and ignoring original tabular size', async () => {
       const actual = await sut.getDatasetFilesTotalDownloadSize(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
-        true,
+        FileDownloadSizeMode.ORIGINAL,
       );
       assert.match(actual, expectedTotalDownloadSize);
     });
@@ -266,7 +267,11 @@ describe('FilesRepository', () => {
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
       );
-      const actual = await sut.getDatasetFilesTotalDownloadSize(testDataset.persistentId, latestDatasetVersionId, true);
+      const actual = await sut.getDatasetFilesTotalDownloadSize(
+        testDataset.persistentId,
+        latestDatasetVersionId,
+        FileDownloadSizeMode.ORIGINAL,
+      );
       assert.match(actual, expectedTotalDownloadSize);
     });
   });

@@ -9,6 +9,7 @@ import { transformFileUserPermissionsResponseToFileUserPermissions } from './tra
 import { FileCriteria } from '../../domain/models/FileCriteria';
 import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
+import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode';
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean;
@@ -78,12 +79,14 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   public async getDatasetFilesTotalDownloadSize(
     datasetId: number | string,
     datasetVersionId: string,
-    ignoreOriginalTabularSize: boolean,
+    fileDownloadSizeMode: FileDownloadSizeMode,
   ): Promise<number> {
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/downloadsize`, datasetId),
       true,
-      { ignoreOriginalTabularSize: ignoreOriginalTabularSize },
+      {
+        mode: fileDownloadSizeMode.toString(),
+      },
     )
       .then((response) => response.data.data.storageSize)
       .catch((error) => {

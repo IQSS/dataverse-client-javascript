@@ -12,6 +12,7 @@ import { FileCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/
 import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { createFileCountsModel, createFileCountsPayload } from '../../testHelpers/files/fileCountsHelper';
 import { createFilesTotalDownloadSizePayload } from '../../testHelpers/files/filesTotalDownloadSizeHelper';
+import { FileDownloadSizeMode } from '../../../src';
 
 describe('FilesRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -306,13 +307,14 @@ describe('FilesRepository', () => {
         data: createFilesTotalDownloadSizePayload(),
       },
     };
+    const testFileDownloadSizeMode = FileDownloadSizeMode.ARCHIVAL;
     const expectedSize = 173;
     const expectedRequestConfigApiKey = {
-      params: { ignoreOriginalTabularSize: false },
+      params: { mode: 'Archival' },
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
     };
     const expectedRequestConfigSessionCookie = {
-      params: { ignoreOriginalTabularSize: false },
+      params: { mode: 'Archival' },
       withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
     };
@@ -323,7 +325,11 @@ describe('FilesRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/downloadsize`;
 
         // API Key auth
-        let actual = await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId, false);
+        let actual = await sut.getDatasetFilesTotalDownloadSize(
+          testDatasetId,
+          testDatasetVersionId,
+          testFileDownloadSizeMode,
+        );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
         assert.match(actual, expectedSize);
@@ -331,7 +337,11 @@ describe('FilesRepository', () => {
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-        actual = await sut.getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId, false);
+        actual = await sut.getDatasetFilesTotalDownloadSize(
+          testDatasetId,
+          testDatasetVersionId,
+          testFileDownloadSizeMode,
+        );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
         assert.match(actual, expectedSize);
@@ -342,7 +352,7 @@ describe('FilesRepository', () => {
 
         let error: ReadError = undefined;
         await sut
-          .getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId, false)
+          .getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId, testFileDownloadSizeMode)
           .catch((e) => (error = e));
 
         assert.calledWithExactly(
@@ -363,7 +373,7 @@ describe('FilesRepository', () => {
         let actual = await sut.getDatasetFilesTotalDownloadSize(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
-          false,
+          testFileDownloadSizeMode,
         );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
@@ -375,7 +385,7 @@ describe('FilesRepository', () => {
         actual = await sut.getDatasetFilesTotalDownloadSize(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
-          false,
+          testFileDownloadSizeMode,
         );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
@@ -387,7 +397,11 @@ describe('FilesRepository', () => {
 
         let error: ReadError = undefined;
         await sut
-          .getDatasetFilesTotalDownloadSize(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId, false)
+          .getDatasetFilesTotalDownloadSize(
+            TestConstants.TEST_DUMMY_PERSISTENT_ID,
+            testDatasetVersionId,
+            testFileDownloadSizeMode,
+          )
           .catch((e) => (error = e));
 
         assert.calledWithExactly(
