@@ -8,12 +8,17 @@ export interface IFilesRepository {
   getDatasetFiles(
     datasetId: number | string,
     datasetVersionId: string,
+    includeDeaccessioned: boolean,
     limit?: number,
     offset?: number,
     fileCriteria?: FileCriteria,
   ): Promise<File[]>;
 
-  getDatasetFileCounts(datasetId: number | string, datasetVersionId: string): Promise<FileCounts>;
+  getDatasetFileCounts(
+    datasetId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+  ): Promise<FileCounts>;
 
   getDatasetFilesTotalDownloadSize(
     datasetId: number | string,

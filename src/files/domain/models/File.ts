@@ -12,6 +12,7 @@ export interface File {
   datasetVersionId?: number;
   categories?: string[];
   contentType: string;
+  friendlyType: string;
   embargo?: FileEmbargo;
   storageIdentifier?: string;
   originalFormat?: string;
@@ -27,6 +28,9 @@ export interface File {
   tabularTags?: string[];
   creationDate?: Date;
   publicationDate?: Date;
+  deleted: boolean;
+  tabularData: boolean;
+  fileAccessRequest?: boolean;
 }
 
 export interface FileEmbargo {
