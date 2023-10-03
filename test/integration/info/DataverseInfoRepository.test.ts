@@ -28,16 +28,16 @@ describe('DataverseInfoRepository', () => {
   });
 
   describe('getMaxEmbargoDurationInMonths', () => {
-    test('should return error or duration depending on whether the setting exists or not', async () => {
-      // The setting does not exist
+    test('should return error when the setting does not exist', async () => {
       let error: ReadError = undefined;
       await sut.getMaxEmbargoDurationInMonths().catch((e) => (error = e));
       assert.match(
         error.message,
         'There was an error when reading the resource. Reason was: [404] Setting :MaxEmbargoDurationInMonths not found',
       );
+    });
 
-      // The setting exists
+    test('should return duration when the setting exists', async () => {
       const testMaxEmbargoDurationInMonths = 12;
       await setMaxEmbargoDurationInMonthsViaApi(testMaxEmbargoDurationInMonths)
         .then()
