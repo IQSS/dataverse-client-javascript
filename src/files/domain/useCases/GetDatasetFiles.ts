@@ -14,10 +14,18 @@ export class GetDatasetFiles implements UseCase<File[]> {
   async execute(
     datasetId: number | string,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
+    includeDeaccessioned: boolean = false,
     limit?: number,
     offset?: number,
     fileCriteria?: FileCriteria,
   ): Promise<File[]> {
-    return await this.filesRepository.getDatasetFiles(datasetId, datasetVersionId, limit, offset, fileCriteria);
+    return await this.filesRepository.getDatasetFiles(
+      datasetId,
+      datasetVersionId,
+      includeDeaccessioned,
+      limit,
+      offset,
+      fileCriteria,
+    );
   }
 }

@@ -62,7 +62,11 @@ describe('FilesRepository', () => {
         fail(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`);
       });
     // Categorize one of the uploaded test files
-    const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+    const currentTestFiles = await sut.getDatasetFiles(
+      TestConstants.TEST_CREATED_DATASET_ID,
+      latestDatasetVersionId,
+      false,
+    );
     const testFile = currentTestFiles[0];
     setFileCategoriesViaApi(testFile.id, [testCategoryName])
       .then()
@@ -80,7 +84,7 @@ describe('FilesRepository', () => {
 
     describe('by numeric id', () => {
       test('should return all files filtering by dataset id and version id', async () => {
-        const actual = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+        const actual = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId, false);
         assert.match(actual.length, 4);
         assert.match(actual[0].name, testTextFile1Name);
         assert.match(actual[1].name, testTextFile2Name);
@@ -92,6 +96,7 @@ describe('FilesRepository', () => {
         const actual = await sut.getDatasetFiles(
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
+          false,
           3,
           3,
           undefined,
@@ -104,6 +109,7 @@ describe('FilesRepository', () => {
         let actual = await sut.getDatasetFiles(
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
+          false,
           undefined,
           undefined,
           testFileCriteria,
@@ -118,7 +124,7 @@ describe('FilesRepository', () => {
         let error: ReadError = undefined;
 
         const nonExistentTestDatasetId = 100;
-        await sut.getDatasetFiles(nonExistentTestDatasetId, latestDatasetVersionId).catch((e) => (error = e));
+        await sut.getDatasetFiles(nonExistentTestDatasetId, latestDatasetVersionId, false).catch((e) => (error = e));
 
         assert.match(
           error.message,
@@ -133,7 +139,7 @@ describe('FilesRepository', () => {
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
         );
-        const actual = await sut.getDatasetFiles(testDataset.persistentId, latestDatasetVersionId);
+        const actual = await sut.getDatasetFiles(testDataset.persistentId, latestDatasetVersionId, false);
         assert.match(actual.length, 4);
         assert.match(actual[0].name, testTextFile1Name);
         assert.match(actual[1].name, testTextFile2Name);
@@ -146,7 +152,14 @@ describe('FilesRepository', () => {
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
         );
-        const actual = await sut.getDatasetFiles(testDataset.persistentId, latestDatasetVersionId, 3, 3, undefined);
+        const actual = await sut.getDatasetFiles(
+          testDataset.persistentId,
+          latestDatasetVersionId,
+          false,
+          3,
+          3,
+          undefined,
+        );
         assert.match(actual.length, 1);
         assert.match(actual[0].name, testTabFile4Name);
       });
@@ -159,6 +172,7 @@ describe('FilesRepository', () => {
         let actual = await sut.getDatasetFiles(
           testDataset.persistentId,
           latestDatasetVersionId,
+          false,
           undefined,
           undefined,
           testFileCriteria,
@@ -173,7 +187,7 @@ describe('FilesRepository', () => {
         let error: ReadError = undefined;
 
         const testWrongPersistentId = 'wrongPersistentId';
-        await sut.getDatasetFiles(testWrongPersistentId, latestDatasetVersionId).catch((e) => (error = e));
+        await sut.getDatasetFiles(testWrongPersistentId, latestDatasetVersionId, false).catch((e) => (error = e));
 
         assert.match(
           error.message,
@@ -211,7 +225,11 @@ describe('FilesRepository', () => {
     };
 
     test('should return file count filtering by numeric id', async () => {
-      const actual = await sut.getDatasetFileCounts(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+      const actual = await sut.getDatasetFileCounts(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+      );
       assert.match(actual.total, expectedFileCounts.total);
       expect(actual.perContentType).to.have.deep.members(expectedFileCounts.perContentType);
       expect(actual.perAccessStatus).to.have.deep.members(expectedFileCounts.perAccessStatus);
@@ -223,7 +241,7 @@ describe('FilesRepository', () => {
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
       );
-      const actual = await sut.getDatasetFileCounts(testDataset.persistentId, latestDatasetVersionId);
+      const actual = await sut.getDatasetFileCounts(testDataset.persistentId, latestDatasetVersionId, false);
       assert.match(actual.total, expectedFileCounts.total);
       expect(actual.perContentType).to.have.deep.members(expectedFileCounts.perContentType);
       expect(actual.perAccessStatus).to.have.deep.members(expectedFileCounts.perAccessStatus);
@@ -233,7 +251,11 @@ describe('FilesRepository', () => {
 
   describe('getFileDownloadCount', () => {
     test('should return count filtering by file id and version id', async () => {
-      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+      const currentTestFiles = await sut.getDatasetFiles(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+      );
       const testFile = currentTestFiles[0];
       const actual = await sut.getFileDownloadCount(testFile.id);
       assert.match(actual, 0);
@@ -253,7 +275,11 @@ describe('FilesRepository', () => {
 
   describe('getFileUserPermissions', () => {
     test('should return user permissions filtering by file id and version id', async () => {
-      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+      const currentTestFiles = await sut.getDatasetFiles(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+      );
       const testFile = currentTestFiles[0];
       const actual = await sut.getFileUserPermissions(testFile.id);
       assert.match(actual.canDownloadFile, true);
@@ -274,14 +300,22 @@ describe('FilesRepository', () => {
 
   describe('getFileDataTables', () => {
     test('should return data tables filtering by tabular file id and version id', async () => {
-      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+      const currentTestFiles = await sut.getDatasetFiles(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+      );
       const testFile = currentTestFiles[3];
       const actual = await sut.getFileDataTables(testFile.id);
       assert.match(actual[0].varQuantity, 3);
     });
 
     test('should return error when file is not tabular and version id', async () => {
-      const currentTestFiles = await sut.getDatasetFiles(TestConstants.TEST_CREATED_DATASET_ID, latestDatasetVersionId);
+      const currentTestFiles = await sut.getDatasetFiles(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+      );
       const testFile = currentTestFiles[0];
 
       let error: ReadError = undefined;
@@ -301,7 +335,7 @@ describe('FilesRepository', () => {
 
       assert.match(
         error.message,
-        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
+        `There was an error when reading the resource. Reason was: [404] File not found for given id.`,
       );
     });
   });

@@ -27,6 +27,7 @@ const transformFilePayloadToFile = (filePayload: any): File => {
     ...(filePayload.dataFile.datasetVersionId && { datasetVersionId: filePayload.dataFile.datasetVersionId }),
     ...(filePayload.dataFile.categories && { categories: filePayload.dataFile.categories }),
     contentType: filePayload.dataFile.contentType,
+    friendlyType: filePayload.dataFile.friendlyType,
     ...(filePayload.dataFile.embargo && { embargo: transformEmbargoPayloadToEmbargo(filePayload.dataFile.embargo) }),
     ...(filePayload.dataFile.storageIdentifier && { storageIdentifier: filePayload.dataFile.storageIdentifier }),
     ...(filePayload.dataFile.originalFormat && { originalFormat: filePayload.dataFile.originalFormat }),
@@ -44,6 +45,9 @@ const transformFilePayloadToFile = (filePayload: any): File => {
     ...(filePayload.dataFile.tabularTags && { tabularTags: filePayload.dataFile.tabularTags }),
     ...(filePayload.dataFile.creationDate && { creationDate: new Date(filePayload.dataFile.creationDate) }),
     ...(filePayload.dataFile.publicationDate && { publicationDate: new Date(filePayload.dataFile.publicationDate) }),
+    deleted: filePayload.dataFile.deleted,
+    tabularData: filePayload.dataFile.tabularData,
+    ...(filePayload.dataFile.fileAccessRequest && { fileAccessRequest: filePayload.dataFile.fileAccessRequest }),
   };
 };
 
