@@ -8,7 +8,7 @@ import { TestConstants } from '../../testHelpers/TestConstants';
 import { createFilePayload, createFileModel } from '../../testHelpers/files/filesHelper';
 import { createFileDataTablePayload, createFileDataTableModel } from '../../testHelpers/files/fileDataTablesHelper';
 import { createFileUserPermissionsModel } from '../../testHelpers/files/fileUserPermissionsHelper';
-import { FileCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
+import { FileSearchCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
 import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { createFileCountsModel, createFileCountsPayload } from '../../testHelpers/files/fileCountsHelper';
 import { createFilesTotalDownloadSizePayload } from '../../testHelpers/files/filesTotalDownloadSizeHelper';
@@ -43,30 +43,32 @@ describe('FilesRepository', () => {
     const testOffset = 20;
     const testCategory = 'testCategory';
     const testContentType = 'testContentType';
-    const testFileCriteria = new FileCriteria()
-      .withOrderCriteria(FileOrderCriteria.NAME_ZA)
+    const testFileCriteria = new FileSearchCriteria()
       .withCategoryName(testCategory)
       .withContentType(testContentType)
       .withAccessStatus(FileAccessStatus.PUBLIC);
+    const testFileOrderCriteria = FileOrderCriteria.NAME_ZA;
 
     const expectedRequestConfigApiKey = {
-      params: { includeDeaccessioned: testIncludeDeaccessioned },
+      params: { includeDeaccessioned: testIncludeDeaccessioned, orderCriteria: testFileOrderCriteria },
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
     };
     const expectedRequestConfigSessionCookie = {
-      params: { includeDeaccessioned: testIncludeDeaccessioned },
+      params: { includeDeaccessioned: testIncludeDeaccessioned, orderCriteria: testFileOrderCriteria },
       withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
     };
+
     const expectedRequestParamsWithOptional = {
       includeDeaccessioned: testIncludeDeaccessioned,
       limit: testLimit,
       offset: testOffset,
-      orderCriteria: testFileCriteria.orderCriteria.toString(),
-      categoryName: testFileCriteria.categoryName,
+      orderCriteria: testFileOrderCriteria,
       contentType: testFileCriteria.contentType,
       accessStatus: testFileCriteria.accessStatus.toString(),
+      categoryName: testFileCriteria.categoryName,
     };
+
     const expectedRequestConfigApiKeyWithOptional = {
       params: expectedRequestParamsWithOptional,
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
@@ -80,7 +82,12 @@ describe('FilesRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/files`;
 
         // API Key auth
-        let actual = await sut.getDatasetFiles(testDatasetId, testDatasetVersionId, testIncludeDeaccessioned);
+        let actual = await sut.getDatasetFiles(
+          testDatasetId,
+          testDatasetVersionId,
+          testIncludeDeaccessioned,
+          testFileOrderCriteria,
+        );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
         assert.match(actual, expectedFiles);
@@ -88,7 +95,12 @@ describe('FilesRepository', () => {
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-        actual = await sut.getDatasetFiles(testDatasetId, testDatasetVersionId, testIncludeDeaccessioned);
+        actual = await sut.getDatasetFiles(
+          testDatasetId,
+          testDatasetVersionId,
+          testIncludeDeaccessioned,
+          testFileOrderCriteria,
+        );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
         assert.match(actual, expectedFiles);
@@ -101,6 +113,7 @@ describe('FilesRepository', () => {
           testDatasetId,
           testDatasetVersionId,
           testIncludeDeaccessioned,
+          testFileOrderCriteria,
           testLimit,
           testOffset,
           testFileCriteria,
@@ -119,7 +132,7 @@ describe('FilesRepository', () => {
 
         let error: ReadError = undefined;
         await sut
-          .getDatasetFiles(testDatasetId, testDatasetVersionId, testIncludeDeaccessioned)
+          .getDatasetFiles(testDatasetId, testDatasetVersionId, testIncludeDeaccessioned, testFileOrderCriteria)
           .catch((e) => (error = e));
 
         assert.calledWithExactly(
@@ -141,6 +154,7 @@ describe('FilesRepository', () => {
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
           testIncludeDeaccessioned,
+          testFileOrderCriteria,
         );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
@@ -153,6 +167,7 @@ describe('FilesRepository', () => {
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
           testIncludeDeaccessioned,
+          testFileOrderCriteria,
         );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
@@ -166,6 +181,7 @@ describe('FilesRepository', () => {
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
           testIncludeDeaccessioned,
+          testFileOrderCriteria,
           testLimit,
           testOffset,
           testFileCriteria,
@@ -184,7 +200,12 @@ describe('FilesRepository', () => {
 
         let error: ReadError = undefined;
         await sut
-          .getDatasetFiles(TestConstants.TEST_DUMMY_PERSISTENT_ID, testDatasetVersionId, testIncludeDeaccessioned)
+          .getDatasetFiles(
+            TestConstants.TEST_DUMMY_PERSISTENT_ID,
+            testDatasetVersionId,
+            testIncludeDeaccessioned,
+            testFileOrderCriteria,
+          )
           .catch((e) => (error = e));
 
         assert.calledWithExactly(
