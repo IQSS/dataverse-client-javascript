@@ -255,7 +255,7 @@ describe('FilesRepository', () => {
       expect(actual.perCategoryName).to.have.deep.members(expectedFileCounts.perCategoryName);
     });
 
-    test('should return file count filtering by numeric id and applying criteria', async () => {
+    test('should return file count filtering by numeric id and applying category criteria', async () => {
       const expectedFileCountsForCriteria: FileCounts = {
         total: 1,
         perContentType: [

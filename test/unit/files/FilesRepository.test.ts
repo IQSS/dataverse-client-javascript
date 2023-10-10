@@ -23,11 +23,13 @@ describe('FilesRepository', () => {
   const testDatasetId = 1;
   const testIncludeDeaccessioned = false;
   const testCategory = 'testCategory';
+  const testTabularTagName = 'testTabularTagName';
   const testContentType = 'testContentType';
   const testFileCriteria = new FileSearchCriteria()
-      .withCategoryName(testCategory)
-      .withContentType(testContentType)
-      .withAccessStatus(FileAccessStatus.PUBLIC);
+    .withCategoryName(testCategory)
+    .withContentType(testContentType)
+    .withAccessStatus(FileAccessStatus.PUBLIC)
+    .withTabularTagName(testTabularTagName);
 
   beforeEach(() => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
@@ -67,6 +69,7 @@ describe('FilesRepository', () => {
       contentType: testFileCriteria.contentType,
       accessStatus: testFileCriteria.accessStatus.toString(),
       categoryName: testFileCriteria.categoryName,
+      tabularTagName: testFileCriteria.tabularTagName,
     };
 
     const expectedRequestConfigApiKeyWithOptional = {
@@ -241,6 +244,7 @@ describe('FilesRepository', () => {
       contentType: testFileCriteria.contentType,
       accessStatus: testFileCriteria.accessStatus.toString(),
       categoryName: testFileCriteria.categoryName,
+      tabularTagName: testFileCriteria.tabularTagName,
     };
 
     const expectedRequestConfigApiKeyWithOptional = {
@@ -281,11 +285,7 @@ describe('FilesRepository', () => {
           testFileCriteria,
         );
 
-        assert.calledWithExactly(
-          axiosGetStub,
-          expectedApiEndpoint,
-          expectedRequestConfigApiKeyWithOptional,
-        );
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKeyWithOptional);
         assert.match(actual, expectedCount);
       });
 

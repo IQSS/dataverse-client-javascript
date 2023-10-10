@@ -19,6 +19,7 @@ export interface GetFilesQueryParams {
   contentType?: string;
   accessStatus?: string;
   categoryName?: string;
+  tabularTagName?: string;
   searchText?: string;
 }
 
@@ -134,6 +135,9 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     }
     if (fileSearchCriteria.categoryName !== undefined) {
       queryParams.categoryName = fileSearchCriteria.categoryName;
+    }
+    if (fileSearchCriteria.tabularTagName !== undefined) {
+      queryParams.tabularTagName = fileSearchCriteria.tabularTagName;
     }
     if (fileSearchCriteria.contentType !== undefined) {
       queryParams.contentType = fileSearchCriteria.contentType;
