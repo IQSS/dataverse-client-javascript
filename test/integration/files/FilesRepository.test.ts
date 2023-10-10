@@ -303,7 +303,8 @@ describe('FilesRepository', () => {
     });
   });
 
-  describe('getDatasetFilesTotalDownloadSize', () => {
+  // TODO: Remove skip once PR https://github.com/IQSS/dataverse/pull/9960 is merged
+  describe.skip('getDatasetFilesTotalDownloadSize', () => {
     const expectedTotalDownloadSize = 193; // 193 bytes
 
     test('should return total download size filtering by numeric id and ignoring original tabular size', async () => {
