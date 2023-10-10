@@ -255,6 +255,41 @@ describe('FilesRepository', () => {
       expect(actual.perCategoryName).to.have.deep.members(expectedFileCounts.perCategoryName);
     });
 
+    test('should return file count filtering by numeric id and applying criteria', async () => {
+      const expectedFileCountsForCriteria: FileCounts = {
+        total: 1,
+        perContentType: [
+          {
+            contentType: 'text/plain',
+            count: 1,
+          },
+        ],
+        perAccessStatus: [
+          {
+            accessStatus: FileAccessStatus.PUBLIC,
+            count: 1,
+          },
+        ],
+        perCategoryName: [
+          {
+            categoryName: testCategoryName,
+            count: 1,
+          },
+        ],
+      };
+      const testCriteria = new FileSearchCriteria().withCategoryName(testCategoryName);
+      const actual = await sut.getDatasetFileCounts(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+        testCriteria,
+      );
+      assert.match(actual.total, expectedFileCountsForCriteria.total);
+      expect(actual.perContentType).to.have.deep.members(expectedFileCountsForCriteria.perContentType);
+      expect(actual.perAccessStatus).to.have.deep.members(expectedFileCountsForCriteria.perAccessStatus);
+      expect(actual.perCategoryName).to.have.deep.members(expectedFileCountsForCriteria.perCategoryName);
+    });
+
     test('should return file count filtering by persistent id', async () => {
       const testDataset = await datasetRepository.getDataset(
         TestConstants.TEST_CREATED_DATASET_ID,

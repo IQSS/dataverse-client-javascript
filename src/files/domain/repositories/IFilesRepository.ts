@@ -20,6 +20,7 @@ export interface IFilesRepository {
     datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<FileCounts>;
 
   getDatasetFilesTotalDownloadSize(

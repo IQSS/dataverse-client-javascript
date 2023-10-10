@@ -22,6 +22,12 @@ describe('FilesRepository', () => {
   const testDatasetVersionId = DatasetNotNumberedVersion.LATEST;
   const testDatasetId = 1;
   const testIncludeDeaccessioned = false;
+  const testCategory = 'testCategory';
+  const testContentType = 'testContentType';
+  const testFileCriteria = new FileSearchCriteria()
+      .withCategoryName(testCategory)
+      .withContentType(testContentType)
+      .withAccessStatus(FileAccessStatus.PUBLIC);
 
   beforeEach(() => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, TestConstants.TEST_DUMMY_API_KEY);
@@ -41,12 +47,6 @@ describe('FilesRepository', () => {
 
     const testLimit = 10;
     const testOffset = 20;
-    const testCategory = 'testCategory';
-    const testContentType = 'testContentType';
-    const testFileCriteria = new FileSearchCriteria()
-      .withCategoryName(testCategory)
-      .withContentType(testContentType)
-      .withAccessStatus(FileAccessStatus.PUBLIC);
     const testFileOrderCriteria = FileOrderCriteria.NAME_ZA;
 
     const expectedRequestConfigApiKey = {
@@ -236,6 +236,18 @@ describe('FilesRepository', () => {
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
     };
 
+    const expectedRequestParamsWithOptional = {
+      includeDeaccessioned: testIncludeDeaccessioned,
+      contentType: testFileCriteria.contentType,
+      accessStatus: testFileCriteria.accessStatus.toString(),
+      categoryName: testFileCriteria.categoryName,
+    };
+
+    const expectedRequestConfigApiKeyWithOptional = {
+      params: expectedRequestParamsWithOptional,
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+    };
+
     const expectedCount = createFileCountsModel();
 
     describe('by numeric id and version id', () => {
@@ -255,6 +267,25 @@ describe('FilesRepository', () => {
         actual = await sut.getDatasetFileCounts(testDatasetId, testDatasetVersionId, testIncludeDeaccessioned);
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookie);
+        assert.match(actual, expectedCount);
+      });
+
+      test('should return file counts when providing id, version id, optional params, and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileCountsSuccessfulResponse);
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/files/counts`;
+
+        const actual = await sut.getDatasetFileCounts(
+          testDatasetId,
+          testDatasetVersionId,
+          testIncludeDeaccessioned,
+          testFileCriteria,
+        );
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          expectedRequestConfigApiKeyWithOptional,
+        );
         assert.match(actual, expectedCount);
       });
 

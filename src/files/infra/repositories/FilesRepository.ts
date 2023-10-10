@@ -64,13 +64,18 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     datasetId: string | number,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<FileCounts> {
+    const queryParams: GetFilesQueryParams = {
+      includeDeaccessioned: includeDeaccessioned,
+    };
+    if (fileSearchCriteria !== undefined) {
+      this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria);
+    }
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/files/counts`, datasetId),
       true,
-      {
-        includeDeaccessioned: includeDeaccessioned,
-      },
+      queryParams,
     )
       .then((response) => transformFileCountsResponseToFileCounts(response))
       .catch((error) => {
