@@ -23,6 +23,15 @@ export interface GetFilesQueryParams {
   searchText?: string;
 }
 
+export interface GetFilesTotalDownloadSizeQueryParams {
+  mode?: string;
+  contentType?: string;
+  accessStatus?: string;
+  categoryName?: string;
+  tabularTagName?: string;
+  searchText?: string;
+}
+
 export class FilesRepository extends ApiRepository implements IFilesRepository {
   private readonly datasetsResourceName: string = 'datasets';
   private readonly filesResourceName: string = 'files';
@@ -88,13 +97,18 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     datasetId: number | string,
     datasetVersionId: string,
     fileDownloadSizeMode: FileDownloadSizeMode,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<number> {
+    const queryParams: GetFilesTotalDownloadSizeQueryParams = {
+      mode: fileDownloadSizeMode.toString(),
+    };
+    if (fileSearchCriteria !== undefined) {
+      this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria);
+    }
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/downloadsize`, datasetId),
       true,
-      {
-        mode: fileDownloadSizeMode.toString(),
-      },
+      queryParams,
     )
       .then((response) => response.data.data.storageSize)
       .catch((error) => {
@@ -127,7 +141,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   private applyFileSearchCriteriaToQueryParams(
-    queryParams: GetFilesQueryParams,
+    queryParams: GetFilesQueryParams | GetFilesTotalDownloadSizeQueryParams,
     fileSearchCriteria: FileSearchCriteria,
   ) {
     if (fileSearchCriteria.accessStatus !== undefined) {

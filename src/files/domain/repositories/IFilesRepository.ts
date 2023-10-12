@@ -27,6 +27,7 @@ export interface IFilesRepository {
     datasetId: number | string,
     datasetVersionId: string,
     fileDownloadSizeMode: FileDownloadSizeMode,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<number>;
 
   getFileDownloadCount(fileId: number | string): Promise<number>;
