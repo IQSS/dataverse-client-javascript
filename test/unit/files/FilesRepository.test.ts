@@ -339,19 +339,21 @@ describe('FilesRepository', () => {
       },
     };
     const testFileDownloadSizeMode = FileDownloadSizeMode.ARCHIVAL;
+    const testIncludeDeaccessioned = false;
     const expectedSize = 173;
     const expectedRequestConfigApiKey = {
-      params: { mode: FileDownloadSizeMode.ARCHIVAL.toString() },
+      params: { mode: FileDownloadSizeMode.ARCHIVAL.toString(), includeDeaccessioned: testIncludeDeaccessioned },
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
     };
     const expectedRequestConfigSessionCookie = {
-      params: { mode: FileDownloadSizeMode.ARCHIVAL.toString() },
+      params: { mode: FileDownloadSizeMode.ARCHIVAL.toString(), includeDeaccessioned: testIncludeDeaccessioned },
       withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
     };
     const expectedRequestConfigApiKeyWithOptional = {
       params: {
         mode: FileDownloadSizeMode.ARCHIVAL.toString(),
+        includeDeaccessioned: testIncludeDeaccessioned,
         contentType: testFileCriteria.contentType,
         accessStatus: testFileCriteria.accessStatus.toString(),
         categoryName: testFileCriteria.categoryName,
@@ -369,6 +371,7 @@ describe('FilesRepository', () => {
         let actual = await sut.getDatasetFilesTotalDownloadSize(
           testDatasetId,
           testDatasetVersionId,
+          testIncludeDeaccessioned,
           testFileDownloadSizeMode,
         );
 
@@ -381,6 +384,7 @@ describe('FilesRepository', () => {
         actual = await sut.getDatasetFilesTotalDownloadSize(
           testDatasetId,
           testDatasetVersionId,
+          testIncludeDeaccessioned,
           testFileDownloadSizeMode,
         );
 
@@ -394,6 +398,7 @@ describe('FilesRepository', () => {
         const actual = await sut.getDatasetFilesTotalDownloadSize(
           testDatasetId,
           testDatasetVersionId,
+          testIncludeDeaccessioned,
           testFileDownloadSizeMode,
           testFileCriteria,
         );
@@ -407,7 +412,12 @@ describe('FilesRepository', () => {
 
         let error: ReadError = undefined;
         await sut
-          .getDatasetFilesTotalDownloadSize(testDatasetId, testDatasetVersionId, testFileDownloadSizeMode)
+          .getDatasetFilesTotalDownloadSize(
+            testDatasetId,
+            testDatasetVersionId,
+            testIncludeDeaccessioned,
+            testFileDownloadSizeMode,
+          )
           .catch((e) => (error = e));
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKey);
@@ -425,6 +435,7 @@ describe('FilesRepository', () => {
         let actual = await sut.getDatasetFilesTotalDownloadSize(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
+          testIncludeDeaccessioned,
           testFileDownloadSizeMode,
         );
 
@@ -437,6 +448,7 @@ describe('FilesRepository', () => {
         actual = await sut.getDatasetFilesTotalDownloadSize(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           testDatasetVersionId,
+          testIncludeDeaccessioned,
           testFileDownloadSizeMode,
         );
 
@@ -452,6 +464,7 @@ describe('FilesRepository', () => {
           .getDatasetFilesTotalDownloadSize(
             TestConstants.TEST_DUMMY_PERSISTENT_ID,
             testDatasetVersionId,
+            testIncludeDeaccessioned,
             testFileDownloadSizeMode,
           )
           .catch((e) => (error = e));

@@ -16,10 +16,12 @@ export class GetDatasetFilesTotalDownloadSize implements UseCase<number> {
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
     fileDownloadSizeMode: FileDownloadSizeMode = FileDownloadSizeMode.ALL,
     fileSearchCriteria?: FileSearchCriteria,
+    includeDeaccessioned: boolean = false,
   ): Promise<number> {
     return await this.filesRepository.getDatasetFilesTotalDownloadSize(
       datasetId,
       datasetVersionId,
+      includeDeaccessioned,
       fileDownloadSizeMode,
       fileSearchCriteria,
     );

@@ -31,6 +31,7 @@ describe('execute', () => {
       getDatasetTotalDownloadSizeStub,
       1,
       DatasetNotNumberedVersion.LATEST,
+      false,
       FileDownloadSizeMode.ALL,
       undefined,
     );
@@ -56,6 +57,7 @@ describe('execute', () => {
       getDatasetTotalDownloadSizeStub,
       1,
       testVersionId,
+      false,
       FileDownloadSizeMode.ARCHIVAL,
       testFileSearchCriteria,
     );

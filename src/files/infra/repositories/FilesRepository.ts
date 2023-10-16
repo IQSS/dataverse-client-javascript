@@ -24,6 +24,7 @@ export interface GetFilesQueryParams {
 }
 
 export interface GetFilesTotalDownloadSizeQueryParams {
+  includeDeaccessioned: boolean;
   mode?: string;
   contentType?: string;
   accessStatus?: string;
@@ -96,10 +97,12 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   public async getDatasetFilesTotalDownloadSize(
     datasetId: number | string,
     datasetVersionId: string,
+    includeDeaccessioned: boolean,
     fileDownloadSizeMode: FileDownloadSizeMode,
     fileSearchCriteria?: FileSearchCriteria,
   ): Promise<number> {
     const queryParams: GetFilesTotalDownloadSizeQueryParams = {
+      includeDeaccessioned: includeDeaccessioned,
       mode: fileDownloadSizeMode.toString(),
     };
     if (fileSearchCriteria !== undefined) {
