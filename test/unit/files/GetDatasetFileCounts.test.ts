@@ -23,7 +23,7 @@ describe('execute', () => {
     const actual = await sut.execute(1);
 
     assert.match(actual, testFileCounts);
-    assert.calledWithExactly(getDatasetFileCountsStub, 1, DatasetNotNumberedVersion.LATEST, false);
+    assert.calledWithExactly(getDatasetFileCountsStub, 1, DatasetNotNumberedVersion.LATEST, false, undefined);
   });
 
   test('should return error result on repository error', async () => {

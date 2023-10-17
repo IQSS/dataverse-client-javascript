@@ -1,7 +1,7 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase';
 import { IFilesRepository } from '../repositories/IFilesRepository';
 import { File } from '../models/File';
-import { FileCriteria } from '../models/FileCriteria';
+import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria';
 import { DatasetNotNumberedVersion } from '../../../datasets';
 
 export class GetDatasetFiles implements UseCase<File[]> {
@@ -17,15 +17,17 @@ export class GetDatasetFiles implements UseCase<File[]> {
     includeDeaccessioned: boolean = false,
     limit?: number,
     offset?: number,
-    fileCriteria?: FileCriteria,
+    fileSearchCriteria?: FileSearchCriteria,
+    fileOrderCriteria: FileOrderCriteria = FileOrderCriteria.NAME_AZ,
   ): Promise<File[]> {
     return await this.filesRepository.getDatasetFiles(
       datasetId,
       datasetVersionId,
       includeDeaccessioned,
+      fileOrderCriteria,
       limit,
       offset,
-      fileCriteria,
+      fileSearchCriteria,
     );
   }
 }

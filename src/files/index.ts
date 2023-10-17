@@ -26,7 +26,7 @@ export {
 
 export { File, FileEmbargo, FileChecksum } from './domain/models/File';
 export { FileUserPermissions } from './domain/models/FileUserPermissions';
-export { FileCriteria, FileOrderCriteria, FileAccessStatus } from './domain/models/FileCriteria';
+export { FileSearchCriteria, FileOrderCriteria, FileAccessStatus } from './domain/models/FileCriteria';
 export {
   FileCounts,
   FileContentTypeCount,

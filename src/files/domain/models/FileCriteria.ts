@@ -1,30 +1,60 @@
-export class FileCriteria {
+export class FileSearchCriteria {
   constructor(
-    public readonly orderCriteria: FileOrderCriteria = FileOrderCriteria.NAME_AZ,
     public readonly contentType?: string,
     public readonly accessStatus?: FileAccessStatus,
     public readonly categoryName?: string,
+    public readonly tabularTagName?: string,
     public readonly searchText?: string,
   ) {}
 
-  withOrderCriteria(orderCriteria: FileOrderCriteria): FileCriteria {
-    return new FileCriteria(orderCriteria, this.contentType, this.accessStatus, this.categoryName);
+  withContentType(contentType: string | undefined): FileSearchCriteria {
+    return new FileSearchCriteria(
+      contentType,
+      this.accessStatus,
+      this.categoryName,
+      this.tabularTagName,
+      this.searchText,
+    );
   }
 
-  withContentType(contentType: string | undefined): FileCriteria {
-    return new FileCriteria(this.orderCriteria, contentType, this.accessStatus, this.categoryName);
+  withAccessStatus(accessStatus: FileAccessStatus | undefined): FileSearchCriteria {
+    return new FileSearchCriteria(
+      this.contentType,
+      accessStatus,
+      this.categoryName,
+      this.tabularTagName,
+      this.searchText,
+    );
   }
 
-  withAccessStatus(accessStatus: FileAccessStatus | undefined): FileCriteria {
-    return new FileCriteria(this.orderCriteria, this.contentType, accessStatus, this.categoryName);
+  withCategoryName(categoryName: string | undefined): FileSearchCriteria {
+    return new FileSearchCriteria(
+      this.contentType,
+      this.accessStatus,
+      categoryName,
+      this.tabularTagName,
+      this.searchText,
+    );
   }
 
-  withCategoryName(categoryName: string | undefined): FileCriteria {
-    return new FileCriteria(this.orderCriteria, this.contentType, this.accessStatus, categoryName);
+  withTabularTagName(tabularTagName: string | undefined): FileSearchCriteria {
+    return new FileSearchCriteria(
+      this.contentType,
+      this.accessStatus,
+      this.categoryName,
+      tabularTagName,
+      this.searchText,
+    );
   }
 
-  withSearchText(searchText: string | undefined): FileCriteria {
-    return new FileCriteria(this.orderCriteria, this.contentType, this.accessStatus, this.categoryName, searchText);
+  withSearchText(searchText: string | undefined): FileSearchCriteria {
+    return new FileSearchCriteria(
+      this.contentType,
+      this.accessStatus,
+      this.categoryName,
+      this.tabularTagName,
+      searchText,
+    );
   }
 }
 
