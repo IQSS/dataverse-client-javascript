@@ -1,10 +1,9 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase';
 import { IFilesRepository } from '../repositories/IFilesRepository';
 import { DatasetNotNumberedVersion } from '../../../datasets';
-import { FileCounts } from '../models/FileCounts';
-import { FileSearchCriteria } from '../models/FileCriteria';
+import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode';
 
-export class GetDatasetFileCounts implements UseCase<FileCounts> {
+export class GetDatasetFilesTotalDownloadSize implements UseCase<number> {
   private filesRepository: IFilesRepository;
 
   constructor(filesRepository: IFilesRepository) {
@@ -14,14 +13,12 @@ export class GetDatasetFileCounts implements UseCase<FileCounts> {
   async execute(
     datasetId: number | string,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
-    includeDeaccessioned: boolean = false,
-    fileSearchCriteria?: FileSearchCriteria,
-  ): Promise<FileCounts> {
-    return await this.filesRepository.getDatasetFileCounts(
+    fileDownloadSizeMode: FileDownloadSizeMode = FileDownloadSizeMode.ALL,
+  ): Promise<number> {
+    return await this.filesRepository.getDatasetFilesTotalDownloadSize(
       datasetId,
       datasetVersionId,
-      includeDeaccessioned,
-      fileSearchCriteria,
+      fileDownloadSizeMode,
     );
   }
 }

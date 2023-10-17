@@ -1,24 +1,33 @@
 import { File } from '../models/File';
 import { FileDataTable } from '../models/FileDataTable';
 import { FileUserPermissions } from '../models/FileUserPermissions';
-import { FileCriteria } from '../models/FileCriteria';
+import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria';
 import { FileCounts } from '../models/FileCounts';
+import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode';
 
 export interface IFilesRepository {
   getDatasetFiles(
     datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
+    fileOrderCriteria: FileOrderCriteria,
     limit?: number,
     offset?: number,
-    fileCriteria?: FileCriteria,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<File[]>;
 
   getDatasetFileCounts(
     datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<FileCounts>;
+
+  getDatasetFilesTotalDownloadSize(
+    datasetId: number | string,
+    datasetVersionId: string,
+    fileDownloadSizeMode: FileDownloadSizeMode,
+  ): Promise<number>;
 
   getFileDownloadCount(fileId: number | string): Promise<number>;
 

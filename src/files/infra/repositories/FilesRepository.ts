@@ -6,9 +6,10 @@ import { FileDataTable } from '../../domain/models/FileDataTable';
 import { transformDataTablesResponseToDataTables } from './transformers/fileDataTableTransformers';
 import { FileUserPermissions } from '../../domain/models/FileUserPermissions';
 import { transformFileUserPermissionsResponseToFileUserPermissions } from './transformers/fileUserPermissionsTransformers';
-import { FileCriteria } from '../../domain/models/FileCriteria';
+import { FileSearchCriteria, FileOrderCriteria } from '../../domain/models/FileCriteria';
 import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
+import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode';
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean;
@@ -18,6 +19,7 @@ export interface GetFilesQueryParams {
   contentType?: string;
   accessStatus?: string;
   categoryName?: string;
+  tabularTagName?: string;
   searchText?: string;
 }
 
@@ -30,12 +32,14 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
+    fileOrderCriteria: FileOrderCriteria,
     limit?: number,
     offset?: number,
-    fileCriteria?: FileCriteria,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<File[]> {
     const queryParams: GetFilesQueryParams = {
       includeDeaccessioned: includeDeaccessioned,
+      orderCriteria: fileOrderCriteria.toString(),
     };
     if (limit !== undefined) {
       queryParams.limit = limit;
@@ -43,8 +47,8 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     if (offset !== undefined) {
       queryParams.offset = offset;
     }
-    if (fileCriteria !== undefined) {
-      this.applyFileCriteriaToQueryParams(queryParams, fileCriteria);
+    if (fileSearchCriteria !== undefined) {
+      this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria);
     }
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/files`, datasetId),
@@ -61,15 +65,38 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     datasetId: string | number,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<FileCounts> {
+    const queryParams: GetFilesQueryParams = {
+      includeDeaccessioned: includeDeaccessioned,
+    };
+    if (fileSearchCriteria !== undefined) {
+      this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria);
+    }
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/files/counts`, datasetId),
       true,
-      {
-        includeDeaccessioned: includeDeaccessioned,
-      },
+      queryParams,
     )
       .then((response) => transformFileCountsResponseToFileCounts(response))
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  public async getDatasetFilesTotalDownloadSize(
+    datasetId: number | string,
+    datasetVersionId: string,
+    fileDownloadSizeMode: FileDownloadSizeMode,
+  ): Promise<number> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/downloadsize`, datasetId),
+      true,
+      {
+        mode: fileDownloadSizeMode.toString(),
+      },
+    )
+      .then((response) => response.data.data.storageSize)
       .catch((error) => {
         throw error;
       });
@@ -99,21 +126,24 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
-  private applyFileCriteriaToQueryParams(queryParams: GetFilesQueryParams, fileCriteria: FileCriteria) {
-    if (fileCriteria.accessStatus !== undefined) {
-      queryParams.accessStatus = fileCriteria.accessStatus.toString();
+  private applyFileSearchCriteriaToQueryParams(
+    queryParams: GetFilesQueryParams,
+    fileSearchCriteria: FileSearchCriteria,
+  ) {
+    if (fileSearchCriteria.accessStatus !== undefined) {
+      queryParams.accessStatus = fileSearchCriteria.accessStatus.toString();
     }
-    if (fileCriteria.categoryName !== undefined) {
-      queryParams.categoryName = fileCriteria.categoryName;
+    if (fileSearchCriteria.categoryName !== undefined) {
+      queryParams.categoryName = fileSearchCriteria.categoryName;
     }
-    if (fileCriteria.contentType !== undefined) {
-      queryParams.contentType = fileCriteria.contentType;
+    if (fileSearchCriteria.tabularTagName !== undefined) {
+      queryParams.tabularTagName = fileSearchCriteria.tabularTagName;
     }
-    if (fileCriteria.searchText !== undefined) {
-      queryParams.searchText = fileCriteria.searchText;
+    if (fileSearchCriteria.contentType !== undefined) {
+      queryParams.contentType = fileSearchCriteria.contentType;
     }
-    if (fileCriteria.orderCriteria !== undefined) {
-      queryParams.orderCriteria = fileCriteria.orderCriteria.toString();
+    if (fileSearchCriteria.searchText !== undefined) {
+      queryParams.searchText = fileSearchCriteria.searchText;
     }
   }
 }
