@@ -304,7 +304,7 @@ describe('DatasetsRepository', () => {
 
   describe('getDatasetUserPermissions', () => {
     const testDatasetUserPermissions = createDatasetUserPermissionsModel();
-    const testFileUserPermissionsResponse = {
+    const testDatasetUserPermissionsResponse = {
       data: {
         status: 'OK',
         data: testDatasetUserPermissions,
@@ -315,7 +315,7 @@ describe('DatasetsRepository', () => {
       const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/userPermissions`;
 
       test('should return dataset user permissions when providing id and response is successful', async () => {
-        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileUserPermissionsResponse);
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetUserPermissionsResponse);
 
         // API Key auth
         let actual = await sut.getDatasetUserPermissions(testDatasetModel.id);
@@ -359,7 +359,7 @@ describe('DatasetsRepository', () => {
       const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/userPermissions?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
 
       test('should return dataset user permissions when providing persistent id and response is successful', async () => {
-        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileUserPermissionsResponse);
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetUserPermissionsResponse);
         // API Key auth
         let actual = await sut.getDatasetUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID);
 
