@@ -4,6 +4,7 @@ import { GetDataset } from './domain/useCases/GetDataset';
 import { GetPrivateUrlDataset } from './domain/useCases/GetPrivateUrlDataset';
 import { GetDatasetCitation } from './domain/useCases/GetDatasetCitation';
 import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDatasetCitation';
+import { GetDatasetUserPermissions } from './domain/useCases/GetDatasetUserPermissions';
 
 const datasetsRepository = new DatasetsRepository();
 
@@ -12,6 +13,7 @@ const getDataset = new GetDataset(datasetsRepository);
 const getPrivateUrlDataset = new GetPrivateUrlDataset(datasetsRepository);
 const getDatasetCitation = new GetDatasetCitation(datasetsRepository);
 const getPrivateUrlDatasetCitation = new GetPrivateUrlDatasetCitation(datasetsRepository);
+const getDatasetUserPermissions = new GetDatasetUserPermissions(datasetsRepository);
 
 export {
   getDatasetSummaryFieldNames,
@@ -19,8 +21,10 @@ export {
   getPrivateUrlDataset,
   getDatasetCitation,
   getPrivateUrlDatasetCitation,
+  getDatasetUserPermissions,
 };
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion';
+export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions';
 export {
   Dataset,
   DatasetVersionInfo,

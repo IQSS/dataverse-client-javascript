@@ -24,8 +24,18 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async getDataset(datasetId: number | string, datasetVersionId: string): Promise<Dataset> {
-    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}`, datasetId), true)
+  public async getDataset(
+    datasetId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+  ): Promise<Dataset> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}`, datasetId),
+      true,
+      {
+        includeDeaccessioned: includeDeaccessioned,
+      },
+    )
       .then((response) => transformVersionResponseToDataset(response))
       .catch((error) => {
         throw error;

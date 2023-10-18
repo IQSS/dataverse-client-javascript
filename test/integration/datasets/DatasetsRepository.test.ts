@@ -32,18 +32,18 @@ describe('DatasetsRepository', () => {
   describe('getDataset', () => {
     describe('by numeric id', () => {
       test('should return dataset when it exists filtering by id and version id', async () => {
-        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId);
+        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId, false);
         expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
       });
 
       test('should return dataset when it exists filtering by id and version id', async () => {
-        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId);
+        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId, false);
         expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
       });
 
       test('should return error when dataset does not exist', async () => {
         let error: ReadError = undefined;
-        await sut.getDataset(nonExistentTestDatasetId, latestVersionId).catch((e) => (error = e));
+        await sut.getDataset(nonExistentTestDatasetId, latestVersionId, false).catch((e) => (error = e));
 
         assert.match(
           error.message,
@@ -53,14 +53,8 @@ describe('DatasetsRepository', () => {
     });
     describe('by persistent id', () => {
       test('should return dataset when it exists filtering by persistent id and version id', async () => {
-        const createdDataset = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId);
-        const actual = await sut.getDataset(createdDataset.persistentId, latestVersionId);
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
-      });
-
-      test('should return dataset when it exists filtering by persistent id and version id', async () => {
-        const createdDataset = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId);
-        const actual = await sut.getDataset(createdDataset.persistentId, latestVersionId);
+        const createdDataset = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId, false);
+        const actual = await sut.getDataset(createdDataset.persistentId, latestVersionId, false);
         expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
       });
 
@@ -68,7 +62,7 @@ describe('DatasetsRepository', () => {
         let error: ReadError = undefined;
 
         const testWrongPersistentId = 'wrongPersistentId';
-        await sut.getDataset(testWrongPersistentId, latestVersionId).catch((e) => (error = e));
+        await sut.getDataset(testWrongPersistentId, latestVersionId, false).catch((e) => (error = e));
 
         assert.match(
           error.message,
