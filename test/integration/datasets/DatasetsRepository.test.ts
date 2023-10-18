@@ -145,5 +145,27 @@ describe('DatasetsRepository', () => {
         assert.match(error.message, expectedErrorInvalidToken);
       });
     });
+
+    describe('getDatasetUserPermissions', () => {
+      test('should return user permissions filtering by dataset id', async () => {
+        const actual = await sut.getDatasetUserPermissions(TestConstants.TEST_CREATED_DATASET_ID);
+        assert.match(actual.canViewUnpublishedDataset, true);
+        assert.match(actual.canEditDataset, true);
+        assert.match(actual.canPublishDataset, true);
+        assert.match(actual.canManageDatasetPermissions, true);
+        assert.match(actual.canDeleteDatasetDraft, true);
+      });
+
+      test('should return error when file does not exist', async () => {
+        let error: ReadError = undefined;
+
+        await sut.getDatasetUserPermissions(nonExistentTestDatasetId).catch((e) => (error = e));
+
+        assert.match(
+          error.message,
+          `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
+        );
+      });
+    });
   });
 });
