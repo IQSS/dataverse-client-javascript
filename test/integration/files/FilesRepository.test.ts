@@ -380,6 +380,7 @@ describe('FilesRepository', () => {
       const testFile = currentTestFiles[0];
       const actual = await sut.getFileUserPermissions(testFile.id);
       assert.match(actual.canDownloadFile, true);
+      assert.match(actual.canManageFilePermissions, true);
       assert.match(actual.canEditOwnerDataset, true);
     });
 

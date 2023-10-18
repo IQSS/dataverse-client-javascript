@@ -3,6 +3,7 @@ import { FileUserPermissions } from '../../../src/files/domain/models/FileUserPe
 export const createFileUserPermissionsModel = (): FileUserPermissions => {
   return {
     canDownloadFile: true,
+    canManageFilePermissions: true,
     canEditOwnerDataset: true,
   };
 };
