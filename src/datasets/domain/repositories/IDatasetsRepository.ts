@@ -1,4 +1,5 @@
 import { Dataset } from '../models/Dataset';
+import { DatasetUserPermissions } from '../models/DatasetUserPermissions';
 
 export interface IDatasetsRepository {
   getDatasetSummaryFieldNames(): Promise<string[]>;
@@ -6,4 +7,5 @@ export interface IDatasetsRepository {
   getPrivateUrlDataset(token: string): Promise<Dataset>;
   getDatasetCitation(datasetId: number, datasetVersionId: string): Promise<string>;
   getPrivateUrlDatasetCitation(token: string): Promise<string>;
+  getDatasetUserPermissions(datasetId: number | string): Promise<DatasetUserPermissions>;
 }

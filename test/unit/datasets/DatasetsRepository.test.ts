@@ -11,6 +11,7 @@ import {
 } from '../../testHelpers/datasets/datasetHelper';
 import { TestConstants } from '../../testHelpers/TestConstants';
 import { DatasetNotNumberedVersion } from '../../../src/datasets';
+import { createDatasetUserPermissionsModel } from '../../testHelpers/datasets/datasetUserPermissionsHelper';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -301,6 +302,103 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
       );
       expect(error).to.be.instanceOf(Error);
+    });
+  });
+
+  describe('getDatasetUserPermissions', () => {
+    const testDatasetUserPermissions = createDatasetUserPermissionsModel();
+    const testFileUserPermissionsResponse = {
+      data: {
+        status: 'OK',
+        data: testDatasetUserPermissions,
+      },
+    };
+
+    describe('by numeric id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/userPermissions`;
+
+      test('should return dataset user permissions when providing id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileUserPermissionsResponse);
+
+        // API Key auth
+        let actual = await sut.getDatasetUserPermissions(testDatasetModel.id);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testDatasetUserPermissions);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getDatasetUserPermissions(testDatasetModel.id);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, testDatasetUserPermissions);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getDatasetUserPermissions(testDatasetModel.id).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+
+    describe('by persistent id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/userPermissions?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
+
+      test('should return dataset user permissions when providing persistent id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testFileUserPermissionsResponse);
+        // API Key auth
+        let actual = await sut.getDatasetUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testDatasetUserPermissions);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getDatasetUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, testDatasetUserPermissions);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getDatasetUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
     });
   });
 });
