@@ -148,6 +148,7 @@ describe('FilesRepository', () => {
         const testDataset = await datasetRepository.getDataset(
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
+          false,
         );
         const actual = await sut.getDatasetFiles(
           testDataset.persistentId,
@@ -166,6 +167,7 @@ describe('FilesRepository', () => {
         const testDataset = await datasetRepository.getDataset(
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
+          false,
         );
         const actual = await sut.getDatasetFiles(
           testDataset.persistentId,
@@ -184,6 +186,7 @@ describe('FilesRepository', () => {
         const testDataset = await datasetRepository.getDataset(
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
+          false
         );
         let actual = await sut.getDatasetFiles(
           testDataset.persistentId,
@@ -294,6 +297,7 @@ describe('FilesRepository', () => {
       const testDataset = await datasetRepository.getDataset(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
+        false
       );
       const actual = await sut.getDatasetFileCounts(testDataset.persistentId, latestDatasetVersionId, false);
       assert.match(actual.total, expectedFileCounts.total);
@@ -320,6 +324,7 @@ describe('FilesRepository', () => {
       const testDataset = await datasetRepository.getDataset(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
+        false
       );
       const actual = await sut.getDatasetFilesTotalDownloadSize(
         testDataset.persistentId,
