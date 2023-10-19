@@ -12,6 +12,7 @@ import {
 import { TestConstants } from '../../testHelpers/TestConstants';
 import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { createDatasetUserPermissionsModel } from '../../testHelpers/datasets/datasetUserPermissionsHelper';
+import { createDatasetLockModel, createDatasetLockPayload } from '../../testHelpers/datasets/datasetLockHelper';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -388,6 +389,103 @@ describe('DatasetsRepository', () => {
 
         let error: ReadError = undefined;
         await sut.getDatasetUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+  });
+
+  describe('getDatasetLocks', () => {
+    const testDatasetLocks = [createDatasetLockModel()];
+    const testDatasetLocksResponse = {
+      data: {
+        status: 'OK',
+        data: [createDatasetLockPayload()],
+      },
+    };
+
+    describe('by numeric id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/locks`;
+
+      test('should return dataset locks when providing id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetLocksResponse);
+
+        // API Key auth
+        let actual = await sut.getDatasetLocks(testDatasetModel.id);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testDatasetLocks);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getDatasetLocks(testDatasetModel.id);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, testDatasetLocks);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getDatasetLocks(testDatasetModel.id).catch((e) => (error = e));
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        expect(error).to.be.instanceOf(Error);
+      });
+    });
+
+    describe('by persistent id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/locks?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
+
+      test('should return dataset locks when providing persistent id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetLocksResponse);
+        // API Key auth
+        let actual = await sut.getDatasetLocks(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        );
+        assert.match(actual, testDatasetLocks);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getDatasetLocks(TestConstants.TEST_DUMMY_PERSISTENT_ID);
+
+        assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        );
+        assert.match(actual, testDatasetLocks);
+      });
+
+      test('should return error result on error response', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+        let error: ReadError = undefined;
+        await sut.getDatasetLocks(TestConstants.TEST_DUMMY_PERSISTENT_ID).catch((e) => (error = e));
 
         assert.calledWithExactly(
           axiosGetStub,

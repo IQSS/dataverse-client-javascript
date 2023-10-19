@@ -9,3 +9,13 @@ export const createDatasetLockModel = (): DatasetLock => {
     message: 'Test.',
   };
 };
+
+export const createDatasetLockPayload = (): any => {
+  return {
+    lockType: DatasetLockType.EDIT_IN_PROGRESS.toString(),
+    date: '2023-05-15T08:21:03Z',
+    user: '1',
+    dataset: '2',
+    message: 'Test.',
+  };
+};

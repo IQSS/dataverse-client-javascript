@@ -1,9 +1,9 @@
 export interface DatasetLock {
   lockType: DatasetLockType;
-  date: string;
+  date?: string;
   userId: string;
   datasetId: string;
-  message: string;
+  message?: string;
 }
 
 export enum DatasetLockType {
