@@ -4,6 +4,8 @@ import { Dataset } from '../../domain/models/Dataset';
 import { transformVersionResponseToDataset } from './transformers/datasetTransformers';
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions';
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers';
+import { DatasetLock } from '../../domain/models/DatasetLock';
+import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets';
@@ -64,6 +66,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async getDatasetUserPermissions(datasetId: string | number): Promise<DatasetUserPermissions> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, `userPermissions`, datasetId), true)
       .then((response) => transformDatasetUserPermissionsResponseToDatasetUserPermissions(response))
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  public async getDatasetLocks(datasetId: string | number): Promise<DatasetLock[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, `locks`, datasetId), true)
+      .then((response) => transformDatasetLocksResponseToDatasetLocks(response))
       .catch((error) => {
         throw error;
       });
