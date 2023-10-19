@@ -1,5 +1,10 @@
 {
   "datasetVersion": {
+    "license": {
+      "name": "CC0 1.0",
+      "uri": "http://creativecommons.org/publicdomain/zero/1.0",
+      "iconUri": "https://licensebuttons.net/p/zero/1.0/88x31.png"
+    },
     "metadataBlocks": {
       "citation": {
         "fields": [

@@ -17,7 +17,7 @@ const transformDatasetLockPayloadToDatasetLock = (datasetLockPayload: any): Data
     lockType: datasetLockPayload.lockType as DatasetLockType,
     ...(datasetLockPayload.date && { date: datasetLockPayload.date }),
     userId: datasetLockPayload.user,
-    datasetId: datasetLockPayload.dataset,
+    datasetPersistentId: datasetLockPayload.dataset,
     ...(datasetLockPayload.message && { message: datasetLockPayload.message }),
   };
 };

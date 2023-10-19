@@ -5,7 +5,7 @@ export const createDatasetLockModel = (): DatasetLock => {
     lockType: DatasetLockType.EDIT_IN_PROGRESS,
     date: '2023-05-15T08:21:03Z',
     userId: '1',
-    datasetId: '2',
+    datasetPersistentId: 'doi:10.5072/FK2/QYOVTJ',
     message: 'Test.',
   };
 };
@@ -15,7 +15,7 @@ export const createDatasetLockPayload = (): any => {
     lockType: DatasetLockType.EDIT_IN_PROGRESS.toString(),
     date: '2023-05-15T08:21:03Z',
     user: '1',
-    dataset: '2',
+    dataset: 'doi:10.5072/FK2/QYOVTJ',
     message: 'Test.',
   };
 };

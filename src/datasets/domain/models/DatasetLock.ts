@@ -2,7 +2,7 @@ export interface DatasetLock {
   lockType: DatasetLockType;
   date?: string;
   userId: string;
-  datasetId: string;
+  datasetPersistentId: string;
   message?: string;
 }
 
