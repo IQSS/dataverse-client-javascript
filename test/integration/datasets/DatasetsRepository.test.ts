@@ -178,7 +178,8 @@ describe('DatasetsRepository', () => {
         // We publish the new test dataset so it will create a lock during publishing
         await publishDatasetViaApi(createdDatasetId)
           .then()
-          .catch(() => {
+          .catch((error) => {
+            console.log(error);
             assert.fail('Error while publishing test Dataset');
           });
         const actual = await sut.getDatasetLocks(createdDatasetId);
