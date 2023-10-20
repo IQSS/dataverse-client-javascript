@@ -168,18 +168,17 @@ describe('DatasetsRepository', () => {
 
     describe('getDatasetLocks', () => {
       test('should return list of dataset locks by dataset id for a dataset while publishing', async () => {
+        let createdDatasetId = undefined;
         // We create a new dataset
         await createDatasetViaApi()
-          .then()
+          .then((response) => (createdDatasetId = response.data.data.id))
           .catch(() => {
             assert.fail('Error while creating test Dataset');
           });
-        const createdDatasetId = 3;
         // We publish the new test dataset so it will create a lock during publishing
         await publishDatasetViaApi(createdDatasetId)
           .then()
-          .catch((error) => {
-            console.log(error);
+          .catch(() => {
             assert.fail('Error while publishing test Dataset');
           });
         const actual = await sut.getDatasetLocks(createdDatasetId);
