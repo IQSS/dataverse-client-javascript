@@ -11,11 +11,8 @@ import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode';
 
-export interface GetFilesQueryParams {
+export interface SearchCriteriaQueryParams {
   includeDeaccessioned: boolean;
-  limit?: number;
-  offset?: number;
-  orderCriteria?: string;
   contentType?: string;
   accessStatus?: string;
   categoryName?: string;
@@ -23,14 +20,14 @@ export interface GetFilesQueryParams {
   searchText?: string;
 }
 
-export interface GetFilesTotalDownloadSizeQueryParams {
-  includeDeaccessioned: boolean;
+export interface GetFilesQueryParams extends SearchCriteriaQueryParams {
+  limit?: number;
+  offset?: number;
+  orderCriteria?: string;
+}
+
+export interface GetFilesTotalDownloadSizeQueryParams extends SearchCriteriaQueryParams {
   mode?: string;
-  contentType?: string;
-  accessStatus?: string;
-  categoryName?: string;
-  tabularTagName?: string;
-  searchText?: string;
 }
 
 export class FilesRepository extends ApiRepository implements IFilesRepository {
