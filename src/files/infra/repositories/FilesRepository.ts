@@ -11,16 +11,23 @@ import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode';
 
-export interface GetFilesQueryParams {
+export interface SearchCriteriaQueryParams {
   includeDeaccessioned: boolean;
-  limit?: number;
-  offset?: number;
-  orderCriteria?: string;
   contentType?: string;
   accessStatus?: string;
   categoryName?: string;
   tabularTagName?: string;
   searchText?: string;
+}
+
+export interface GetFilesQueryParams extends SearchCriteriaQueryParams {
+  limit?: number;
+  offset?: number;
+  orderCriteria?: string;
+}
+
+export interface GetFilesTotalDownloadSizeQueryParams extends SearchCriteriaQueryParams {
+  mode?: string;
 }
 
 export class FilesRepository extends ApiRepository implements IFilesRepository {
@@ -87,14 +94,21 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   public async getDatasetFilesTotalDownloadSize(
     datasetId: number | string,
     datasetVersionId: string,
+    includeDeaccessioned: boolean,
     fileDownloadSizeMode: FileDownloadSizeMode,
+    fileSearchCriteria?: FileSearchCriteria,
   ): Promise<number> {
+    const queryParams: GetFilesTotalDownloadSizeQueryParams = {
+      includeDeaccessioned: includeDeaccessioned,
+      mode: fileDownloadSizeMode.toString(),
+    };
+    if (fileSearchCriteria !== undefined) {
+      this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria);
+    }
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/downloadsize`, datasetId),
       true,
-      {
-        mode: fileDownloadSizeMode.toString(),
-      },
+      queryParams,
     )
       .then((response) => response.data.data.storageSize)
       .catch((error) => {
@@ -127,7 +141,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   private applyFileSearchCriteriaToQueryParams(
-    queryParams: GetFilesQueryParams,
+    queryParams: GetFilesQueryParams | GetFilesTotalDownloadSizeQueryParams,
     fileSearchCriteria: FileSearchCriteria,
   ) {
     if (fileSearchCriteria.accessStatus !== undefined) {

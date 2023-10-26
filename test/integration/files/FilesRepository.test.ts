@@ -303,14 +303,14 @@ describe('FilesRepository', () => {
     });
   });
 
-  // TODO: Remove skip once PR https://github.com/IQSS/dataverse/pull/9960 is merged
-  describe.skip('getDatasetFilesTotalDownloadSize', () => {
+  describe('getDatasetFilesTotalDownloadSize', () => {
     const expectedTotalDownloadSize = 193; // 193 bytes
 
     test('should return total download size filtering by numeric id and ignoring original tabular size', async () => {
       const actual = await sut.getDatasetFilesTotalDownloadSize(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
+        false,
         FileDownloadSizeMode.ORIGINAL,
       );
       assert.match(actual, expectedTotalDownloadSize);
@@ -324,9 +324,23 @@ describe('FilesRepository', () => {
       const actual = await sut.getDatasetFilesTotalDownloadSize(
         testDataset.persistentId,
         latestDatasetVersionId,
+        false,
         FileDownloadSizeMode.ORIGINAL,
       );
       assert.match(actual, expectedTotalDownloadSize);
+    });
+
+    test('should return total download size filtering by numeric id, ignoring original tabular size and applying category criteria', async () => {
+      const expectedTotalDownloadSizeForCriteria = 12; // 12 bytes
+      const testCriteria = new FileSearchCriteria().withCategoryName(testCategoryName);
+      const actual = await sut.getDatasetFilesTotalDownloadSize(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+        FileDownloadSizeMode.ORIGINAL,
+        testCriteria,
+      );
+      assert.match(actual, expectedTotalDownloadSizeForCriteria);
     });
   });
 
