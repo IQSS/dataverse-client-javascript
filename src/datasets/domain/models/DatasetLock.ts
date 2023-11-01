@@ -7,6 +7,7 @@ export interface DatasetLock {
 }
 
 export enum DatasetLockType {
+  INGEST = 'Ingest',
   WORKFLOW = 'Workflow',
   IN_REVIEW = 'InReview',
   DCM_UPLOAD = 'DcmUpload',
