@@ -204,6 +204,14 @@ export const createDatasetViaApi = async (): Promise<AxiosResponse> => {
   );
 };
 
+export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResponse> => {
+  return await axios.post(
+    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/actions/:publish?type=major`,
+    {},
+    DATAVERSE_API_REQUEST_HEADERS,
+  );
+};
+
 export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosResponse> => {
   return await axios.post(
     `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,
