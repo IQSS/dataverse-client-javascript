@@ -7,6 +7,7 @@ export const transformFileUserPermissionsResponseToFileUserPermissions = (
   const fileUserPermissionsPayload = response.data.data;
   return {
     canDownloadFile: fileUserPermissionsPayload.canDownloadFile,
+    canManageFilePermissions: fileUserPermissionsPayload.canManageFilePermissions,
     canEditOwnerDataset: fileUserPermissionsPayload.canEditOwnerDataset,
   };
 };

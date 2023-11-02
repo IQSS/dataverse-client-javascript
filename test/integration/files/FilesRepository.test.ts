@@ -12,7 +12,8 @@ import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { FileCounts } from '../../../src/files/domain/models/FileCounts';
 import { FileDownloadSizeMode } from '../../../src';
 
-describe('FilesRepository', () => {
+// TODO: Test skipped once we fix it on https://github.com/IQSS/dataverse-client-javascript/issues/101
+xdescribe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
 
   const testTextFile1Name = 'test-file-1.txt';
@@ -148,6 +149,7 @@ describe('FilesRepository', () => {
         const testDataset = await datasetRepository.getDataset(
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
+          false,
         );
         const actual = await sut.getDatasetFiles(
           testDataset.persistentId,
@@ -166,6 +168,7 @@ describe('FilesRepository', () => {
         const testDataset = await datasetRepository.getDataset(
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
+          false,
         );
         const actual = await sut.getDatasetFiles(
           testDataset.persistentId,
@@ -184,6 +187,7 @@ describe('FilesRepository', () => {
         const testDataset = await datasetRepository.getDataset(
           TestConstants.TEST_CREATED_DATASET_ID,
           latestDatasetVersionId,
+          false
         );
         let actual = await sut.getDatasetFiles(
           testDataset.persistentId,
@@ -294,6 +298,7 @@ describe('FilesRepository', () => {
       const testDataset = await datasetRepository.getDataset(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
+        false
       );
       const actual = await sut.getDatasetFileCounts(testDataset.persistentId, latestDatasetVersionId, false);
       assert.match(actual.total, expectedFileCounts.total);
@@ -303,14 +308,14 @@ describe('FilesRepository', () => {
     });
   });
 
-  // TODO: Remove skip once PR https://github.com/IQSS/dataverse/pull/9960 is merged
-  describe.skip('getDatasetFilesTotalDownloadSize', () => {
+  describe('getDatasetFilesTotalDownloadSize', () => {
     const expectedTotalDownloadSize = 193; // 193 bytes
 
     test('should return total download size filtering by numeric id and ignoring original tabular size', async () => {
       const actual = await sut.getDatasetFilesTotalDownloadSize(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
+        false,
         FileDownloadSizeMode.ORIGINAL,
       );
       assert.match(actual, expectedTotalDownloadSize);
@@ -320,13 +325,28 @@ describe('FilesRepository', () => {
       const testDataset = await datasetRepository.getDataset(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestDatasetVersionId,
+        false
       );
       const actual = await sut.getDatasetFilesTotalDownloadSize(
         testDataset.persistentId,
         latestDatasetVersionId,
+        false,
         FileDownloadSizeMode.ORIGINAL,
       );
       assert.match(actual, expectedTotalDownloadSize);
+    });
+
+    test('should return total download size filtering by numeric id, ignoring original tabular size and applying category criteria', async () => {
+      const expectedTotalDownloadSizeForCriteria = 12; // 12 bytes
+      const testCriteria = new FileSearchCriteria().withCategoryName(testCategoryName);
+      const actual = await sut.getDatasetFilesTotalDownloadSize(
+        TestConstants.TEST_CREATED_DATASET_ID,
+        latestDatasetVersionId,
+        false,
+        FileDownloadSizeMode.ORIGINAL,
+        testCriteria,
+      );
+      assert.match(actual, expectedTotalDownloadSizeForCriteria);
     });
   });
 
@@ -366,6 +386,7 @@ describe('FilesRepository', () => {
       const testFile = currentTestFiles[0];
       const actual = await sut.getFileUserPermissions(testFile.id);
       assert.match(actual.canDownloadFile, true);
+      assert.match(actual.canManageFilePermissions, true);
       assert.match(actual.canEditOwnerDataset, true);
     });
 

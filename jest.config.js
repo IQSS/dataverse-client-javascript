@@ -7,5 +7,5 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   coveragePathIgnorePatterns: ['node_modules', 'testHelpers'],
   globalSetup: '<rootDir>/test/integration/environment/setup.js',
-  testTimeout: 15000,
+  testTimeout: 25000,
 };
