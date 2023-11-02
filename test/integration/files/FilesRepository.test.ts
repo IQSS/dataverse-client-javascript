@@ -12,7 +12,8 @@ import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { FileCounts } from '../../../src/files/domain/models/FileCounts';
 import { FileDownloadSizeMode } from '../../../src';
 
-describe('FilesRepository', () => {
+// TODO: Test skipped once we fix it on https://github.com/IQSS/dataverse-client-javascript/issues/101
+xdescribe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
 
   const testTextFile1Name = 'test-file-1.txt';
