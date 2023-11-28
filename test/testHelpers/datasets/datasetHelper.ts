@@ -212,6 +212,13 @@ export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResp
   );
 };
 
+export const deaccessionDatasetViaApi = async (datasetId: number,versionId: string): Promise<AxiosResponse> => {
+    return await axios.post(
+        `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
+        {},
+        DATAVERSE_API_REQUEST_HEADERS,
+    );
+}
 export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosResponse> => {
   return await axios.post(
     `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,

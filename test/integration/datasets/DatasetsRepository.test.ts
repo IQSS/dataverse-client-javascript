@@ -6,6 +6,7 @@ import {
   createDatasetViaApi,
   createPrivateUrlViaApi,
   publishDatasetViaApi,
+    deaccessionDatasetViaApi
 } from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { DatasetNotNumberedVersion, DatasetLockType } from '../../../src/datasets';
@@ -94,6 +95,23 @@ describe('DatasetsRepository', () => {
         error.message,
         `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
       );
+    });
+    test('should return citation when dataset is deaccessioned', async () => {
+      await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_ID).then((response) =>
+      {  console.log(JSON.stringify(response.data.data))})
+      await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_ID,'1.0')
+            .then()
+            .catch((error) => {
+                console.log(JSON.stringify(error));
+                assert.fail('Error while deaccessioning test Dataset');
+            });
+
+      const actualDatasetCitation = await sut.getDatasetCitation(
+          TestConstants.TEST_CREATED_DATASET_ID,
+          latestVersionId,
+      );
+      expect(typeof actualDatasetCitation).toBe('string');
+
     });
   });
 

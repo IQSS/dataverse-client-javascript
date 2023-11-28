@@ -242,7 +242,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY_INCLUDE_DEACCESSIONED,
       );
       assert.match(actual, testCitation);
 
@@ -254,7 +254,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE_INCLUDE_DEACCESSIONED,
       );
       assert.match(actual, testCitation);
     });
@@ -268,7 +268,7 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}/citation`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY_INCLUDE_DEACCESSIONED,
       );
       expect(error).to.be.instanceOf(Error);
     });

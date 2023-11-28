@@ -7,6 +7,9 @@ import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from 
 import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
 
+export interface GetCitationQueryParams {
+    includeDeaccessioned: boolean;
+}
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets';
 
@@ -45,10 +48,16 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
+
+
   public async getDatasetCitation(datasetId: number, datasetVersionId: string): Promise<string> {
+      const queryParams: GetCitationQueryParams = {
+          includeDeaccessioned: true,
+
+      };
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/citation`, datasetId),
-      true,
+      true,queryParams
     )
       .then((response) => response.data.data.message)
       .catch((error) => {
