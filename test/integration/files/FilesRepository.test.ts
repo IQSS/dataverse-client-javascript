@@ -4,7 +4,7 @@ import { assert } from 'sinon';
 import { expect } from 'chai';
 import { TestConstants } from '../../testHelpers/TestConstants';
 import { createDatasetViaApi } from '../../testHelpers/datasets/datasetHelper';
-import { uploadFileViaApi, setFileCategoriesViaApi } from '../../testHelpers/files/filesHelper';
+import { uploadFileViaApi } from '../../testHelpers/files/filesHelper';
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { FileSearchCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
@@ -12,8 +12,7 @@ import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { FileCounts } from '../../../src/files/domain/models/FileCounts';
 import { FileDownloadSizeMode } from '../../../src';
 
-// TODO: Test skipped once we fix it on https://github.com/IQSS/dataverse-client-javascript/issues/101
-xdescribe('FilesRepository', () => {
+describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
 
   const testTextFile1Name = 'test-file-1.txt';
@@ -35,8 +34,8 @@ xdescribe('FilesRepository', () => {
       .catch(() => {
         fail('Test beforeAll(): Error while creating test Dataset');
       });
-    // Uploading test file 1
-    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testTextFile1Name)
+    // Uploading test file 1 with some categories
+    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_ID, testTextFile1Name, {categories: [testCategoryName]})
       .then()
       .catch((e) => {
         console.log(e);
@@ -62,20 +61,6 @@ xdescribe('FilesRepository', () => {
       .catch((e) => {
         console.log(e);
         fail(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`);
-      });
-    // Categorize one of the uploaded test files
-    const currentTestFiles = await sut.getDatasetFiles(
-      TestConstants.TEST_CREATED_DATASET_ID,
-      latestDatasetVersionId,
-      false,
-      FileOrderCriteria.NAME_AZ,
-    );
-    const testFile = currentTestFiles[0];
-    setFileCategoriesViaApi(testFile.id, [testCategoryName])
-      .then()
-      .catch((e) => {
-        console.log(e);
-        fail(`Tests beforeAll(): Error while setting file categories to ${testFile.name}`);
       });
   });
 
