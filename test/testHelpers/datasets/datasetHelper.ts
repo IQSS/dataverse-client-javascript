@@ -213,9 +213,10 @@ export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResp
 };
 
 export const deaccessionDatasetViaApi = async (datasetId: number,versionId: string): Promise<AxiosResponse> => {
+    const data = { deaccessionReason: 'Test reason.'};
     return await axios.post(
         `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
-        {},
+        JSON.stringify(data),
         DATAVERSE_API_REQUEST_HEADERS,
     );
 }
