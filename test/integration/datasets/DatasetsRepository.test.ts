@@ -97,9 +97,25 @@ describe('DatasetsRepository', () => {
       );
     });
     test('should return citation when dataset is deaccessioned', async () => {
-      await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_ID).then((response) =>
-      {  console.log(JSON.stringify(response.data.data))})
-      await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_ID,'1.0')
+      let createdDatasetId = undefined;
+      await createDatasetViaApi()
+          .then((response) => (createdDatasetId = response.data.data.id))
+          .catch(() => {
+            assert.fail('Error while creating test Dataset');
+          });
+      // We publish the new test dataset we can deaccession it
+      await publishDatasetViaApi(createdDatasetId)
+          .then()
+          .catch(() => {
+            assert.fail('Error while publishing test Dataset');
+          });
+
+      let locks = await sut.getDatasetLocks(createdDatasetId);
+      while (locks.length > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            locks = await sut.getDatasetLocks(createdDatasetId);
+      }
+      await deaccessionDatasetViaApi(createdDatasetId,'1.0')
             .then()
             .catch((error) => {
                 console.log(JSON.stringify(error));
@@ -107,7 +123,7 @@ describe('DatasetsRepository', () => {
             });
 
       const actualDatasetCitation = await sut.getDatasetCitation(
-          TestConstants.TEST_CREATED_DATASET_ID,
+          createdDatasetId,
           latestVersionId,
       );
       expect(typeof actualDatasetCitation).toBe('string');
