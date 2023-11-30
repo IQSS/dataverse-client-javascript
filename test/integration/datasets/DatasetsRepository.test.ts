@@ -111,9 +111,15 @@ describe('DatasetsRepository', () => {
           });
 
       let locks = await sut.getDatasetLocks(createdDatasetId);
-      while (locks.length > 0) {
+      const maxTries = 10;
+      let tries = 0;
+      while (locks.length > 0 && tries < maxTries) {
             await new Promise(resolve => setTimeout(resolve, 1000));
             locks = await sut.getDatasetLocks(createdDatasetId);
+            tries++
+      }
+      if (tries >= maxTries && locks.length > 0) {
+        assert.fail('Error while waiting for locks to be released');
       }
       await deaccessionDatasetViaApi(createdDatasetId,'1.0')
             .then()
