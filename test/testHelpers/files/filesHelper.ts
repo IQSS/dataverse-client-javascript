@@ -3,6 +3,10 @@ import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
 import { readFile } from 'fs/promises';
 
+interface FileMetadata {
+  categories?: string[]
+}
+
 export const createFileModel = (): File => {
   return {
     id: 1,
@@ -70,21 +74,20 @@ export const createFilePayload = (): any => {
   };
 };
 
-export const uploadFileViaApi = async (datasetId: number, fileName: string): Promise<AxiosResponse> => {
+export const uploadFileViaApi = async (datasetId: number, fileName: string, fileMetadata?: FileMetadata): Promise<AxiosResponse> => {
   const formData = new FormData();
   const file = await readFile(`${__dirname}/${fileName}`);
+
   formData.append('file', new Blob([file]), fileName);
+
+  if(fileMetadata){
+    formData.append('jsonData', JSON.stringify(fileMetadata));
+  }
+
   return await axios.post(`${TestConstants.TEST_API_URL}/datasets/${datasetId}/add`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
       'X-Dataverse-Key': process.env.TEST_API_KEY,
     },
-  });
-};
-
-export const setFileCategoriesViaApi = async (fileId: number, fileCategoryNames: string[]): Promise<AxiosResponse> => {
-  const data = { categories: fileCategoryNames };
-  return await axios.post(`${TestConstants.TEST_API_URL}/files/${fileId}/metadata/categories`, JSON.stringify(data), {
-    headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY },
   });
 };
