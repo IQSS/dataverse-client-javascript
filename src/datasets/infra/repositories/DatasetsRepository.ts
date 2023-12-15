@@ -6,6 +6,7 @@ import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissio
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers';
 import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
+import { DatasetPreview } from '../../domain/models/DatasetPreview';
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets';
@@ -36,7 +37,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true,
       {
         includeDeaccessioned: includeDeaccessioned,
-        includeFiles: false
+        includeFiles: false,
       },
     )
       .then((response) => transformVersionResponseToDataset(response))
@@ -78,5 +79,10 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .catch((error) => {
         throw error;
       });
+  }
+
+  public async getCollectionDatasetPreviews(collectionId: string | number): Promise<DatasetPreview[]> {
+    console.log(collectionId);
+    return null;
   }
 }
