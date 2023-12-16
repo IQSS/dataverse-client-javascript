@@ -232,12 +232,13 @@ describe('DatasetsRepository', () => {
   });
 
   describe('getDatasetCitation', () => {
+    const testIncludeDeaccessioned = true;
     test('should return citation when response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testCitationSuccessfulResponse);
       const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}/citation`;
 
       // API Key auth
-      let actual = await sut.getDatasetCitation(testDatasetModel.id, testVersionId);
+      let actual = await sut.getDatasetCitation(testDatasetModel.id, testVersionId, testIncludeDeaccessioned);
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -249,7 +250,7 @@ describe('DatasetsRepository', () => {
       // Session cookie auth
       ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-      actual = await sut.getDatasetCitation(testDatasetModel.id, testVersionId);
+      actual = await sut.getDatasetCitation(testDatasetModel.id, testVersionId, testIncludeDeaccessioned);
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -263,7 +264,7 @@ describe('DatasetsRepository', () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
-      await sut.getDatasetCitation(1, testVersionId).catch((e) => (error = e));
+      await sut.getDatasetCitation(1, testVersionId,testIncludeDeaccessioned).catch((e) => (error = e));
 
       assert.calledWithExactly(
         axiosGetStub,

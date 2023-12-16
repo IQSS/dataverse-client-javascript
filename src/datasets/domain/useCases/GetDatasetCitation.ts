@@ -12,7 +12,8 @@ export class GetDatasetCitation implements UseCase<string> {
   async execute(
     datasetId: number,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
+    includeDeaccessioned: boolean = false,
   ): Promise<string> {
-    return await this.datasetsRepository.getDatasetCitation(datasetId, datasetVersionId);
+    return await this.datasetsRepository.getDatasetCitation(datasetId, datasetVersionId, includeDeaccessioned)
   }
 }

@@ -82,14 +82,14 @@ describe('DatasetsRepository', () => {
       const actualDatasetCitation = await sut.getDatasetCitation(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestVersionId,
+        false,
       );
       expect(typeof actualDatasetCitation).toBe('string');
     });
 
     test('should return error when dataset does not exist', async () => {
       let error: ReadError = undefined;
-
-      await sut.getDatasetCitation(nonExistentTestDatasetId, latestVersionId).catch((e) => (error = e));
+      await sut.getDatasetCitation(nonExistentTestDatasetId, latestVersionId,false).catch((e) => (error = e));
 
       assert.match(
         error.message,
@@ -131,6 +131,7 @@ describe('DatasetsRepository', () => {
       const actualDatasetCitation = await sut.getDatasetCitation(
           createdDatasetId,
           latestVersionId,
+          true,
       );
       expect(typeof actualDatasetCitation).toBe('string');
 
