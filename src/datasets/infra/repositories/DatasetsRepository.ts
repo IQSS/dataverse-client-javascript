@@ -7,9 +7,7 @@ import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from 
 import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
 
-export interface GetCitationQueryParams {
-    includeDeaccessioned: boolean;
-}
+
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets';
 
