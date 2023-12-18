@@ -6,7 +6,7 @@ import { GetDatasetCitation } from './domain/useCases/GetDatasetCitation';
 import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDatasetCitation';
 import { GetDatasetUserPermissions } from './domain/useCases/GetDatasetUserPermissions';
 import { GetDatasetLocks } from './domain/useCases/GetDatasetLocks';
-import { GetCollectionDatasetPreviews } from './domain/useCases/GetCollectionDatasetPreviews';
+import { GetAllDatasetPreviews } from './domain/useCases/GetAllDatasetPreviews';
 
 const datasetsRepository = new DatasetsRepository();
 
@@ -17,7 +17,7 @@ const getDatasetCitation = new GetDatasetCitation(datasetsRepository);
 const getPrivateUrlDatasetCitation = new GetPrivateUrlDatasetCitation(datasetsRepository);
 const getDatasetUserPermissions = new GetDatasetUserPermissions(datasetsRepository);
 const getDatasetLocks = new GetDatasetLocks(datasetsRepository);
-const getCollectionDatasetPreviews = new GetCollectionDatasetPreviews(datasetsRepository);
+const getAllDatasetPreviews = new GetAllDatasetPreviews(datasetsRepository);
 
 export {
   getDatasetSummaryFieldNames,
@@ -27,7 +27,7 @@ export {
   getPrivateUrlDatasetCitation,
   getDatasetUserPermissions,
   getDatasetLocks,
-  getCollectionDatasetPreviews,
+  getAllDatasetPreviews,
 };
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion';
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions';

@@ -1,4 +1,4 @@
-import { GetCollectionDatasetPreviews } from '../../../src/datasets/domain/useCases/GetCollectionDatasetPreviews';
+import { GetAllDatasetPreviews } from '../../../src/datasets/domain/useCases/GetAllDatasetPreviews';
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview';
@@ -15,24 +15,24 @@ describe('execute', () => {
   test('should return dataset previews on repository success', async () => {
     const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()];
     const datasetsRepositoryStub = <IDatasetsRepository>{};
-    const getCollectionDatasetPreviewsStub = sandbox.stub().returns(testDatasetPreviews);
-    datasetsRepositoryStub.getCollectionDatasetPreviews = getCollectionDatasetPreviewsStub;
-    const sut = new GetCollectionDatasetPreviews(datasetsRepositoryStub);
+    const getAllDatasetPreviewsStub = sandbox.stub().returns(testDatasetPreviews);
+    datasetsRepositoryStub.getAllDatasetPreviews = getAllDatasetPreviewsStub;
+    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub);
 
-    const actual = await sut.execute(1);
+    const actual = await sut.execute();
 
     assert.match(actual, testDatasetPreviews);
-    assert.calledWithExactly(getCollectionDatasetPreviewsStub, 1, undefined, undefined);
+    assert.calledWithExactly(getAllDatasetPreviewsStub, undefined, undefined);
   });
 
   test('should return error result on repository error', async () => {
     const datasetsRepositoryStub = <IDatasetsRepository>{};
     const testReadError = new ReadError();
-    datasetsRepositoryStub.getCollectionDatasetPreviews = sandbox.stub().throwsException(testReadError);
-    const sut = new GetCollectionDatasetPreviews(datasetsRepositoryStub);
+    datasetsRepositoryStub.getAllDatasetPreviews = sandbox.stub().throwsException(testReadError);
+    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub);
 
     let actualError: ReadError = undefined;
-    await sut.execute(1).catch((e: ReadError) => (actualError = e));
+    await sut.execute().catch((e: ReadError) => (actualError = e));
 
     assert.match(actualError, testReadError);
   });

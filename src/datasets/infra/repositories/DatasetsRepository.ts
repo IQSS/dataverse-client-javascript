@@ -81,8 +81,8 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async getCollectionDatasetPreviews(collectionId: string | number): Promise<DatasetPreview[]> {
-    console.log(collectionId);
-    return null;
+  public async getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreview[]> {
+    console.log(limit + offset);
+    return [];
   }
 }
