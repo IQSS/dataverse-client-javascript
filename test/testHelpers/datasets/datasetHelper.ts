@@ -70,6 +70,7 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
   return datasetModel;
 };
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
   const datasetPayload: any = {
     id: 19,

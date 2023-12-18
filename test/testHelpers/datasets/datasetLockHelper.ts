@@ -10,6 +10,7 @@ export const createDatasetLockModel = (): DatasetLock => {
   };
 };
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export const createDatasetLockPayload = (): any => {
   return {
     lockType: DatasetLockType.EDIT_IN_PROGRESS.toString(),

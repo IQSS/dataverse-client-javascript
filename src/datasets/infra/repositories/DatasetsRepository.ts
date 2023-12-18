@@ -7,6 +7,12 @@ import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from 
 import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
 import { DatasetPreview } from '../../domain/models/DatasetPreview';
+import { transformDatasetPreviewsResponseToPreviews } from './transformers/datasetPreviewsTransformers';
+
+export interface GetAllDatasetPreviewsQueryParams {
+  limit?: number;
+  offset?: number;
+}
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets';
@@ -82,7 +88,17 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreview[]> {
-    console.log(limit + offset);
-    return [];
+    const queryParams: GetAllDatasetPreviewsQueryParams = {};
+    if (limit !== undefined) {
+      queryParams.limit = limit;
+    }
+    if (offset !== undefined) {
+      queryParams.offset = offset;
+    }
+    return this.doGet('/search?q=*&type=datasets', true, queryParams)
+      .then((response) => transformDatasetPreviewsResponseToPreviews(response))
+      .catch((error) => {
+        throw error;
+      });
   }
 }

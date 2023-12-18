@@ -5,6 +5,9 @@ const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z';
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z';
 const DATASET_RELEASE_TIME_STR = '2023-05-15T08:21:03Z';
 
+const DATASET_CITATION =
+  'Doe, John, 2023, "Test Dataset 1", https://doi.org/10.5072/FK2/XXXXXX, Root, V1, UNF:6:AAc5A5tAI9AVodAAAsOysA== [fileUNF]';
+
 export const createDatasetPreviewModel = (): DatasetPreview => {
   const datasetPreviewModel: DatasetPreview = {
     persistentId: 'doi:10.5072/FK2/HC6KTB',
@@ -18,9 +21,25 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
       lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
       releaseTime: new Date(DATASET_RELEASE_TIME_STR),
     },
-    citation:
-      'Doe, John, 2023, "Test Dataset 1", https://doi.org/10.5072/FK2/XXXXXX, Root, V1, UNF:6:AAc5A5tAI9AVodAAAsOysA== [fileUNF]',
+    citation: DATASET_CITATION,
     description: 'test',
   };
   return datasetPreviewModel;
+};
+
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export const createDatasetPreviewPayload = (): any => {
+  return {
+    global_id: 'doi:10.5072/FK2/HC6KTB',
+    name: 'Test Dataset 1',
+    versionId: 19,
+    majorVersion: 1,
+    minorVersion: 0,
+    versionState: DatasetVersionState.RELEASED.toString(),
+    createdAt: DATASET_CREATE_TIME_STR,
+    updatedAt: DATASET_UPDATE_TIME_STR,
+    published_at: DATASET_RELEASE_TIME_STR,
+    citation: DATASET_CITATION,
+    description: 'test',
+  };
 };
