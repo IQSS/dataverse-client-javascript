@@ -227,3 +227,22 @@ export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosRe
     DATAVERSE_API_REQUEST_HEADERS,
   );
 };
+export const getLocksViaApi = async (persistentId: string): Promise<any> => {
+   return axios.get(`${TestConstants.TEST_API_URL}/datasets/:persistentId/locks?persistentId=${persistentId}`).then((response) => {
+        return response.data.data;
+    })
+}
+
+export const waitForNoLocks = async (persistentId: string, maxRetries = 20, delay = 1000): Promise<void> => {
+   for (let retry = 0; retry < maxRetries; retry++) {
+        await getLocksViaApi(persistentId)
+            .then(
+            response => {
+          if (Object.keys(response).length === 1) {
+          return;
+        }})
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  throw new Error('Max retries reached.');
+};
+
