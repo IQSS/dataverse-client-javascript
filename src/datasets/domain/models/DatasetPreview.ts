@@ -1,4 +1,10 @@
+import { DatasetVersionInfo } from './Dataset';
+
 export interface DatasetPreview {
-  id: number;
+  persistentId: string;
   title: string;
+  versionId: number;
+  versionInfo: DatasetVersionInfo;
+  citation: string;
+  description: string;
 }
