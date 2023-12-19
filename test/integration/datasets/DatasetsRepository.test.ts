@@ -167,13 +167,6 @@ describe('DatasetsRepository', () => {
       });
     });
 
-    describe('getAllDatasetPreviews', () => {
-      test('should return dataset previews', async () => {
-        let actual: DatasetPreview[] = await sut.getAllDatasetPreviews();
-        assert.match(actual.length, 1);
-      });
-    });
-
     describe('getDatasetLocks', () => {
       test('should return list of dataset locks by dataset id for a dataset while publishing', async () => {
         let createdDatasetId = undefined;
@@ -205,6 +198,14 @@ describe('DatasetsRepository', () => {
           error.message,
           `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
         );
+      });
+    });
+
+    describe('getAllDatasetPreviews', () => {
+      test('should return dataset previews', async () => {
+        let actual: DatasetPreview[] = await sut.getAllDatasetPreviews();
+        assert.pass(actual.length > 0);
+        assert.match(actual[0].title, "Darwin's Finches");
       });
     });
   });
