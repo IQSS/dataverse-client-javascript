@@ -6,8 +6,8 @@ import {
   createDatasetViaApi,
   createPrivateUrlViaApi,
   publishDatasetViaApi,
-  deaccessionDatasetViaApi
- // , waitForNoLocks
+  deaccessionDatasetViaApi,
+  waitForNoLocks
 } from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { DatasetNotNumberedVersion, DatasetLockType } from '../../../src/datasets';
@@ -110,8 +110,8 @@ describe('DatasetsRepository', () => {
           .catch(() => {
             assert.fail('Error while publishing test Dataset');
           });
-
-   //   await waitForNoLocks(createdDatasetId,2)
+      
+      await waitForNoLocks(createdDatasetId, 10)
       let locks = await sut.getDatasetLocks(createdDatasetId);
       const maxTries = 10;
       let tries = 0;

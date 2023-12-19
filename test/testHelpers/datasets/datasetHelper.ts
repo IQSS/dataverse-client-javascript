@@ -212,14 +212,15 @@ export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResp
   );
 };
 
-export const deaccessionDatasetViaApi = async (datasetId: number,versionId: string): Promise<AxiosResponse> => {
-    const data = { deaccessionReason: 'Test reason.'};
-    return await axios.post(
-        `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
-        JSON.stringify(data),
-        DATAVERSE_API_REQUEST_HEADERS,
-    );
-}
+export const deaccessionDatasetViaApi = async (datasetId: number, versionId: string): Promise<AxiosResponse> => {
+  const data = { deaccessionReason: 'Test reason.' };
+  return await axios.post(
+    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
+    JSON.stringify(data),
+    DATAVERSE_API_REQUEST_HEADERS,
+  );
+};
+
 export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosResponse> => {
   return await axios.post(
     `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,
@@ -227,22 +228,30 @@ export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosRe
     DATAVERSE_API_REQUEST_HEADERS,
   );
 };
-export const getLocksViaApi = async (persistentId: string): Promise<any> => {
-   return axios.get(`${TestConstants.TEST_API_URL}/datasets/:persistentId/locks?persistentId=${persistentId}`).then((response) => {
-        return response.data.data;
-    })
-}
 
-export const waitForNoLocks = async (persistentId: string, maxRetries = 20, delay = 1000): Promise<void> => {
-   for (let retry = 0; retry < maxRetries; retry++) {
-        await getLocksViaApi(persistentId)
-            .then(
-            response => {
-          if (Object.keys(response).length === 1) {
-          return;
-        }})
-    await new Promise(resolve => setTimeout(resolve, delay));
+export const waitForNoLocks = async (datasetId: number, maxRetries = 20, delay = 1000): Promise<void> => {
+  let hasLocks = true;
+  let retry = 0;
+  while (hasLocks && retry < maxRetries) {
+    await axios
+      .get(`${TestConstants.TEST_API_URL}/datasets/${datasetId}/locks`)
+      .then((response) => {
+        const nLocks = response.data.data.length;
+        if (nLocks == 0) {
+          hasLocks = false;
+        }
+      })
+      .catch((error) => {
+        console.log(
+          `Error while waiting for no dataset locks: [${error.response.status}]${
+            error.response.data ? ` ${error.response.data.message}` : ''
+          }`,
+        );
+      });
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    retry++;
   }
-  throw new Error('Max retries reached.');
+  if (hasLocks) {
+    throw new Error('Max retries reached.');
+  }
 };
-
