@@ -9,6 +9,7 @@ import {
 } from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { DatasetNotNumberedVersion, DatasetLockType } from '../../../src/datasets';
+import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview';
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository();
@@ -163,6 +164,13 @@ describe('DatasetsRepository', () => {
           error.message,
           `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
         );
+      });
+    });
+
+    describe('getAllDatasetPreviews', () => {
+      test('should return dataset previews', async () => {
+        let actual: DatasetPreview[] = await sut.getAllDatasetPreviews();
+        assert.match(actual.length, 1);
       });
     });
 

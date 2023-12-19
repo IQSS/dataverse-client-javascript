@@ -506,11 +506,13 @@ describe('DatasetsRepository', () => {
     const testDatasetPreviewsResponse = {
       data: {
         status: 'OK',
-        items: [createDatasetPreviewPayload()],
+        data: {
+          items: [createDatasetPreviewPayload()],
+        },
       },
     };
 
-    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?q=*&type=datasets`;
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?q=*&type=dataset`;
 
     test('should return dataset previews when response is successful', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetPreviewsResponse);

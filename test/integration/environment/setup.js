@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { DockerComposeEnvironment, Wait } = require('testcontainers');
 const axios = require('axios');
 const { TestConstants } = require('../../testHelpers/TestConstants');
@@ -15,6 +16,8 @@ const API_KEY_USER_ENDPOINT = '/builtin-users/dataverseAdmin/api-token';
 const API_KEY_USER_PASSWORD = 'admin1';
 
 module.exports = async () => {
+  console.log('Cleaning up old container volumes...');
+  fs.rmSync(`${__dirname}/docker-dev-volumes`, { recursive: true, force: true });
   console.log('Running test containers...');
   await new DockerComposeEnvironment(COMPOSE_FILE_PATH, COMPOSE_FILE)
     .withStartupTimeout(CONTAINERS_STARTUP_TIMEOUT)

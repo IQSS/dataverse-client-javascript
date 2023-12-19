@@ -95,7 +95,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     if (offset !== undefined) {
       queryParams.offset = offset;
     }
-    return this.doGet('/search?q=*&type=datasets', true, queryParams)
+    return this.doGet('/search?q=*&type=dataset', true, queryParams)
       .then((response) => transformDatasetPreviewsResponseToPreviews(response))
       .catch((error) => {
         throw error;

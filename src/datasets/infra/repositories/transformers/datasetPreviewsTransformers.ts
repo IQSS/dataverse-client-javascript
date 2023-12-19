@@ -4,7 +4,7 @@ import { DatasetVersionState } from '../../../domain/models/Dataset';
 
 export const transformDatasetPreviewsResponseToPreviews = (response: AxiosResponse): DatasetPreview[] => {
   const datasetPreviews: DatasetPreview[] = [];
-  const datasetPreviewsPayload = response.data.items;
+  const datasetPreviewsPayload = response.data.data.items;
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   datasetPreviewsPayload.forEach(function (datasetPreviewPayload: any) {
     datasetPreviews.push(transformDatasetPreviewPayloadToDatasetPreview(datasetPreviewPayload));

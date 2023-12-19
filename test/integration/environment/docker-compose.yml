@@ -58,6 +58,9 @@ services:
       - sh
       - -c
       - 'fix-fs-perms.sh solr && cp -a /template/* /solr-template'
+    volumes:
+      - ./docker-dev-volumes/solr/data:/var/solr
+      - ./docker-dev-volumes/solr/conf:/solr-template
 
   test_solr:
     container_name: 'test_solr'
@@ -74,6 +77,9 @@ services:
       - 'solr-precreate'
       - 'collection1'
       - '/template'
+    volumes:
+      - ./docker-dev-volumes/solr/data:/var/solr
+      - ./docker-dev-volumes/solr/conf:/template
 
   test_smtp:
     container_name: 'test_smtp'
