@@ -1,7 +1,12 @@
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { assert } from 'sinon';
 import { TestConstants } from '../../testHelpers/TestConstants';
-import { createPrivateUrlViaApi, publishDatasetViaApi } from '../../testHelpers/datasets/datasetHelper';
+import {
+  createPrivateUrlViaApi,
+  publishDatasetViaApi,
+  deaccessionDatasetViaApi,
+  waitForNoLocks,
+} from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { DatasetNotNumberedVersion, DatasetLockType } from '../../../src/datasets';
 import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview';
@@ -67,27 +72,6 @@ describe('DatasetsRepository', () => {
           `There was an error when reading the resource. Reason was: [404] Dataset with Persistent ID ${testWrongPersistentId} not found.`,
         );
       });
-    });
-  });
-
-  describe('getDatasetCitation', () => {
-    test('should return citation when dataset exists', async () => {
-      const actualDatasetCitation = await sut.getDatasetCitation(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
-        latestVersionId,
-      );
-      expect(typeof actualDatasetCitation).toBe('string');
-    });
-
-    test('should return error when dataset does not exist', async () => {
-      let error: ReadError = undefined;
-
-      await sut.getDatasetCitation(nonExistentTestDatasetId, latestVersionId).catch((e) => (error = e));
-
-      assert.match(
-        error.message,
-        `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
-      );
     });
   });
 
@@ -184,6 +168,49 @@ describe('DatasetsRepository', () => {
           `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
         );
       });
+    });
+  });
+
+  describe('getDatasetCitation', () => {
+    test('should return citation when dataset exists', async () => {
+      const actualDatasetCitation = await sut.getDatasetCitation(
+        TestConstants.TEST_CREATED_DATASET_1_ID,
+        latestVersionId,
+        false,
+      );
+      expect(typeof actualDatasetCitation).toBe('string');
+    });
+
+    test('should return error when dataset does not exist', async () => {
+      let error: ReadError = undefined;
+      await sut.getDatasetCitation(nonExistentTestDatasetId, latestVersionId, false).catch((e) => (error = e));
+
+      assert.match(
+        error.message,
+        `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
+      );
+    });
+
+    test('should return citation when dataset is deaccessioned', async () => {
+      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_2_ID, 10)
+        .then()
+        .catch(() => {
+          assert.fail('Error while waiting for no locks');
+        });
+
+      await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID, '1.0')
+        .then()
+        .catch((error) => {
+          console.log(JSON.stringify(error));
+          assert.fail('Error while deaccessioning test Dataset');
+        });
+
+      const actualDatasetCitation = await sut.getDatasetCitation(
+        TestConstants.TEST_CREATED_DATASET_2_ID,
+        latestVersionId,
+        true,
+      );
+      expect(typeof actualDatasetCitation).toBe('string');
     });
   });
 
