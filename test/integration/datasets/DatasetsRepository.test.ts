@@ -19,6 +19,14 @@ describe('DatasetsRepository', () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
   });
 
+  describe('getDatasetSummaryFieldNames', () => {
+    test('should return not empty field list on successful response', async () => {
+      const actual = await sut.getDatasetSummaryFieldNames();
+
+      assert.pass(actual.length > 0);
+    });
+  });
+
   describe('getDataset', () => {
     describe('by numeric id', () => {
       test('should return dataset when it exists filtering by id and version id', async () => {
