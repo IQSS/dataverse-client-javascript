@@ -540,6 +540,43 @@ describe('DatasetsRepository', () => {
       assert.match(actual, testDatasetPreviews);
     });
 
+    test('should return dataset previews when providing pagination params and response is successful', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetPreviewsResponse);
+
+      const testLimit = 10;
+      const testOffset = 20;
+
+      // API Key auth
+      let actual = await sut.getAllDatasetPreviews(testLimit, testOffset);
+
+      const expectedRequestParamsWithPagination = {
+        per_page: testLimit,
+        start: testOffset,
+      };
+
+      const expectedRequestConfigApiKeyWithPagination = {
+        params: expectedRequestParamsWithPagination,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      };
+
+      assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKeyWithPagination);
+      assert.match(actual, testDatasetPreviews);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      actual = await sut.getAllDatasetPreviews(testLimit, testOffset);
+
+      const expectedRequestConfigSessionCookieWithPagination = {
+        params: expectedRequestParamsWithPagination,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+        withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
+      };
+
+      assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookieWithPagination);
+      assert.match(actual, testDatasetPreviews);
+    });
+
     test('should return error result on error response', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
