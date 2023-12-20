@@ -6,6 +6,8 @@ import {
   createDatasetViaApi,
   createPrivateUrlViaApi,
   publishDatasetViaApi,
+  deaccessionDatasetViaApi,
+  waitForNoLocks
 } from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { DatasetNotNumberedVersion, DatasetLockType } from '../../../src/datasets';
@@ -81,19 +83,53 @@ describe('DatasetsRepository', () => {
       const actualDatasetCitation = await sut.getDatasetCitation(
         TestConstants.TEST_CREATED_DATASET_ID,
         latestVersionId,
+        false,
       );
       expect(typeof actualDatasetCitation).toBe('string');
     });
 
     test('should return error when dataset does not exist', async () => {
       let error: ReadError = undefined;
-
-      await sut.getDatasetCitation(nonExistentTestDatasetId, latestVersionId).catch((e) => (error = e));
+      await sut.getDatasetCitation(nonExistentTestDatasetId, latestVersionId,false).catch((e) => (error = e));
 
       assert.match(
         error.message,
         `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`,
       );
+    });
+    test('should return citation when dataset is deaccessioned', async () => {
+      let createdDatasetId = undefined;
+      await createDatasetViaApi()
+          .then((response) => (createdDatasetId = response.data.data.id))
+          .catch(() => {
+            assert.fail('Error while creating test Dataset');
+          });
+      // We publish the new test dataset we can deaccession it
+      await publishDatasetViaApi(createdDatasetId)
+          .then()
+          .catch(() => {
+            assert.fail('Error while publishing test Dataset');
+          });
+      
+      await waitForNoLocks(createdDatasetId, 10)
+            .then()
+            .catch(() => {
+                assert.fail('Error while waiting for no locks');
+            });
+      await deaccessionDatasetViaApi(createdDatasetId,'1.0')
+            .then()
+            .catch((error) => {
+                console.log(JSON.stringify(error));
+                assert.fail('Error while deaccessioning test Dataset');
+            });
+
+      const actualDatasetCitation = await sut.getDatasetCitation(
+          createdDatasetId,
+          latestVersionId,
+          true,
+      );
+      expect(typeof actualDatasetCitation).toBe('string');
+
     });
   });
 
