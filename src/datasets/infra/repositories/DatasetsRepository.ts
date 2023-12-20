@@ -10,8 +10,8 @@ import { DatasetPreview } from '../../domain/models/DatasetPreview';
 import { transformDatasetPreviewsResponseToPreviews } from './transformers/datasetPreviewsTransformers';
 
 export interface GetAllDatasetPreviewsQueryParams {
-  limit?: number;
-  offset?: number;
+  per_page?: number;
+  start?: number;
 }
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
@@ -90,10 +90,10 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreview[]> {
     const queryParams: GetAllDatasetPreviewsQueryParams = {};
     if (limit !== undefined) {
-      queryParams.limit = limit;
+      queryParams.per_page = limit;
     }
     if (offset !== undefined) {
-      queryParams.offset = offset;
+      queryParams.start = offset;
     }
     return this.doGet('/search?q=*&type=dataset', true, queryParams)
       .then((response) => transformDatasetPreviewsResponseToPreviews(response))

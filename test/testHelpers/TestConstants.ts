@@ -28,5 +28,6 @@ export class TestConstants {
       'Content-Type': 'application/json',
     },
   };
-  static readonly TEST_CREATED_DATASET_ID = 2;
+  static readonly TEST_CREATED_DATASET_1_ID = 2;
+  static readonly TEST_CREATED_DATASET_2_ID = 3;
 }

@@ -1,15 +1,13 @@
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { assert } from 'sinon';
-import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import { TestConstants } from '../../testHelpers/TestConstants';
-import {
-  createDatasetViaApi,
-  createPrivateUrlViaApi,
-  publishDatasetViaApi,
-} from '../../testHelpers/datasets/datasetHelper';
+import { createPrivateUrlViaApi, publishDatasetViaApi } from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { DatasetNotNumberedVersion, DatasetLockType } from '../../../src/datasets';
 import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview';
+import { fail } from 'assert';
+import { ApiConfig } from '../../../src';
+import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository();
@@ -19,31 +17,18 @@ describe('DatasetsRepository', () => {
 
   beforeAll(async () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
-    await createDatasetViaApi()
-      .then()
-      .catch(() => {
-        fail('Tests beforeAll(): Error while creating test Dataset');
-      });
-  });
-
-  describe('getDatasetSummaryFieldNames', () => {
-    test('should return not empty field list on successful response', async () => {
-      const actual = await sut.getDatasetSummaryFieldNames();
-
-      assert.pass(actual.length > 0);
-    });
   });
 
   describe('getDataset', () => {
     describe('by numeric id', () => {
       test('should return dataset when it exists filtering by id and version id', async () => {
-        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId, false);
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_1_ID, latestVersionId, false);
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID);
       });
 
       test('should return dataset when it exists filtering by id and version id', async () => {
-        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId, false);
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_1_ID, latestVersionId, false);
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID);
       });
 
       test('should return error when dataset does not exist', async () => {
@@ -58,9 +43,9 @@ describe('DatasetsRepository', () => {
     });
     describe('by persistent id', () => {
       test('should return dataset when it exists filtering by persistent id and version id', async () => {
-        const createdDataset = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_ID, latestVersionId, false);
+        const createdDataset = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_1_ID, latestVersionId, false);
         const actual = await sut.getDataset(createdDataset.persistentId, latestVersionId, false);
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID);
       });
 
       test('should return error when dataset does not exist', async () => {
@@ -80,7 +65,7 @@ describe('DatasetsRepository', () => {
   describe('getDatasetCitation', () => {
     test('should return citation when dataset exists', async () => {
       const actualDatasetCitation = await sut.getDatasetCitation(
-        TestConstants.TEST_CREATED_DATASET_ID,
+        TestConstants.TEST_CREATED_DATASET_1_ID,
         latestVersionId,
       );
       expect(typeof actualDatasetCitation).toBe('string');
@@ -104,7 +89,7 @@ describe('DatasetsRepository', () => {
     let privateUrlToken: string = undefined;
 
     beforeAll(async () => {
-      await createPrivateUrlViaApi(TestConstants.TEST_CREATED_DATASET_ID)
+      await createPrivateUrlViaApi(TestConstants.TEST_CREATED_DATASET_1_ID)
         .then((response) => {
           privateUrlToken = response.data.data.token;
         })
@@ -117,7 +102,7 @@ describe('DatasetsRepository', () => {
       test('should return dataset when token is valid', async () => {
         const actual = await sut.getPrivateUrlDataset(privateUrlToken);
 
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_ID);
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID);
       });
 
       test('should return error when token is not valid', async () => {
@@ -147,7 +132,7 @@ describe('DatasetsRepository', () => {
 
     describe('getDatasetUserPermissions', () => {
       test('should return user permissions filtering by dataset id', async () => {
-        const actual = await sut.getDatasetUserPermissions(TestConstants.TEST_CREATED_DATASET_ID);
+        const actual = await sut.getDatasetUserPermissions(TestConstants.TEST_CREATED_DATASET_1_ID);
         assert.match(actual.canViewUnpublishedDataset, true);
         assert.match(actual.canEditDataset, true);
         assert.match(actual.canPublishDataset, true);
@@ -169,20 +154,12 @@ describe('DatasetsRepository', () => {
 
     describe('getDatasetLocks', () => {
       test('should return list of dataset locks by dataset id for a dataset while publishing', async () => {
-        let createdDatasetId = undefined;
-        // We create a new dataset
-        await createDatasetViaApi()
-          .then((response) => (createdDatasetId = response.data.data.id))
-          .catch(() => {
-            assert.fail('Error while creating test Dataset');
-          });
-        // We publish the new test dataset so it will create a lock during publishing
-        await publishDatasetViaApi(createdDatasetId)
+        await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID)
           .then()
           .catch(() => {
             assert.fail('Error while publishing test Dataset');
           });
-        const actual = await sut.getDatasetLocks(createdDatasetId);
+        const actual = await sut.getDatasetLocks(TestConstants.TEST_CREATED_DATASET_2_ID);
         assert.match(actual.length, 1);
         assert.match(actual[0].lockType, DatasetLockType.FINALIZE_PUBLICATION);
         assert.match(actual[0].userId, 'dataverseAdmin');
@@ -200,13 +177,32 @@ describe('DatasetsRepository', () => {
         );
       });
     });
+  });
 
-    describe('getAllDatasetPreviews', () => {
-      test('should return dataset previews', async () => {
-        let actual: DatasetPreview[] = await sut.getAllDatasetPreviews();
-        assert.pass(actual.length > 0);
-        assert.match(actual[0].title, "Darwin's Finches");
-      });
+  describe('getAllDatasetPreviews', () => {
+    const expectedDatasetTitle = "Darwin's Finches";
+
+    test('should return all datasets when no pagination params are defined', async () => {
+      const actual: DatasetPreview[] = await sut.getAllDatasetPreviews();
+      assert.match(actual.length, 2);
+      assert.match(actual[0].title, expectedDatasetTitle);
+    });
+
+    test('should return dataset pages correctly when pagination params are defined', async () => {
+      // First page
+      let actual = await sut.getAllDatasetPreviews(1, 0);
+      assert.match(actual.length, 1);
+      assert.match(actual[0].title, expectedDatasetTitle);
+      const firstDatasetPid = actual[0].persistentId;
+      // Second page
+      actual = await sut.getAllDatasetPreviews(1, 1);
+      assert.match(actual.length, 1);
+      assert.match(actual[0].title, expectedDatasetTitle);
+      const secondDatasetPid = actual[0].persistentId;
+      expect(secondDatasetPid == firstDatasetPid).toBe(false);
+      // Third page
+      actual = await sut.getAllDatasetPreviews(1, 2);
+      assert.match(actual.length, 0);
     });
   });
 });
