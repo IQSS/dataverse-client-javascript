@@ -8,8 +8,7 @@ import {
   waitForNoLocks,
 } from '../../testHelpers/datasets/datasetHelper';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
-import { DatasetNotNumberedVersion, DatasetLockType } from '../../../src/datasets';
-import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview';
+import { DatasetNotNumberedVersion, DatasetLockType, DatasetPreviewSubset } from '../../../src/datasets';
 import { fail } from 'assert';
 import { ApiConfig } from '../../../src';
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
@@ -218,26 +217,30 @@ describe('DatasetsRepository', () => {
     const expectedDatasetTitle = "Darwin's Finches";
 
     test('should return all datasets when no pagination params are defined', async () => {
-      const actual: DatasetPreview[] = await sut.getAllDatasetPreviews();
-      assert.match(actual.length, 2);
-      assert.match(actual[0].title, expectedDatasetTitle);
+      const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews();
+      assert.match(actual.datasetPreviews.length, 2);
+      assert.match(actual.datasetPreviews[0].title, expectedDatasetTitle);
+      assert.match(actual.totalDatasetCount, 2);
     });
 
     test('should return dataset pages correctly when pagination params are defined', async () => {
       // First page
       let actual = await sut.getAllDatasetPreviews(1, 0);
-      assert.match(actual.length, 1);
-      assert.match(actual[0].title, expectedDatasetTitle);
-      const firstDatasetPid = actual[0].persistentId;
+      assert.match(actual.datasetPreviews.length, 1);
+      assert.match(actual.datasetPreviews[0].title, expectedDatasetTitle);
+      assert.match(actual.totalDatasetCount, 2);
+      const firstDatasetPid = actual.datasetPreviews[0].persistentId;
       // Second page
       actual = await sut.getAllDatasetPreviews(1, 1);
-      assert.match(actual.length, 1);
-      assert.match(actual[0].title, expectedDatasetTitle);
-      const secondDatasetPid = actual[0].persistentId;
+      assert.match(actual.datasetPreviews.length, 1);
+      assert.match(actual.datasetPreviews[0].title, expectedDatasetTitle);
+      assert.match(actual.totalDatasetCount, 2);
+      const secondDatasetPid = actual.datasetPreviews[0].persistentId;
       expect(secondDatasetPid == firstDatasetPid).toBe(false);
       // Third page
       actual = await sut.getAllDatasetPreviews(1, 2);
-      assert.match(actual.length, 0);
+      assert.match(actual.datasetPreviews.length, 0);
+      assert.match(actual.totalDatasetCount, 2);
     });
   });
 });

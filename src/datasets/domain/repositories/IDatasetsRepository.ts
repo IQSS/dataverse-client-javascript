@@ -1,7 +1,7 @@
 import { Dataset } from '../models/Dataset';
 import { DatasetUserPermissions } from '../models/DatasetUserPermissions';
 import { DatasetLock } from '../models/DatasetLock';
-import { DatasetPreview } from '../models/DatasetPreview';
+import { DatasetPreviewSubset } from '../models/DatasetPreviewSubset';
 
 export interface IDatasetsRepository {
   getDatasetSummaryFieldNames(): Promise<string[]>;
@@ -11,5 +11,5 @@ export interface IDatasetsRepository {
   getPrivateUrlDatasetCitation(token: string): Promise<string>;
   getDatasetUserPermissions(datasetId: number | string): Promise<DatasetUserPermissions>;
   getDatasetLocks(datasetId: number | string): Promise<DatasetLock[]>;
-  getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreview[]>;
+  getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreviewSubset>;
 }

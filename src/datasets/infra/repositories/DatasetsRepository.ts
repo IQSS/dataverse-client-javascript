@@ -6,8 +6,8 @@ import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissio
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers';
 import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
-import { DatasetPreview } from '../../domain/models/DatasetPreview';
-import { transformDatasetPreviewsResponseToPreviews } from './transformers/datasetPreviewsTransformers';
+import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers';
+import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number;
@@ -92,7 +92,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreview[]> {
+  public async getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreviewSubset> {
     const queryParams: GetAllDatasetPreviewsQueryParams = {};
     if (limit !== undefined) {
       queryParams.per_page = limit;
@@ -100,8 +100,8 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     if (offset !== undefined) {
       queryParams.start = offset;
     }
-    return this.doGet('/search?q=*&type=dataset', true, queryParams)
-      .then((response) => transformDatasetPreviewsResponseToPreviews(response))
+    return this.doGet('/search?q=*&type=dataset&sort=date&order=desc', true, queryParams)
+      .then((response) => transformDatasetPreviewsResponseToDatasetPreviewSubset(response))
       .catch((error) => {
         throw error;
       });

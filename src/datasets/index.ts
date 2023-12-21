@@ -44,3 +44,4 @@ export {
   DatasetMetadataSubField,
 } from './domain/models/Dataset';
 export { DatasetPreview } from './domain/models/DatasetPreview';
+export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset';
