@@ -2,18 +2,32 @@ import { AxiosResponse } from 'axios';
 import { DatasetPreview } from '../../../domain/models/DatasetPreview';
 import { DatasetVersionState } from '../../../domain/models/Dataset';
 
+export interface DatasetPreviewPayload {
+  global_id: string;
+  name: string;
+  versionId: number;
+  majorVersion: number;
+  minorVersion: number;
+  versionState: string;
+  createdAt: string;
+  updatedAt: string;
+  published_at?: string;
+  citation: string;
+  description: string;
+}
+
 export const transformDatasetPreviewsResponseToPreviews = (response: AxiosResponse): DatasetPreview[] => {
   const datasetPreviews: DatasetPreview[] = [];
   const datasetPreviewsPayload = response.data.data.items;
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  datasetPreviewsPayload.forEach(function (datasetPreviewPayload: any) {
+  datasetPreviewsPayload.forEach(function (datasetPreviewPayload: DatasetPreviewPayload) {
     datasetPreviews.push(transformDatasetPreviewPayloadToDatasetPreview(datasetPreviewPayload));
   });
   return datasetPreviews;
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformDatasetPreviewPayloadToDatasetPreview = (datasetPreviewPayload: any): DatasetPreview => {
+const transformDatasetPreviewPayloadToDatasetPreview = (
+  datasetPreviewPayload: DatasetPreviewPayload,
+): DatasetPreview => {
   return {
     persistentId: datasetPreviewPayload.global_id,
     title: datasetPreviewPayload.name,

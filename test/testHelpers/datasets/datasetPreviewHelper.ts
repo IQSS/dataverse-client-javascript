@@ -1,5 +1,6 @@
 import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview';
 import { DatasetVersionState } from '../../../src/datasets/domain/models/Dataset';
+import { DatasetPreviewPayload } from '../../../src/datasets/infra/repositories/transformers/datasetPreviewsTransformers';
 
 const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z';
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z';
@@ -27,8 +28,7 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
   return datasetPreviewModel;
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export const createDatasetPreviewPayload = (): any => {
+export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
   return {
     global_id: 'doi:10.5072/FK2/HC6KTB',
     name: 'Test Dataset 1',
