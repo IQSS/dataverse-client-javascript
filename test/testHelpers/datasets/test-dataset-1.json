@@ -9,7 +9,7 @@
       "citation": {
         "fields": [
           {
-            "value": "Darwin's Finches",
+            "value": "First Dataset",
             "typeClass": "primitive",
             "multiple": false,
             "typeName": "title"
@@ -60,7 +60,7 @@
             "value": [
               {
                 "dsDescriptionValue": {
-                  "value": "Darwin's finches (also known as the Galápagos finches) are a group of about fifteen species of passerine birds.",
+                  "value": "This is the description of the first dataset.",
                   "multiple": false,
                   "typeClass": "primitive",
                   "typeName": "dsDescriptionValue"

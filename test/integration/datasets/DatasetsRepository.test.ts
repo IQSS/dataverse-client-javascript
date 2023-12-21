@@ -23,6 +23,37 @@ describe('DatasetsRepository', () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
   });
 
+  describe('getAllDatasetPreviews', () => {
+    const testPageLimit = 1;
+
+    test('should return all dataset previews when no pagination params are defined', async () => {
+      const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews();
+      assert.match(actual.datasetPreviews.length, 2);
+      assert.match(actual.datasetPreviews[0].title, 'Second Dataset');
+      assert.match(actual.totalDatasetCount, 2);
+    });
+
+    test('should return first dataset preview page', async () => {
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 0);
+      assert.match(actual.datasetPreviews.length, 1);
+      assert.match(actual.datasetPreviews[0].title, 'Second Dataset');
+      assert.match(actual.totalDatasetCount, 2);
+    });
+
+    test('should return second dataset preview page', async () => {
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 1);
+      assert.match(actual.datasetPreviews.length, 1);
+      assert.match(actual.datasetPreviews[0].title, 'First Dataset');
+      assert.match(actual.totalDatasetCount, 2);
+    });
+
+    test('should return third dataset preview page', async () => {
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 2);
+      assert.match(actual.datasetPreviews.length, 0);
+      assert.match(actual.totalDatasetCount, 2);
+    });
+  });
+
   describe('getDatasetSummaryFieldNames', () => {
     test('should return not empty field list on successful response', async () => {
       const actual = await sut.getDatasetSummaryFieldNames();
@@ -210,37 +241,6 @@ describe('DatasetsRepository', () => {
         true,
       );
       expect(typeof actualDatasetCitation).toBe('string');
-    });
-  });
-
-  describe('getAllDatasetPreviews', () => {
-    const expectedDatasetTitle = "Darwin's Finches";
-
-    test('should return all datasets when no pagination params are defined', async () => {
-      const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews();
-      assert.match(actual.datasetPreviews.length, 2);
-      assert.match(actual.datasetPreviews[0].title, expectedDatasetTitle);
-      assert.match(actual.totalDatasetCount, 2);
-    });
-
-    test('should return dataset pages correctly when pagination params are defined', async () => {
-      // First page
-      let actual = await sut.getAllDatasetPreviews(1, 0);
-      assert.match(actual.datasetPreviews.length, 1);
-      assert.match(actual.datasetPreviews[0].title, expectedDatasetTitle);
-      assert.match(actual.totalDatasetCount, 2);
-      const firstDatasetPid = actual.datasetPreviews[0].persistentId;
-      // Second page
-      actual = await sut.getAllDatasetPreviews(1, 1);
-      assert.match(actual.datasetPreviews.length, 1);
-      assert.match(actual.datasetPreviews[0].title, expectedDatasetTitle);
-      assert.match(actual.totalDatasetCount, 2);
-      const secondDatasetPid = actual.datasetPreviews[0].persistentId;
-      expect(secondDatasetPid == firstDatasetPid).toBe(false);
-      // Third page
-      actual = await sut.getAllDatasetPreviews(1, 2);
-      assert.match(actual.datasetPreviews.length, 0);
-      assert.match(actual.totalDatasetCount, 2);
     });
   });
 });

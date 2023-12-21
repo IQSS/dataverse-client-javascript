@@ -2,7 +2,6 @@ import { Dataset, DatasetVersionState, DatasetLicense } from '../../../src/datas
 import TurndownService from 'turndown';
 import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
-import datasetJson from './test-dataset.json';
 
 const turndownService = new TurndownService();
 
@@ -195,14 +194,6 @@ export const createDatasetLicenseModel = (withIconUri: boolean = true): DatasetL
     datasetLicense.iconUri = 'https://licensebuttons.net/p/zero/1.0/88x31.png';
   }
   return datasetLicense;
-};
-
-export const createDatasetViaApi = async (): Promise<AxiosResponse> => {
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/dataverses/root/datasets`,
-    datasetJson,
-    DATAVERSE_API_REQUEST_HEADERS,
-  );
 };
 
 export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResponse> => {
