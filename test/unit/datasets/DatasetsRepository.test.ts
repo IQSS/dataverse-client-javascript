@@ -10,9 +10,13 @@ import {
   createDatasetLicenseModel,
 } from '../../testHelpers/datasets/datasetHelper';
 import { TestConstants } from '../../testHelpers/TestConstants';
-import { DatasetNotNumberedVersion } from '../../../src/datasets';
+import { DatasetNotNumberedVersion, DatasetPreviewSubset } from '../../../src/datasets';
 import { createDatasetUserPermissionsModel } from '../../testHelpers/datasets/datasetUserPermissionsHelper';
 import { createDatasetLockModel, createDatasetLockPayload } from '../../testHelpers/datasets/datasetLockHelper';
+import {
+  createDatasetPreviewModel,
+  createDatasetPreviewPayload,
+} from '../../testHelpers/datasets/datasetPreviewHelper';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -264,7 +268,7 @@ describe('DatasetsRepository', () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 
       let error: ReadError = undefined;
-      await sut.getDatasetCitation(1, testVersionId,testIncludeDeaccessioned).catch((e) => (error = e));
+      await sut.getDatasetCitation(1, testVersionId, testIncludeDeaccessioned).catch((e) => (error = e));
 
       assert.calledWithExactly(
         axiosGetStub,
@@ -495,6 +499,105 @@ describe('DatasetsRepository', () => {
         );
         expect(error).to.be.instanceOf(Error);
       });
+    });
+  });
+
+  describe('getAllDatasetPreviews', () => {
+    const testDatasetPreviews = [createDatasetPreviewModel()];
+    const testTotalCount = 1;
+
+    const testDatasetPreviewSubset: DatasetPreviewSubset = {
+      datasetPreviews: testDatasetPreviews,
+      totalDatasetCount: testTotalCount,
+    };
+
+    const testDatasetPreviewsResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          total_count: testTotalCount,
+          items: [createDatasetPreviewPayload()],
+        },
+      },
+    };
+
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?q=*&type=dataset&sort=date&order=desc`;
+
+    test('should return dataset previews when response is successful', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetPreviewsResponse);
+
+      // API Key auth
+      let actual = await sut.getAllDatasetPreviews();
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+      assert.match(actual, testDatasetPreviewSubset);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      actual = await sut.getAllDatasetPreviews();
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+      );
+      assert.match(actual, testDatasetPreviewSubset);
+    });
+
+    test('should return dataset previews when providing pagination params and response is successful', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetPreviewsResponse);
+
+      const testLimit = 10;
+      const testOffset = 20;
+
+      // API Key auth
+      let actual = await sut.getAllDatasetPreviews(testLimit, testOffset);
+
+      const expectedRequestParamsWithPagination = {
+        per_page: testLimit,
+        start: testOffset,
+      };
+
+      const expectedRequestConfigApiKeyWithPagination = {
+        params: expectedRequestParamsWithPagination,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      };
+
+      assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKeyWithPagination);
+      assert.match(actual, testDatasetPreviewSubset);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      actual = await sut.getAllDatasetPreviews(testLimit, testOffset);
+
+      const expectedRequestConfigSessionCookieWithPagination = {
+        params: expectedRequestParamsWithPagination,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+        withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
+      };
+
+      assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookieWithPagination);
+      assert.match(actual, testDatasetPreviewSubset);
+    });
+
+    test('should return error result on error response', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+      let error: ReadError = undefined;
+      await sut.getAllDatasetPreviews().catch((e) => (error = e));
+
+      assert.calledWithExactly(
+        axiosGetStub,
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+      expect(error).to.be.instanceOf(Error);
     });
   });
 });

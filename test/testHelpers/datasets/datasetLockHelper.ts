@@ -1,4 +1,5 @@
 import { DatasetLock, DatasetLockType } from '../../../src/datasets/domain/models/DatasetLock';
+import { DatasetLockPayload } from '../../../src/datasets/infra/repositories/transformers/datasetLocksTransformers';
 
 export const createDatasetLockModel = (): DatasetLock => {
   return {
@@ -10,7 +11,7 @@ export const createDatasetLockModel = (): DatasetLock => {
   };
 };
 
-export const createDatasetLockPayload = (): any => {
+export const createDatasetLockPayload = (): DatasetLockPayload => {
   return {
     lockType: DatasetLockType.EDIT_IN_PROGRESS.toString(),
     date: '2023-05-15T08:21:03Z',

@@ -6,7 +6,13 @@ import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissio
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers';
 import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
+import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers';
+import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
 
+export interface GetAllDatasetPreviewsQueryParams {
+  per_page?: number;
+  start?: number;
+}
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets';
@@ -37,7 +43,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true,
       {
         includeDeaccessioned: includeDeaccessioned,
-        includeFiles: false
+        includeFiles: false,
       },
     )
       .then((response) => transformVersionResponseToDataset(response))
@@ -46,14 +52,15 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-
-
-  public async getDatasetCitation(datasetId: number, datasetVersionId: string,
-                                  includeDeaccessioned: boolean): Promise<string> {
-
+  public async getDatasetCitation(
+    datasetId: number,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+  ): Promise<string> {
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}/citation`, datasetId),
-      true, { includeDeaccessioned: includeDeaccessioned}
+      true,
+      { includeDeaccessioned: includeDeaccessioned },
     )
       .then((response) => response.data.data.message)
       .catch((error) => {
@@ -80,6 +87,21 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async getDatasetLocks(datasetId: string | number): Promise<DatasetLock[]> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, `locks`, datasetId), true)
       .then((response) => transformDatasetLocksResponseToDatasetLocks(response))
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  public async getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreviewSubset> {
+    const queryParams: GetAllDatasetPreviewsQueryParams = {};
+    if (limit !== undefined) {
+      queryParams.per_page = limit;
+    }
+    if (offset !== undefined) {
+      queryParams.start = offset;
+    }
+    return this.doGet('/search?q=*&type=dataset&sort=date&order=desc', true, queryParams)
+      .then((response) => transformDatasetPreviewsResponseToDatasetPreviewSubset(response))
       .catch((error) => {
         throw error;
       });
