@@ -56,7 +56,9 @@ export abstract class ApiRepository {
         requestConfig.withCredentials = true;
         break;
       case DataverseApiAuthMechanism.API_KEY:
-        requestConfig.headers['X-Dataverse-Key'] = ApiConfig.dataverseApiKey;
+        if (typeof ApiConfig.dataverseApiKey !== 'undefined') {
+          requestConfig.headers['X-Dataverse-Key'] = ApiConfig.dataverseApiKey;
+        }
         break;
     }
     return requestConfig;

@@ -19,7 +19,11 @@ describe('DatasetsRepository', () => {
 
   const latestVersionId = DatasetNotNumberedVersion.LATEST;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
+  });
+
+  afterEach(async () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
   });
 
@@ -104,6 +108,12 @@ describe('DatasetsRepository', () => {
 
         const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_2_ID, latestVersionId, true);
 
+        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_2_ID);
+      });
+
+      test('should return dataset when it is deaccessioned, includeDeaccessioned param is set, and user is unauthenticated', async () => {
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined);
+        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_2_ID, latestVersionId, true);
         expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_2_ID);
       });
 
