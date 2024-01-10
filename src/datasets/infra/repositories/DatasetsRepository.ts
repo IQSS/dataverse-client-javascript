@@ -8,6 +8,7 @@ import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers';
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
+import { NewDataset } from '../../domain/models/NewDataset';
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number;
@@ -105,5 +106,9 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .catch((error) => {
         throw error;
       });
+  }
+
+  public async createDataset(newDataset: NewDataset): Promise<void> {
+    console.log(newDataset);
   }
 }

@@ -16,6 +16,8 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
+        isRequired: true,
+        displayOrder: 0,
       },
       testField2: {
         name: 'testName2',
@@ -27,6 +29,8 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         multiple: true,
         isControlledVocabulary: false,
         displayFormat: '',
+        isRequired: true,
+        displayOrder: 0,
         childMetadataFields: {
           testField3: {
             name: 'testName3',
@@ -38,6 +42,8 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 0,
           },
           testField4: {
             name: 'testName4',
@@ -49,6 +55,8 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 0,
           },
         },
       },
@@ -72,6 +80,8 @@ export const createMetadataBlockPayload = (): any => {
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
+        isRequired: true,
+        displayOrder: 0,
       },
       testField2: {
         name: 'testName2',
@@ -83,6 +93,8 @@ export const createMetadataBlockPayload = (): any => {
         multiple: true,
         isControlledVocabulary: false,
         displayFormat: '',
+        isRequired: true,
+        displayOrder: 0,
         childFields: {
           testField3: {
             name: 'testName3',
@@ -94,6 +106,8 @@ export const createMetadataBlockPayload = (): any => {
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 0,
           },
           testField4: {
             name: 'testName4',
@@ -105,6 +119,8 @@ export const createMetadataBlockPayload = (): any => {
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 0,
           },
         },
       },

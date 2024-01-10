@@ -14,6 +14,9 @@ export interface MetadataFieldInfo {
   description: string;
   multiple: boolean;
   isControlledVocabulary: boolean;
+  controlledVocabularyValues?: string[];
   displayFormat: string;
   childMetadataFields?: Record<string, MetadataFieldInfo>;
+  isRequired: boolean;
+  displayOrder: number;
 }
