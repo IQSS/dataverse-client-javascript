@@ -1,9 +1,14 @@
-import { Author, DatasetContact, DatasetDescription } from './Dataset';
+import { DatasetMetadataSubField } from './Dataset';
 
 export interface NewDataset {
-  title: string;
-  authors: Author[];
-  contacts: DatasetContact[];
-  descriptions: DatasetDescription[];
-  subjects: string[];
+  metadataBlockValues: NewDatasetMetadataBlockValues[];
 }
+
+export interface NewDatasetMetadataBlockValues {
+  name: string;
+  fields: NewDatasetMetadataFields;
+}
+
+export type NewDatasetMetadataFields = Record<string, NewDatasetMetadataFieldValue>;
+
+export type NewDatasetMetadataFieldValue = string | string[] | DatasetMetadataSubField | DatasetMetadataSubField[];
