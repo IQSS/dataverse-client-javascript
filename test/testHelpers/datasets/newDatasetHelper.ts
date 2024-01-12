@@ -1,7 +1,44 @@
-import { NewDataset } from '../../../src/datasets/domain/models/NewDataset';
+import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/domain/models/NewDataset';
 import { MetadataBlock } from '../../../src';
 
-export const createNewDatasetModel = (): NewDataset => {
+export const createNewDatasetModel = (authorFieldValue?: NewDatasetMetadataFieldValue | string): NewDataset => {
+  const validAuthorFieldValue = [
+    {
+      authorName: 'Admin, Dataverse',
+      authorAffiliation: 'Dataverse.org',
+    },
+    {
+      authorName: 'Owner, Dataverse',
+      authorAffiliation: 'Dataverse.org',
+    },
+  ];
+  return {
+    metadataBlockValues: [
+      {
+        name: 'citation',
+        fields: {
+          title: 'test dataset',
+          author: authorFieldValue !== undefined ? authorFieldValue : validAuthorFieldValue,
+        },
+      },
+    ],
+  };
+};
+
+export const createNewDatasetModelWithoutFirstLevelRequiredField = (): NewDataset => {
+  return {
+    metadataBlockValues: [
+      {
+        name: 'citation',
+        fields: {
+          title: 'test dataset',
+        },
+      },
+    ],
+  };
+};
+
+export const createNewDatasetModelWithoutSecondLevelRequiredField = (): NewDataset => {
   return {
     metadataBlockValues: [
       {
@@ -14,23 +51,9 @@ export const createNewDatasetModel = (): NewDataset => {
               authorAffiliation: 'Dataverse.org',
             },
             {
-              authorName: 'Owner, Dataverse',
               authorAffiliation: 'Dataverse.org',
             },
           ],
-        },
-      },
-    ],
-  };
-};
-
-export const createNewDatasetModelWithoutRequiredField = (): NewDataset => {
-  return {
-    metadataBlockValues: [
-      {
-        name: 'citation',
-        fields: {
-          title: 'test dataset',
         },
       },
     ],
