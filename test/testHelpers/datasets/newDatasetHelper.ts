@@ -24,6 +24,19 @@ export const createNewDatasetModel = (): NewDataset => {
   };
 };
 
+export const createNewDatasetModelWithoutRequiredField = (): NewDataset => {
+  return {
+    metadataBlockValues: [
+      {
+        name: 'citation',
+        fields: {
+          title: 'test dataset',
+        },
+      },
+    ],
+  };
+};
+
 export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
   return {
     id: 1,
