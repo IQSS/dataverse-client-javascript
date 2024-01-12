@@ -1,4 +1,5 @@
 import { NewDataset } from '../../../src/datasets/domain/models/NewDataset';
+import { MetadataBlock } from '../../../src';
 
 export const createNewDatasetModel = (): NewDataset => {
   return {
@@ -20,5 +21,69 @@ export const createNewDatasetModel = (): NewDataset => {
         },
       },
     ],
+  };
+};
+
+export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
+  return {
+    id: 1,
+    name: 'citation',
+    displayName: 'Citation Metadata',
+    metadataFields: {
+      title: {
+        name: 'title',
+        displayName: 'title',
+        title: 'title',
+        type: 'DatasetField',
+        watermark: 'watermark',
+        description: 'description',
+        multiple: false,
+        isControlledVocabulary: false,
+        displayFormat: '#VALUE',
+        isRequired: true,
+        displayOrder: 0,
+      },
+      author: {
+        name: 'author',
+        displayName: 'author',
+        title: 'author',
+        type: 'NONE',
+        watermark: 'watermark',
+        description: 'description',
+        multiple: true,
+        isControlledVocabulary: false,
+        displayFormat: '#VALUE',
+        isRequired: true,
+        displayOrder: 1,
+        childMetadataFields: {
+          authorName: {
+            name: 'authorName',
+            displayName: 'author name',
+            title: 'author name',
+            type: 'TEXT',
+            watermark: 'watermark',
+            description: 'description',
+            multiple: false,
+            isControlledVocabulary: false,
+            displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 2,
+          },
+          authorAffiliation: {
+            name: 'authorAffiliation',
+            displayName: 'author affiliation',
+            title: 'author affiliation',
+            type: 'TEXT',
+            watermark: 'watermark',
+            description: 'descriprion',
+            multiple: false,
+            isControlledVocabulary: false,
+            displayFormat: '#VALUE',
+            isRequired: false,
+            displayOrder: 3,
+          },
+        },
+      },
+    },
   };
 };

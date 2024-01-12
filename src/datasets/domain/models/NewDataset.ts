@@ -1,5 +1,3 @@
-import { DatasetMetadataSubField } from './Dataset';
-
 export interface NewDataset {
   metadataBlockValues: NewDatasetMetadataBlockValues[];
 }
@@ -11,4 +9,10 @@ export interface NewDatasetMetadataBlockValues {
 
 export type NewDatasetMetadataFields = Record<string, NewDatasetMetadataFieldValue>;
 
-export type NewDatasetMetadataFieldValue = string | string[] | DatasetMetadataSubField | DatasetMetadataSubField[];
+export type NewDatasetMetadataFieldValue =
+  | string
+  | string[]
+  | NewDatasetMetadataSubFieldValue
+  | NewDatasetMetadataSubFieldValue[];
+
+export type NewDatasetMetadataSubFieldValue = Record<string, string>;

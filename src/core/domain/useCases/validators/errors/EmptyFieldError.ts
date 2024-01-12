@@ -1,7 +1,7 @@
 import { FieldValidationError } from './FieldValidationError';
 
 export class EmptyFieldError extends FieldValidationError {
-  constructor(field: string) {
-    super(field, 'The field should not be empty.');
+  constructor(metadataFieldName: string, citationBlockName: string, parentMetadataFieldName?: string) {
+    super(metadataFieldName, citationBlockName, parentMetadataFieldName, 'The field should not be empty.');
   }
 }

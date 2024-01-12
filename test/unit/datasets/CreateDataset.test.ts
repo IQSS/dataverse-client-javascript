@@ -20,18 +20,18 @@ describe('execute', () => {
     const createDatasetStub = sandbox.stub();
     datasetsRepositoryStub.createDataset = createDatasetStub;
 
-    const newDatasetValidatorMock = <NewResourceValidator<NewDataset>>{};
-    const validateMock = sandbox.stub().resolves();
-    newDatasetValidatorMock.validate = validateMock;
+    const newDatasetValidatorStub = <NewResourceValidator<NewDataset>>{};
+    const validateStub = sandbox.stub().resolves();
+    newDatasetValidatorStub.validate = validateStub;
 
-    const sut = new CreateDataset(datasetsRepositoryStub, newDatasetValidatorMock);
+    const sut = new CreateDataset(datasetsRepositoryStub, newDatasetValidatorStub);
 
     await sut.execute(testDataset);
 
-    assert.calledWithExactly(validateMock, testDataset);
+    assert.calledWithExactly(validateStub, testDataset);
     assert.calledWithExactly(createDatasetStub, testDataset);
 
-    assert.callOrder(validateMock, createDatasetStub);
+    assert.callOrder(validateStub, createDatasetStub);
   });
 
   test('should throw ResourceValidationError and not call repository when validation is unsuccessful', async () => {
@@ -39,38 +39,38 @@ describe('execute', () => {
     const createDatasetStub = sandbox.stub();
     datasetsRepositoryStub.createDataset = createDatasetStub;
 
-    const newDatasetValidatorMock = <NewResourceValidator<NewDataset>>{};
+    const newDatasetValidatorStub = <NewResourceValidator<NewDataset>>{};
     const testValidationError = new ResourceValidationError('Test error');
-    const validateMock = sandbox.stub().throwsException(testValidationError);
-    newDatasetValidatorMock.validate = validateMock;
+    const validateStub = sandbox.stub().throwsException(testValidationError);
+    newDatasetValidatorStub.validate = validateStub;
 
-    const sut = new CreateDataset(datasetsRepositoryStub, newDatasetValidatorMock);
+    const sut = new CreateDataset(datasetsRepositoryStub, newDatasetValidatorStub);
     let actualError: ResourceValidationError = undefined;
     await sut.execute(testDataset).catch((e) => (actualError = e));
     assert.match(actualError, testValidationError);
 
-    assert.calledWithExactly(validateMock, testDataset);
+    assert.calledWithExactly(validateStub, testDataset);
     assert.notCalled(createDatasetStub);
   });
 
   test('should throw WriteError when validation is successful and repository raises an error', async () => {
-    const datasetsRepositoryMock = <IDatasetsRepository>{};
+    const datasetsRepositoryStub = <IDatasetsRepository>{};
     const testWriteError = new WriteError('Test error');
-    const createDatasetMock = sandbox.stub().throwsException(testWriteError);
-    datasetsRepositoryMock.createDataset = createDatasetMock;
+    const createDatasetStub = sandbox.stub().throwsException(testWriteError);
+    datasetsRepositoryStub.createDataset = createDatasetStub;
 
-    const newDatasetValidatorMock = <NewResourceValidator<NewDataset>>{};
+    const newDatasetValidatorStub = <NewResourceValidator<NewDataset>>{};
     const validateMock = sandbox.stub().resolves();
-    newDatasetValidatorMock.validate = validateMock;
+    newDatasetValidatorStub.validate = validateMock;
 
-    const sut = new CreateDataset(datasetsRepositoryMock, newDatasetValidatorMock);
+    const sut = new CreateDataset(datasetsRepositoryStub, newDatasetValidatorStub);
     let actualError: ResourceValidationError = undefined;
     await sut.execute(testDataset).catch((e) => (actualError = e));
     assert.match(actualError, testWriteError);
 
     assert.calledWithExactly(validateMock, testDataset);
-    assert.calledWithExactly(createDatasetMock, testDataset);
+    assert.calledWithExactly(createDatasetStub, testDataset);
 
-    assert.callOrder(validateMock, createDatasetMock);
+    assert.callOrder(validateMock, createDatasetStub);
   });
 });
