@@ -22,10 +22,6 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
         const metadataFieldInfo: MetadataFieldInfo = metadataBlock.metadataFields[metadataFieldKey];
         const newDatasetMetadataFieldValue: NewDatasetMetadataFieldValue = metadataBlockValues.fields[metadataFieldKey];
 
-        if (metadataFieldInfo.isRequired && newDatasetMetadataFieldValue == undefined) {
-          throw new EmptyFieldError(metadataFieldKey, newDatasetMetadataBlockName);
-        }
-
         this.validateMetadataFieldValueType(
           metadataFieldInfo,
           metadataFieldKey,
@@ -35,17 +31,30 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
 
         if (metadataFieldInfo.childMetadataFields != undefined) {
           // TODO: child fields validation
+          /*  for (const childMetadataFieldKey of Object.keys(metadataFieldInfo.childMetadataFields)) {
+            const childMetadataFieldInfo: MetadataFieldInfo = metadataFieldInfo.childMetadataFields[childMetadataFieldKey];
+            const newDatasetChildMetadataFieldValue: NewDatasetMetadataSubFieldValue | NewDatasetMetadataSubFieldValue[] = newDatasetMetadataFieldValue[childMetadataFieldKey] as NewDatasetMetadataSubFieldValue | string
+            this.validateMetadataFieldValueType(
+              childMetadataFieldInfo,
+              childMetadataFieldKey,
+              newDatasetMetadataFieldValue,
+              newDatasetMetadataBlockName,
+            );
+          } */
         }
       }
     }
   }
 
-  validateMetadataFieldValueType(
+  private validateMetadataFieldValueType(
     metadataFieldInfo: MetadataFieldInfo,
     metadataFieldKey: string,
     newDatasetMetadataFieldValue: NewDatasetMetadataFieldValue,
     newDatasetMetadataBlockName: string,
   ): void {
+    if (metadataFieldInfo.isRequired && newDatasetMetadataFieldValue == undefined) {
+      throw new EmptyFieldError(metadataFieldKey, newDatasetMetadataBlockName);
+    }
     if (metadataFieldInfo.multiple) {
       if (!Array.isArray(newDatasetMetadataFieldValue)) {
         throw this.createValidationError(
@@ -78,6 +87,23 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
           newDatasetMetadataBlockName,
           undefined,
           'The provided array of values is not valid.',
+        );
+      }
+    } else {
+      if (Array.isArray(newDatasetMetadataFieldValue)) {
+        throw this.createValidationError(
+          metadataFieldKey,
+          newDatasetMetadataBlockName,
+          undefined,
+          'Expecting a single field, not an array.',
+        );
+      }
+      if (typeof newDatasetMetadataFieldValue === 'object' && metadataFieldInfo.type !== 'NONE') {
+        throw this.createValidationError(
+          metadataFieldKey,
+          newDatasetMetadataBlockName,
+          undefined,
+          'Expecting a string, not sub fields.',
         );
       }
     }

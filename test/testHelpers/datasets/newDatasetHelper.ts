@@ -2,9 +2,11 @@ import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/
 import { MetadataBlock } from '../../../src';
 
 export const createNewDatasetModel = (
+  titleFieldValue?: NewDatasetMetadataFieldValue | string,
   authorFieldValue?: NewDatasetMetadataFieldValue | string,
   alternativeTitleValue?: NewDatasetMetadataFieldValue | string,
 ): NewDataset => {
+  const validTitle = 'test dataset';
   const validAuthorFieldValue = [
     {
       authorName: 'Admin, Dataverse',
@@ -21,7 +23,7 @@ export const createNewDatasetModel = (
       {
         name: 'citation',
         fields: {
-          title: 'test dataset',
+          title: titleFieldValue !== undefined ? titleFieldValue : validTitle,
           author: authorFieldValue !== undefined ? authorFieldValue : validAuthorFieldValue,
           alternativeTitle: alternativeTitleValue !== undefined ? alternativeTitleValue : validAlternativeTitleValue,
         },

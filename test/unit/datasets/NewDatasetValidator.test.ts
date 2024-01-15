@@ -61,9 +61,32 @@ describe('execute', () => {
     );
   });
 
+  test('should raise an error when the provided field value for an unique field is an array', async () => {
+    const invalidTitleFieldValue = ['title1', 'title2'];
+    const testNewDataset = createNewDatasetModel(invalidTitleFieldValue, undefined, undefined);
+    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      testNewDataset,
+      'title',
+      'There was an error when validating the field title from metadata block citation. Reason was: Expecting a single field, not an array.',
+    );
+  });
+
+  test('should raise an error when the provided field value is an object and the field expects a string', async () => {
+    const invalidTitleFieldValue = {
+      invalidSubfield1: 'invalid value 1',
+      invalidSubfield2: 'invalid value 2',
+    };
+    const testNewDataset = createNewDatasetModel(invalidTitleFieldValue, undefined, undefined);
+    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      testNewDataset,
+      'title',
+      'There was an error when validating the field title from metadata block citation. Reason was: Expecting a string, not sub fields.',
+    );
+  });
+
   test('should raise an error when the provided field value for a multiple field is a string', async () => {
     const invalidAuthorFieldValue = 'invalidValue';
-    const testNewDataset = createNewDatasetModel(invalidAuthorFieldValue);
+    const testNewDataset = createNewDatasetModel(undefined, invalidAuthorFieldValue, undefined);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
       'author',
@@ -73,7 +96,7 @@ describe('execute', () => {
 
   test('should raise an error when the provided field value is an array of strings and the field expects an array of objects', async () => {
     const invalidAuthorFieldValue = ['invalidValue1', 'invalidValue2'];
-    const testNewDataset = createNewDatasetModel(invalidAuthorFieldValue);
+    const testNewDataset = createNewDatasetModel(undefined, invalidAuthorFieldValue, undefined);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
       'author',
@@ -92,7 +115,7 @@ describe('execute', () => {
         invalidSubfield2: 'invalid value 2',
       },
     ];
-    const testNewDataset = createNewDatasetModel(undefined, invalidAlternativeTitleFieldValue);
+    const testNewDataset = createNewDatasetModel(undefined, undefined, invalidAlternativeTitleFieldValue);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
       'alternativeTitle',
