@@ -1,7 +1,10 @@
 import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/domain/models/NewDataset';
 import { MetadataBlock } from '../../../src';
 
-export const createNewDatasetModel = (authorFieldValue?: NewDatasetMetadataFieldValue | string): NewDataset => {
+export const createNewDatasetModel = (
+  authorFieldValue?: NewDatasetMetadataFieldValue | string,
+  alternativeTitleValue?: NewDatasetMetadataFieldValue | string,
+): NewDataset => {
   const validAuthorFieldValue = [
     {
       authorName: 'Admin, Dataverse',
@@ -12,6 +15,7 @@ export const createNewDatasetModel = (authorFieldValue?: NewDatasetMetadataField
       authorAffiliation: 'Dataverse.org',
     },
   ];
+  const validAlternativeTitleValue = ['alternative1', 'alternative2'];
   return {
     metadataBlockValues: [
       {
@@ -19,6 +23,7 @@ export const createNewDatasetModel = (authorFieldValue?: NewDatasetMetadataField
         fields: {
           title: 'test dataset',
           author: authorFieldValue !== undefined ? authorFieldValue : validAuthorFieldValue,
+          alternativeTitle: alternativeTitleValue !== undefined ? alternativeTitleValue : validAlternativeTitleValue,
         },
       },
     ],
@@ -119,6 +124,19 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
             displayOrder: 3,
           },
         },
+      },
+      alternativeTitle: {
+        name: 'alternativeTitle',
+        displayName: 'Alternative Title',
+        title: 'Alternative Title',
+        type: 'TEXT',
+        watermark: '',
+        description: 'Either 1) a title commonly used to refer to the Dataset or 2) an abbreviation of the main title',
+        multiple: true,
+        isControlledVocabulary: false,
+        displayFormat: '',
+        isRequired: true,
+        displayOrder: 4,
       },
     },
   };

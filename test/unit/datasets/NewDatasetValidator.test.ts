@@ -28,6 +28,7 @@ describe('execute', () => {
 
   async function runValidateExpectingFieldValidationError<T extends FieldValidationError>(
     newDataset: NewDataset,
+    expectedMetadataFieldName: string,
     expectedErrorMessage: string,
   ): Promise<void> {
     const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
@@ -39,7 +40,7 @@ describe('execute', () => {
       .catch((error) => {
         const fieldValidationError = error as T;
         assert.match(fieldValidationError.citationBlockName, 'citation');
-        assert.match(fieldValidationError.metadataFieldName, 'author');
+        assert.match(fieldValidationError.metadataFieldName, expectedMetadataFieldName);
         assert.match(fieldValidationError.parentMetadataFieldName, undefined);
         assert.match(fieldValidationError.message, expectedErrorMessage);
       });
@@ -55,6 +56,7 @@ describe('execute', () => {
   test('should raise an empty field error when a first level field is missing', async () => {
     await runValidateExpectingFieldValidationError<EmptyFieldError>(
       createNewDatasetModelWithoutFirstLevelRequiredField(),
+      'author',
       'There was an error when validating the field author from metadata block citation. Reason was: The field should not be empty.',
     );
   });
@@ -64,6 +66,7 @@ describe('execute', () => {
     const testNewDataset = createNewDatasetModel(invalidAuthorFieldValue);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
+      'author',
       'There was an error when validating the field author from metadata block citation. Reason was: Expecting an array of values.',
     );
   });
@@ -73,7 +76,27 @@ describe('execute', () => {
     const testNewDataset = createNewDatasetModel(invalidAuthorFieldValue);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
+      'author',
       'There was an error when validating the field author from metadata block citation. Reason was: Expecting an array of sub fields, not strings',
+    );
+  });
+
+  test('should raise an error when the provided field value is an array of objects and the field expects an array of strings', async () => {
+    const invalidAlternativeTitleFieldValue = [
+      {
+        invalidSubfield1: 'invalid value 1',
+        invalidSubfield2: 'invalid value 2',
+      },
+      {
+        invalidSubfield1: 'invalid value 1',
+        invalidSubfield2: 'invalid value 2',
+      },
+    ];
+    const testNewDataset = createNewDatasetModel(undefined, invalidAlternativeTitleFieldValue);
+    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      testNewDataset,
+      'alternativeTitle',
+      'There was an error when validating the field alternativeTitle from metadata block citation. Reason was: Expecting an array of strings, not sub fields',
     );
   });
 });
