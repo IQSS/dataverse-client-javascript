@@ -7,8 +7,8 @@ import {
 } from '../../testHelpers/datasets/newDatasetHelper';
 import { fail } from 'assert';
 import { IMetadataBlocksRepository } from '../../../src/metadataBlocks/domain/repositories/IMetadataBlocksRepository';
-import { EmptyFieldError } from '../../../src/core/domain/useCases/validators/errors/EmptyFieldError';
-import { FieldValidationError } from '../../../src/core/domain/useCases/validators/errors/FieldValidationError';
+import { EmptyFieldError } from '../../../src/datasets/domain/useCases/validators/errors/EmptyFieldError';
+import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError';
 import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/domain/models/NewDataset';
 
 describe('execute', () => {

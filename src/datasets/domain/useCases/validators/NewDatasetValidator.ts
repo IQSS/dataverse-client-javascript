@@ -8,10 +8,10 @@ import { NewResourceValidator } from '../../../../core/domain/useCases/validator
 import { IMetadataBlocksRepository } from '../../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository';
 import { MetadataFieldInfo } from '../../../../metadataBlocks';
 import { ResourceValidationError } from '../../../../core/domain/useCases/validators/errors/ResourceValidationError';
-import { EmptyFieldError } from '../../../../core/domain/useCases/validators/errors/EmptyFieldError';
-import { FieldValidationError } from '../../../../core/domain/useCases/validators/errors/FieldValidationError';
-import { ControlledVocabularyFieldError } from '../../../../core/domain/useCases/validators/errors/ControlledVocabularyFieldError';
-import { DateFormatFieldError } from '../../../../core/domain/useCases/validators/errors/DateFormatFieldError';
+import { EmptyFieldError } from './errors/EmptyFieldError';
+import { FieldValidationError } from './errors/FieldValidationError';
+import { ControlledVocabularyFieldError } from './errors/ControlledVocabularyFieldError';
+import { DateFormatFieldError } from './errors/DateFormatFieldError';
 
 export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
   private metadataBlockRepository: IMetadataBlocksRepository;

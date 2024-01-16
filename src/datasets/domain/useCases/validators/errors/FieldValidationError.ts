@@ -1,4 +1,4 @@
-import { ResourceValidationError } from './ResourceValidationError';
+import { ResourceValidationError } from '../../../../../core/domain/useCases/validators/errors/ResourceValidationError';
 
 export class FieldValidationError extends ResourceValidationError {
   citationBlockName: string;
