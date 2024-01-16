@@ -49,7 +49,7 @@ describe('execute', () => {
       });
   }
 
-  test('should not raise validation error when new dataset is valid', async () => {
+  test('should not raise a validation error when a new dataset with only the required fields is valid', async () => {
     const testNewDataset = createNewDatasetModel();
     const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
 
@@ -178,5 +178,28 @@ describe('execute', () => {
       'timePeriodCoveredStart',
       'There was an error when validating the field timePeriodCoveredStart from metadata block citation. Reason was: The field requires a valid date format (YYYY-MM-DD).',
     );
+  });
+
+  test('should not raise a date format validation error when a date field has a valid format', async () => {
+    const testNewDataset = createNewDatasetModel(undefined, undefined, undefined, '2020-01-01');
+    const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
+    await sut.validate(testNewDataset).catch((e) => fail(e));
+  });
+
+  test('should raise a controlled vocabulary error when a controlled vocabulary field has an invalid format', async () => {
+    const testNewDataset = createNewDatasetModel(undefined, undefined, undefined, undefined, 'Wrong Value');
+    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      testNewDataset,
+      'contributorType',
+      'There was an error when validating the field contributorType from metadata block citation with parent field contributor. Reason was: The field does not have a valid controlled vocabulary value.',
+      'contributor',
+      0,
+    );
+  });
+
+  test('should not raise a controlled vocabulary error when the value for a controlled vocabulary field is correct', async () => {
+    const testNewDataset = createNewDatasetModel(undefined, undefined, undefined, undefined, 'Project Member');
+    const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
+    await sut.validate(testNewDataset).catch((e) => fail(e));
   });
 });

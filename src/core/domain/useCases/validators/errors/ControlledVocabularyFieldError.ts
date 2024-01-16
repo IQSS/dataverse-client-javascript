@@ -12,7 +12,7 @@ export class ControlledVocabularyFieldError extends FieldValidationError {
       citationBlockName,
       parentMetadataFieldName,
       fieldPosition,
-      'The field does have a valid controlled vocabulary value.',
+      'The field does not have a valid controlled vocabulary value.',
     );
   }
 }
