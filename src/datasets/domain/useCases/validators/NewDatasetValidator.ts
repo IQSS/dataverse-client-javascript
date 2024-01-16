@@ -1,4 +1,4 @@
-import { NewDataset, NewDatasetMetadataFieldValue } from '../../models/NewDataset';
+import { NewDataset, NewDatasetMetadataFieldValue, NewDatasetMetadataChildFieldValue } from '../../models/NewDataset';
 import { NewResourceValidator } from '../../../../core/domain/useCases/validators/NewResourceValidator';
 import { IMetadataBlocksRepository } from '../../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository';
 import { MetadataFieldInfo } from '../../../../metadataBlocks';
@@ -22,7 +22,7 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
         const metadataFieldInfo: MetadataFieldInfo = metadataBlock.metadataFields[metadataFieldKey];
         const newDatasetMetadataFieldValue: NewDatasetMetadataFieldValue = metadataBlockValues.fields[metadataFieldKey];
 
-        this.validateMetadataFieldValueType(
+        this.validateMetadataFieldValue(
           metadataFieldInfo,
           metadataFieldKey,
           newDatasetMetadataFieldValue,
@@ -30,82 +30,162 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
         );
 
         if (metadataFieldInfo.childMetadataFields != undefined) {
-          // TODO: child fields validation
-          /*  for (const childMetadataFieldKey of Object.keys(metadataFieldInfo.childMetadataFields)) {
-            const childMetadataFieldInfo: MetadataFieldInfo = metadataFieldInfo.childMetadataFields[childMetadataFieldKey];
-            const newDatasetChildMetadataFieldValue: NewDatasetMetadataSubFieldValue | NewDatasetMetadataSubFieldValue[] = newDatasetMetadataFieldValue[childMetadataFieldKey] as NewDatasetMetadataSubFieldValue | string
-            this.validateMetadataFieldValueType(
-              childMetadataFieldInfo,
-              childMetadataFieldKey,
-              newDatasetMetadataFieldValue,
+          const childMetadataFieldKeys = Object.keys(metadataFieldInfo.childMetadataFields);
+          if (metadataFieldInfo.multiple) {
+            const newDatasetMetadataFieldChildFieldValues =
+              newDatasetMetadataFieldValue as NewDatasetMetadataChildFieldValue[];
+            for (const metadataChildFieldValue of newDatasetMetadataFieldChildFieldValues) {
+              this.validateChildMetadataFieldValues(
+                childMetadataFieldKeys,
+                metadataFieldInfo,
+                metadataChildFieldValue,
+                newDatasetMetadataBlockName,
+                metadataFieldKey,
+              );
+            }
+          } else {
+            const metadataChildFieldValue = newDatasetMetadataFieldValue as NewDatasetMetadataChildFieldValue;
+            this.validateChildMetadataFieldValues(
+              childMetadataFieldKeys,
+              metadataFieldInfo,
+              metadataChildFieldValue,
               newDatasetMetadataBlockName,
+              metadataFieldKey,
             );
-          } */
+          }
         }
       }
     }
   }
 
-  private validateMetadataFieldValueType(
+  private validateChildMetadataFieldValues(
+    childMetadataFieldKeys: string[],
+    metadataFieldInfo: MetadataFieldInfo,
+    metadataChildFieldValue: Record<string, string>,
+    newDatasetMetadataBlockName: string,
+    metadataParentFieldKey: string,
+  ) {
+    for (const childMetadataFieldKey of childMetadataFieldKeys) {
+      const childMetadataFieldInfo = metadataFieldInfo.childMetadataFields[childMetadataFieldKey];
+      this.validateMetadataFieldValue(
+        childMetadataFieldInfo,
+        childMetadataFieldKey,
+        metadataChildFieldValue[childMetadataFieldKey],
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+      );
+    }
+  }
+
+  private validateMetadataFieldValue(
     metadataFieldInfo: MetadataFieldInfo,
     metadataFieldKey: string,
     newDatasetMetadataFieldValue: NewDatasetMetadataFieldValue,
     newDatasetMetadataBlockName: string,
+    metadataParentFieldKey?: string,
   ): void {
-    if (metadataFieldInfo.isRequired && newDatasetMetadataFieldValue == undefined) {
-      throw new EmptyFieldError(metadataFieldKey, newDatasetMetadataBlockName);
+    if (
+      newDatasetMetadataFieldValue == undefined ||
+      newDatasetMetadataFieldValue == null ||
+      (typeof newDatasetMetadataFieldValue == 'string' && newDatasetMetadataFieldValue.trim() === '')
+    ) {
+      if (metadataFieldInfo.isRequired) {
+        throw new EmptyFieldError(metadataFieldKey, newDatasetMetadataBlockName, metadataParentFieldKey);
+      } else {
+        return;
+      }
     }
     if (metadataFieldInfo.multiple) {
-      if (!Array.isArray(newDatasetMetadataFieldValue)) {
-        throw this.createValidationError(
-          metadataFieldKey,
-          newDatasetMetadataBlockName,
-          undefined,
-          'Expecting an array of values.',
-        );
-      }
-      if (this.isValidArrayType(newDatasetMetadataFieldValue, 'string') && metadataFieldInfo.type === 'NONE') {
-        throw this.createValidationError(
-          metadataFieldKey,
-          newDatasetMetadataBlockName,
-          undefined,
-          'Expecting an array of sub fields, not strings.',
-        );
-      } else if (this.isValidArrayType(newDatasetMetadataFieldValue, 'object') && metadataFieldInfo.type !== 'NONE') {
-        throw this.createValidationError(
-          metadataFieldKey,
-          newDatasetMetadataBlockName,
-          undefined,
-          'Expecting an array of strings, not sub fields.',
-        );
-      } else if (
-        !this.isValidArrayType(newDatasetMetadataFieldValue, 'object') &&
-        !this.isValidArrayType(newDatasetMetadataFieldValue, 'string')
-      ) {
-        throw this.createValidationError(
-          metadataFieldKey,
-          newDatasetMetadataBlockName,
-          undefined,
-          'The provided array of values is not valid.',
-        );
-      }
+      this.validateMultipleMetadataField(
+        newDatasetMetadataFieldValue,
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        metadataFieldInfo,
+      );
     } else {
-      if (Array.isArray(newDatasetMetadataFieldValue)) {
-        throw this.createValidationError(
-          metadataFieldKey,
-          newDatasetMetadataBlockName,
-          undefined,
-          'Expecting a single field, not an array.',
-        );
-      }
-      if (typeof newDatasetMetadataFieldValue === 'object' && metadataFieldInfo.type !== 'NONE') {
-        throw this.createValidationError(
-          metadataFieldKey,
-          newDatasetMetadataBlockName,
-          undefined,
-          'Expecting a string, not sub fields.',
-        );
-      }
+      this.validateSingleMetadataField(
+        newDatasetMetadataFieldValue,
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        metadataFieldInfo,
+      );
+    }
+  }
+
+  private validateMultipleMetadataField(
+    newDatasetMetadataFieldValue: NewDatasetMetadataFieldValue,
+    metadataFieldKey: string,
+    newDatasetMetadataBlockName: string,
+    metadataParentFieldKey: string,
+    metadataFieldInfo: MetadataFieldInfo,
+  ) {
+    if (!Array.isArray(newDatasetMetadataFieldValue)) {
+      throw this.createValidationError(
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        'Expecting an array of values.',
+      );
+    }
+    if (this.isValidArrayType(newDatasetMetadataFieldValue, 'string') && metadataFieldInfo.type === 'NONE') {
+      throw this.createValidationError(
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        'Expecting an array of child fields, not strings.',
+      );
+    } else if (this.isValidArrayType(newDatasetMetadataFieldValue, 'object') && metadataFieldInfo.type !== 'NONE') {
+      throw this.createValidationError(
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        'Expecting an array of strings, not child fields.',
+      );
+    } else if (
+      !this.isValidArrayType(newDatasetMetadataFieldValue, 'object') &&
+      !this.isValidArrayType(newDatasetMetadataFieldValue, 'string')
+    ) {
+      throw this.createValidationError(
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        'The provided array of values is not valid.',
+      );
+    }
+  }
+
+  private validateSingleMetadataField(
+    newDatasetMetadataFieldValue: NewDatasetMetadataFieldValue,
+    metadataFieldKey: string,
+    newDatasetMetadataBlockName: string,
+    metadataParentFieldKey: string,
+    metadataFieldInfo: MetadataFieldInfo,
+  ) {
+    if (Array.isArray(newDatasetMetadataFieldValue)) {
+      throw this.createValidationError(
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        'Expecting a single field, not an array.',
+      );
+    }
+    if (typeof newDatasetMetadataFieldValue === 'object' && metadataFieldInfo.type !== 'NONE') {
+      throw this.createValidationError(
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        'Expecting a string, not child fields.',
+      );
+    }
+    if (typeof newDatasetMetadataFieldValue === 'string' && metadataFieldInfo.type === 'NONE') {
+      throw this.createValidationError(
+        metadataFieldKey,
+        newDatasetMetadataBlockName,
+        metadataParentFieldKey,
+        'Expecting child fields, not a string.',
+      );
     }
   }
 

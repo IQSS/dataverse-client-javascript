@@ -12,7 +12,7 @@ export type NewDatasetMetadataFields = Record<string, NewDatasetMetadataFieldVal
 export type NewDatasetMetadataFieldValue =
   | string
   | string[]
-  | NewDatasetMetadataSubFieldValue
-  | NewDatasetMetadataSubFieldValue[];
+  | NewDatasetMetadataChildFieldValue
+  | NewDatasetMetadataChildFieldValue[];
 
-export type NewDatasetMetadataSubFieldValue = Record<string, string>;
+export type NewDatasetMetadataChildFieldValue = Record<string, string>;

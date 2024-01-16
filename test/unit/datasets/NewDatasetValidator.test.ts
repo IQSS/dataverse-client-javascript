@@ -30,6 +30,7 @@ describe('execute', () => {
     newDataset: NewDataset,
     expectedMetadataFieldName: string,
     expectedErrorMessage: string,
+    expectedParentMetadataFieldName?: string,
   ): Promise<void> {
     const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
     await sut
@@ -41,7 +42,7 @@ describe('execute', () => {
         const fieldValidationError = error as T;
         assert.match(fieldValidationError.citationBlockName, 'citation');
         assert.match(fieldValidationError.metadataFieldName, expectedMetadataFieldName);
-        assert.match(fieldValidationError.parentMetadataFieldName, undefined);
+        assert.match(fieldValidationError.parentMetadataFieldName, expectedParentMetadataFieldName);
         assert.match(fieldValidationError.message, expectedErrorMessage);
       });
   }
@@ -73,14 +74,14 @@ describe('execute', () => {
 
   test('should raise an error when the provided field value is an object and the field expects a string', async () => {
     const invalidTitleFieldValue = {
-      invalidSubfield1: 'invalid value 1',
-      invalidSubfield2: 'invalid value 2',
+      invalidChildField1: 'invalid value 1',
+      invalidChildField2: 'invalid value 2',
     };
     const testNewDataset = createNewDatasetModel(invalidTitleFieldValue, undefined, undefined);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
       'title',
-      'There was an error when validating the field title from metadata block citation. Reason was: Expecting a string, not sub fields.',
+      'There was an error when validating the field title from metadata block citation. Reason was: Expecting a string, not child fields.',
     );
   });
 
@@ -100,26 +101,45 @@ describe('execute', () => {
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
       'author',
-      'There was an error when validating the field author from metadata block citation. Reason was: Expecting an array of sub fields, not strings',
+      'There was an error when validating the field author from metadata block citation. Reason was: Expecting an array of child fields, not strings',
     );
   });
 
   test('should raise an error when the provided field value is an array of objects and the field expects an array of strings', async () => {
     const invalidAlternativeTitleFieldValue = [
       {
-        invalidSubfield1: 'invalid value 1',
-        invalidSubfield2: 'invalid value 2',
+        invalidChildField1: 'invalid value 1',
+        invalidChildField2: 'invalid value 2',
       },
       {
-        invalidSubfield1: 'invalid value 1',
-        invalidSubfield2: 'invalid value 2',
+        invalidChildField1: 'invalid value 1',
+        invalidChildField2: 'invalid value 2',
       },
     ];
     const testNewDataset = createNewDatasetModel(undefined, undefined, invalidAlternativeTitleFieldValue);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
       'alternativeTitle',
-      'There was an error when validating the field alternativeTitle from metadata block citation. Reason was: Expecting an array of strings, not sub fields',
+      'There was an error when validating the field alternativeTitle from metadata block citation. Reason was: Expecting an array of strings, not child fields',
+    );
+  });
+
+  test('should raise an empty field error when a child field is missing', async () => {
+    const invalidAuthorFieldValue = [
+      {
+        authorName: 'Admin, Dataverse',
+        authorAffiliation: 'Dataverse.org',
+      },
+      {
+        authorAffiliation: 'Dataverse.org',
+      },
+    ];
+    const testNewDataset = createNewDatasetModel(undefined, invalidAuthorFieldValue, undefined);
+    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      testNewDataset,
+      'authorName',
+      'There was an error when validating the field authorName from metadata block citation with parent field author. Reason was: The field should not be empty.',
+      'author',
     );
   });
 });
