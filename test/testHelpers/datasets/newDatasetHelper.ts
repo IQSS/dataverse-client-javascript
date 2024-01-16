@@ -2,9 +2,9 @@ import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/
 import { MetadataBlock } from '../../../src';
 
 export const createNewDatasetModel = (
-  titleFieldValue?: NewDatasetMetadataFieldValue | string,
-  authorFieldValue?: NewDatasetMetadataFieldValue | string,
-  alternativeTitleValue?: NewDatasetMetadataFieldValue | string,
+  titleFieldValue?: NewDatasetMetadataFieldValue,
+  authorFieldValue?: NewDatasetMetadataFieldValue,
+  alternativeTitleValue?: NewDatasetMetadataFieldValue,
 ): NewDataset => {
   const validTitle = 'test dataset';
   const validAuthorFieldValue = [

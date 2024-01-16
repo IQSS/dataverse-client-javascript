@@ -9,7 +9,7 @@ import { fail } from 'assert';
 import { IMetadataBlocksRepository } from '../../../src/metadataBlocks/domain/repositories/IMetadataBlocksRepository';
 import { EmptyFieldError } from '../../../src/core/domain/useCases/validators/errors/EmptyFieldError';
 import { FieldValidationError } from '../../../src/core/domain/useCases/validators/errors/FieldValidationError';
-import { NewDataset } from '../../../src/datasets/domain/models/NewDataset';
+import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/domain/models/NewDataset';
 
 describe('execute', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -31,6 +31,7 @@ describe('execute', () => {
     expectedMetadataFieldName: string,
     expectedErrorMessage: string,
     expectedParentMetadataFieldName?: string,
+    expectedPosition?: number,
   ): Promise<void> {
     const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
     await sut
@@ -43,6 +44,7 @@ describe('execute', () => {
         assert.match(fieldValidationError.citationBlockName, 'citation');
         assert.match(fieldValidationError.metadataFieldName, expectedMetadataFieldName);
         assert.match(fieldValidationError.parentMetadataFieldName, expectedParentMetadataFieldName);
+        assert.match(fieldValidationError.fieldPosition, expectedPosition);
         assert.match(fieldValidationError.message, expectedErrorMessage);
       });
   }
@@ -54,9 +56,19 @@ describe('execute', () => {
     await sut.validate(testNewDataset).catch((e) => fail(e));
   });
 
-  test('should raise an empty field error when a first level field is missing', async () => {
+  test('should raise an empty field error when a first level required string field is missing', async () => {
     await runValidateExpectingFieldValidationError<EmptyFieldError>(
       createNewDatasetModelWithoutFirstLevelRequiredField(),
+      'author',
+      'There was an error when validating the field author from metadata block citation. Reason was: The field should not be empty.',
+    );
+  });
+
+  test('should raise an empty field error when a first level required array field is empty', async () => {
+    const invalidAuthorFieldValue : NewDatasetMetadataFieldValue = [];
+    const testNewDataset = createNewDatasetModel(undefined, invalidAuthorFieldValue, undefined);
+    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      testNewDataset,
       'author',
       'There was an error when validating the field author from metadata block citation. Reason was: The field should not be empty.',
     );
@@ -138,8 +150,9 @@ describe('execute', () => {
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
       'authorName',
-      'There was an error when validating the field authorName from metadata block citation with parent field author. Reason was: The field should not be empty.',
+      'There was an error when validating the field authorName from metadata block citation with parent field author in position 1. Reason was: The field should not be empty.',
       'author',
+      1,
     );
   });
 });

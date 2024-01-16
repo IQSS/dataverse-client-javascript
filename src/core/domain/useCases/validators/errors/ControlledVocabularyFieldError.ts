@@ -1,6 +1,6 @@
 import { FieldValidationError } from './FieldValidationError';
 
-export class EmptyFieldError extends FieldValidationError {
+export class ControlledVocabularyFieldError extends FieldValidationError {
   constructor(
     metadataFieldName: string,
     citationBlockName: string,
@@ -12,7 +12,7 @@ export class EmptyFieldError extends FieldValidationError {
       citationBlockName,
       parentMetadataFieldName,
       fieldPosition,
-      'The field should not be empty.',
+      'The field does have a valid controlled vocabulary value.',
     );
   }
 }
