@@ -7,6 +7,9 @@ import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDat
 import { GetDatasetUserPermissions } from './domain/useCases/GetDatasetUserPermissions';
 import { GetDatasetLocks } from './domain/useCases/GetDatasetLocks';
 import { GetAllDatasetPreviews } from './domain/useCases/GetAllDatasetPreviews';
+import { NewDatasetValidator } from './domain/useCases/validators/NewDatasetValidator';
+import { MetadataBlocksRepository } from '../metadataBlocks/infra/repositories/MetadataBlocksRepository';
+import { CreateDataset } from './domain/useCases/CreateDataset';
 
 const datasetsRepository = new DatasetsRepository();
 
@@ -19,6 +22,9 @@ const getDatasetUserPermissions = new GetDatasetUserPermissions(datasetsReposito
 const getDatasetLocks = new GetDatasetLocks(datasetsRepository);
 const getAllDatasetPreviews = new GetAllDatasetPreviews(datasetsRepository);
 
+const newDatasetValidator = new NewDatasetValidator(new MetadataBlocksRepository());
+const createDataset = new CreateDataset(datasetsRepository, newDatasetValidator);
+
 export {
   getDatasetSummaryFieldNames,
   getDataset,
@@ -28,6 +34,7 @@ export {
   getDatasetUserPermissions,
   getDatasetLocks,
   getAllDatasetPreviews,
+  createDataset,
 };
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion';
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions';
