@@ -1,4 +1,9 @@
-import { NewDataset, NewDatasetMetadataFieldValue, NewDatasetMetadataChildFieldValue } from '../../models/NewDataset';
+import {
+  NewDataset,
+  NewDatasetMetadataFieldValue,
+  NewDatasetMetadataChildFieldValue,
+  NewDatasetMetadataBlockValues,
+} from '../../models/NewDataset';
 import { NewResourceValidator } from '../../../../core/domain/useCases/validators/NewResourceValidator';
 import { IMetadataBlocksRepository } from '../../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository';
 import { MetadataFieldInfo } from '../../../../metadataBlocks';
@@ -16,17 +21,20 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
 
   async validate(resource: NewDataset): Promise<void | ResourceValidationError> {
     for (const metadataBlockValues of resource.metadataBlockValues) {
-      const metadataBlockName = metadataBlockValues.name;
+      await this.validateMetadataBlock(metadataBlockValues);
+    }
+  }
 
-      const metadataBlock = await this.metadataBlockRepository.getMetadataBlockByName(metadataBlockName);
-      for (const metadataFieldKey of Object.keys(metadataBlock.metadataFields)) {
-        this.validateMetadataField(
-          metadataBlock.metadataFields[metadataFieldKey],
-          metadataFieldKey,
-          metadataBlockValues.fields[metadataFieldKey],
-          metadataBlockName,
-        );
-      }
+  private async validateMetadataBlock(metadataBlockValues: NewDatasetMetadataBlockValues) {
+    const metadataBlockName = metadataBlockValues.name;
+    const metadataBlock = await this.metadataBlockRepository.getMetadataBlockByName(metadataBlockName);
+    for (const metadataFieldKey of Object.keys(metadataBlock.metadataFields)) {
+      this.validateMetadataField(
+        metadataBlock.metadataFields[metadataFieldKey],
+        metadataFieldKey,
+        metadataBlockValues.fields[metadataFieldKey],
+        metadataBlockName,
+      );
     }
   }
 
