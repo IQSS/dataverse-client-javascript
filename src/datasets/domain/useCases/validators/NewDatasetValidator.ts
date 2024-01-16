@@ -41,8 +41,8 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
     if (
       metadataFieldValue == undefined ||
       metadataFieldValue == null ||
-      (typeof metadataFieldValue == 'string' && metadataFieldValue.trim() === '') ||
-      (Array.isArray(metadataFieldValue) && (metadataFieldValue as Array<NewDatasetMetadataFieldValue>).length == 0)
+      this.isEmptyString(metadataFieldValue) ||
+      this.isEmptyArray(metadataFieldValue)
     ) {
       if (metadataFieldInfo.isRequired) {
         throw new EmptyFieldError(metadataFieldKey, metadataBlockName, metadataParentFieldKey, metadataFieldPosition);
@@ -240,6 +240,14 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
         metadataFieldPosition,
       );
     }
+  }
+
+  private isEmptyString(metadataFieldValue: NewDatasetMetadataFieldValue): boolean {
+    return typeof metadataFieldValue == 'string' && metadataFieldValue.trim() === '';
+  }
+
+  private isEmptyArray(metadataFieldValue: NewDatasetMetadataFieldValue): boolean {
+    return Array.isArray(metadataFieldValue) && (metadataFieldValue as Array<NewDatasetMetadataFieldValue>).length == 0;
   }
 
   private isValidArrayType(
