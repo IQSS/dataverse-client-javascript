@@ -4,7 +4,8 @@ import { MetadataBlock } from '../../../src';
 export const createNewDatasetModel = (
   titleFieldValue?: NewDatasetMetadataFieldValue,
   authorFieldValue?: NewDatasetMetadataFieldValue,
-  alternativeTitleValue?: NewDatasetMetadataFieldValue,
+  alternativeRequiredTitleValue?: NewDatasetMetadataFieldValue,
+  timePeriodCoveredStartValue?: NewDatasetMetadataFieldValue,
 ): NewDataset => {
   const validTitle = 'test dataset';
   const validAuthorFieldValue = [
@@ -17,7 +18,7 @@ export const createNewDatasetModel = (
       authorAffiliation: 'Dataverse.org',
     },
   ];
-  const validAlternativeTitleValue = ['alternative1', 'alternative2'];
+  const validAlternativeRequiredTitleValue = ['alternative1', 'alternative2'];
   return {
     metadataBlockValues: [
       {
@@ -25,7 +26,11 @@ export const createNewDatasetModel = (
         fields: {
           title: titleFieldValue !== undefined ? titleFieldValue : validTitle,
           author: authorFieldValue !== undefined ? authorFieldValue : validAuthorFieldValue,
-          alternativeTitle: alternativeTitleValue !== undefined ? alternativeTitleValue : validAlternativeTitleValue,
+          alternativeRequiredTitle:
+            alternativeRequiredTitleValue !== undefined
+              ? alternativeRequiredTitleValue
+              : validAlternativeRequiredTitleValue,
+          ...(timePeriodCoveredStartValue && { timePeriodCoveredStart: timePeriodCoveredStartValue }),
         },
       },
     ],
@@ -127,9 +132,9 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
           },
         },
       },
-      alternativeTitle: {
-        name: 'alternativeTitle',
-        displayName: 'Alternative Title',
+      alternativeRequiredTitle: {
+        name: 'alternativeRequiredTitle',
+        displayName: 'Alternative Required Title',
         title: 'Alternative Title',
         type: 'TEXT',
         watermark: '',
@@ -138,6 +143,19 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: '',
         isRequired: true,
+        displayOrder: 4,
+      },
+      timePeriodCoveredStart: {
+        name: 'timePeriodCoveredStart',
+        displayName: 'Time Period Start Date',
+        title: 'Start Date',
+        type: 'DATE',
+        watermark: 'YYYY-MM-DD',
+        description: 'The start date of the time period that the data refer to',
+        multiple: false,
+        isControlledVocabulary: false,
+        displayFormat: '#NAME: #VALUE ',
+        isRequired: false,
         displayOrder: 4,
       },
     },

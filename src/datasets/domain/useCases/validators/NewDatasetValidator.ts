@@ -11,6 +11,7 @@ import { ResourceValidationError } from '../../../../core/domain/useCases/valida
 import { EmptyFieldError } from '../../../../core/domain/useCases/validators/errors/EmptyFieldError';
 import { FieldValidationError } from '../../../../core/domain/useCases/validators/errors/FieldValidationError';
 import { ControlledVocabularyFieldError } from '../../../../core/domain/useCases/validators/errors/ControlledVocabularyFieldError';
+import { DateFormatFieldError } from '../../../../core/domain/useCases/validators/errors/DateFormatFieldError';
 
 export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
   private metadataBlockRepository: IMetadataBlocksRepository;
@@ -200,7 +201,19 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
         metadataParentFieldKey,
         metadataFieldPosition,
       );
-    } else if (metadataFieldInfo.childMetadataFields != undefined) {
+    }
+
+    if (metadataFieldInfo.type == 'DATE') {
+      this.validateDateFieldValue(
+        value as string,
+        metadataBlockName,
+        metadataFieldKey,
+        metadataParentFieldKey,
+        metadataFieldPosition,
+      );
+    }
+
+    if (metadataFieldInfo.childMetadataFields != undefined) {
       this.validateChildMetadataFieldValues(
         metadataFieldInfo,
         value as NewDatasetMetadataChildFieldValue,
@@ -221,6 +234,24 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
   ) {
     if (!metadataFieldInfo.controlledVocabularyValues.includes(controledVocabularyValue)) {
       throw new ControlledVocabularyFieldError(
+        metadataFieldKey,
+        metadataBlockName,
+        metadataParentFieldKey,
+        metadataFieldPosition,
+      );
+    }
+  }
+
+  private validateDateFieldValue(
+    dateFieldValue: string,
+    metadataBlockName: string,
+    metadataFieldKey: string,
+    metadataParentFieldKey?: string,
+    metadataFieldPosition?: number,
+  ) {
+    const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateFormatRegex.test(dateFieldValue)) {
+      throw new DateFormatFieldError(
         metadataFieldKey,
         metadataBlockName,
         metadataParentFieldKey,

@@ -65,7 +65,7 @@ describe('execute', () => {
   });
 
   test('should raise an empty field error when a first level required array field is empty', async () => {
-    const invalidAuthorFieldValue : NewDatasetMetadataFieldValue = [];
+    const invalidAuthorFieldValue: NewDatasetMetadataFieldValue = [];
     const testNewDataset = createNewDatasetModel(undefined, invalidAuthorFieldValue, undefined);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
@@ -131,12 +131,12 @@ describe('execute', () => {
     const testNewDataset = createNewDatasetModel(undefined, undefined, invalidAlternativeTitleFieldValue);
     await runValidateExpectingFieldValidationError<FieldValidationError>(
       testNewDataset,
-      'alternativeTitle',
-      'There was an error when validating the field alternativeTitle from metadata block citation. Reason was: Expecting an array of strings, not child fields',
+      'alternativeRequiredTitle',
+      'There was an error when validating the field alternativeRequiredTitle from metadata block citation. Reason was: Expecting an array of strings, not child fields',
     );
   });
 
-  test('should raise an empty field error when a child field is missing', async () => {
+  test('should raise an empty field error when a required child field is missing', async () => {
     const invalidAuthorFieldValue = [
       {
         authorName: 'Admin, Dataverse',
@@ -153,6 +153,30 @@ describe('execute', () => {
       'There was an error when validating the field authorName from metadata block citation with parent field author in position 1. Reason was: The field should not be empty.',
       'author',
       1,
+    );
+  });
+
+  test('should not raise an empty field error when a not required child field is missing', async () => {
+    const authorFieldValue = [
+      {
+        authorName: 'Admin, Dataverse',
+        authorAffiliation: 'Dataverse.org',
+      },
+      {
+        authorName: 'John, Doe',
+      },
+    ];
+    const testNewDataset = createNewDatasetModel(undefined, authorFieldValue, undefined);
+    const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
+    await sut.validate(testNewDataset).catch((e) => fail(e));
+  });
+
+  test('should raise a date format validation error when a date field has an invalid format', async () => {
+    const testNewDataset = createNewDatasetModel(undefined, undefined, undefined, '1-1-2020');
+    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      testNewDataset,
+      'timePeriodCoveredStart',
+      'There was an error when validating the field timePeriodCoveredStart from metadata block citation. Reason was: The field requires a valid date format (YYYY-MM-DD).',
     );
   });
 });
