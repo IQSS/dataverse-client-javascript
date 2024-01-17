@@ -18,6 +18,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
+        typeClass: 'primitive',
       },
       testField2: {
         name: 'testName2',
@@ -31,6 +32,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '',
         isRequired: true,
         displayOrder: 0,
+        typeClass: 'compound',
         childMetadataFields: {
           testField3: {
             name: 'testName3',
@@ -44,6 +46,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
+            typeClass: 'primitive',
           },
           testField4: {
             name: 'testName4',
@@ -57,6 +60,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
+            typeClass: 'primitive',
           },
         },
       },
@@ -82,6 +86,7 @@ export const createMetadataBlockPayload = (): any => {
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
+        typeClass: 'primitive',
       },
       testField2: {
         name: 'testName2',
@@ -95,6 +100,7 @@ export const createMetadataBlockPayload = (): any => {
         displayFormat: '',
         isRequired: true,
         displayOrder: 0,
+        typeClass: 'compound',
         childFields: {
           testField3: {
             name: 'testName3',
@@ -108,6 +114,7 @@ export const createMetadataBlockPayload = (): any => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
+            typeClass: 'primitive',
           },
           testField4: {
             name: 'testName4',
@@ -121,6 +128,7 @@ export const createMetadataBlockPayload = (): any => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
+            typeClass: 'primitive',
           },
         },
       },

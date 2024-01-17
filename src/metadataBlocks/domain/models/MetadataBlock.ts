@@ -10,6 +10,7 @@ export interface MetadataFieldInfo {
   displayName: string;
   title: string;
   type: string;
+  typeClass: string;
   watermark: string;
   description: string;
   multiple: boolean;

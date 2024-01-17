@@ -99,6 +99,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
+        typeClass: 'primitive',
       },
       author: {
         name: 'author',
@@ -112,6 +113,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 1,
+        typeClass: 'compound',
         childMetadataFields: {
           authorName: {
             name: 'authorName',
@@ -125,6 +127,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 2,
+            typeClass: 'primitive',
           },
           authorAffiliation: {
             name: 'authorAffiliation',
@@ -138,6 +141,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: false,
             displayOrder: 3,
+            typeClass: 'primitive',
           },
         },
       },
@@ -153,6 +157,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '',
         isRequired: true,
         displayOrder: 4,
+        typeClass: 'primitive',
       },
       timePeriodCoveredStart: {
         name: 'timePeriodCoveredStart',
@@ -166,6 +171,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '#NAME: #VALUE ',
         isRequired: false,
         displayOrder: 5,
+        typeClass: 'primitive',
       },
       contributor: {
         name: 'contributor',
@@ -180,6 +186,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: ':',
         isRequired: false,
         displayOrder: 6,
+        typeClass: 'compound',
         childMetadataFields: {
           contributorType: {
             name: 'contributorType',
@@ -212,6 +219,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
               'Work Package Leader',
               'Other',
             ],
+            typeClass: 'controlledVocabulary',
           },
           contributorName: {
             name: 'contributorName',
@@ -225,6 +233,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 8,
+            typeClass: 'primitive',
           },
         },
       },
