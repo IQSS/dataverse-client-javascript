@@ -13,6 +13,15 @@ import { FieldValidationError } from './errors/FieldValidationError';
 import { ControlledVocabularyFieldError } from './errors/ControlledVocabularyFieldError';
 import { DateFormatFieldError } from './errors/DateFormatFieldError';
 
+export interface NewDatasetMetadataFieldAndValueInfo {
+  metadataFieldInfo: MetadataFieldInfo;
+  metadataFieldKey: string;
+  metadataFieldValue: NewDatasetMetadataFieldValue;
+  metadataBlockName: string;
+  metadataParentFieldKey?: string;
+  metadataFieldPosition?: number;
+}
+
 export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
   private metadataBlockRepository: IMetadataBlocksRepository;
 
@@ -30,23 +39,18 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
     const metadataBlockName = metadataBlockValues.name;
     const metadataBlock = await this.metadataBlockRepository.getMetadataBlockByName(metadataBlockName);
     for (const metadataFieldKey of Object.keys(metadataBlock.metadataFields)) {
-      this.validateMetadataField(
-        metadataBlock.metadataFields[metadataFieldKey],
-        metadataFieldKey,
-        metadataBlockValues.fields[metadataFieldKey],
-        metadataBlockName,
-      );
+      this.validateMetadataField({
+        metadataFieldInfo: metadataBlock.metadataFields[metadataFieldKey],
+        metadataFieldKey: metadataFieldKey,
+        metadataFieldValue: metadataBlockValues.fields[metadataFieldKey],
+        metadataBlockName: metadataBlockName,
+      });
     }
   }
 
-  private validateMetadataField(
-    metadataFieldInfo: MetadataFieldInfo,
-    metadataFieldKey: string,
-    metadataFieldValue: NewDatasetMetadataFieldValue,
-    metadataBlockName: string,
-    metadataParentFieldKey?: string,
-    metadataFieldPosition?: number,
-  ): void {
+  private validateMetadataField(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo): void {
+    const metadataFieldValue = newDatasetMetadataFieldAndValueInfo.metadataFieldValue;
+    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
     if (
       metadataFieldValue == undefined ||
       metadataFieldValue == null ||
@@ -54,63 +58,37 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
       this.isEmptyArray(metadataFieldValue)
     ) {
       if (metadataFieldInfo.isRequired) {
-        throw new EmptyFieldError(metadataFieldKey, metadataBlockName, metadataParentFieldKey, metadataFieldPosition);
+        throw new EmptyFieldError(
+          newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+          newDatasetMetadataFieldAndValueInfo.metadataBlockName,
+          newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+          newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
+        );
       } else {
         return;
       }
     }
     if (metadataFieldInfo.multiple) {
-      this.validateMultipleMetadataField(
-        metadataFieldValue,
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldInfo,
-        metadataFieldPosition,
-      );
+      this.validateMultipleMetadataField(newDatasetMetadataFieldAndValueInfo);
     } else {
-      this.validateSingleMetadataField(
-        metadataFieldValue,
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldInfo,
-        metadataFieldPosition,
-      );
+      this.validateSingleMetadataField(newDatasetMetadataFieldAndValueInfo);
     }
   }
 
-  private validateMultipleMetadataField(
-    metadataFieldValue: NewDatasetMetadataFieldValue,
-    metadataFieldKey: string,
-    metadataBlockName: string,
-    metadataParentFieldKey: string,
-    metadataFieldInfo: MetadataFieldInfo,
-    metadataFieldPosition: number,
-  ) {
+  private validateMultipleMetadataField(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
+    const metadataFieldValue = newDatasetMetadataFieldAndValueInfo.metadataFieldValue;
+    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
     if (!Array.isArray(metadataFieldValue)) {
-      throw this.createGeneralValidationError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
-        'Expecting an array of values.',
-      );
+      throw this.createGeneralValidationError(newDatasetMetadataFieldAndValueInfo, 'Expecting an array of values.');
     }
     if (this.isValidArrayType(metadataFieldValue, 'string') && metadataFieldInfo.type === 'NONE') {
       throw this.createGeneralValidationError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
+        newDatasetMetadataFieldAndValueInfo,
         'Expecting an array of child fields, not strings.',
       );
     } else if (this.isValidArrayType(metadataFieldValue, 'object') && metadataFieldInfo.type !== 'NONE') {
       throw this.createGeneralValidationError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
+        newDatasetMetadataFieldAndValueInfo,
         'Expecting an array of strings, not child fields.',
       );
     } else if (
@@ -118,166 +96,107 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
       !this.isValidArrayType(metadataFieldValue, 'string')
     ) {
       throw this.createGeneralValidationError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
+        newDatasetMetadataFieldAndValueInfo,
         'The provided array of values is not valid.',
       );
     }
 
     const fieldValues = metadataFieldValue as NewDatasetMetadataFieldValue[];
     fieldValues.forEach((value, metadataFieldPosition) => {
-      this.validateFieldValue(
-        metadataFieldInfo,
-        value,
-        metadataBlockName,
-        metadataFieldKey,
-        metadataParentFieldKey,
-        metadataFieldPosition,
-      );
+      this.validateFieldValue({
+        metadataFieldInfo: metadataFieldInfo,
+        metadataFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+        metadataFieldValue: value,
+        metadataBlockName: newDatasetMetadataFieldAndValueInfo.metadataBlockName,
+        metadataParentFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+        metadataFieldPosition: metadataFieldPosition,
+      });
     });
   }
 
-  private validateSingleMetadataField(
-    metadataFieldValue: NewDatasetMetadataFieldValue,
-    metadataFieldKey: string,
-    metadataBlockName: string,
-    metadataParentFieldKey: string,
-    metadataFieldInfo: MetadataFieldInfo,
-    metadataFieldPosition: number,
-  ) {
+  private validateSingleMetadataField(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
+    const metadataFieldValue = newDatasetMetadataFieldAndValueInfo.metadataFieldValue;
+    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
     if (Array.isArray(metadataFieldValue)) {
       throw this.createGeneralValidationError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
+        newDatasetMetadataFieldAndValueInfo,
         'Expecting a single field, not an array.',
       );
     }
     if (typeof metadataFieldValue === 'object' && metadataFieldInfo.type !== 'NONE') {
       throw this.createGeneralValidationError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
+        newDatasetMetadataFieldAndValueInfo,
         'Expecting a string, not child fields.',
       );
     }
     if (typeof metadataFieldValue === 'string' && metadataFieldInfo.type === 'NONE') {
       throw this.createGeneralValidationError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
+        newDatasetMetadataFieldAndValueInfo,
         'Expecting child fields, not a string.',
       );
     }
-    this.validateFieldValue(
-      metadataFieldInfo,
-      metadataFieldValue,
-      metadataBlockName,
-      metadataFieldKey,
-      metadataParentFieldKey,
-      metadataFieldPosition,
-    );
+    this.validateFieldValue(newDatasetMetadataFieldAndValueInfo);
   }
 
-  private validateFieldValue(
-    metadataFieldInfo: MetadataFieldInfo,
-    value: NewDatasetMetadataFieldValue,
-    metadataBlockName: string,
-    metadataFieldKey: string,
-    metadataParentFieldKey: string,
-    metadataFieldPosition: number,
-  ) {
+  private validateFieldValue(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
+    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
     if (metadataFieldInfo.isControlledVocabulary) {
-      this.validateControlledVocabularyFieldValue(
-        metadataFieldInfo,
-        value as string,
-        metadataBlockName,
-        metadataFieldKey,
-        metadataParentFieldKey,
-        metadataFieldPosition,
-      );
+      this.validateControlledVocabularyFieldValue(newDatasetMetadataFieldAndValueInfo);
     }
 
     if (metadataFieldInfo.type == 'DATE') {
-      this.validateDateFieldValue(
-        value as string,
-        metadataBlockName,
-        metadataFieldKey,
-        metadataParentFieldKey,
-        metadataFieldPosition,
-      );
+      this.validateDateFieldValue(newDatasetMetadataFieldAndValueInfo);
     }
 
     if (metadataFieldInfo.childMetadataFields != undefined) {
-      this.validateChildMetadataFieldValues(
-        metadataFieldInfo,
-        value as NewDatasetMetadataChildFieldValue,
-        metadataBlockName,
-        metadataFieldKey,
-        metadataFieldPosition,
-      );
+      this.validateChildMetadataFieldValues(newDatasetMetadataFieldAndValueInfo);
     }
   }
 
   private validateControlledVocabularyFieldValue(
-    metadataFieldInfo: MetadataFieldInfo,
-    controledVocabularyValue: string,
-    metadataBlockName: string,
-    metadataFieldKey: string,
-    metadataParentFieldKey?: string,
-    metadataFieldPosition?: number,
+    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo,
   ) {
-    if (!metadataFieldInfo.controlledVocabularyValues.includes(controledVocabularyValue)) {
+    if (
+      !newDatasetMetadataFieldAndValueInfo.metadataFieldInfo.controlledVocabularyValues.includes(
+        newDatasetMetadataFieldAndValueInfo.metadataFieldValue as string,
+      )
+    ) {
       throw new ControlledVocabularyFieldError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
+        newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+        newDatasetMetadataFieldAndValueInfo.metadataBlockName,
+        newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+        newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
       );
     }
   }
 
-  private validateDateFieldValue(
-    dateFieldValue: string,
-    metadataBlockName: string,
-    metadataFieldKey: string,
-    metadataParentFieldKey?: string,
-    metadataFieldPosition?: number,
-  ) {
+  private validateDateFieldValue(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
     const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateFormatRegex.test(dateFieldValue)) {
+    if (!dateFormatRegex.test(newDatasetMetadataFieldAndValueInfo.metadataFieldValue as string)) {
       throw new DateFormatFieldError(
-        metadataFieldKey,
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
+        newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+        newDatasetMetadataFieldAndValueInfo.metadataBlockName,
+        newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+        newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
       );
     }
   }
 
-  private validateChildMetadataFieldValues(
-    metadataFieldInfo: MetadataFieldInfo,
-    metadataChildFieldValue: NewDatasetMetadataChildFieldValue,
-    metadataBlockName: string,
-    metadataParentFieldKey: string,
-    metadataFieldPosition?: number,
-  ) {
+  private validateChildMetadataFieldValues(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
+    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
     const childMetadataFieldKeys = Object.keys(metadataFieldInfo.childMetadataFields);
     for (const childMetadataFieldKey of childMetadataFieldKeys) {
       const childMetadataFieldInfo = metadataFieldInfo.childMetadataFields[childMetadataFieldKey];
-      this.validateMetadataField(
-        childMetadataFieldInfo,
-        childMetadataFieldKey,
-        metadataChildFieldValue[childMetadataFieldKey],
-        metadataBlockName,
-        metadataParentFieldKey,
-        metadataFieldPosition,
-      );
+      this.validateMetadataField({
+        metadataFieldInfo: childMetadataFieldInfo,
+        metadataFieldKey: childMetadataFieldKey,
+        metadataFieldValue: (
+          newDatasetMetadataFieldAndValueInfo.metadataFieldValue as NewDatasetMetadataChildFieldValue
+        )[childMetadataFieldKey],
+        metadataBlockName: newDatasetMetadataFieldAndValueInfo.metadataBlockName,
+        metadataParentFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+        metadataFieldPosition: newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
+      });
     }
   }
 
@@ -297,17 +216,14 @@ export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
   }
 
   private createGeneralValidationError(
-    metadataFieldKey: string,
-    metadataBlockName: string,
-    parentMetadataFieldName: string | undefined,
-    metadataFieldPosition: number | undefined,
+    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo,
     reason: string,
   ): FieldValidationError {
     return new FieldValidationError(
-      metadataFieldKey,
-      metadataBlockName,
-      parentMetadataFieldName,
-      metadataFieldPosition,
+      newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+      newDatasetMetadataFieldAndValueInfo.metadataBlockName,
+      newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+      newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
       reason,
     );
   }
