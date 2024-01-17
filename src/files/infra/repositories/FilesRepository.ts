@@ -1,7 +1,7 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository';
-import { File } from '../../domain/models/File';
-import { transformFilesResponseToFiles } from './transformers/fileTransformers';
+import {FilesSubset} from "../../domain/models/FilesSubset";
+import { transformFilesResponseToFilesSubset } from './transformers/fileTransformers';
 import { FileDataTable } from '../../domain/models/FileDataTable';
 import { transformDataTablesResponseToDataTables } from './transformers/fileDataTableTransformers';
 import { FileUserPermissions } from '../../domain/models/FileUserPermissions';
@@ -46,7 +46,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     limit?: number,
     offset?: number,
     fileSearchCriteria?: FileSearchCriteria,
-  ): Promise<File[]> {
+  ): Promise<FilesSubset> {
     const queryParams: GetFilesQueryParams = {
       includeDeaccessioned: includeDeaccessioned,
       orderCriteria: fileOrderCriteria.toString(),
@@ -65,7 +65,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       true,
       queryParams,
     )
-      .then((response) => transformFilesResponseToFiles(response))
+      .then((response) => transformFilesResponseToFilesSubset(response))
       .catch((error) => {
         throw error;
       });

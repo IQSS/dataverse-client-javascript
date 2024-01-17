@@ -2,6 +2,7 @@ import { File } from '../../../src/files/domain/models/File';
 import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
 import { readFile } from 'fs/promises';
+import {FilesSubset} from "../../../src/files/domain/models/FilesSubset";
 
 interface FileMetadata {
   categories?: string[]
@@ -38,6 +39,17 @@ export const createFileModel = (): File => {
   };
 };
 
+export const createManyFilesModel = (amount: number): File[] => {
+  return Array.from({ length: amount }, () => createFileModel());
+}
+
+export const createFilesSubsetModel = (amount: number): FilesSubset => {
+    return {
+        files: createManyFilesModel(amount),
+        totalFilesCount: amount,
+    };
+}
+
 export const createFilePayload = (): any => {
   return {
     label: 'test',
@@ -73,6 +85,10 @@ export const createFilePayload = (): any => {
     },
   };
 };
+
+export const createManyFilesPayload = (amount: number): any[] => {
+    return Array.from({ length: amount }, () => createFilePayload());
+}
 
 export const uploadFileViaApi = async (datasetId: number, fileName: string, fileMetadata?: FileMetadata): Promise<AxiosResponse> => {
   const formData = new FormData();
