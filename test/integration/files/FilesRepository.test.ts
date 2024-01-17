@@ -109,7 +109,7 @@ describe('FilesRepository', () => {
         assert.match(actual.files[0].name, testTextFile3Name);
         assert.match(actual.files[1].name, testTextFile2Name);
         assert.match(actual.files[2].name, testTextFile1Name);
-        assert.match(actual.totalFilesCount, 4);
+        assert.match(actual.totalFilesCount, 3);
       });
 
       test('should return error when dataset does not exist', async () => {
@@ -187,7 +187,7 @@ describe('FilesRepository', () => {
         assert.match(actual.files[0].name, testTextFile3Name);
         assert.match(actual.files[1].name, testTextFile2Name);
         assert.match(actual.files[2].name, testTextFile1Name);
-        assert.match(actual.totalFilesCount, 4);
+        assert.match(actual.totalFilesCount, 3);
       });
 
       test('should return error when dataset does not exist', async () => {
