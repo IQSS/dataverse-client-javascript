@@ -9,8 +9,10 @@ import { DatasetLicense } from '../../../domain/models/Dataset';
 import { MetadataBlock, MetadataFieldInfo } from '../../../../metadataBlocks';
 
 export interface NewDatasetRequestPayload {
-  license?: DatasetLicense;
-  metadataBlocks: Record<string, MetadataBlockRequestPayload>;
+  datasetVersion: {
+    license?: DatasetLicense;
+    metadataBlocks: Record<string, MetadataBlockRequestPayload>;
+  };
 }
 
 export interface MetadataBlockRequestPayload {
@@ -36,8 +38,10 @@ export const transformNewDatasetModelToRequestPayload = (
   metadataBlocks: MetadataBlock[],
 ): NewDatasetRequestPayload => {
   return {
-    ...(newDataset.license && { license: newDataset.license }),
-    metadataBlocks: transformMetadataBlockModelsToRequestPayload(newDataset.metadataBlockValues, metadataBlocks),
+    datasetVersion: {
+      ...(newDataset.license && { license: newDataset.license }),
+      metadataBlocks: transformMetadataBlockModelsToRequestPayload(newDataset.metadataBlockValues, metadataBlocks),
+    },
   };
 };
 
@@ -51,11 +55,11 @@ export const transformMetadataBlockModelsToRequestPayload = (
       (metadataBlock) => metadataBlock.name == metadataBlockValuesModel.name,
     );
     metadataBlocksRequestPayload[metadataBlockValuesModel.name] = {
-      displayName: metadataBlock.displayName,
       fields: transformMetadataFieldModelsToRequestPayload(
         metadataBlockValuesModel.fields,
         metadataBlock.metadataFields,
       ),
+      displayName: metadataBlock.displayName,
     };
   });
   return metadataBlocksRequestPayload;

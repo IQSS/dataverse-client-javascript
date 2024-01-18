@@ -81,6 +81,14 @@ export const createNewDatasetModelWithoutSecondLevelRequiredField = (): NewDatas
   };
 };
 
+/**
+ *
+ * This method creates a simplified and altered version of the Citation Metadata Block, only for testing purposes.
+ * For this reason some of the metadata fields do not correspond to the real ones.
+ *
+ * @returns {MetadataBlock} A MetadataBlock testing instance.
+ *
+ **/
 export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
   return {
     id: 1,
