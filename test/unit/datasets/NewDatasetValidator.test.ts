@@ -10,7 +10,7 @@ import { EmptyFieldError } from '../../../src/datasets/domain/useCases/validator
 import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError';
 import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/domain/models/NewDataset';
 
-describe('execute', () => {
+describe('validate', () => {
   const sandbox: SinonSandbox = createSandbox();
   const testMetadataBlocks = [createNewDatasetMetadataBlockModel()];
 
