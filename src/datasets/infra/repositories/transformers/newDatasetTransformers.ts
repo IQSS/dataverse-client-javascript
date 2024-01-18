@@ -36,7 +36,7 @@ export const transformNewDatasetModelToRequestPayload = (
   metadataBlocks: MetadataBlock[],
 ): NewDatasetRequestPayload => {
   return {
-    license: newDataset.license,
+    ...(newDataset.license && { license: newDataset.license }),
     metadataBlocks: transformMetadataBlockModelsToRequestPayload(newDataset.metadataBlockValues, metadataBlocks),
   };
 };
@@ -46,10 +46,9 @@ export const transformMetadataBlockModelsToRequestPayload = (
   metadataBlocks: MetadataBlock[],
 ): Record<string, MetadataBlockRequestPayload> => {
   let metadataBlocksRequestPayload: Record<string, MetadataBlockRequestPayload> = {};
-  for (const item in metadataBlockValuesModels) {
-    const metadataBlockValuesModel: NewDatasetMetadataBlockValues = item as unknown as NewDatasetMetadataBlockValues;
+  metadataBlockValuesModels.forEach(function (metadataBlockValuesModel: NewDatasetMetadataBlockValues) {
     const metadataBlock: MetadataBlock = metadataBlocks.find(
-      (metadataBlock) => metadataBlock.name === (item as unknown as NewDatasetMetadataBlockValues).name,
+      (metadataBlock) => metadataBlock.name == metadataBlockValuesModel.name,
     );
     metadataBlocksRequestPayload[metadataBlockValuesModel.name] = {
       displayName: metadataBlock.displayName,
@@ -58,7 +57,7 @@ export const transformMetadataBlockModelsToRequestPayload = (
         metadataBlock.metadataFields,
       ),
     };
-  }
+  });
   return metadataBlocksRequestPayload;
 };
 
@@ -87,26 +86,23 @@ export const transformMetadataFieldValueToRequestPayload = (
 ): MetadataFieldRequestPayload => {
   let value: MetadataFieldValueRequestPayload;
   if (Array.isArray(metadataFieldValue)) {
-    if (metadataFieldValue.every((item: unknown) => typeof item === 'string')) {
+    if (typeof metadataFieldValue[0] == 'string') {
       value = metadataFieldValue as string[];
     } else {
       let value: Record<string, MetadataFieldRequestPayload>[] = [];
-      for (const item in metadataFieldValue as NewDatasetMetadataChildFieldValue[]) {
+      metadataFieldValue.forEach(function (metadataFieldValue: NewDatasetMetadataFieldValue) {
         value.push(
           transformMetadataChildFieldValueToRequestPayload(
-            item as unknown as NewDatasetMetadataChildFieldValue,
+            metadataFieldValue as NewDatasetMetadataChildFieldValue,
             metadataFieldInfo,
           ),
         );
-      }
+      });
     }
   } else if (typeof metadataFieldValue == 'string') {
     value = metadataFieldValue;
   } else {
-    value = transformMetadataChildFieldValueToRequestPayload(
-      metadataFieldValue as unknown as NewDatasetMetadataChildFieldValue,
-      metadataFieldInfo,
-    );
+    value = transformMetadataChildFieldValueToRequestPayload(metadataFieldValue, metadataFieldInfo);
   }
   return {
     value: value,
