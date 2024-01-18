@@ -21,9 +21,7 @@ const getPrivateUrlDatasetCitation = new GetPrivateUrlDatasetCitation(datasetsRe
 const getDatasetUserPermissions = new GetDatasetUserPermissions(datasetsRepository);
 const getDatasetLocks = new GetDatasetLocks(datasetsRepository);
 const getAllDatasetPreviews = new GetAllDatasetPreviews(datasetsRepository);
-
-const newDatasetValidator = new NewDatasetValidator(new MetadataBlocksRepository());
-const createDataset = new CreateDataset(datasetsRepository, newDatasetValidator);
+const createDataset = new CreateDataset(datasetsRepository, new MetadataBlocksRepository(), new NewDatasetValidator());
 
 export {
   getDatasetSummaryFieldNames,

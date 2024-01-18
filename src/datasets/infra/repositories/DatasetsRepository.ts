@@ -9,6 +9,7 @@ import { transformDatasetLocksResponseToDatasetLocks } from './transformers/data
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers';
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
 import { NewDataset } from '../../domain/models/NewDataset';
+import { MetadataBlock } from '../../../metadataBlocks';
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number;
@@ -108,7 +109,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async createDataset(newDataset: NewDataset): Promise<void> {
-    console.log(newDataset);
+  public async createDataset(newDataset: NewDataset, datasetMetadataBlocks: MetadataBlock[]): Promise<void> {
+    console.log(newDataset + ' ' + datasetMetadataBlocks.length);
   }
 }

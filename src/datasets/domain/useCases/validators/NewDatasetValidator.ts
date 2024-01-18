@@ -5,8 +5,7 @@ import {
   NewDatasetMetadataBlockValues,
 } from '../../models/NewDataset';
 import { NewResourceValidator } from '../../../../core/domain/useCases/validators/NewResourceValidator';
-import { IMetadataBlocksRepository } from '../../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository';
-import { MetadataFieldInfo } from '../../../../metadataBlocks';
+import { MetadataFieldInfo, MetadataBlock } from '../../../../metadataBlocks';
 import { ResourceValidationError } from '../../../../core/domain/useCases/validators/errors/ResourceValidationError';
 import { EmptyFieldError } from './errors/EmptyFieldError';
 import { FieldValidationError } from './errors/FieldValidationError';
@@ -22,22 +21,21 @@ export interface NewDatasetMetadataFieldAndValueInfo {
   metadataFieldPosition?: number;
 }
 
-export class NewDatasetValidator implements NewResourceValidator<NewDataset> {
-  private metadataBlockRepository: IMetadataBlocksRepository;
-
-  constructor(metadataBlockRepository: IMetadataBlocksRepository) {
-    this.metadataBlockRepository = metadataBlockRepository;
-  }
-
-  async validate(resource: NewDataset): Promise<void | ResourceValidationError> {
+export class NewDatasetValidator implements NewResourceValidator {
+  async validate(resource: NewDataset, metadataBlocks: MetadataBlock[]): Promise<void | ResourceValidationError> {
     for (const metadataBlockValues of resource.metadataBlockValues) {
-      await this.validateMetadataBlock(metadataBlockValues);
+      await this.validateMetadataBlock(metadataBlockValues, metadataBlocks);
     }
   }
 
-  private async validateMetadataBlock(metadataBlockValues: NewDatasetMetadataBlockValues) {
+  private async validateMetadataBlock(
+    metadataBlockValues: NewDatasetMetadataBlockValues,
+    metadataBlocks: MetadataBlock[],
+  ) {
     const metadataBlockName = metadataBlockValues.name;
-    const metadataBlock = await this.metadataBlockRepository.getMetadataBlockByName(metadataBlockName);
+    const metadataBlock: MetadataBlock = metadataBlocks.find(
+      (metadataBlock) => metadataBlock.name === metadataBlockName,
+    );
     for (const metadataFieldKey of Object.keys(metadataBlock.metadataFields)) {
       this.validateMetadataField({
         metadataFieldInfo: metadataBlock.metadataFields[metadataFieldKey],

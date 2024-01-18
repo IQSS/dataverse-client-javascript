@@ -6,25 +6,17 @@ import {
   createNewDatasetModelWithoutFirstLevelRequiredField,
 } from '../../testHelpers/datasets/newDatasetHelper';
 import { fail } from 'assert';
-import { IMetadataBlocksRepository } from '../../../src/metadataBlocks/domain/repositories/IMetadataBlocksRepository';
 import { EmptyFieldError } from '../../../src/datasets/domain/useCases/validators/errors/EmptyFieldError';
 import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError';
 import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/domain/models/NewDataset';
 
 describe('execute', () => {
   const sandbox: SinonSandbox = createSandbox();
+  const testMetadataBlocks = [createNewDatasetMetadataBlockModel()];
 
   afterEach(() => {
     sandbox.restore();
   });
-
-  function setupMetadataBlocksRepositoryStub(): IMetadataBlocksRepository {
-    const testMetadataBlock = createNewDatasetMetadataBlockModel();
-    const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{};
-    const getMetadataBlockByNameStub = sandbox.stub().resolves(testMetadataBlock);
-    metadataBlocksRepositoryStub.getMetadataBlockByName = getMetadataBlockByNameStub;
-    return metadataBlocksRepositoryStub;
-  }
 
   async function runValidateExpectingFieldValidationError<T extends FieldValidationError>(
     newDataset: NewDataset,
@@ -33,9 +25,9 @@ describe('execute', () => {
     expectedParentMetadataFieldName?: string,
     expectedPosition?: number,
   ): Promise<void> {
-    const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
+    const sut = new NewDatasetValidator();
     await sut
-      .validate(newDataset)
+      .validate(newDataset, testMetadataBlocks)
       .then(() => {
         fail('Validation should fail');
       })
@@ -51,9 +43,9 @@ describe('execute', () => {
 
   test('should not raise a validation error when a new dataset with only the required fields is valid', async () => {
     const testNewDataset = createNewDatasetModel();
-    const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
+    const sut = new NewDatasetValidator();
 
-    await sut.validate(testNewDataset).catch((e) => fail(e));
+    await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
   });
 
   test('should raise an empty field error when a first level required string field is missing', async () => {
@@ -167,8 +159,8 @@ describe('execute', () => {
       },
     ];
     const testNewDataset = createNewDatasetModel(undefined, authorFieldValue, undefined);
-    const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
-    await sut.validate(testNewDataset).catch((e) => fail(e));
+    const sut = new NewDatasetValidator();
+    await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
   });
 
   test('should raise a date format validation error when a date field has an invalid format', async () => {
@@ -182,8 +174,8 @@ describe('execute', () => {
 
   test('should not raise a date format validation error when a date field has a valid format', async () => {
     const testNewDataset = createNewDatasetModel(undefined, undefined, undefined, '2020-01-01');
-    const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
-    await sut.validate(testNewDataset).catch((e) => fail(e));
+    const sut = new NewDatasetValidator();
+    await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
   });
 
   test('should raise a controlled vocabulary error when a controlled vocabulary field has an invalid format', async () => {
@@ -199,7 +191,7 @@ describe('execute', () => {
 
   test('should not raise a controlled vocabulary error when the value for a controlled vocabulary field is correct', async () => {
     const testNewDataset = createNewDatasetModel(undefined, undefined, undefined, undefined, 'Project Member');
-    const sut = new NewDatasetValidator(setupMetadataBlocksRepositoryStub());
-    await sut.validate(testNewDataset).catch((e) => fail(e));
+    const sut = new NewDatasetValidator();
+    await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
   });
 });

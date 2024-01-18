@@ -1,4 +1,7 @@
+import { DatasetLicense } from './Dataset';
+
 export interface NewDataset {
+  license?: DatasetLicense;
   metadataBlockValues: NewDatasetMetadataBlockValues[];
 }
 
