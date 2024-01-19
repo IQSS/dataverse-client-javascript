@@ -46,17 +46,17 @@ export const transformNewDatasetModelToRequestPayload = (
 };
 
 export const transformMetadataBlockModelsToRequestPayload = (
-  metadataBlockValuesModels: NewDatasetMetadataBlockValues[],
+  newDatasetMetadataBlocksValues: NewDatasetMetadataBlockValues[],
   metadataBlocks: MetadataBlock[],
 ): Record<string, MetadataBlockRequestPayload> => {
   let metadataBlocksRequestPayload: Record<string, MetadataBlockRequestPayload> = {};
-  metadataBlockValuesModels.forEach(function (metadataBlockValuesModel: NewDatasetMetadataBlockValues) {
+  newDatasetMetadataBlocksValues.forEach(function (newDatasetMetadataBlockValues: NewDatasetMetadataBlockValues) {
     const metadataBlock: MetadataBlock = metadataBlocks.find(
-      (metadataBlock) => metadataBlock.name == metadataBlockValuesModel.name,
+      (metadataBlock) => metadataBlock.name == newDatasetMetadataBlockValues.name,
     );
-    metadataBlocksRequestPayload[metadataBlockValuesModel.name] = {
+    metadataBlocksRequestPayload[newDatasetMetadataBlockValues.name] = {
       fields: transformMetadataFieldModelsToRequestPayload(
-        metadataBlockValuesModel.fields,
+        newDatasetMetadataBlockValues.fields,
         metadataBlock.metadataFields,
       ),
       displayName: metadataBlock.displayName,
@@ -66,64 +66,67 @@ export const transformMetadataBlockModelsToRequestPayload = (
 };
 
 export const transformMetadataFieldModelsToRequestPayload = (
-  metadataFieldsModel: NewDatasetMetadataFields,
-  metadataFields: Record<string, MetadataFieldInfo>,
+  newDatasetMetadataFields: NewDatasetMetadataFields,
+  metadataBlockFields: Record<string, MetadataFieldInfo>,
 ): MetadataFieldRequestPayload[] => {
   let metadataFieldsRequestPayload: MetadataFieldRequestPayload[] = [];
-  for (const metadataFieldKey of Object.keys(metadataFieldsModel)) {
-    const metadataFieldValue: NewDatasetMetadataFieldValue = metadataFieldsModel[metadataFieldKey];
-    metadataFieldsRequestPayload.push(
-      transformMetadataFieldValueToRequestPayload(
-        metadataFieldValue,
-        metadataFieldKey,
-        metadataFields[metadataFieldKey],
+  for (const metadataFieldKey of Object.keys(newDatasetMetadataFields)) {
+    const newDatasetMetadataChildFieldValue: NewDatasetMetadataFieldValue = newDatasetMetadataFields[metadataFieldKey];
+    metadataFieldsRequestPayload.push({
+      value: transformMetadataFieldValueToRequestPayload(
+        newDatasetMetadataChildFieldValue,
+        metadataBlockFields[metadataFieldKey],
       ),
-    );
+      typeClass: metadataBlockFields[metadataFieldKey].typeClass,
+      multiple: metadataBlockFields[metadataFieldKey].multiple,
+      typeName: metadataFieldKey,
+    });
   }
   return metadataFieldsRequestPayload;
 };
 
 export const transformMetadataFieldValueToRequestPayload = (
-  metadataFieldValue: NewDatasetMetadataFieldValue,
-  metadataFieldKey: string,
-  metadataFieldInfo: MetadataFieldInfo,
-): MetadataFieldRequestPayload => {
+  newDatasetMetadataFieldValue: NewDatasetMetadataFieldValue,
+  metadataBlockFieldInfo: MetadataFieldInfo,
+): MetadataFieldValueRequestPayload => {
   let value: MetadataFieldValueRequestPayload;
-  if (Array.isArray(metadataFieldValue)) {
-    if (typeof metadataFieldValue[0] == 'string') {
-      value = metadataFieldValue as string[];
+  if (metadataBlockFieldInfo.multiple) {
+    const newDatasetMetadataChildFieldValues = newDatasetMetadataFieldValue as
+      | string[]
+      | NewDatasetMetadataChildFieldValue[];
+    if (typeof newDatasetMetadataChildFieldValues[0] == 'string') {
+      value = newDatasetMetadataFieldValue as string[];
     } else {
-      let value: Record<string, MetadataFieldRequestPayload>[] = [];
-      metadataFieldValue.forEach(function (metadataFieldValue: NewDatasetMetadataFieldValue) {
-        value.push(
-          transformMetadataChildFieldValueToRequestPayload(
-            metadataFieldValue as NewDatasetMetadataChildFieldValue,
-            metadataFieldInfo,
-          ),
+      value = [];
+      (newDatasetMetadataChildFieldValues as NewDatasetMetadataChildFieldValue[]).forEach(function (
+        childMetadataFieldValue: NewDatasetMetadataChildFieldValue,
+      ) {
+        (value as Record<string, MetadataFieldRequestPayload>[]).push(
+          transformMetadataChildFieldValueToRequestPayload(childMetadataFieldValue, metadataBlockFieldInfo),
         );
       });
     }
-  } else if (typeof metadataFieldValue == 'string') {
-    value = metadataFieldValue;
   } else {
-    value = transformMetadataChildFieldValueToRequestPayload(metadataFieldValue, metadataFieldInfo);
+    if (typeof newDatasetMetadataFieldValue == 'string') {
+      value = newDatasetMetadataFieldValue;
+    } else {
+      value = transformMetadataChildFieldValueToRequestPayload(
+        newDatasetMetadataFieldValue as NewDatasetMetadataChildFieldValue,
+        metadataBlockFieldInfo,
+      );
+    }
   }
-  return {
-    value: value,
-    typeClass: metadataFieldInfo.typeClass,
-    multiple: metadataFieldInfo.multiple,
-    typeName: metadataFieldKey,
-  };
+  return value;
 };
 
 export const transformMetadataChildFieldValueToRequestPayload = (
-  metadataFieldValue: NewDatasetMetadataChildFieldValue,
-  metadataFieldInfo: MetadataFieldInfo,
+  newDatasetMetadataChildFieldValue: NewDatasetMetadataChildFieldValue,
+  metadataBlockFieldInfo: MetadataFieldInfo,
 ): Record<string, MetadataFieldRequestPayload> => {
   let metadataChildFieldRequestPayload: Record<string, MetadataFieldRequestPayload> = {};
-  for (const metadataChildFieldKey of Object.keys(metadataFieldValue)) {
-    const childMetadataFieldInfo: MetadataFieldInfo = metadataFieldInfo.childMetadataFields[metadataChildFieldKey];
-    const value: string = metadataFieldValue[metadataChildFieldKey] as unknown as string;
+  for (const metadataChildFieldKey of Object.keys(newDatasetMetadataChildFieldValue)) {
+    const childMetadataFieldInfo: MetadataFieldInfo = metadataBlockFieldInfo.childMetadataFields[metadataChildFieldKey];
+    const value: string = newDatasetMetadataChildFieldValue[metadataChildFieldKey] as unknown as string;
     metadataChildFieldRequestPayload[metadataChildFieldKey] = {
       value: value,
       typeClass: childMetadataFieldInfo.typeClass,
@@ -131,5 +134,6 @@ export const transformMetadataChildFieldValueToRequestPayload = (
       typeName: metadataChildFieldKey,
     };
   }
+
   return metadataChildFieldRequestPayload;
 };
