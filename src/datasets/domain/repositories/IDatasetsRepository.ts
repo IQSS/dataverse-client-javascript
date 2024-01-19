@@ -4,6 +4,7 @@ import { DatasetLock } from '../models/DatasetLock';
 import { DatasetPreviewSubset } from '../models/DatasetPreviewSubset';
 import { NewDataset } from '../models/NewDataset';
 import { MetadataBlock } from '../../../metadataBlocks';
+import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers';
 
 export interface IDatasetsRepository {
   getDatasetSummaryFieldNames(): Promise<string[]>;
