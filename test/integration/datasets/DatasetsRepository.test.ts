@@ -12,6 +12,8 @@ import { DatasetNotNumberedVersion, DatasetLockType, DatasetPreviewSubset } from
 import { fail } from 'assert';
 import { ApiConfig } from '../../../src';
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
+import { NewDataset } from '../../../src/datasets/domain/models/NewDataset';
+import { MetadataBlocksRepository } from '../../../src/metadataBlocks/infra/repositories/MetadataBlocksRepository';
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository();
@@ -241,6 +243,56 @@ describe('DatasetsRepository', () => {
         true,
       );
       expect(typeof actualDatasetCitation).toBe('string');
+    });
+  });
+
+  describe('createDataset', () => {
+    const testNewDatasetTitle = 'Dataset created using the createDataset use case';
+    const testNewDataset: NewDataset = {
+      metadataBlockValues: [
+        {
+          name: 'citation',
+          fields: {
+            title: testNewDatasetTitle,
+            author: [
+              {
+                authorName: 'Admin, Dataverse',
+                authorAffiliation: 'Dataverse.org',
+              },
+              {
+                authorName: 'Owner, Dataverse',
+                authorAffiliation: 'Dataverse.org',
+              },
+            ],
+            datasetContact: [
+              {
+                datasetContactEmail: 'finch@mailinator.com',
+                datasetContactName: 'Finch, Fiona',
+              },
+            ],
+            dsDescription: [
+              {
+                dsDescriptionValue: 'This is the description of the dataset.',
+              },
+            ],
+            subject: ['Medicine, Health and Life Sciences'],
+          },
+        },
+      ],
+    };
+
+    test('should create a dataset', async () => {
+      const metadataBlocksRepository = new MetadataBlocksRepository();
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName('citation');
+
+      await sut.createDataset(testNewDataset, [citationMetadataBlock], 'root').catch(() => {
+        assert.fail('Error while creating the Dataset');
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const actualCreatedDataset = await sut.getDataset(4, latestVersionId, false);
+      expect(actualCreatedDataset.metadataBlocks[0].fields.title).toBe(testNewDatasetTitle);
     });
   });
 });
