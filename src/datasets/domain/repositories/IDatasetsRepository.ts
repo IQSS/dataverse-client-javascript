@@ -14,5 +14,5 @@ export interface IDatasetsRepository {
   getDatasetUserPermissions(datasetId: number | string): Promise<DatasetUserPermissions>;
   getDatasetLocks(datasetId: number | string): Promise<DatasetLock[]>;
   getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreviewSubset>;
-  createDataset(newDataset: NewDataset, datasetMetadataBlocks: MetadataBlock[], collectionId: string): Promise<void>;
+  createDataset(newDataset: NewDataset, datasetMetadataBlocks: MetadataBlock[], collectionId: string): Promise<CreatedDatasetIdentifiers>;
 }

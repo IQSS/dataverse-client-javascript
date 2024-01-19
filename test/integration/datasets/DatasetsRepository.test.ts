@@ -14,6 +14,7 @@ import { ApiConfig } from '../../../src';
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import { NewDataset } from '../../../src/datasets/domain/models/NewDataset';
 import { MetadataBlocksRepository } from '../../../src/metadataBlocks/infra/repositories/MetadataBlocksRepository';
+import { Author, DatasetContact, DatasetDescription } from '../../../src/datasets/domain/models/Dataset';
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository();
@@ -247,52 +248,75 @@ describe('DatasetsRepository', () => {
   });
 
   describe('createDataset', () => {
-    const testNewDatasetTitle = 'Dataset created using the createDataset use case';
-    const testNewDataset: NewDataset = {
-      metadataBlockValues: [
-        {
-          name: 'citation',
-          fields: {
-            title: testNewDatasetTitle,
-            author: [
-              {
-                authorName: 'Admin, Dataverse',
-                authorAffiliation: 'Dataverse.org',
-              },
-              {
-                authorName: 'Owner, Dataverse',
-                authorAffiliation: 'Dataverse.org',
-              },
-            ],
-            datasetContact: [
-              {
-                datasetContactEmail: 'finch@mailinator.com',
-                datasetContactName: 'Finch, Fiona',
-              },
-            ],
-            dsDescription: [
-              {
-                dsDescriptionValue: 'This is the description of the dataset.',
-              },
-            ],
-            subject: ['Medicine, Health and Life Sciences'],
-          },
-        },
-      ],
-    };
+    test('should create a dataset with the provided dataset citation fields', async () => {
+      const testTitle = 'Dataset created using the createDataset use case';
+      const testAuthorName1 = 'Admin, Dataverse';
+      const testAuthorName2 = 'Owner, Dataverse';
+      const testAuthorAffiliation1 = 'Dataverse.org';
+      const testAuthorAffiliation2 = 'Dataversedemo.org';
+      const testContactEmail = 'finch@mailinator.com';
+      const testContactName = 'Finch, Fiona';
+      const testDescription = 'This is the description of the dataset.';
+      const testSubject = ['Medicine, Health and Life Sciences'];
 
-    test('should create a dataset', async () => {
+      const testNewDataset: NewDataset = {
+        metadataBlockValues: [
+          {
+            name: 'citation',
+            fields: {
+              title: testTitle,
+              author: [
+                {
+                  authorName: testAuthorName1,
+                  authorAffiliation: testAuthorAffiliation1,
+                },
+                {
+                  authorName: testAuthorName2,
+                  authorAffiliation: testAuthorAffiliation2,
+                },
+              ],
+              datasetContact: [
+                {
+                  datasetContactEmail: testContactEmail,
+                  datasetContactName: testContactName,
+                },
+              ],
+              dsDescription: [
+                {
+                  dsDescriptionValue: testDescription,
+                },
+              ],
+              subject: testSubject,
+            },
+          },
+        ],
+      };
+
       const metadataBlocksRepository = new MetadataBlocksRepository();
       const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName('citation');
+      const createdDataset = await sut.createDataset(testNewDataset, [citationMetadataBlock], 'root');
+      const actualCreatedDataset = await sut.getDataset(createdDataset.numericId, latestVersionId, false);
 
-      await sut.createDataset(testNewDataset, [citationMetadataBlock], 'root').catch(() => {
-        assert.fail('Error while creating the Dataset');
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const actualCreatedDataset = await sut.getDataset(4, latestVersionId, false);
-      expect(actualCreatedDataset.metadataBlocks[0].fields.title).toBe(testNewDatasetTitle);
+      expect(actualCreatedDataset.metadataBlocks[0].fields.title).toBe(testTitle);
+      expect((actualCreatedDataset.metadataBlocks[0].fields.author[0] as Author).authorName).toBe(testAuthorName1);
+      expect((actualCreatedDataset.metadataBlocks[0].fields.author[0] as Author).authorAffiliation).toBe(
+        testAuthorAffiliation1,
+      );
+      expect((actualCreatedDataset.metadataBlocks[0].fields.author[1] as Author).authorName).toBe(testAuthorName2);
+      expect((actualCreatedDataset.metadataBlocks[0].fields.author[1] as Author).authorAffiliation).toBe(
+        testAuthorAffiliation2,
+      );
+      expect(
+        (actualCreatedDataset.metadataBlocks[0].fields.datasetContact[0] as DatasetContact).datasetContactEmail,
+      ).toBe(testContactEmail);
+      expect(
+        (actualCreatedDataset.metadataBlocks[0].fields.datasetContact[0] as DatasetContact).datasetContactName,
+      ).toBe(testContactName);
+      expect(
+        (actualCreatedDataset.metadataBlocks[0].fields.dsDescription[0] as DatasetDescription).dsDescriptionValue,
+      ).toBe(testDescription);
+      expect(actualCreatedDataset.metadataBlocks[0].fields.subject[0]).toBe(testSubject[0]);
+      expect(actualCreatedDataset.metadataBlocks[0].fields.subject[1]).toBe(testSubject[1]);
     });
   });
 });

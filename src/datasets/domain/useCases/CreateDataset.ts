@@ -4,8 +4,9 @@ import { NewDataset, NewDatasetMetadataBlockValues } from '../models/NewDataset'
 import { NewResourceValidator } from '../../../core/domain/useCases/validators/NewResourceValidator';
 import { IMetadataBlocksRepository } from '../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository';
 import { MetadataBlock } from '../../../metadataBlocks';
+import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers';
 
-export class CreateDataset implements UseCase<void> {
+export class CreateDataset implements UseCase<CreatedDatasetIdentifiers> {
   private datasetsRepository: IDatasetsRepository;
   private metadataBlocksRepository: IMetadataBlocksRepository;
   private newDatasetValidator: NewResourceValidator;
@@ -20,7 +21,7 @@ export class CreateDataset implements UseCase<void> {
     this.newDatasetValidator = newDatasetValidator;
   }
 
-  async execute(newDataset: NewDataset, collectionId: string = 'root'): Promise<void> {
+  async execute(newDataset: NewDataset, collectionId: string = 'root'): Promise<CreatedDatasetIdentifiers> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(newDataset);
     return await this.newDatasetValidator.validate(newDataset, metadataBlocks).then(async () => {
       return await this.datasetsRepository.createDataset(newDataset, metadataBlocks, collectionId);

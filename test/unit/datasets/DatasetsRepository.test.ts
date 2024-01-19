@@ -613,13 +613,28 @@ describe('DatasetsRepository', () => {
     const testCollectionName = 'test';
     const expectedNewDatasetRequestPayloadJson = JSON.stringify(createNewDatasetRequestPayload());
 
+    const testCreatedDatasetIdentifiers = {
+      persistentId: 'test',
+      numericId: 1,
+    };
+
+    const testCreateDatasetResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          id: testCreatedDatasetIdentifiers.numericId,
+          persistentId: testCreatedDatasetIdentifiers.persistentId,
+        },
+      },
+    };
+
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionName}/datasets`;
 
     test('should call the API with a correct request payload', async () => {
-      const axiosPostStub = sandbox.stub(axios, 'post').resolves();
+      const axiosPostStub = sandbox.stub(axios, 'post').resolves(testCreateDatasetResponse);
 
       // API Key auth
-      await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
+      let actual = await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
 
       assert.calledWithExactly(
         axiosPostStub,
@@ -628,10 +643,12 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
 
+      assert.match(actual, testCreatedDatasetIdentifiers);
+
       // Session cookie auth
       ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
 
-      await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
+      actual = await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
 
       assert.calledWithExactly(
         axiosPostStub,
@@ -639,6 +656,8 @@ describe('DatasetsRepository', () => {
         expectedNewDatasetRequestPayloadJson,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
       );
+
+      assert.match(actual, testCreatedDatasetIdentifiers);
     });
 
     test('should return error result on error response', async () => {

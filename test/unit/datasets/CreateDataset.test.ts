@@ -1,4 +1,5 @@
 import { CreateDataset } from '../../../src/datasets/domain/useCases/CreateDataset';
+import { CreatedDatasetIdentifiers } from '../../../src/datasets/domain/models/CreatedDatasetIdentifiers';
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository';
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { NewResourceValidator } from '../../../src/core/domain/useCases/validators/NewResourceValidator';
@@ -23,9 +24,14 @@ describe('execute', () => {
     return metadataBlocksRepositoryStub;
   }
 
-  test('should call repository when validation is successful', async () => {
+  test('should return new dataset identifiers when validation is successful and repository call is successful', async () => {
+    const testCreatedDatasetIdentifiers: CreatedDatasetIdentifiers = {
+      persistentId: 'test',
+      numericId: 1,
+    };
+
     const datasetsRepositoryStub = <IDatasetsRepository>{};
-    const createDatasetStub = sandbox.stub();
+    const createDatasetStub = sandbox.stub().returns(testCreatedDatasetIdentifiers);
     datasetsRepositoryStub.createDataset = createDatasetStub;
 
     const newDatasetValidatorStub = <NewResourceValidator>{};
@@ -34,10 +40,12 @@ describe('execute', () => {
 
     const sut = new CreateDataset(datasetsRepositoryStub, setupMetadataBlocksRepositoryStub(), newDatasetValidatorStub);
 
-    await sut.execute(testDataset);
+    const actual = await sut.execute(testDataset);
+
+    assert.match(actual, testCreatedDatasetIdentifiers);
 
     assert.calledWithExactly(validateStub, testDataset, testMetadataBlocks);
-    assert.calledWithExactly(createDatasetStub, testDataset, testMetadataBlocks, 'root')
+    assert.calledWithExactly(createDatasetStub, testDataset, testMetadataBlocks, 'root');
 
     assert.callOrder(validateStub, createDatasetStub);
   });

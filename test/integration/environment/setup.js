@@ -51,12 +51,11 @@ async function setupTestFixtures() {
   console.log('Creating test datasets...');
   await createDatasetViaApi(datasetJson1)
     .then()
-    .catch((error) => {
+    .catch(() => {
       console.error('Tests setup: Error while creating test Dataset 1');
     });
   await createDatasetViaApi(datasetJson2)
-    .then()
-    .catch((error) => {
+    .catch(() => {
       console.error('Tests setup: Error while creating test Dataset 2');
     });
   console.log('Test datasets created');

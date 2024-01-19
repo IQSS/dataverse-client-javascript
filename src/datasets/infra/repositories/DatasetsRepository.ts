@@ -11,6 +11,7 @@ import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
 import { NewDataset } from '../../domain/models/NewDataset';
 import { MetadataBlock } from '../../../metadataBlocks';
 import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers';
+import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers';
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number;
@@ -114,12 +115,18 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     newDataset: NewDataset,
     datasetMetadataBlocks: MetadataBlock[],
     collectionId: string,
-  ): Promise<void> {
+  ): Promise<CreatedDatasetIdentifiers> {
     return this.doPost(
       `/dataverses/${collectionId}/datasets`,
       transformNewDatasetModelToRequestPayload(newDataset, datasetMetadataBlocks),
     )
-      .then(() => {})
+      .then((response) => {
+        const responseData = response.data.data;
+        return {
+          persistentId: responseData.persistentId,
+          numericId: responseData.id,
+        };
+      })
       .catch((error) => {
         throw error;
       });
