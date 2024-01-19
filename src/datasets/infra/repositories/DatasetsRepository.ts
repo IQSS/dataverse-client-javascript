@@ -19,7 +19,6 @@ export interface GetAllDatasetPreviewsQueryParams {
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets';
-  private readonly dataversesResourceName: string = 'dataverses';
 
   public async getDatasetSummaryFieldNames(): Promise<string[]> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'summaryFieldNames'))
@@ -117,7 +116,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     collectionId: string,
   ): Promise<void> {
     return this.doPost(
-      this.buildApiEndpoint(this.dataversesResourceName, `datasets`, collectionId),
+      `/dataverses/${collectionId}/datasets`,
       transformNewDatasetModelToRequestPayload(newDataset, datasetMetadataBlocks),
     )
       .then(() => {})

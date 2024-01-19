@@ -22,6 +22,7 @@ import {
   createNewDatasetMetadataBlockModel,
   createNewDatasetRequestPayload,
 } from '../../testHelpers/datasets/newDatasetHelper';
+import { WriteError } from '../../../src';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -615,13 +616,13 @@ describe('DatasetsRepository', () => {
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionName}/datasets`;
 
     test('should call the API with a correct request payload', async () => {
-      const axiosPostMock = sandbox.stub(axios, 'post');
+      const axiosPostStub = sandbox.stub(axios, 'post').resolves();
 
       // API Key auth
       await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
 
       assert.calledWithExactly(
-        axiosPostMock,
+        axiosPostStub,
         expectedApiEndpoint,
         expectedNewDatasetRequestPayloadJson,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
@@ -633,11 +634,26 @@ describe('DatasetsRepository', () => {
       await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
 
       assert.calledWithExactly(
-        axiosPostMock,
+        axiosPostStub,
         expectedApiEndpoint,
         expectedNewDatasetRequestPayloadJson,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
       );
+    });
+
+    test('should return error result on error response', async () => {
+      const axiosPostStub = sandbox.stub(axios, 'post').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+      let error: WriteError = undefined;
+      await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName).catch((e) => (error = e));
+
+      assert.calledWithExactly(
+        axiosPostStub,
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+      expect(error).to.be.instanceOf(Error);
     });
   });
 });
