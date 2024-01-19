@@ -50,3 +50,11 @@ export {
 } from './domain/models/Dataset';
 export { DatasetPreview } from './domain/models/DatasetPreview';
 export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset';
+export {
+  NewDataset,
+  NewDatasetMetadataBlockValues,
+  NewDatasetMetadataFields,
+  NewDatasetMetadataFieldValue,
+  NewDatasetMetadataChildFieldValue,
+} from './domain/models/NewDataset';
+export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers';
