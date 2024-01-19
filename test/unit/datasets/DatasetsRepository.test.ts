@@ -17,6 +17,11 @@ import {
   createDatasetPreviewModel,
   createDatasetPreviewPayload,
 } from '../../testHelpers/datasets/datasetPreviewHelper';
+import {
+  createNewDatasetModel,
+  createNewDatasetMetadataBlockModel,
+  createNewDatasetRequestPayload,
+} from '../../testHelpers/datasets/newDatasetHelper';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -598,6 +603,41 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       expect(error).to.be.instanceOf(Error);
+    });
+  });
+
+  describe('createDataset', () => {
+    const testNewDataset = createNewDatasetModel();
+    const testMetadataBlocks = [createNewDatasetMetadataBlockModel()];
+    const testCollectionName = 'test';
+    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createNewDatasetRequestPayload());
+
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionName}/datasets`;
+
+    test('should call the API with a correct request payload', async () => {
+      const axiosPostMock = sandbox.stub(axios, 'post');
+
+      // API Key auth
+      await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
+
+      assert.calledWithExactly(
+        axiosPostMock,
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
+
+      assert.calledWithExactly(
+        axiosPostMock,
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+      );
     });
   });
 });

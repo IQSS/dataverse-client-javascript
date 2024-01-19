@@ -37,7 +37,7 @@ describe('execute', () => {
     await sut.execute(testDataset);
 
     assert.calledWithExactly(validateStub, testDataset, testMetadataBlocks);
-    assert.calledWithExactly(createDatasetStub, testDataset, testMetadataBlocks);
+    assert.calledWithExactly(createDatasetStub, testDataset, testMetadataBlocks, 'root')
 
     assert.callOrder(validateStub, createDatasetStub);
   });
@@ -77,7 +77,7 @@ describe('execute', () => {
     assert.match(actualError, testWriteError);
 
     assert.calledWithExactly(validateMock, testDataset, testMetadataBlocks);
-    assert.calledWithExactly(createDatasetStub, testDataset, testMetadataBlocks);
+    assert.calledWithExactly(createDatasetStub, testDataset, testMetadataBlocks, 'root');
 
     assert.callOrder(validateMock, createDatasetStub);
   });

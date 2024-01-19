@@ -20,10 +20,10 @@ export class CreateDataset implements UseCase<void> {
     this.newDatasetValidator = newDatasetValidator;
   }
 
-  async execute(newDataset: NewDataset): Promise<void> {
+  async execute(newDataset: NewDataset, collectionId: string = 'root'): Promise<void> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(newDataset);
     return await this.newDatasetValidator.validate(newDataset, metadataBlocks).then(async () => {
-      return await this.datasetsRepository.createDataset(newDataset, metadataBlocks);
+      return await this.datasetsRepository.createDataset(newDataset, metadataBlocks, collectionId);
     });
   }
 

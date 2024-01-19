@@ -10,6 +10,7 @@ import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transf
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
 import { NewDataset } from '../../domain/models/NewDataset';
 import { MetadataBlock } from '../../../metadataBlocks';
+import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers';
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number;
@@ -18,6 +19,7 @@ export interface GetAllDatasetPreviewsQueryParams {
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets';
+  private readonly dataversesResourceName: string = 'dataverses';
 
   public async getDatasetSummaryFieldNames(): Promise<string[]> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'summaryFieldNames'))
@@ -109,7 +111,18 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async createDataset(newDataset: NewDataset, datasetMetadataBlocks: MetadataBlock[]): Promise<void> {
-    console.log(newDataset + ' ' + datasetMetadataBlocks.length);
+  public async createDataset(
+    newDataset: NewDataset,
+    datasetMetadataBlocks: MetadataBlock[],
+    collectionId: string,
+  ): Promise<void> {
+    return this.doPost(
+      this.buildApiEndpoint(this.dataversesResourceName, `datasets`, collectionId),
+      transformNewDatasetModelToRequestPayload(newDataset, datasetMetadataBlocks),
+    )
+      .then(() => {})
+      .catch((error) => {
+        throw error;
+      });
   }
 }
