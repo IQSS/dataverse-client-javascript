@@ -24,50 +24,6 @@ export abstract class BaseMetadataFieldValidator {
     metadataFieldValidator.validate(newDatasetMetadataFieldAndValueInfo);
   }
 
-  protected validateFieldValue(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
-    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
-    if (metadataFieldInfo.isControlledVocabulary) {
-      this.validateControlledVocabularyFieldValue(newDatasetMetadataFieldAndValueInfo);
-    }
-
-    if (metadataFieldInfo.type == 'DATE') {
-      this.validateDateFieldValue(newDatasetMetadataFieldAndValueInfo);
-    }
-
-    if (metadataFieldInfo.childMetadataFields != undefined) {
-      this.validateChildMetadataFieldValues(newDatasetMetadataFieldAndValueInfo);
-    }
-  }
-
-  protected validateControlledVocabularyFieldValue(
-    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo,
-  ) {
-    if (
-      !newDatasetMetadataFieldAndValueInfo.metadataFieldInfo.controlledVocabularyValues.includes(
-        newDatasetMetadataFieldAndValueInfo.metadataFieldValue as string,
-      )
-    ) {
-      throw new ControlledVocabularyFieldError(
-        newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
-        newDatasetMetadataFieldAndValueInfo.metadataBlockName,
-        newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
-        newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
-      );
-    }
-  }
-
-  protected validateDateFieldValue(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
-    const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateFormatRegex.test(newDatasetMetadataFieldAndValueInfo.metadataFieldValue as string)) {
-      throw new DateFormatFieldError(
-        newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
-        newDatasetMetadataFieldAndValueInfo.metadataBlockName,
-        newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
-        newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
-      );
-    }
-  }
-
   protected validateChildMetadataFieldValues(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
     const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
     const childMetadataFieldKeys = Object.keys(metadataFieldInfo.childMetadataFields);
@@ -97,5 +53,49 @@ export abstract class BaseMetadataFieldValidator {
       newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
       reason,
     );
+  }
+
+  protected validateFieldValue(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
+    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
+    if (metadataFieldInfo.isControlledVocabulary) {
+      this.validateControlledVocabularyFieldValue(newDatasetMetadataFieldAndValueInfo);
+    }
+
+    if (metadataFieldInfo.type == 'DATE') {
+      this.validateDateFieldValue(newDatasetMetadataFieldAndValueInfo);
+    }
+
+    if (metadataFieldInfo.childMetadataFields != undefined) {
+      this.validateChildMetadataFieldValues(newDatasetMetadataFieldAndValueInfo);
+    }
+  }
+
+  private validateControlledVocabularyFieldValue(
+    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo,
+  ) {
+    if (
+      !newDatasetMetadataFieldAndValueInfo.metadataFieldInfo.controlledVocabularyValues.includes(
+        newDatasetMetadataFieldAndValueInfo.metadataFieldValue as string,
+      )
+    ) {
+      throw new ControlledVocabularyFieldError(
+        newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+        newDatasetMetadataFieldAndValueInfo.metadataBlockName,
+        newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+        newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
+      );
+    }
+  }
+
+  private validateDateFieldValue(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo) {
+    const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateFormatRegex.test(newDatasetMetadataFieldAndValueInfo.metadataFieldValue as string)) {
+      throw new DateFormatFieldError(
+        newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
+        newDatasetMetadataFieldAndValueInfo.metadataBlockName,
+        newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+        newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
+      );
+    }
   }
 }
