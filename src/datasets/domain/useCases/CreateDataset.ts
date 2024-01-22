@@ -23,20 +23,17 @@ export class CreateDataset implements UseCase<CreatedDatasetIdentifiers> {
 
   async execute(newDataset: NewDatasetDTO, collectionId: string = 'root'): Promise<CreatedDatasetIdentifiers> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(newDataset);
-    return await this.newDatasetValidator.validate(newDataset, metadataBlocks).then(async () => {
-      return await this.datasetsRepository.createDataset(newDataset, metadataBlocks, collectionId);
-    });
+    this.newDatasetValidator.validate(newDataset, metadataBlocks);
+    return this.datasetsRepository.createDataset(newDataset, metadataBlocks, collectionId);
   }
 
   async getNewDatasetMetadataBlocks(newDataset: NewDatasetDTO): Promise<MetadataBlock[]> {
     let metadataBlocks: MetadataBlock[] = [];
-    for (const metadataBlockValue in newDataset.metadataBlockValues) {
-      metadataBlocks.push(
-        await this.metadataBlocksRepository.getMetadataBlockByName(
-          (metadataBlockValue as unknown as NewDatasetMetadataBlockValuesDTO).name,
-        ),
-      );
-    }
+    await Promise.all(
+      newDataset.metadataBlockValues.map(async (metadataBlockValue: NewDatasetMetadataBlockValuesDTO) => {
+        metadataBlocks.push(await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockValue.name));
+      }),
+    );
     return metadataBlocks;
   }
 }

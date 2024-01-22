@@ -5,7 +5,7 @@ import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { NewResourceValidator } from '../../../src/core/domain/useCases/validators/NewResourceValidator';
 import { createNewDatasetDTO, createNewDatasetMetadataBlockModel } from '../../testHelpers/datasets/newDatasetHelper';
 import { ResourceValidationError } from '../../../src/core/domain/useCases/validators/errors/ResourceValidationError';
-import { WriteError } from '../../../src';
+import { WriteError, ReadError } from '../../../src';
 import { IMetadataBlocksRepository } from '../../../src/metadataBlocks/domain/repositories/IMetadataBlocksRepository';
 
 describe('execute', () => {
@@ -16,13 +16,6 @@ describe('execute', () => {
   afterEach(() => {
     sandbox.restore();
   });
-
-  function setupMetadataBlocksRepositoryStub(): IMetadataBlocksRepository {
-    const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{};
-    const getMetadataBlockByNameStub = sandbox.stub().resolves(testMetadataBlocks[0]);
-    metadataBlocksRepositoryStub.getMetadataBlockByName = getMetadataBlockByNameStub;
-    return metadataBlocksRepositoryStub;
-  }
 
   test('should return new dataset identifiers when validation is successful and repository call is successful', async () => {
     const testCreatedDatasetIdentifiers: CreatedDatasetIdentifiers = {
@@ -38,12 +31,17 @@ describe('execute', () => {
     const validateStub = sandbox.stub().resolves();
     newDatasetValidatorStub.validate = validateStub;
 
-    const sut = new CreateDataset(datasetsRepositoryStub, setupMetadataBlocksRepositoryStub(), newDatasetValidatorStub);
+    const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{};
+    const getMetadataBlockByNameStub = sandbox.stub().resolves(testMetadataBlocks[0]);
+    metadataBlocksRepositoryStub.getMetadataBlockByName = getMetadataBlockByNameStub;
+
+    const sut = new CreateDataset(datasetsRepositoryStub, metadataBlocksRepositoryStub, newDatasetValidatorStub);
 
     const actual = await sut.execute(testDataset);
 
     assert.match(actual, testCreatedDatasetIdentifiers);
 
+    assert.calledWithExactly(getMetadataBlockByNameStub, testMetadataBlocks[0].name);
     assert.calledWithExactly(validateStub, testDataset, testMetadataBlocks);
     assert.calledWithExactly(createDatasetStub, testDataset, testMetadataBlocks, 'root');
 
@@ -51,22 +49,27 @@ describe('execute', () => {
   });
 
   test('should throw ResourceValidationError and not call repository when validation is unsuccessful', async () => {
-    const datasetsRepositoryStub = <IDatasetsRepository>{};
-    const createDatasetStub = sandbox.stub();
-    datasetsRepositoryStub.createDataset = createDatasetStub;
+    const datasetsRepositoryMock = <IDatasetsRepository>{};
+    const createDatasetMock = sandbox.stub();
+    datasetsRepositoryMock.createDataset = createDatasetMock;
 
     const newDatasetValidatorStub = <NewResourceValidator>{};
     const testValidationError = new ResourceValidationError('Test error');
     const validateStub = sandbox.stub().throwsException(testValidationError);
     newDatasetValidatorStub.validate = validateStub;
 
-    const sut = new CreateDataset(datasetsRepositoryStub, setupMetadataBlocksRepositoryStub(), newDatasetValidatorStub);
+    const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{};
+    const getMetadataBlockByNameStub = sandbox.stub().resolves(testMetadataBlocks[0]);
+    metadataBlocksRepositoryStub.getMetadataBlockByName = getMetadataBlockByNameStub;
+
+    const sut = new CreateDataset(datasetsRepositoryMock, metadataBlocksRepositoryStub, newDatasetValidatorStub);
     let actualError: ResourceValidationError = undefined;
     await sut.execute(testDataset).catch((e) => (actualError = e));
     assert.match(actualError, testValidationError);
 
+    assert.calledWithExactly(getMetadataBlockByNameStub, testMetadataBlocks[0].name);
     assert.calledWithExactly(validateStub, testDataset, testMetadataBlocks);
-    assert.notCalled(createDatasetStub);
+    assert.notCalled(createDatasetMock);
   });
 
   test('should throw WriteError when validation is successful and repository raises an error', async () => {
@@ -79,14 +82,44 @@ describe('execute', () => {
     const validateMock = sandbox.stub().resolves();
     newDatasetValidatorStub.validate = validateMock;
 
-    const sut = new CreateDataset(datasetsRepositoryStub, setupMetadataBlocksRepositoryStub(), newDatasetValidatorStub);
-    let actualError: ResourceValidationError = undefined;
+    const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{};
+    const getMetadataBlockByNameStub = sandbox.stub().resolves(testMetadataBlocks[0]);
+    metadataBlocksRepositoryStub.getMetadataBlockByName = getMetadataBlockByNameStub;
+
+    const sut = new CreateDataset(datasetsRepositoryStub, metadataBlocksRepositoryStub, newDatasetValidatorStub);
+    let actualError: WriteError = undefined;
     await sut.execute(testDataset).catch((e) => (actualError = e));
     assert.match(actualError, testWriteError);
 
+    assert.calledWithExactly(getMetadataBlockByNameStub, testMetadataBlocks[0].name);
     assert.calledWithExactly(validateMock, testDataset, testMetadataBlocks);
     assert.calledWithExactly(createDatasetStub, testDataset, testMetadataBlocks, 'root');
 
     assert.callOrder(validateMock, createDatasetStub);
+  });
+
+  test('should throw ReadError when metadata blocks repository raises an error', async () => {
+    const datasetsRepositoryMock = <IDatasetsRepository>{};
+    const createDatasetMock = sandbox.stub();
+    datasetsRepositoryMock.createDataset = createDatasetMock;
+
+    const newDatasetValidatorMock = <NewResourceValidator>{};
+    const validateMock = sandbox.stub().resolves();
+    newDatasetValidatorMock.validate = validateMock;
+
+    const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{};
+    const testReadError = new ReadError('Test error');
+    const getMetadataBlockByNameStub = sandbox.stub().throwsException(testReadError);
+    metadataBlocksRepositoryStub.getMetadataBlockByName = getMetadataBlockByNameStub;
+
+    const sut = new CreateDataset(datasetsRepositoryMock, metadataBlocksRepositoryStub, newDatasetValidatorMock);
+    let actualError: ReadError = undefined;
+    await sut.execute(testDataset).catch((e) => (actualError = e));
+    assert.match(actualError, testReadError);
+
+    assert.notCalled(validateMock);
+    assert.notCalled(createDatasetMock);
+
+    assert.calledWithExactly(getMetadataBlockByNameStub, testMetadataBlocks[0].name);
   });
 });

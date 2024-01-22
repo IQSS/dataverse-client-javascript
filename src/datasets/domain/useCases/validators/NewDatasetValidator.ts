@@ -203,7 +203,9 @@ export class NewDatasetValidator implements NewResourceValidator {
   }
 
   private isEmptyArray(metadataFieldValue: NewDatasetMetadataFieldValueDTO): boolean {
-    return Array.isArray(metadataFieldValue) && (metadataFieldValue as Array<NewDatasetMetadataFieldValueDTO>).length == 0;
+    return (
+      Array.isArray(metadataFieldValue) && (metadataFieldValue as Array<NewDatasetMetadataFieldValueDTO>).length == 0
+    );
   }
 
   private isValidArrayType(

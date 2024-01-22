@@ -71,7 +71,8 @@ export const transformMetadataFieldModelsToRequestPayload = (
 ): MetadataFieldRequestPayload[] => {
   let metadataFieldsRequestPayload: MetadataFieldRequestPayload[] = [];
   for (const metadataFieldKey of Object.keys(newDatasetMetadataFields)) {
-    const newDatasetMetadataChildFieldValue: NewDatasetMetadataFieldValueDTO = newDatasetMetadataFields[metadataFieldKey];
+    const newDatasetMetadataChildFieldValue: NewDatasetMetadataFieldValueDTO =
+      newDatasetMetadataFields[metadataFieldKey];
     metadataFieldsRequestPayload.push({
       value: transformMetadataFieldValueToRequestPayload(
         newDatasetMetadataChildFieldValue,
