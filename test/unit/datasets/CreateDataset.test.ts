@@ -3,14 +3,14 @@ import { CreatedDatasetIdentifiers } from '../../../src/datasets/domain/models/C
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository';
 import { assert, createSandbox, SinonSandbox } from 'sinon';
 import { NewResourceValidator } from '../../../src/core/domain/useCases/validators/NewResourceValidator';
-import { createNewDatasetModel, createNewDatasetMetadataBlockModel } from '../../testHelpers/datasets/newDatasetHelper';
+import { createNewDatasetDTO, createNewDatasetMetadataBlockModel } from '../../testHelpers/datasets/newDatasetHelper';
 import { ResourceValidationError } from '../../../src/core/domain/useCases/validators/errors/ResourceValidationError';
 import { WriteError } from '../../../src';
 import { IMetadataBlocksRepository } from '../../../src/metadataBlocks/domain/repositories/IMetadataBlocksRepository';
 
 describe('execute', () => {
   const sandbox: SinonSandbox = createSandbox();
-  const testDataset = createNewDatasetModel();
+  const testDataset = createNewDatasetDTO();
   const testMetadataBlocks = [createNewDatasetMetadataBlockModel()];
 
   afterEach(() => {

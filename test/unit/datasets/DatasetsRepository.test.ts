@@ -18,7 +18,7 @@ import {
   createDatasetPreviewPayload,
 } from '../../testHelpers/datasets/datasetPreviewHelper';
 import {
-  createNewDatasetModel,
+  createNewDatasetDTO,
   createNewDatasetMetadataBlockModel,
   createNewDatasetRequestPayload,
 } from '../../testHelpers/datasets/newDatasetHelper';
@@ -608,7 +608,7 @@ describe('DatasetsRepository', () => {
   });
 
   describe('createDataset', () => {
-    const testNewDataset = createNewDatasetModel();
+    const testNewDataset = createNewDatasetDTO();
     const testMetadataBlocks = [createNewDatasetMetadataBlockModel()];
     const testCollectionName = 'test';
     const expectedNewDatasetRequestPayloadJson = JSON.stringify(createNewDatasetRequestPayload());

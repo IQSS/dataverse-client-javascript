@@ -8,7 +8,7 @@ import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers';
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
-import { NewDataset } from '../../domain/models/NewDataset';
+import { NewDatasetDTO } from '../../domain/dtos/NewDatasetDTO';
 import { MetadataBlock } from '../../../metadataBlocks';
 import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers';
 import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers';
@@ -112,7 +112,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async createDataset(
-    newDataset: NewDataset,
+    newDataset: NewDatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
     collectionId: string,
   ): Promise<CreatedDatasetIdentifiers> {

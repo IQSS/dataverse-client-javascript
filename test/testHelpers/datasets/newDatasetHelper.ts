@@ -1,14 +1,14 @@
-import { NewDataset, NewDatasetMetadataFieldValue } from '../../../src/datasets/domain/models/NewDataset';
+import { NewDatasetDTO, NewDatasetMetadataFieldValueDTO } from '../../../src/datasets/domain/dtos/NewDatasetDTO';
 import { MetadataBlock } from '../../../src';
 import { NewDatasetRequestPayload } from '../../../src/datasets/infra/repositories/transformers/newDatasetTransformers';
 
-export const createNewDatasetModel = (
-  titleFieldValue?: NewDatasetMetadataFieldValue,
-  authorFieldValue?: NewDatasetMetadataFieldValue,
-  alternativeRequiredTitleValue?: NewDatasetMetadataFieldValue,
-  timePeriodCoveredStartValue?: NewDatasetMetadataFieldValue,
-  contributorTypeValue?: NewDatasetMetadataFieldValue,
-): NewDataset => {
+export const createNewDatasetDTO = (
+  titleFieldValue?: NewDatasetMetadataFieldValueDTO,
+  authorFieldValue?: NewDatasetMetadataFieldValueDTO,
+  alternativeRequiredTitleValue?: NewDatasetMetadataFieldValueDTO,
+  timePeriodCoveredStartValue?: NewDatasetMetadataFieldValueDTO,
+  contributorTypeValue?: NewDatasetMetadataFieldValueDTO,
+): NewDatasetDTO => {
   const validTitle = 'test dataset';
   const validAuthorFieldValue = [
     {
@@ -47,7 +47,7 @@ export const createNewDatasetModel = (
   };
 };
 
-export const createNewDatasetModelWithoutFirstLevelRequiredField = (): NewDataset => {
+export const createNewDatasetDTOWithoutFirstLevelRequiredField = (): NewDatasetDTO => {
   return {
     metadataBlockValues: [
       {
@@ -60,7 +60,7 @@ export const createNewDatasetModelWithoutFirstLevelRequiredField = (): NewDatase
   };
 };
 
-export const createNewDatasetModelWithoutSecondLevelRequiredField = (): NewDataset => {
+export const createNewDatasetDTOWithoutSecondLevelRequiredField = (): NewDatasetDTO => {
   return {
     metadataBlockValues: [
       {

@@ -12,7 +12,7 @@ import { DatasetNotNumberedVersion, DatasetLockType, DatasetPreviewSubset } from
 import { fail } from 'assert';
 import { ApiConfig } from '../../../src';
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
-import { NewDataset } from '../../../src/datasets/domain/models/NewDataset';
+import { NewDatasetDTO } from '../../../src/datasets/domain/dtos/NewDatasetDTO';
 import { MetadataBlocksRepository } from '../../../src/metadataBlocks/infra/repositories/MetadataBlocksRepository';
 import { Author, DatasetContact, DatasetDescription } from '../../../src/datasets/domain/models/Dataset';
 
@@ -259,7 +259,7 @@ describe('DatasetsRepository', () => {
       const testDescription = 'This is the description of the dataset.';
       const testSubject = ['Medicine, Health and Life Sciences'];
 
-      const testNewDataset: NewDataset = {
+      const testNewDataset: NewDatasetDTO = {
         metadataBlockValues: [
           {
             name: 'citation',

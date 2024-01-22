@@ -1,9 +1,9 @@
 import {
-  NewDataset,
-  NewDatasetMetadataFieldValue,
-  NewDatasetMetadataChildFieldValue,
-  NewDatasetMetadataBlockValues,
-} from '../../models/NewDataset';
+  NewDatasetDTO,
+  NewDatasetMetadataFieldValueDTO,
+  NewDatasetMetadataChildFieldValueDTO,
+  NewDatasetMetadataBlockValuesDTO,
+} from '../../dtos/NewDatasetDTO';
 import { NewResourceValidator } from '../../../../core/domain/useCases/validators/NewResourceValidator';
 import { MetadataFieldInfo, MetadataBlock } from '../../../../metadataBlocks';
 import { ResourceValidationError } from '../../../../core/domain/useCases/validators/errors/ResourceValidationError';
@@ -15,21 +15,21 @@ import { DateFormatFieldError } from './errors/DateFormatFieldError';
 export interface NewDatasetMetadataFieldAndValueInfo {
   metadataFieldInfo: MetadataFieldInfo;
   metadataFieldKey: string;
-  metadataFieldValue: NewDatasetMetadataFieldValue;
+  metadataFieldValue: NewDatasetMetadataFieldValueDTO;
   metadataBlockName: string;
   metadataParentFieldKey?: string;
   metadataFieldPosition?: number;
 }
 
 export class NewDatasetValidator implements NewResourceValidator {
-  async validate(resource: NewDataset, metadataBlocks: MetadataBlock[]): Promise<void | ResourceValidationError> {
+  async validate(resource: NewDatasetDTO, metadataBlocks: MetadataBlock[]): Promise<void | ResourceValidationError> {
     for (const metadataBlockValues of resource.metadataBlockValues) {
       await this.validateMetadataBlock(metadataBlockValues, metadataBlocks);
     }
   }
 
   private async validateMetadataBlock(
-    metadataBlockValues: NewDatasetMetadataBlockValues,
+    metadataBlockValues: NewDatasetMetadataBlockValuesDTO,
     metadataBlocks: MetadataBlock[],
   ) {
     const metadataBlockName = metadataBlockValues.name;
@@ -99,7 +99,7 @@ export class NewDatasetValidator implements NewResourceValidator {
       );
     }
 
-    const fieldValues = metadataFieldValue as NewDatasetMetadataFieldValue[];
+    const fieldValues = metadataFieldValue as NewDatasetMetadataFieldValueDTO[];
     fieldValues.forEach((value, metadataFieldPosition) => {
       this.validateFieldValue({
         metadataFieldInfo: metadataFieldInfo,
@@ -189,7 +189,7 @@ export class NewDatasetValidator implements NewResourceValidator {
         metadataFieldInfo: childMetadataFieldInfo,
         metadataFieldKey: childMetadataFieldKey,
         metadataFieldValue: (
-          newDatasetMetadataFieldAndValueInfo.metadataFieldValue as NewDatasetMetadataChildFieldValue
+          newDatasetMetadataFieldAndValueInfo.metadataFieldValue as NewDatasetMetadataChildFieldValueDTO
         )[childMetadataFieldKey],
         metadataBlockName: newDatasetMetadataFieldAndValueInfo.metadataBlockName,
         metadataParentFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
@@ -198,19 +198,19 @@ export class NewDatasetValidator implements NewResourceValidator {
     }
   }
 
-  private isEmptyString(metadataFieldValue: NewDatasetMetadataFieldValue): boolean {
+  private isEmptyString(metadataFieldValue: NewDatasetMetadataFieldValueDTO): boolean {
     return typeof metadataFieldValue == 'string' && metadataFieldValue.trim() === '';
   }
 
-  private isEmptyArray(metadataFieldValue: NewDatasetMetadataFieldValue): boolean {
-    return Array.isArray(metadataFieldValue) && (metadataFieldValue as Array<NewDatasetMetadataFieldValue>).length == 0;
+  private isEmptyArray(metadataFieldValue: NewDatasetMetadataFieldValueDTO): boolean {
+    return Array.isArray(metadataFieldValue) && (metadataFieldValue as Array<NewDatasetMetadataFieldValueDTO>).length == 0;
   }
 
   private isValidArrayType(
-    metadataFieldValue: Array<string | NewDatasetMetadataFieldValue>,
+    metadataFieldValue: Array<string | NewDatasetMetadataFieldValueDTO>,
     expectedType: 'string' | 'object',
   ): boolean {
-    return metadataFieldValue.every((item: string | NewDatasetMetadataFieldValue) => typeof item === expectedType);
+    return metadataFieldValue.every((item: string | NewDatasetMetadataFieldValueDTO) => typeof item === expectedType);
   }
 
   private createGeneralValidationError(

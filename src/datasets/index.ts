@@ -51,10 +51,10 @@ export {
 export { DatasetPreview } from './domain/models/DatasetPreview';
 export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset';
 export {
-  NewDataset,
-  NewDatasetMetadataBlockValues,
-  NewDatasetMetadataFields,
-  NewDatasetMetadataFieldValue,
-  NewDatasetMetadataChildFieldValue,
-} from './domain/models/NewDataset';
+  NewDatasetDTO as NewDataset,
+  NewDatasetMetadataBlockValuesDTO as NewDatasetMetadataBlockValues,
+  NewDatasetMetadataFieldsDTO as NewDatasetMetadataFields,
+  NewDatasetMetadataFieldValueDTO as NewDatasetMetadataFieldValue,
+  NewDatasetMetadataChildFieldValueDTO as NewDatasetMetadataChildFieldValue,
+} from './domain/dtos/NewDatasetDTO';
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers';
