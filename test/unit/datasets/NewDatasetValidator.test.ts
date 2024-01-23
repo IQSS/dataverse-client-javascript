@@ -1,5 +1,5 @@
 import { NewDatasetValidator } from '../../../src/datasets/domain/useCases/validators/NewDatasetValidator';
-import { assert, createSandbox, SinonSandbox } from 'sinon';
+import { assert } from 'sinon';
 import {
   createNewDatasetDTO,
   createNewDatasetMetadataBlockModel,
@@ -9,14 +9,19 @@ import { fail } from 'assert';
 import { EmptyFieldError } from '../../../src/datasets/domain/useCases/validators/errors/EmptyFieldError';
 import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError';
 import { NewDatasetDTO, NewDatasetMetadataFieldValueDTO } from '../../../src/datasets/domain/dtos/NewDatasetDTO';
+import { SingleMetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/SingleMetadataFieldValidator';
+import { MetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/MetadataFieldValidator';
+import { MultipleMetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/MultipleMetadataFieldValidator';
 
 describe('validate', () => {
-  const sandbox: SinonSandbox = createSandbox();
   const testMetadataBlocks = [createNewDatasetMetadataBlockModel()];
 
-  afterEach(() => {
-    sandbox.restore();
-  });
+  const singleMetadataFieldValidator = new SingleMetadataFieldValidator();
+  const metadataFieldValidator = new MetadataFieldValidator(
+    new SingleMetadataFieldValidator(),
+    new MultipleMetadataFieldValidator(singleMetadataFieldValidator),
+  );
+  const sut = new NewDatasetValidator(metadataFieldValidator);
 
   async function runValidateExpectingFieldValidationError<T extends FieldValidationError>(
     newDataset: NewDatasetDTO,
@@ -25,7 +30,6 @@ describe('validate', () => {
     expectedParentMetadataFieldName?: string,
     expectedPosition?: number,
   ): Promise<void> {
-    const sut = new NewDatasetValidator();
     await sut
       .validate(newDataset, testMetadataBlocks)
       .then(() => {
@@ -43,8 +47,6 @@ describe('validate', () => {
 
   test('should not raise a validation error when a new dataset with only the required fields is valid', async () => {
     const testNewDataset = createNewDatasetDTO();
-    const sut = new NewDatasetValidator();
-
     await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
   });
 
@@ -159,7 +161,6 @@ describe('validate', () => {
       },
     ];
     const testNewDataset = createNewDatasetDTO(undefined, authorFieldValue, undefined);
-    const sut = new NewDatasetValidator();
     await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
   });
 
@@ -174,7 +175,6 @@ describe('validate', () => {
 
   test('should not raise a date format validation error when a date field has a valid format', async () => {
     const testNewDataset = createNewDatasetDTO(undefined, undefined, undefined, '2020-01-01');
-    const sut = new NewDatasetValidator();
     await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
   });
 
@@ -191,7 +191,6 @@ describe('validate', () => {
 
   test('should not raise a controlled vocabulary error when the value for a controlled vocabulary field is correct', async () => {
     const testNewDataset = createNewDatasetDTO(undefined, undefined, undefined, undefined, 'Project Member');
-    const sut = new NewDatasetValidator();
     await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
   });
 });

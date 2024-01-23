@@ -1,10 +1,12 @@
-import {
-  BaseMetadataFieldValidator,
-  NewDatasetMetadataFieldAndValueInfo,
-} from './BaseMetadataFieldValidator';
+import { BaseMetadataFieldValidator, NewDatasetMetadataFieldAndValueInfo } from './BaseMetadataFieldValidator';
 import { NewDatasetMetadataFieldValueDTO } from '../../dtos/NewDatasetDTO';
+import { SingleMetadataFieldValidator } from './SingleMetadataFieldValidator';
 
 export class MultipleMetadataFieldValidator extends BaseMetadataFieldValidator {
+  constructor(private singleMetadataFieldValidator: SingleMetadataFieldValidator) {
+    super();
+  }
+
   validate(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo): void {
     const metadataFieldValue = newDatasetMetadataFieldAndValueInfo.metadataFieldValue;
     const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
@@ -33,7 +35,7 @@ export class MultipleMetadataFieldValidator extends BaseMetadataFieldValidator {
 
     const fieldValues = metadataFieldValue as NewDatasetMetadataFieldValueDTO[];
     fieldValues.forEach((value, metadataFieldPosition) => {
-      this.validateFieldValue({
+      this.singleMetadataFieldValidator.validate({
         metadataFieldInfo: metadataFieldInfo,
         metadataFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
         metadataFieldValue: value,

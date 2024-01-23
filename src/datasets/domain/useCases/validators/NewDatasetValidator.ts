@@ -2,9 +2,11 @@ import { NewDatasetDTO, NewDatasetMetadataBlockValuesDTO } from '../../dtos/NewD
 import { NewResourceValidator } from '../../../../core/domain/useCases/validators/NewResourceValidator';
 import { MetadataBlock } from '../../../../metadataBlocks';
 import { ResourceValidationError } from '../../../../core/domain/useCases/validators/errors/ResourceValidationError';
-import { MetadataFieldValidator } from './MetadataFieldValidator';
+import { BaseMetadataFieldValidator } from './BaseMetadataFieldValidator';
 
 export class NewDatasetValidator implements NewResourceValidator {
+  constructor(private metadataFieldValidator: BaseMetadataFieldValidator) {}
+
   async validate(resource: NewDatasetDTO, metadataBlocks: MetadataBlock[]): Promise<void | ResourceValidationError> {
     for (const metadataBlockValues of resource.metadataBlockValues) {
       await this.validateMetadataBlock(metadataBlockValues, metadataBlocks);
@@ -20,7 +22,7 @@ export class NewDatasetValidator implements NewResourceValidator {
       (metadataBlock) => metadataBlock.name === metadataBlockName,
     );
     for (const metadataFieldKey of Object.keys(metadataBlock.metadataFields)) {
-      new MetadataFieldValidator().validate({
+      this.metadataFieldValidator.validate({
         metadataFieldInfo: metadataBlock.metadataFields[metadataFieldKey],
         metadataFieldKey: metadataFieldKey,
         metadataFieldValue: metadataBlockValues.fields[metadataFieldKey],

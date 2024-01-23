@@ -10,6 +10,9 @@ import { GetAllDatasetPreviews } from './domain/useCases/GetAllDatasetPreviews';
 import { NewDatasetValidator } from './domain/useCases/validators/NewDatasetValidator';
 import { MetadataBlocksRepository } from '../metadataBlocks/infra/repositories/MetadataBlocksRepository';
 import { CreateDataset } from './domain/useCases/CreateDataset';
+import { MetadataFieldValidator } from './domain/useCases/validators/MetadataFieldValidator';
+import { SingleMetadataFieldValidator } from './domain/useCases/validators/SingleMetadataFieldValidator';
+import { MultipleMetadataFieldValidator } from './domain/useCases/validators/MultipleMetadataFieldValidator';
 
 const datasetsRepository = new DatasetsRepository();
 
@@ -21,7 +24,16 @@ const getPrivateUrlDatasetCitation = new GetPrivateUrlDatasetCitation(datasetsRe
 const getDatasetUserPermissions = new GetDatasetUserPermissions(datasetsRepository);
 const getDatasetLocks = new GetDatasetLocks(datasetsRepository);
 const getAllDatasetPreviews = new GetAllDatasetPreviews(datasetsRepository);
-const createDataset = new CreateDataset(datasetsRepository, new MetadataBlocksRepository(), new NewDatasetValidator());
+const singleMetadataFieldValidator = new SingleMetadataFieldValidator();
+const metadataFieldValidator = new MetadataFieldValidator(
+  new SingleMetadataFieldValidator(),
+  new MultipleMetadataFieldValidator(singleMetadataFieldValidator),
+);
+const createDataset = new CreateDataset(
+  datasetsRepository,
+  new MetadataBlocksRepository(),
+  new NewDatasetValidator(metadataFieldValidator),
+);
 
 export {
   getDatasetSummaryFieldNames,
