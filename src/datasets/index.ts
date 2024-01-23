@@ -7,7 +7,7 @@ import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDat
 import { GetDatasetUserPermissions } from './domain/useCases/GetDatasetUserPermissions';
 import { GetDatasetLocks } from './domain/useCases/GetDatasetLocks';
 import { GetAllDatasetPreviews } from './domain/useCases/GetAllDatasetPreviews';
-import { NewDatasetValidator } from './domain/useCases/validators/NewDatasetValidator';
+import { NewDatasetResourceValidator } from './domain/useCases/validators/NewDatasetResourceValidator';
 import { MetadataBlocksRepository } from '../metadataBlocks/infra/repositories/MetadataBlocksRepository';
 import { CreateDataset } from './domain/useCases/CreateDataset';
 import { MetadataFieldValidator } from './domain/useCases/validators/MetadataFieldValidator';
@@ -32,7 +32,7 @@ const metadataFieldValidator = new MetadataFieldValidator(
 const createDataset = new CreateDataset(
   datasetsRepository,
   new MetadataBlocksRepository(),
-  new NewDatasetValidator(metadataFieldValidator),
+  new NewDatasetResourceValidator(metadataFieldValidator),
 );
 
 export {

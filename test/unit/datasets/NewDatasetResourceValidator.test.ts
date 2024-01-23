@@ -1,4 +1,4 @@
-import { NewDatasetValidator } from '../../../src/datasets/domain/useCases/validators/NewDatasetValidator';
+import { NewDatasetResourceValidator } from '../../../src/datasets/domain/useCases/validators/NewDatasetResourceValidator';
 import { assert } from 'sinon';
 import {
   createNewDatasetDTO,
@@ -21,7 +21,7 @@ describe('validate', () => {
     new SingleMetadataFieldValidator(),
     new MultipleMetadataFieldValidator(singleMetadataFieldValidator),
   );
-  const sut = new NewDatasetValidator(metadataFieldValidator);
+  const sut = new NewDatasetResourceValidator(metadataFieldValidator);
 
   async function runValidateExpectingFieldValidationError<T extends FieldValidationError>(
     newDataset: NewDatasetDTO,

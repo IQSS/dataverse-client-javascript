@@ -4,7 +4,7 @@ import { MetadataBlock } from '../../../../metadataBlocks';
 import { ResourceValidationError } from '../../../../core/domain/useCases/validators/errors/ResourceValidationError';
 import { BaseMetadataFieldValidator } from './BaseMetadataFieldValidator';
 
-export class NewDatasetValidator implements NewResourceValidator {
+export class NewDatasetResourceValidator implements NewResourceValidator {
   constructor(private metadataFieldValidator: BaseMetadataFieldValidator) {}
 
   async validate(resource: NewDatasetDTO, metadataBlocks: MetadataBlock[]): Promise<void | ResourceValidationError> {
