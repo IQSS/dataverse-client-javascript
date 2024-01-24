@@ -5,7 +5,7 @@
 A JavaScript/TypeScript API wrapper for [Dataverse](http://guides.dataverse.org/en/latest/api/).
 
 - [Installation](./docs/installation.md)
-- [Use Cases Documentation](./docs/api.md)
+- [Use Cases](./docs/useCases.md)
 - [Local Development](./docs/localDevelopment.md)
 - [Contributing](./CONTRIBUTING.md)
 - [License](./LICENSE)
