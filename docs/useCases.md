@@ -12,7 +12,7 @@ The different use cases currently available in the package are classified below,
 
 #### [GetAllDatasetPreviews](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts)
 
-Returns an instance of [DatasetPreviewSubset](../src/datasets/domain/models/DatasetPreviewSubset.ts) that contains information for each dataset that the calling user can access in the installation.
+Returns an instance of [DatasetPreviewSubset](../src/datasets/domain/models/DatasetPreviewSubset.ts) that contains reduced information for each dataset that the calling user can access in the installation.
 
 ##### Example call:
 
