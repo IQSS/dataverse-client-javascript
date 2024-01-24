@@ -8,8 +8,8 @@ export const transformFilesResponseToFilesSubset = (
   const filesPayload = response.data.data;
   const files: File[] = [];
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  filesPayload.forEach(function (filesPayload: any) {
-    files.push(transformFilePayloadToFile(filesPayload));
+  filesPayload.forEach(function (filePayload: any) {
+    files.push(transformFilePayloadToFile(filePayload));
   });
 
   return {
