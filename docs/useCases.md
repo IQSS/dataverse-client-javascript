@@ -8,6 +8,35 @@ The different use cases currently available in the package are classified below,
 
 ## Datasets
 
+### Read operations
+
+#### [GetAllDatasetPreviews](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts)
+
+Returns an instance of [DatasetPreviewSubset](../src/datasets/domain/models/DatasetPreviewSubset.ts) that contains information for each dataset that the calling user can access in the installation.
+
+##### Example call:
+
+````typescript
+import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const limit = 10;
+const offset = 20;
+
+getAllDatasetPreviews
+  .execute(limit, offset)
+  .then((subset: DatasetPreviewSubset) => {
+    /* ... */
+  });
+  
+/* ... */
+````
+
+Note that `limit` and `offset` are optional parameters for pagination.
+
+#### [GetDataset](../src/datasets/domain/useCases/GetDataset.ts)
+
 TODO
 
 ## Files
