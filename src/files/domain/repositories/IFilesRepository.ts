@@ -36,4 +36,6 @@ export interface IFilesRepository {
   getFileUserPermissions(fileId: number | string): Promise<FileUserPermissions>;
 
   getFileDataTables(fileId: number | string): Promise<FileDataTable[]>;
+
+  getFile(fileId: number | string): Promise<File>;
 }

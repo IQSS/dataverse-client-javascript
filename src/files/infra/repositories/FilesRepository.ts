@@ -143,6 +143,10 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
+  public async getFile(fileId: number | string): Promise<File> {
+    return Promise.reject(new Error(`Not implemented ${fileId}`));
+  }
+
   private applyFileSearchCriteriaToQueryParams(
     queryParams: GetFilesQueryParams | GetFilesTotalDownloadSizeQueryParams,
     fileSearchCriteria: FileSearchCriteria,
