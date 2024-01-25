@@ -1,5 +1,5 @@
-import { IFilesRepository } from "../repositories/IFilesRepository";
-import { File } from "../models/File";
+import { IFilesRepository } from '../repositories/IFilesRepository';
+import { File } from '../models/File';
 
 export class GetFile {
   constructor(private readonly filesRepository: IFilesRepository) {}

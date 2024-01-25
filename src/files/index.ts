@@ -5,8 +5,8 @@ import { GetFileDownloadCount } from './domain/useCases/GetFileDownloadCount';
 import { GetFileUserPermissions } from './domain/useCases/GetFileUserPermissions';
 import { GetFileDataTables } from './domain/useCases/GetFileDataTables';
 import { GetDatasetFilesTotalDownloadSize } from './domain/useCases/GetDatasetFilesTotalDownloadSize';
-import { GetFile } from "./domain/useCases/GetFile";
-import { GetFileDraft } from "./domain/useCases/GetFileDraft";
+import { GetFile } from './domain/useCases/GetFile';
+import { GetFileDraft } from './domain/useCases/GetFileDraft';
 
 const filesRepository = new FilesRepository();
 
@@ -27,7 +27,7 @@ export {
   getDatasetFileCounts,
   getDatasetFilesTotalDownloadSize,
   getFile,
-  getFileDraft
+  getFileDraft,
 };
 
 export { File, FileEmbargo, FileChecksum } from './domain/models/File';
