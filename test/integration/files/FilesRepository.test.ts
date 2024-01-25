@@ -427,7 +427,7 @@ describe('FilesRepository', () => {
   });
 
   describe('getFile', () => {
-    let fileId: number;
+    let testFileId: number;
     beforeAll(async () => {
       const files = await sut.getDatasetFiles(
           TestConstants.TEST_CREATED_DATASET_1_ID,
@@ -435,11 +435,11 @@ describe('FilesRepository', () => {
           false,
             FileOrderCriteria.NAME_AZ,
       );
-      fileId = files[0].id;
+      testFileId = files[0].id;
     })
     describe('by numeric id', () => {
         test('should return file when providing a valid id', async () => {
-          const actual = await sut.getFile(fileId);
+          const actual = await sut.getFile(testFileId);
 
           assert.match(actual.name, testTextFile1Name);
         });
@@ -454,6 +454,37 @@ describe('FilesRepository', () => {
             `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
           );
         });
+    });
+  });
+
+  describe('getFileDraft', () => {
+    let testFileId: number;
+    beforeAll(async () => {
+      const files = await sut.getDatasetFiles(
+          TestConstants.TEST_CREATED_DATASET_1_ID,
+          latestDatasetVersionId,
+          false,
+          FileOrderCriteria.NAME_AZ,
+      );
+      testFileId = files[0].id;
+    })
+    describe('by numeric id', () => {
+      test('should return file when providing a valid id', async () => {
+        const actual = await sut.getFileDraft(testFileId);
+
+        assert.match(actual.name, testTextFile1Name);
+      });
+
+      test('should return error when file does not exist', async () => {
+        let error: ReadError = undefined;
+
+        await sut.getFileDraft(nonExistentFiledId).catch((e) => (error = e));
+
+        assert.match(
+            error.message,
+            `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
+        );
+      });
     });
   });
 });

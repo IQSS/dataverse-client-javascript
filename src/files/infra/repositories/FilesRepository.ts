@@ -151,6 +151,14 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
+  public async getFileDraft(fileId: number | string): Promise<File> {
+      return this.doGet(this.buildApiEndpoint(this.filesResourceName, 'draft', fileId), true)
+      .then((response) => transformFileResponseToFile(response))
+      .catch((error) => {
+          throw error;
+      });
+  }
+
   private applyFileSearchCriteriaToQueryParams(
     queryParams: GetFilesQueryParams | GetFilesTotalDownloadSizeQueryParams,
     fileSearchCriteria: FileSearchCriteria,
