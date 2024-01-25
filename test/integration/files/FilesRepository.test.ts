@@ -455,6 +455,9 @@ describe('FilesRepository', () => {
           );
         });
     });
+    describe('by persistent id', () => {
+      // TODO - Find the way of adding a persistent id to a file via API to create the test data
+    });
   });
 
   describe('getFileDraft', () => {
@@ -485,6 +488,9 @@ describe('FilesRepository', () => {
             `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
         );
       });
+    });
+    describe('by persistent id', () => {
+      // TODO - Find the way of adding a persistent id to a file via API to create the test data
     });
   });
 });
