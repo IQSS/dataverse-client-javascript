@@ -1,7 +1,7 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository';
 import { File } from '../../domain/models/File';
-import { transformFilesResponseToFiles } from './transformers/fileTransformers';
+import {transformFileResponseToFile, transformFilesResponseToFiles} from './transformers/fileTransformers';
 import { FileDataTable } from '../../domain/models/FileDataTable';
 import { transformDataTablesResponseToDataTables } from './transformers/fileDataTableTransformers';
 import { FileUserPermissions } from '../../domain/models/FileUserPermissions';
@@ -144,7 +144,11 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   public async getFile(fileId: number | string): Promise<File> {
-    return Promise.reject(new Error(`Not implemented ${fileId}`));
+    return this.doGet(this.buildApiEndpoint(this.filesResourceName, '', fileId), true)
+      .then((response) => transformFileResponseToFile(response))
+      .catch((error) => {
+        throw error;
+      });
   }
 
   private applyFileSearchCriteriaToQueryParams(

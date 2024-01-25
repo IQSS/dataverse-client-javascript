@@ -11,6 +11,11 @@ export const transformFilesResponseToFiles = (response: AxiosResponse): File[] =
   return files;
 };
 
+export const transformFileResponseToFile = (response: AxiosResponse): File => {
+    const filePayload = response.data.data;
+    return transformFilePayloadToFile(filePayload);
+}
+
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformFilePayloadToFile = (filePayload: any): File => {
   return {

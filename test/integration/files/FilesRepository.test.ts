@@ -425,4 +425,35 @@ describe('FilesRepository', () => {
       );
     });
   });
+
+  describe('getFile', () => {
+    let fileId: number;
+    beforeAll(async () => {
+      const files = await sut.getDatasetFiles(
+          TestConstants.TEST_CREATED_DATASET_1_ID,
+          latestDatasetVersionId,
+          false,
+            FileOrderCriteria.NAME_AZ,
+      );
+      fileId = files[0].id;
+    })
+    describe('by numeric id', () => {
+        test('should return file when providing a valid id', async () => {
+          const actual = await sut.getFile(fileId);
+
+          assert.match(actual.name, testTextFile1Name);
+        });
+
+        test('should return error when file does not exist', async () => {
+          let error: ReadError = undefined;
+
+          await sut.getFile(nonExistentFiledId).catch((e) => (error = e));
+
+          assert.match(
+            error.message,
+            `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
+          );
+        });
+    });
+  });
 });
