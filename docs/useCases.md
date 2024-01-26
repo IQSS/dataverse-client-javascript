@@ -12,10 +12,10 @@ The different use cases currently available in the package are classified below,
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a dataset](#get-a-dataset)
     - [List all datasets](#list-all-datasets)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Examples](#examples)
-- [Conclusion](#conclusion)
+- [Files](#Files)
+- [Metadata Blocks](#metadata-blocks)
+- [Users](#Users)
+- [Info](#Info)
 
 ## Datasets
 
