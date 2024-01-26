@@ -10,8 +10,9 @@ The different use cases currently available in the package are classified below,
 
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
-    - [Get a dataset](#get-a-dataset)
-    - [List all datasets](#list-all-datasets)
+    - [Get a Dataset](#get-a-dataset)
+    - [Get Citation Text from a Dataset](#get-citation-text-from-a-dataset)
+    - [List all Datasets](#list-all-datasets)
 - [Files](#Files)
 - [Metadata Blocks](#metadata-blocks)
 - [Users](#Users)
@@ -19,9 +20,9 @@ The different use cases currently available in the package are classified below,
 
 ## Datasets
 
-### Datasets read use cases
+### Datasets Read Use Cases
 
-#### Get a dataset
+#### Get a Dataset
 
 Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given the search parameters to identify it.
 
@@ -48,13 +49,19 @@ getDataset
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, parameter the default value is `DatasetNotNumberedVersion.LATEST`.
+The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
-There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, parameter the default value is `false`.
+There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
+#### Get Citation Text from a Dataset
 
+TODO
 
-#### List all datasets
+##### Example call:
+
+*See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) definition*.
+
+#### List All Datasets
 
 Returns an instance of [DatasetPreviewSubset](../src/datasets/domain/models/DatasetPreviewSubset.ts) that contains reduced information for each dataset that the calling user can access in the installation.
 
