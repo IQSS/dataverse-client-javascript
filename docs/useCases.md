@@ -23,7 +23,7 @@ The different use cases currently available in the package are classified below,
 
 #### Get a dataset
 
-Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance,  given the search parameters to identify it.
+Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given the search parameters to identify it.
 
 ##### Example call:
 
@@ -48,9 +48,9 @@ getDataset
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. This parameter is optional and if it is not set, the default value is: `DatasetNotNumberedVersion.LATEST`.
+The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, parameter the default value is `DatasetNotNumberedVersion.LATEST`.
 
-There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, parameter the default value is `false`.
 
 
 
