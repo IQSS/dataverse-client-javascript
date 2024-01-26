@@ -91,3 +91,23 @@ export const uploadFileViaApi = async (datasetId: number, fileName: string, file
     },
   });
 };
+
+export const registerFileViaApi = async (fileId: number): Promise<AxiosResponse> => {
+  return await  enableFilePIDs().then(() => axios.get(`${TestConstants.TEST_API_URL}/admin/${fileId}/registerDataFile`, {
+      headers: {
+        'X-Dataverse-Key': process.env.TEST_API_KEY,
+      }
+  }));
+}
+
+const enableFilePIDs = async (): Promise<AxiosResponse> => {
+  return await axios.put(`${TestConstants.TEST_API_URL}/admin/settings/:AllowEnablingFilePIDsPerCollection`, "true", {
+    headers: {
+      'X-Dataverse-Key': process.env.TEST_API_KEY,
+    },
+  }).then(() => axios.put(`${TestConstants.TEST_API_URL}/dataverses/root/attribute/filePIDsEnabled?value=true`, {}, {
+    headers: {
+      'X-Dataverse-Key': process.env.TEST_API_KEY,
+    },
+  }));
+};

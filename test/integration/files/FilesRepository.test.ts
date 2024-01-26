@@ -3,7 +3,7 @@ import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/re
 import { assert } from 'sinon';
 import { expect } from 'chai';
 import { TestConstants } from '../../testHelpers/TestConstants';
-import { uploadFileViaApi } from '../../testHelpers/files/filesHelper';
+import {registerFileViaApi, uploadFileViaApi} from '../../testHelpers/files/filesHelper';
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { FileSearchCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
@@ -27,10 +27,12 @@ describe('FilesRepository', () => {
 
   const datasetRepository = new DatasetsRepository();
 
+  let testFileId: number;
+  let testFilePersistentId: string;
   beforeAll(async () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
     // Uploading test file 1 with some categories
-    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTextFile1Name, { categories: [testCategoryName] })
+    const uploadFileResponse = await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTextFile1Name, { categories: [testCategoryName] })
       .then()
       .catch((e) => {
         console.log(e);
@@ -57,6 +59,16 @@ describe('FilesRepository', () => {
         console.log(e);
         fail(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`);
       });
+    // Registering test file 1
+    await registerFileViaApi(uploadFileResponse.data.data.files[0].dataFile.id);
+    const files = await sut.getDatasetFiles(
+        TestConstants.TEST_CREATED_DATASET_1_ID,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ,
+    )
+    testFileId = files[0].id;
+    testFilePersistentId = files[0].persistentId;
   });
 
   describe('getDatasetFiles', () => {
@@ -427,16 +439,6 @@ describe('FilesRepository', () => {
   });
 
   describe('getFile', () => {
-    let testFileId: number;
-    beforeAll(async () => {
-      const files = await sut.getDatasetFiles(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
-          latestDatasetVersionId,
-          false,
-            FileOrderCriteria.NAME_AZ,
-      );
-      testFileId = files[0].id;
-    })
     describe('by numeric id', () => {
         test('should return file when providing a valid id', async () => {
           const actual = await sut.getFile(testFileId);
@@ -456,29 +458,34 @@ describe('FilesRepository', () => {
         });
     });
     describe('by persistent id', () => {
-      // TODO - Find the way of adding a persistent id to a file via API to create the test data
-    });
-  });
-
-  describe('getFileDraft', () => {
-    let testFileId: number;
-    beforeAll(async () => {
-      const files = await sut.getDatasetFiles(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
-          latestDatasetVersionId,
-          false,
-          FileOrderCriteria.NAME_AZ,
-      );
-      testFileId = files[0].id;
-    })
-    describe('by numeric id', () => {
-      test('should return file when providing a valid id', async () => {
-        const actual = await sut.getFileDraft(testFileId);
+      test('should return file when providing a valid persistentId', async () => {
+        const actual = await sut.getFile(testFilePersistentId);
 
         assert.match(actual.name, testTextFile1Name);
       });
 
       test('should return error when file does not exist', async () => {
+        let error: ReadError = undefined;
+        const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId';
+        await sut.getFile(nonExistentFiledPersistentId).catch((e) => (error = e));
+
+        assert.match(
+            error.message,
+            `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
+        );
+      });
+    });
+  });
+
+  describe('getFileDraft', () => {
+    describe('by numeric id', () => {
+      test('should return file draft when providing a valid id', async () => {
+        const actual = await sut.getFileDraft(testFileId);
+
+        assert.match(actual.name, testTextFile1Name);
+      });
+
+      test('should return error when file draft does not exist', async () => {
         let error: ReadError = undefined;
 
         await sut.getFileDraft(nonExistentFiledId).catch((e) => (error = e));
@@ -490,7 +497,22 @@ describe('FilesRepository', () => {
       });
     });
     describe('by persistent id', () => {
-      // TODO - Find the way of adding a persistent id to a file via API to create the test data
+      test('should return file draft when providing a valid persistentId', async () => {
+        const actual = await sut.getFileDraft(testFilePersistentId);
+
+        assert.match(actual.name, testTextFile1Name);
+      });
+
+      test('should return error when file draft does not exist', async () => {
+        let error: ReadError = undefined;
+        const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId';
+        await sut.getFileDraft(nonExistentFiledPersistentId).catch((e) => (error = e));
+
+        assert.match(
+            error.message,
+            `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
+        );
+      });
     });
   });
 });
