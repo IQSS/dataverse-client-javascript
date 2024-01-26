@@ -23,7 +23,7 @@ The different use cases currently available in the package are classified below,
 
 #### Get a dataset
 
-Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given the parameters that identify it.
+Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance,  given the search parameters to identify it.
 
 ##### Example call:
 
@@ -33,7 +33,7 @@ import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript'
 /* ... */
 
 const datasetId = 'doi:10.77777/FK2/AAAAAA';
-const datasetVersionId = 20;
+const datasetVersionId = '1.0';
 
 getDataset
   .execute(datasetId, datasetVersionId)
@@ -45,6 +45,13 @@ getDataset
 ````
 
 *See [use case](../src/datasets/domain/useCases/GetDataset.ts)* definition.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. This parameter is optional and if it is not set, the default value is: `DatasetNotNumberedVersion.LATEST`.
+
+There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
 
 
 #### List all datasets
