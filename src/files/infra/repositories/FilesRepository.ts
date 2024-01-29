@@ -10,6 +10,7 @@ import { FileSearchCriteria, FileOrderCriteria } from '../../domain/models/FileC
 import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode';
+import { FileNotNumberedVersion } from '../../domain/models/FileNotNumberedVersion';
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean;
@@ -143,20 +144,25 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
-  public async getFile(fileId: number | string): Promise<File> {
-    return this.doGet(this.buildApiEndpoint(this.filesResourceName, '', fileId), true)
+  public async getFile(fileId: number | string, fileVersionId: string): Promise<File> {
+    return this.doGet(this.getFileEndpoint(fileId, fileVersionId), true)
       .then((response) => transformFileResponseToFile(response))
       .catch((error) => {
         throw error;
       });
   }
 
-  public async getFileDraft(fileId: number | string): Promise<File> {
-    return this.doGet(this.buildApiEndpoint(this.filesResourceName, 'draft', fileId), true)
-      .then((response) => transformFileResponseToFile(response))
-      .catch((error) => {
-        throw error;
-      });
+  private getFileEndpoint(fileId: number | string, fileVersionId: string): string {
+    if (fileVersionId === FileNotNumberedVersion.DRAFT) {
+      return this.buildApiEndpoint(this.filesResourceName, 'draft', fileId);
+    }
+    if (fileVersionId === FileNotNumberedVersion.LATEST) {
+      return this.buildApiEndpoint(this.filesResourceName, '', fileId);
+    }
+    // TODO: Implement once it is supported by the API https://github.com/IQSS/dataverse/issues/10280
+    throw new Error(
+      `Requesting a specific version of a file is not yet supported. Version: ${fileVersionId}. Please try using the :latest or :draft version instead.`,
+    );
   }
 
   private applyFileSearchCriteriaToQueryParams(

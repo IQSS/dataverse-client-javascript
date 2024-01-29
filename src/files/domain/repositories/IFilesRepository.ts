@@ -37,7 +37,5 @@ export interface IFilesRepository {
 
   getFileDataTables(fileId: number | string): Promise<FileDataTable[]>;
 
-  getFile(fileId: number | string): Promise<File>;
-
-  getFileDraft(fileId: number | string): Promise<File>;
+  getFile(fileId: number | string, fileVersionId: string): Promise<File>;
 }

@@ -11,6 +11,7 @@ import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { FileCounts } from '../../../src/files/domain/models/FileCounts';
 import { FileDownloadSizeMode } from '../../../src';
 import { fail } from 'assert';
+import {FileNotNumberedVersion} from "../../../src/files/domain/models/FileNotNumberedVersion";
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
@@ -441,15 +442,33 @@ describe('FilesRepository', () => {
   describe('getFile', () => {
     describe('by numeric id', () => {
         test('should return file when providing a valid id', async () => {
-          const actual = await sut.getFile(testFileId);
+          const actual = await sut.getFile(testFileId, FileNotNumberedVersion.LATEST);
 
           assert.match(actual.name, testTextFile1Name);
         });
 
+      test('should return file draft when providing a valid id and version is draft', async () => {
+        const actual = await sut.getFile(testFileId, FileNotNumberedVersion.DRAFT);
+
+        assert.match(actual.name, testTextFile1Name);
+      });
+
+      test('should return Not Implemented Yet error when when providing a valid id and version is different than latest and draft', async () => {
+        // This tests can be removed once the API supports getting a file by version
+        let error: ReadError = undefined;
+
+        await sut.getFile(testFileId, '1.0').catch((e) => (error = e));
+
+        assert.match(
+            error.message,
+            `Requesting a specific version of a file is not yet supported. Version: 1.0. Please try using the :latest or :draft version instead.`,
+        );
+      });
+
         test('should return error when file does not exist', async () => {
           let error: ReadError = undefined;
 
-          await sut.getFile(nonExistentFiledId).catch((e) => (error = e));
+          await sut.getFile(nonExistentFiledId, FileNotNumberedVersion.LATEST).catch((e) => (error = e));
 
           assert.match(
             error.message,
@@ -458,55 +477,35 @@ describe('FilesRepository', () => {
         });
     });
     describe('by persistent id', () => {
-      test('should return file when providing a valid persistentId', async () => {
-        const actual = await sut.getFile(testFilePersistentId);
+      test('should return file when providing a valid persistent id', async () => {
+        const actual = await sut.getFile(testFilePersistentId, FileNotNumberedVersion.LATEST);
 
         assert.match(actual.name, testTextFile1Name);
+      });
+
+      test('should return file draft when providing a valid persistent id and version is draft', async () => {
+        const actual = await sut.getFile(testFilePersistentId, FileNotNumberedVersion.DRAFT);
+
+        assert.match(actual.name, testTextFile1Name);
+      });
+
+      test('should return Not Implemented Yet error when when providing a valid persistent id and version is different than latest and draft', async () => {
+        // This tests can be removed once the API supports getting a file by version
+        let error: ReadError = undefined;
+
+        await sut.getFile(testFilePersistentId, '1.0').catch((e) => (error = e));
+
+        assert.match(
+            error.message,
+            `Requesting a specific version of a file is not yet supported. Version: 1.0. Please try using the :latest or :draft version instead.`,
+        );
       });
 
       test('should return error when file does not exist', async () => {
         let error: ReadError = undefined;
+
         const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId';
-        await sut.getFile(nonExistentFiledPersistentId).catch((e) => (error = e));
-
-        assert.match(
-            error.message,
-            `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
-        );
-      });
-    });
-  });
-
-  describe('getFileDraft', () => {
-    describe('by numeric id', () => {
-      test('should return file draft when providing a valid id', async () => {
-        const actual = await sut.getFileDraft(testFileId);
-
-        assert.match(actual.name, testTextFile1Name);
-      });
-
-      test('should return error when file draft does not exist', async () => {
-        let error: ReadError = undefined;
-
-        await sut.getFileDraft(nonExistentFiledId).catch((e) => (error = e));
-
-        assert.match(
-            error.message,
-            `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
-        );
-      });
-    });
-    describe('by persistent id', () => {
-      test('should return file draft when providing a valid persistentId', async () => {
-        const actual = await sut.getFileDraft(testFilePersistentId);
-
-        assert.match(actual.name, testTextFile1Name);
-      });
-
-      test('should return error when file draft does not exist', async () => {
-        let error: ReadError = undefined;
-        const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId';
-        await sut.getFileDraft(nonExistentFiledPersistentId).catch((e) => (error = e));
+        await sut.getFile(nonExistentFiledPersistentId, FileNotNumberedVersion.LATEST).catch((e) => (error = e));
 
         assert.match(
             error.message,
