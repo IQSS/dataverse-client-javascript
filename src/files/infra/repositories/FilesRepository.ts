@@ -161,7 +161,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     }
     // TODO: Implement once it is supported by the API https://github.com/IQSS/dataverse/issues/10280
     throw new Error(
-      `Requesting a specific dataset version of a file is not yet supported. Version: ${datasetVersionId}. Please try using the :latest or :draft version instead.`,
+      `Requesting a file by its dataset version is not yet supported. Requested version: ${datasetVersionId}. Please try using the :latest or :draft version instead.`,
     );
   }
 

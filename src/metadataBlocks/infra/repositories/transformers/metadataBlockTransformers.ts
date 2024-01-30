@@ -17,10 +17,7 @@ export const transformMetadataBlockResponseToMetadataBlock = (response: AxiosRes
   };
 };
 
-const transformPayloadMetadataFieldInfo = (
-  metadataFieldInfoPayload: any,
-  isChild = false,
-): MetadataFieldInfo => {
+const transformPayloadMetadataFieldInfo = (metadataFieldInfoPayload: any, isChild = false): MetadataFieldInfo => {
   const metadataFieldInfo: MetadataFieldInfo = {
     name: metadataFieldInfoPayload.name,
     displayName: metadataFieldInfoPayload.displayName,

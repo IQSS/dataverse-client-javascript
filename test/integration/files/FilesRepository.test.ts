@@ -460,7 +460,7 @@ describe('FilesRepository', () => {
 
         assert.match(
             error.message,
-            `Requesting a specific version of a file is not yet supported. Version: 1.0. Please try using the :latest or :draft version instead.`,
+            `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`,
         );
       });
 
@@ -496,7 +496,7 @@ describe('FilesRepository', () => {
 
         assert.match(
             error.message,
-            `Requesting a specific version of a file is not yet supported. Version: 1.0. Please try using the :latest or :draft version instead.`,
+            `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`,
         );
       });
 
