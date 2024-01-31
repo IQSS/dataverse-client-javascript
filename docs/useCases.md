@@ -13,6 +13,7 @@ The different use cases currently available in the package are classified below,
     - [Get a Dataset](#get-a-dataset)
     - [Get Dataset Citation Text](#get-dataset-citation-text)
     - [Get Dataset Locks](#get-dataset-locks)
+    - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
     - [List All Datasets](#list-all-datasets)
 - [Files](#Files)
 - [Metadata Blocks](#metadata-blocks)
@@ -106,6 +107,28 @@ getDatasetLocks
 *See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) definition*.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Get Dataset Summary Field Names
+
+Returns the names of the dataset summary fields configured in the installation.
+
+##### Example call:
+
+````typescript
+import { getDatasetSummaryFieldNames } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getDatasetSummaryFieldNames
+  .execute()
+  .then((names: string[]) => {
+    /* ... */
+  });
+  
+/* ... */
+````
+
+*See [use case](../src/datasets/domain/useCases/GetDatasetSummaryFieldNames.ts) definition*.
 
 #### List All Datasets
 
