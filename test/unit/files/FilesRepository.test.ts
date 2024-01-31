@@ -5,7 +5,11 @@ import { expect } from 'chai';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig';
 import { TestConstants } from '../../testHelpers/TestConstants';
-import { createFilePayload, createFileModel } from '../../testHelpers/files/filesHelper';
+import {
+  createFileModel,
+  createManyFilesPayload,
+  createFilesSubsetModel
+} from '../../testHelpers/files/filesHelper';
 import { createFileDataTablePayload, createFileDataTableModel } from '../../testHelpers/files/fileDataTablesHelper';
 import { createFileUserPermissionsModel } from '../../testHelpers/files/fileUserPermissionsHelper';
 import { FileSearchCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
@@ -40,10 +44,12 @@ describe('FilesRepository', () => {
   });
 
   describe('getDatasetFiles', () => {
+    const testTotalCount = 4;
     const testFilesSuccessfulResponse = {
       data: {
         status: 'OK',
-        data: [createFilePayload()],
+        data: createManyFilesPayload(testTotalCount),
+        totalCount: testTotalCount,
       },
     };
 
@@ -77,7 +83,7 @@ describe('FilesRepository', () => {
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
     };
 
-    const expectedFiles = [testFile];
+    const expectedFiles = createFilesSubsetModel(testTotalCount);
 
     describe('by numeric id and version id', () => {
       const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/files`;
@@ -124,7 +130,7 @@ describe('FilesRepository', () => {
         );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKeyWithOptional);
-        assert.match(actual, [testFile]);
+        assert.match(actual, expectedFiles);
       });
 
       test('should return error result on error response', async () => {
@@ -185,7 +191,7 @@ describe('FilesRepository', () => {
         );
 
         assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKeyWithOptional);
-        assert.match(actual, [testFile]);
+        assert.match(actual, expectedFiles);
       });
 
       test('should return error result on error response', async () => {
