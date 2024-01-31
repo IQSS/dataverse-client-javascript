@@ -14,6 +14,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Citation Text](#get-dataset-citation-text)
     - [Get Dataset Locks](#get-dataset-locks)
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
+    - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
     - [List All Datasets](#list-all-datasets)
 - [Files](#Files)
 - [Metadata Blocks](#metadata-blocks)
@@ -129,6 +130,32 @@ getDatasetSummaryFieldNames
 ````
 
 *See [use case](../src/datasets/domain/useCases/GetDatasetSummaryFieldNames.ts) definition*.
+
+#### Get User Permissions on a Dataset
+
+Returns an instance of [DatasetUserPermissions](../src/datasets/domain/models/DatasetUserPermissions.ts) that includes the permissions that the calling user has on a particular Dataset.
+
+##### Example call:
+
+````typescript
+import { getDatasetUserPermissions } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA';
+
+getDatasetUserPermissions
+  .execute(datasetId)
+  .then((permissions: DatasetUserPermissions) => {
+    /* ... */
+  });
+  
+/* ... */
+````
+
+*See [use case](../src/datasets/domain/useCases/GetDatasetUserPermissions.ts) definition*.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 #### List All Datasets
 
