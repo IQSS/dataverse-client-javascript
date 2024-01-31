@@ -8,6 +8,12 @@ export class GetPrivateUrlDatasetCitation implements UseCase<string> {
     this.datasetsRepository = datasetsRepository;
   }
 
+  /**
+   * Returns the Dataset citation text, given an associated Private URL Token.
+   *
+   * @param {string} [token] - A Private URL token.
+   * @returns {Promise<string>}
+   */
   async execute(token: string): Promise<string> {
     return await this.datasetsRepository.getPrivateUrlDatasetCitation(token);
   }

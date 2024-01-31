@@ -1,6 +1,6 @@
 # Use Cases
 
-In the context of [Domain-Driven Design (DDD)](https://martinfowler.com/bliki/DomainDrivenDesign.html), a use case is a specific way to describe and capture a user's or system's interaction with the domain to achieve a particular goal. 
+In the context of [Domain-Driven Design (DDD)](https://martinfowler.com/bliki/DomainDrivenDesign.html), a use case is a specific way to describe and capture a user's or system's interaction with the domain to achieve a particular goal.
 
 This package exposes the functionality in the form of use cases, with the main goal that any package consumer can easily identify the desired functionality.
 
@@ -11,7 +11,9 @@ The different use cases currently available in the package are classified below,
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
+    - [Get Dataset By Private URL Token](#get-dataset-by-private-url-token)
     - [Get Dataset Citation Text](#get-dataset-citation-text)
+    - [Get Dataset Citation Text By Private URL](#get-dataset-citation-text-by-private-url)
     - [Get Dataset Locks](#get-dataset-locks)
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
     - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
@@ -31,24 +33,22 @@ Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given th
 
 ##### Example call:
 
-````typescript
-import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript'
+```typescript
+import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript';
 
 /* ... */
 
 const datasetId = 'doi:10.77777/FK2/AAAAAA';
 const datasetVersionId = '1.0';
 
-getDataset
-  .execute(datasetId, datasetVersionId)
-  .then((dataset: Dataset) => {
-    /* ... */
-  });
-  
-/* ... */
-````
+getDataset.execute(datasetId, datasetVersionId).then((dataset: Dataset) => {
+  /* ... */
+});
 
-*See [use case](../src/datasets/domain/useCases/GetDataset.ts)* definition.
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDataset.ts)_ definition.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -56,32 +56,72 @@ The `datasetVersionId` parameter can correspond to a numeric version identifier,
 
 There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
+#### Get Dataset By Private URL Token
+
+Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given an associated Private URL Token.
+
+```typescript
+import { getPrivateUrlDataset } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const token = 'a56444bc-7697-4711-8964-e0577f055fd2';
+
+getPrivateUrlDataset.execute(token).then((dataset: Dataset) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetPrivateUrlDataset.ts)_ definition.
+
 #### Get Dataset Citation Text
 
 Returns the Dataset citation text.
 
 ##### Example call:
 
-````typescript
-import { getDatasetCitation } from '@iqss/dataverse-client-javascript'
+```typescript
+import { getDatasetCitation } from '@iqss/dataverse-client-javascript';
 
 /* ... */
 
 const datasetId = 2;
 const datasetVersionId = '1.0';
 
-getDatasetCitation
-  .execute(datasetId, datasetVersionId)
-  .then((citationText: string) => {
-    /* ... */
-  });
-  
-/* ... */
-````
+getDatasetCitation.execute(datasetId, datasetVersionId).then((citationText: string) => {
+  /* ... */
+});
 
-*See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) definition*.
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) definition_.
 
 There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
+#### Get Dataset Citation Text By Private URL
+
+Returns the Dataset citation text, given an associated Private URL Token.
+
+##### Example call:
+
+```typescript
+import { getPrivateUrlDatasetCitation } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const token = 'a56444bc-7697-4711-8964-e0577f055fd2';
+
+getPrivateUrlDatasetCitation.execute(token).then((citationText: string) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetPrivateUrlDatasetCitation.ts) definition_.
 
 #### Get Dataset Locks
 
@@ -89,23 +129,21 @@ Returns a [DatasetLock](../src/datasets/domain/models/DatasetLock.ts) array of a
 
 ##### Example call:
 
-````typescript
-import { getDatasetLocks } from '@iqss/dataverse-client-javascript'
+```typescript
+import { getDatasetLocks } from '@iqss/dataverse-client-javascript';
 
 /* ... */
 
 const datasetId = 'doi:10.77777/FK2/AAAAAA';
 
-getDatasetLocks
-  .execute(datasetId)
-  .then((datasetLocks: DatasetLock[]) => {
-    /* ... */
-  });
-  
-/* ... */
-````
+getDatasetLocks.execute(datasetId).then((datasetLocks: DatasetLock[]) => {
+  /* ... */
+});
 
-*See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) definition*.
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) definition_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -115,21 +153,19 @@ Returns the names of the dataset summary fields configured in the installation.
 
 ##### Example call:
 
-````typescript
-import { getDatasetSummaryFieldNames } from '@iqss/dataverse-client-javascript'
+```typescript
+import { getDatasetSummaryFieldNames } from '@iqss/dataverse-client-javascript';
 
 /* ... */
 
-getDatasetSummaryFieldNames
-  .execute()
-  .then((names: string[]) => {
-    /* ... */
-  });
-  
-/* ... */
-````
+getDatasetSummaryFieldNames.execute().then((names: string[]) => {
+  /* ... */
+});
 
-*See [use case](../src/datasets/domain/useCases/GetDatasetSummaryFieldNames.ts) definition*.
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetSummaryFieldNames.ts) definition_.
 
 #### Get User Permissions on a Dataset
 
@@ -137,23 +173,21 @@ Returns an instance of [DatasetUserPermissions](../src/datasets/domain/models/Da
 
 ##### Example call:
 
-````typescript
-import { getDatasetUserPermissions } from '@iqss/dataverse-client-javascript'
+```typescript
+import { getDatasetUserPermissions } from '@iqss/dataverse-client-javascript';
 
 /* ... */
 
 const datasetId = 'doi:10.77777/FK2/AAAAAA';
 
-getDatasetUserPermissions
-  .execute(datasetId)
-  .then((permissions: DatasetUserPermissions) => {
-    /* ... */
-  });
-  
-/* ... */
-````
+getDatasetUserPermissions.execute(datasetId).then((permissions: DatasetUserPermissions) => {
+  /* ... */
+});
 
-*See [use case](../src/datasets/domain/useCases/GetDatasetUserPermissions.ts) definition*.
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetUserPermissions.ts) definition_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -163,24 +197,22 @@ Returns an instance of [DatasetPreviewSubset](../src/datasets/domain/models/Data
 
 ##### Example call:
 
-````typescript
-import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript'
+```typescript
+import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript';
 
 /* ... */
 
 const limit = 10;
 const offset = 20;
 
-getAllDatasetPreviews
-  .execute(limit, offset)
-  .then((subset: DatasetPreviewSubset) => {
-    /* ... */
-  });
-  
-/* ... */
-````
+getAllDatasetPreviews.execute(limit, offset).then((subset: DatasetPreviewSubset) => {
+  /* ... */
+});
 
-*See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) definition*.
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) definition_.
 
 Note that `limit` and `offset` are optional parameters for pagination.
 
