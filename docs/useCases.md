@@ -55,11 +55,30 @@ There is a third optional parameter called `includeDeaccessioned`, which indicat
 
 #### Get Citation Text from a Dataset
 
-TODO
+Returns the Dataset citation text.
 
 ##### Example call:
 
+````typescript
+import { getDatasetCitation } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA';
+const datasetVersionId = '1.0';
+
+getDatasetCitation
+  .execute(datasetId, datasetVersionId)
+  .then((citationText: string) => {
+    /* ... */
+  });
+  
+/* ... */
+````
+
 *See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) definition*.
+
+There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
 #### List All Datasets
 
