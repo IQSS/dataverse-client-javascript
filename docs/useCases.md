@@ -11,8 +11,9 @@ The different use cases currently available in the package are classified below,
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
-    - [Get Citation Text from a Dataset](#get-citation-text-from-a-dataset)
-    - [List all Datasets](#list-all-datasets)
+    - [Get Dataset Citation Text](#get-dataset-citation-text)
+    - [Get Dataset Locks](#get-dataset-locks)
+    - [List All Datasets](#list-all-datasets)
 - [Files](#Files)
 - [Metadata Blocks](#metadata-blocks)
 - [Users](#Users)
@@ -53,7 +54,7 @@ The `datasetVersionId` parameter can correspond to a numeric version identifier,
 
 There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
-#### Get Citation Text from a Dataset
+#### Get Dataset Citation Text
 
 Returns the Dataset citation text.
 
@@ -64,7 +65,7 @@ import { getDatasetCitation } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId = 'doi:10.77777/FK2/AAAAAA';
+const datasetId = 2;
 const datasetVersionId = '1.0';
 
 getDatasetCitation
@@ -79,6 +80,32 @@ getDatasetCitation
 *See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) definition*.
 
 There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
+#### Get Dataset Locks
+
+Returns a [DatasetLock](../src/datasets/domain/models/DatasetLock.ts) array of all locks present in a Dataset.
+
+##### Example call:
+
+````typescript
+import { getDatasetLocks } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA';
+
+getDatasetLocks
+  .execute(datasetId)
+  .then((datasetLocks: DatasetLock[]) => {
+    /* ... */
+  });
+  
+/* ... */
+````
+
+*See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) definition*.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 #### List All Datasets
 

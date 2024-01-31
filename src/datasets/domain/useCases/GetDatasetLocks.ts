@@ -9,6 +9,12 @@ export class GetDatasetLocks implements UseCase<DatasetLock[]> {
     this.datasetsRepository = datasetsRepository;
   }
 
+  /**
+   * Returns all locks present in a Dataset.
+   *
+   * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
+   * @returns {Promise<DatasetLock[]>}
+   */
   async execute(datasetId: number | string): Promise<DatasetLock[]> {
     return await this.datasetsRepository.getDatasetLocks(datasetId);
   }
