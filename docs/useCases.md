@@ -19,6 +19,8 @@ The different use cases currently available in the package are classified below,
     - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
     - [List All Datasets](#list-all-datasets)
 - [Files](#Files)
+  - [Files read use cases](#files-read-use-cases)
+    - [List Files in a Dataset](#list-files-in-a-dataset)
 - [Metadata Blocks](#metadata-blocks)
 - [Users](#Users)
 - [Info](#Info)
@@ -220,7 +222,64 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 
 ## Files
 
-TODO
+### Files read use cases
+
+#### List Files in a Dataset
+
+Returns an instance of [FilesSubset](../src/files/domain/models/FilesSubset.ts), which contains the files from the requested Dataset and page (if pagination parameters are set).
+
+##### Example call:
+
+```typescript
+import { getDatasetFiles } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const datasetId = 2;
+const datasetVersionId = '1.0';
+
+getDatasetFiles.execute(datasetId, datasetVersionId).then((subset: FilesSubset) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetDatasetFiles.ts) definition_.
+
+This use case supports the following optional parameters depending on the search goals:
+
+- **includeDeaccessioned**: (boolean) Indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
+- **fileSearchCriteria**: ([FileSearchCriteria](../src/files/domain/models/FileCriteria.ts)) Supports filtering the files by different file properties.
+- **fileOrderCriteria**: ([FileOrderCriteria](../src/files/domain/models/FileCriteria.ts)) Supports ordering the results according to different criteria. If not set, the defalt value is `FileOrderCriteria.NAME_AZ`.
+
+##### Example call using optional parameters:
+
+```typescript
+import { getDatasetFiles } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const datasetId: number = 2;
+const datasetVersionId: string = '1.0';
+const includeDeaccessioned: boolean = true;
+const limit: number = 10;
+const offset: number = 20;
+const searchCriteria: FileSearchCriteria = {
+  searchText: 'file title',
+};
+const orderCriteria: FileOrderCriteria = FileOrderCriteria.NEWEST;
+
+getDatasetFiles
+  .execute(datasetId, datasetVersionId, includeDeaccessioned, limit, offset, searchCriteria, orderCriteria)
+  .then((subset: FilesSubset) => {
+    /* ... */
+  });
+
+/* ... */
+```
 
 ## Metadata Blocks
 
