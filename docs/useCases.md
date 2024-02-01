@@ -13,7 +13,7 @@ The different use cases currently available in the package are classified below,
     - [Get a Dataset](#get-a-dataset)
     - [Get Dataset By Private URL Token](#get-dataset-by-private-url-token)
     - [Get Dataset Citation Text](#get-dataset-citation-text)
-    - [Get Dataset Citation Text By Private URL](#get-dataset-citation-text-by-private-url)
+    - [Get Dataset Citation Text By Private URL Token](#get-dataset-citation-text-by-private-url-token)
     - [Get Dataset Locks](#get-dataset-locks)
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
     - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
@@ -103,7 +103,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) definitio
 
 There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
-#### Get Dataset Citation Text By Private URL
+#### Get Dataset Citation Text By Private URL Token
 
 Returns the Dataset citation text, given an associated Private URL Token.
 
