@@ -24,6 +24,7 @@ The different use cases currently available in the package are classified below,
     - [Get File Data Tables](#get-file-data-tables)
     - [Get File Download Count](#get-file-download-count)
     - [Get the size of Downloading all the files of a Dataset Version](#get-the-size-of-downloading-all-the-files-of-a-dataset-version)
+    - [Get User Permissions on a File](#get-user-permissions-on-a-file)
     - [List Files in a Dataset](#list-files-in-a-dataset)
 - [Metadata Blocks](#metadata-blocks)
 - [Users](#Users)
@@ -393,6 +394,36 @@ getDatasetFilesTotalDownloadSize
 
 /* ... */
 ```
+
+#### Get User Permissions on a File
+
+This use case returns a [FileUserPermissions](../src/files/domain/models/FileUserPermissions.ts) object, which includes the permissions that the calling user has on a particular File.
+
+The returned *FileUserPermissions* object contains the following permissions, as booleans:
+
+- Can download the file (*canDownloadFile*)
+- Can manage the file permissions (*canManageFilePermissions*)
+- Can edit the file owner dataset (*canEditOwnerDataset*)
+
+##### Example call:
+
+```typescript
+import { getFileUserPermissions } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const fileId: number = 2;
+
+getFileUserPermissions.execute(fileId).then((permissions: FileUserPermissions) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileUserPermissions.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 #### List Files in a Dataset
 
