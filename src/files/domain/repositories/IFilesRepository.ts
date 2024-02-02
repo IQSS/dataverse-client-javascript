@@ -1,9 +1,10 @@
-import { File } from '../models/File';
+import { FilesSubset } from '../models/FilesSubset';
 import { FileDataTable } from '../models/FileDataTable';
 import { FileUserPermissions } from '../models/FileUserPermissions';
 import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria';
 import { FileCounts } from '../models/FileCounts';
 import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode';
+import { File } from '../models/File';
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -14,7 +15,7 @@ export interface IFilesRepository {
     limit?: number,
     offset?: number,
     fileSearchCriteria?: FileSearchCriteria,
-  ): Promise<File[]>;
+  ): Promise<FilesSubset>;
 
   getDatasetFileCounts(
     datasetId: number | string,

@@ -47,3 +47,4 @@ export {
   FileDataVariableFormatType,
 } from './domain/models/FileDataTable';
 export { FileDownloadSizeMode } from './domain/models/FileDownloadSizeMode';
+export { FilesSubset } from './domain/models/FilesSubset';
