@@ -21,6 +21,7 @@ The different use cases currently available in the package are classified below,
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get File Counts in a Dataset](#get-file-counts-in-a-dataset)
+    - [Get File Data Tables](#get-file-data-tables)
     - [Get File Download Count](#get-file-download-count)
     - [Get the size of Downloading all the files of a Dataset Version](#get-the-size-of-downloading-all-the-files-of-a-dataset-version)
     - [List Files in a Dataset](#list-files-in-a-dataset)
@@ -285,6 +286,30 @@ getDatasetFileCounts
 
 /* ... */
 ```
+
+#### Get File Data Tables
+
+This use case is oriented toward tabular files and provides an array of [FileDataTable](../src/files/domain/models/FileDataTable.ts) objects for an existing tabular file.
+
+##### Example call:
+
+```typescript
+import { getFileDataTables } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const fileId = 2;
+
+getFileDataTables.execute(fileId).then((dataTables: FileDataTable[]) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileDataTables.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 #### Get File Download Count
 
