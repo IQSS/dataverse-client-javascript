@@ -27,6 +27,7 @@ The different use cases currently available in the package are classified below,
     - [Get User Permissions on a File](#get-user-permissions-on-a-file)
     - [List Files in a Dataset](#list-files-in-a-dataset)
 - [Metadata Blocks](#metadata-blocks)
+  - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
 - [Users](#Users)
 - [Info](#Info)
 
@@ -399,11 +400,11 @@ getDatasetFilesTotalDownloadSize
 
 This use case returns a [FileUserPermissions](../src/files/domain/models/FileUserPermissions.ts) object, which includes the permissions that the calling user has on a particular File.
 
-The returned *FileUserPermissions* object contains the following permissions, as booleans:
+The returned _FileUserPermissions_ object contains the following permissions, as booleans:
 
-- Can download the file (*canDownloadFile*)
-- Can manage the file permissions (*canManageFilePermissions*)
-- Can edit the file owner dataset (*canEditOwnerDataset*)
+- Can download the file (_canDownloadFile_)
+- Can manage the file permissions (_canManageFilePermissions_)
+- Can edit the file owner dataset (_canEditOwnerDataset_)
 
 ##### Example call:
 
@@ -486,7 +487,29 @@ getDatasetFiles
 
 ## Metadata Blocks
 
-TODO
+### Metadata Blocks read use cases
+
+#### Get Metadata Block By Name
+
+Returns a [MetadataBlock](../src/metadataBlocks/domain/models/MetadataBlock.ts) instance, given its name.
+
+##### Example call:
+
+```typescript
+import { getMetadataBlockByName } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const name = 'citation';
+
+getMetadataBlockByName.execute(name).then((metadataBlock: MetadataBlock) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/metadataBlocks/domain/useCases/GetMetadataBlockByName.ts) implementation_.
 
 ## Users
 
