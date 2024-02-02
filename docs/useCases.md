@@ -102,7 +102,7 @@ getDatasetCitation.execute(datasetId, datasetVersionId).then((citationText: stri
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) implementation.
+_See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -128,7 +128,7 @@ getPrivateUrlDatasetCitation.execute(token).then((citationText: string) => {
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetPrivateUrlDatasetCitation.ts) implementation.
+_See [use case](../src/datasets/domain/useCases/GetPrivateUrlDatasetCitation.ts) implementation_.
 
 #### Get Dataset Locks
 
@@ -150,7 +150,7 @@ getDatasetLocks.execute(datasetId).then((datasetLocks: DatasetLock[]) => {
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) implementation.
+_See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -172,7 +172,7 @@ getDatasetSummaryFieldNames.execute().then((names: string[]) => {
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetSummaryFieldNames.ts) implementation.
+_See [use case](../src/datasets/domain/useCases/GetDatasetSummaryFieldNames.ts) implementation_.
 
 #### Get User Permissions on a Dataset
 
@@ -194,7 +194,7 @@ getDatasetUserPermissions.execute(datasetId).then((permissions: DatasetUserPermi
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetUserPermissions.ts) implementation.
+_See [use case](../src/datasets/domain/useCases/GetDatasetUserPermissions.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -219,7 +219,7 @@ getAllDatasetPreviews.execute(limit, offset).then((subset: DatasetPreviewSubset)
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) implementation.
+_See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) implementation_.
 
 Note that `limit` and `offset` are optional parameters for pagination.
 
@@ -255,7 +255,7 @@ getDatasetFileCounts.execute(datasetId, datasetVersionId).then((fileCounts: File
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/GetDatasetFileCounts.ts) implementation.
+_See [use case](../src/files/domain/useCases/GetDatasetFileCounts.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -306,7 +306,7 @@ getFileDownloadCount.execute(fileId).then((count: number) => {
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/GetFileDownloadCount.ts) implementation.
+_See [use case](../src/files/domain/useCases/GetFileDownloadCount.ts) implementation_.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -331,7 +331,7 @@ getDatasetFilesTotalDownloadSize.execute(datasetId, datasetVersionId).then((size
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/GetDatasetFilesTotalDownloadSize.ts) implementation.
+_See [use case](../src/files/domain/useCases/GetDatasetFilesTotalDownloadSize.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -390,7 +390,7 @@ getDatasetFiles.execute(datasetId, datasetVersionId).then((subset: FilesSubset) 
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/GetDatasetFiles.ts) implementation.
+_See [use case](../src/files/domain/useCases/GetDatasetFiles.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
