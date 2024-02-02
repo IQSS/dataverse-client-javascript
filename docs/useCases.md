@@ -289,7 +289,7 @@ Returns an instance of [FileCounts](../src/files/domain/models/FileCounts.ts), c
 - **Per content type**
 - **Per category name**
 - **Per tabular tag name**
-- **Per access status** (Possible values: *Public*, *Restricted*, *EmbargoedThenRestricted*, *EmbargoedThenPublic*)
+- **Per access status** (Possible values: _Public_, _Restricted_, _EmbargoedThenRestricted_, _EmbargoedThenPublic_)
 
 ##### Example call:
 
@@ -301,7 +301,7 @@ import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript';
 const datasetId = 2;
 const datasetVersionId = '1.0';
 
-getDatasetFileCounts.execute(datasetId, datasetVersionId).then((subset: FilesSubset) => {
+getDatasetFileCounts.execute(datasetId, datasetVersionId).then((fileCounts: FileCounts) => {
   /* ... */
 });
 
@@ -313,6 +313,29 @@ _See [use case](../src/files/domain/useCases/GetDatasetFileCounts.ts) definition
 There is a third optional parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
 A fourth optional parameter `fileSearchCriteria` receives a [FileSearchCriteria](../src/files/domain/models/FileCriteria.ts) parameter to retrieve counts only for files that match the specified criteria.
+
+##### Example call using optional parameters:
+
+```typescript
+import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const datasetId: number = 2;
+const datasetVersionId: string = '1.0';
+const includeDeaccessioned: boolean = true;
+const searchCriteria: FileSearchCriteria = {
+  categoryName: 'Physics',
+};
+
+getDatasetFileCounts
+  .execute(datasetId, datasetVersionId, includeDeaccessioned, searchCriteria)
+  .then((fileCounts: FileCounts) => {
+    /* ... */
+  });
+
+/* ... */
+```
 
 ## Metadata Blocks
 
