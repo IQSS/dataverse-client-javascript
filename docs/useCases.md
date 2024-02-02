@@ -21,6 +21,7 @@ The different use cases currently available in the package are classified below,
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get File Counts in a Dataset](#get-file-counts-in-a-dataset)
+    - [Get File Download Count](#get-file-download-count)
     - [Get the size of Downloading all the files of a Dataset Version](#get-the-size-of-downloading-all-the-files-of-a-dataset-version)
     - [List Files in a Dataset](#list-files-in-a-dataset)
 - [Metadata Blocks](#metadata-blocks)
@@ -101,7 +102,9 @@ getDatasetCitation.execute(datasetId, datasetVersionId).then((citationText: stri
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) definition_.
+_See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) implementation.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
@@ -125,7 +128,7 @@ getPrivateUrlDatasetCitation.execute(token).then((citationText: string) => {
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetPrivateUrlDatasetCitation.ts) definition_.
+_See [use case](../src/datasets/domain/useCases/GetPrivateUrlDatasetCitation.ts) implementation.
 
 #### Get Dataset Locks
 
@@ -147,7 +150,7 @@ getDatasetLocks.execute(datasetId).then((datasetLocks: DatasetLock[]) => {
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) definition_.
+_See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) implementation.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -169,7 +172,7 @@ getDatasetSummaryFieldNames.execute().then((names: string[]) => {
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetSummaryFieldNames.ts) definition_.
+_See [use case](../src/datasets/domain/useCases/GetDatasetSummaryFieldNames.ts) implementation.
 
 #### Get User Permissions on a Dataset
 
@@ -191,7 +194,7 @@ getDatasetUserPermissions.execute(datasetId).then((permissions: DatasetUserPermi
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetUserPermissions.ts) definition_.
+_See [use case](../src/datasets/domain/useCases/GetDatasetUserPermissions.ts) implementation.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -216,7 +219,7 @@ getAllDatasetPreviews.execute(limit, offset).then((subset: DatasetPreviewSubset)
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) definition_.
+_See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) implementation.
 
 Note that `limit` and `offset` are optional parameters for pagination.
 
@@ -225,6 +228,146 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 ## Files
 
 ### Files read use cases
+
+#### Get File Counts in a Dataset
+
+Returns an instance of [FileCounts](../src/files/domain/models/FileCounts.ts), containing the requested Dataset total file count, as well as file counts for the following file properties:
+
+- **Per content type**
+- **Per category name**
+- **Per tabular tag name**
+- **Per access status** (Possible values: _Public_, _Restricted_, _EmbargoedThenRestricted_, _EmbargoedThenPublic_)
+
+##### Example call:
+
+```typescript
+import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const datasetId = 2;
+const datasetVersionId = '1.0';
+
+getDatasetFileCounts.execute(datasetId, datasetVersionId).then((fileCounts: FileCounts) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetDatasetFileCounts.ts) implementation.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
+An optional fourth parameter `fileSearchCriteria` receives a [FileSearchCriteria](../src/files/domain/models/FileCriteria.ts) object to retrieve counts only for files that match the specified criteria.
+
+##### Example call using optional parameters:
+
+```typescript
+import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const datasetId: number = 2;
+const datasetVersionId: string = '1.0';
+const includeDeaccessioned: boolean = true;
+const searchCriteria: FileSearchCriteria = {
+  categoryName: 'physics',
+};
+
+getDatasetFileCounts
+  .execute(datasetId, datasetVersionId, includeDeaccessioned, searchCriteria)
+  .then((fileCounts: FileCounts) => {
+    /* ... */
+  });
+
+/* ... */
+```
+
+#### Get File Download Count
+
+Provides the download count for a particular File.
+
+##### Example call:
+
+```typescript
+import { getFileDownloadCount } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const fileId: number = 2;
+
+getFileDownloadCount.execute(fileId).then((count: number) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileDownloadCount.ts) implementation.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Get the size of Downloading all the files of a Dataset Version
+
+Returns the combined size in bytes of all the files available for download from a particular Dataset.
+
+##### Example call:
+
+```typescript
+import { getDatasetFilesTotalDownloadSize } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const datasetId: number = 2;
+const datasetVersionId: string = '1.0';
+
+getDatasetFilesTotalDownloadSize.execute(datasetId, datasetVersionId).then((size: number) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetDatasetFilesTotalDownloadSize.ts) implementation.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+There is a third optional parameter called `fileDownloadSizeMode` which receives an enum type of [FileDownloadSizeMode](../src/files/domain/models/FileDownloadSizeMode.ts), and applies a filter criteria to the operation. This parameter supports the following values:
+
+- `FileDownloadSizeMode.ALL` (Default): Includes both archival and original sizes for tabular files
+- `FileDownloadSizeMode.ARCHIVAL`: Includes only the archival size for tabular files
+- `FileDownloadSizeMode.ORIGINAL`: Includes only the original size for tabular files
+
+An optional fourth parameter called `fileSearchCriteria` receives a [FileSearchCriteria](../src/files/domain/models/FileCriteria.ts) object to only consider files that match the specified criteria.
+
+An optional fifth parameter called `includeDeaccessioned` indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
+##### Example call using optional parameters:
+
+```typescript
+import { getDatasetFilesTotalDownloadSize } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const datasetId: number = 2;
+const datasetVersionId: string = '1.0';
+const mode: FileDownloadSizeMode = FileDownloadSizeMode.ARCHIVAL;
+const searchCriteria: FileDownloadSizeMode = {
+  categoryName: 'physics',
+};
+const includeDeaccessioned: boolean = true;
+
+getDatasetFilesTotalDownloadSize
+  .execute(datasetId, datasetVersionId, mode, searchCriteria, includeDeaccessioned)
+  .then((size: number) => {
+    /* ... */
+  });
+
+/* ... */
+```
 
 #### List Files in a Dataset
 
@@ -247,7 +390,9 @@ getDatasetFiles.execute(datasetId, datasetVersionId).then((subset: FilesSubset) 
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/GetDatasetFiles.ts) definition_.
+_See [use case](../src/files/domain/useCases/GetDatasetFiles.ts) implementation.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 This use case supports the following optional parameters depending on the search goals:
 
@@ -277,116 +422,6 @@ const orderCriteria: FileOrderCriteria = FileOrderCriteria.NEWEST;
 getDatasetFiles
   .execute(datasetId, datasetVersionId, includeDeaccessioned, limit, offset, searchCriteria, orderCriteria)
   .then((subset: FilesSubset) => {
-    /* ... */
-  });
-
-/* ... */
-```
-
-### Get File Counts in a Dataset
-
-Returns an instance of [FileCounts](../src/files/domain/models/FileCounts.ts), containing the requested Dataset total file count, as well as file counts for the following file properties:
-
-- **Per content type**
-- **Per category name**
-- **Per tabular tag name**
-- **Per access status** (Possible values: _Public_, _Restricted_, _EmbargoedThenRestricted_, _EmbargoedThenPublic_)
-
-##### Example call:
-
-```typescript
-import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript';
-
-/* ... */
-
-const datasetId = 2;
-const datasetVersionId = '1.0';
-
-getDatasetFileCounts.execute(datasetId, datasetVersionId).then((fileCounts: FileCounts) => {
-  /* ... */
-});
-
-/* ... */
-```
-
-_See [use case](../src/files/domain/useCases/GetDatasetFileCounts.ts) definition_.
-
-There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
-
-An optional fourth parameter `fileSearchCriteria` receives a [FileSearchCriteria](../src/files/domain/models/FileCriteria.ts) object to retrieve counts only for files that match the specified criteria.
-
-##### Example call using optional parameters:
-
-```typescript
-import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript';
-
-/* ... */
-
-const datasetId: number = 2;
-const datasetVersionId: string = '1.0';
-const includeDeaccessioned: boolean = true;
-const searchCriteria: FileSearchCriteria = {
-  categoryName: 'physics',
-};
-
-getDatasetFileCounts
-  .execute(datasetId, datasetVersionId, includeDeaccessioned, searchCriteria)
-  .then((fileCounts: FileCounts) => {
-    /* ... */
-  });
-
-/* ... */
-```
-
-### Get the size of Downloading all the files of a Dataset Version
-
-Returns the combined size in bytes of all the files available for download from a particular Dataset.
-
-##### Example call:
-
-```typescript
-import { getDatasetFilesTotalDownloadSize } from '@iqss/dataverse-client-javascript';
-
-/* ... */
-
-const datasetId: number = 2;
-const datasetVersionId: string = '1.0';
-
-getDatasetFilesTotalDownloadSize.execute(datasetId, datasetVersionId).then((size: number) => {
-  /* ... */
-});
-
-/* ... */
-```
-
-There is a third optional parameter called `fileDownloadSizeMode` which receives an enum type of [FileDownloadSizeMode](../src/files/domain/models/FileDownloadSizeMode.ts), and applies a filter criteria to the operation. This parameter supports the following values:
-
-- `FileDownloadSizeMode.ALL` (Default): Includes both archival and original sizes for tabular files
-- `FileDownloadSizeMode.ARCHIVAL`: Includes only the archival size for tabular files
-- `FileDownloadSizeMode.ORIGINAL`: Includes only the original size for tabular files
-
-An optional fourth parameter called `fileSearchCriteria` receives a [FileSearchCriteria](../src/files/domain/models/FileCriteria.ts) object to only consider files that match the specified criteria.
-
-An optional fifth parameter called `includeDeaccessioned` indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
-
-##### Example call using optional parameters:
-
-```typescript
-import { getDatasetFilesTotalDownloadSize } from '@iqss/dataverse-client-javascript';
-
-/* ... */
-
-const datasetId: number = 2;
-const datasetVersionId: string = '1.0';
-const fileDownloadSizeMode: FileDownloadSizeMode = FileDownloadSizeMode.ARCHIVAL;
-const fileSearchCriteria: FileDownloadSizeMode = {
-  categoryName: 'physics',
-};
-const includeDeaccessioned: boolean = true;
-
-getDatasetFilesTotalDownloadSize
-  .execute(datasetId, datasetVersionId, fileDownloadSizeMode, fileSearchCriteria, includeDeaccessioned)
-  .then((size: number) => {
     /* ... */
   });
 
