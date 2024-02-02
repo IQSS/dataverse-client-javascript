@@ -28,6 +28,7 @@ The different use cases currently available in the package are classified below,
     - [List Files in a Dataset](#list-files-in-a-dataset)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
+      - [Get Metadata Block By Name](#get-metadata-block-by-name)
 - [Users](#Users)
 - [Info](#Info)
 
