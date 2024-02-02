@@ -8,7 +8,8 @@ import { TestConstants } from '../../testHelpers/TestConstants';
 import {
   createFileModel,
   createManyFilesPayload,
-  createFilesSubsetModel
+  createFilesSubsetModel,
+  createFilePayload
 } from '../../testHelpers/files/filesHelper';
 import { createFileDataTablePayload, createFileDataTableModel } from '../../testHelpers/files/fileDataTablesHelper';
 import { createFileUserPermissionsModel } from '../../testHelpers/files/fileUserPermissionsHelper';

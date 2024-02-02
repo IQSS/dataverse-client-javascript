@@ -61,14 +61,14 @@ describe('FilesRepository', () => {
       });
     // Registering test file 1
     await registerFileViaApi(uploadFileResponse.data.data.files[0].dataFile.id);
-    const files = await sut.getDatasetFiles(
+    const filesSubset = await sut.getDatasetFiles(
         TestConstants.TEST_CREATED_DATASET_1_ID,
         latestDatasetVersionId,
         false,
         FileOrderCriteria.NAME_AZ,
     )
-    testFileId = files[0].id;
-    testFilePersistentId = files[0].persistentId;
+    testFileId = filesSubset.files[0].id;
+    testFilePersistentId = filesSubset.files[0].persistentId;
   });
 
   describe('getDatasetFiles', () => {
