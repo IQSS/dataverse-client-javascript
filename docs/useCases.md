@@ -28,8 +28,10 @@ The different use cases currently available in the package are classified below,
     - [List Files in a Dataset](#list-files-in-a-dataset)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
-      - [Get Metadata Block By Name](#get-metadata-block-by-name)
+    - [Get Metadata Block By Name](#get-metadata-block-by-name)
 - [Users](#Users)
+  - [Users read use cases](#users-read-use-cases)
+    - [Get Current Authenticated User](#get-current-authenticated-user)
 - [Info](#Info)
 
 ## Datasets
@@ -514,7 +516,27 @@ _See [use case](../src/metadataBlocks/domain/useCases/GetMetadataBlockByName.ts)
 
 ## Users
 
-TODO
+### Users read use cases
+
+#### Get Current Authenticated User
+
+Returns the current [AuthenticatedUser](../src/users/domain/models/AuthenticatedUser.ts) corresponding to the authentication mechanism provided through `ApiConfig`.
+
+##### Example call:
+
+```typescript
+import { getCurrentAuthenticatedUser } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+getCurrentAuthenticatedUser.execute().then((user: AuthenticatedUser) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/users/domain/useCases/GetCurrentAuthenticatedUser.ts) implementation_.
 
 ## Info
 
