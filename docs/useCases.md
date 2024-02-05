@@ -34,6 +34,7 @@ The different use cases currently available in the package are classified below,
     - [Get Current Authenticated User](#get-current-authenticated-user)
 - [Info](#Info)
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
+  - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
 
 ## Datasets
 
@@ -560,3 +561,23 @@ getDataverseVersion.execute().then((version: DataverseVersion) => {
 ```
 
 _See [use case](../src/info/domain/useCases/GetDataverseVersion.ts) implementation_.
+
+#### Get Maximum Embargo Duration In Months
+
+Returns a number indicating the configured maximum embargo duration in months.
+
+##### Example call:
+
+```typescript
+import { getMaxEmbargoDurationInMonths } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+getMaxEmbargoDurationInMonths.execute().then((months: number) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/info/domain/useCases/GetMaxEmbargoDurationInMonths.ts) implementation_.
