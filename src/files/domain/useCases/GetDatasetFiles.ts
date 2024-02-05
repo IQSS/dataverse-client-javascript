@@ -1,6 +1,6 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase';
 import { IFilesRepository } from '../repositories/IFilesRepository';
-import { FilesSubset } from "../models/FilesSubset";
+import { FilesSubset } from '../models/FilesSubset';
 import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria';
 import { DatasetNotNumberedVersion } from '../../../datasets';
 
@@ -14,7 +14,7 @@ export class GetDatasetFiles implements UseCase<FilesSubset> {
   async execute(
     datasetId: number | string,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
-    includeDeaccessioned: boolean = false,
+    includeDeaccessioned = false,
     limit?: number,
     offset?: number,
     fileSearchCriteria?: FileSearchCriteria,

@@ -1,6 +1,6 @@
-import { File } from "./File";
+import { File } from './File';
 
 export interface FilesSubset {
-    files: File[];
-    totalFilesCount: number;
+  files: File[];
+  totalFilesCount: number;
 }

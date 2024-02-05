@@ -1,10 +1,8 @@
 import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File';
 import { AxiosResponse } from 'axios';
-import { FilesSubset } from "../../../domain/models/FilesSubset";
+import { FilesSubset } from '../../../domain/models/FilesSubset';
 
-export const transformFilesResponseToFilesSubset = (
-    response: AxiosResponse,
-): FilesSubset => {
+export const transformFilesResponseToFilesSubset = (response: AxiosResponse): FilesSubset => {
   const filesPayload = response.data.data;
   const files: File[] = [];
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -16,6 +14,11 @@ export const transformFilesResponseToFilesSubset = (
     files: files,
     totalFilesCount: response.data.totalCount,
   };
+};
+
+export const transformFileResponseToFile = (response: AxiosResponse): File => {
+  const filePayload = response.data.data;
+  return transformFilePayloadToFile(filePayload);
 };
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any

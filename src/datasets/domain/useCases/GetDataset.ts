@@ -13,7 +13,7 @@ export class GetDataset implements UseCase<Dataset> {
   async execute(
     datasetId: number | string,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
-    includeDeaccessioned: boolean = false,
+    includeDeaccessioned = false,
   ): Promise<Dataset> {
     return await this.datasetsRepository.getDataset(datasetId, datasetVersionId, includeDeaccessioned);
   }
