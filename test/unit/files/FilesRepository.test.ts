@@ -8,7 +8,8 @@ import { TestConstants } from '../../testHelpers/TestConstants';
 import {
   createFileModel,
   createManyFilesPayload,
-  createFilesSubsetModel
+  createFilesSubsetModel,
+  createFilePayload
 } from '../../testHelpers/files/filesHelper';
 import { createFileDataTablePayload, createFileDataTableModel } from '../../testHelpers/files/fileDataTablesHelper';
 import { createFileUserPermissionsModel } from '../../testHelpers/files/fileUserPermissionsHelper';
@@ -773,6 +774,104 @@ describe('FilesRepository', () => {
         );
         expect(error).to.be.instanceOf(Error);
       });
+    });
+  });
+  describe('getFile' , () => {
+    describe('by numeric id', () => {
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/`;
+        const testGetFileResponse = {
+            data: {
+            status: 'OK',
+            data: createFilePayload(),
+            },
+        };
+        test('should return file when providing id and response is successful', async () => {
+            const axiosGetStub = sandbox.stub(axios, 'get').resolves(testGetFileResponse);
+
+            // API Key auth
+            let actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST);
+
+            assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+            );
+            assert.match(actual, createFileModel());
+
+            // Session cookie auth
+            ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+            actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST);
+
+            assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+            );
+            assert.match(actual, createFileModel());
+        });
+
+        test('should return error result on error response', async () => {
+            const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+            let error: ReadError = undefined;
+            await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST).catch((e) => (error = e));
+
+            assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+            );
+            expect(error).to.be.instanceOf(Error);
+        });
+    });
+    describe('by persistent id', () => {
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId/?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
+        const testGetFileResponse = {
+            data: {
+            status: 'OK',
+            data: createFilePayload(),
+            },
+        };
+        test('should return file when providing persistent id and response is successful', async () => {
+            const axiosGetStub = sandbox.stub(axios, 'get').resolves(testGetFileResponse);
+
+            // API Key auth
+            let actual = await sut.getFile(TestConstants.TEST_DUMMY_PERSISTENT_ID, DatasetNotNumberedVersion.LATEST);
+
+            assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+            );
+            assert.match(actual, createFileModel());
+
+            // Session cookie auth
+            ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+            actual = await sut.getFile(TestConstants.TEST_DUMMY_PERSISTENT_ID, DatasetNotNumberedVersion.LATEST);
+
+            assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+            );
+            assert.match(actual, createFileModel());
+        });
+
+        test('should return error result on error response', async () => {
+            const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+            let error: ReadError = undefined;
+            await sut.getFile(TestConstants.TEST_DUMMY_PERSISTENT_ID, DatasetNotNumberedVersion.LATEST).catch((e) => (error = e));
+
+            assert.calledWithExactly(
+            axiosGetStub,
+            expectedApiEndpoint,
+            TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+            );
+            expect(error).to.be.instanceOf(Error);
+        });
     });
   });
 });

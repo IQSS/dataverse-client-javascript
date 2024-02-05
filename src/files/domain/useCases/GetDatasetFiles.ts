@@ -26,7 +26,7 @@ export class GetDatasetFiles implements UseCase<FilesSubset> {
   async execute(
     datasetId: number | string,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
-    includeDeaccessioned: boolean = false,
+    includeDeaccessioned = false,
     limit?: number,
     offset?: number,
     fileSearchCriteria?: FileSearchCriteria,

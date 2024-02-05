@@ -23,7 +23,7 @@ export class GetDatasetFileCounts implements UseCase<FileCounts> {
   async execute(
     datasetId: number | string,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
-    includeDeaccessioned: boolean = false,
+    includeDeaccessioned = false,
     fileSearchCriteria?: FileSearchCriteria,
   ): Promise<FileCounts> {
     return await this.filesRepository.getDatasetFileCounts(

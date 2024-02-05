@@ -1,7 +1,8 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository';
-import {FilesSubset} from "../../domain/models/FilesSubset";
-import { transformFilesResponseToFilesSubset } from './transformers/fileTransformers';
+import { File } from '../../domain/models/File';
+import { transformFileResponseToFile, transformFilesResponseToFilesSubset } from './transformers/fileTransformers';
+import { FilesSubset } from '../../domain/models/FilesSubset';
 import { FileDataTable } from '../../domain/models/FileDataTable';
 import { transformDataTablesResponseToDataTables } from './transformers/fileDataTableTransformers';
 import { FileUserPermissions } from '../../domain/models/FileUserPermissions';
@@ -10,6 +11,7 @@ import { FileSearchCriteria, FileOrderCriteria } from '../../domain/models/FileC
 import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode';
+import { DatasetNotNumberedVersion } from '../../../datasets';
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean;
@@ -141,6 +143,27 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       .catch((error) => {
         throw error;
       });
+  }
+
+  public async getFile(fileId: number | string, datasetVersionId: string): Promise<File> {
+    return this.doGet(this.getFileEndpoint(fileId, datasetVersionId), true)
+      .then((response) => transformFileResponseToFile(response))
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  private getFileEndpoint(fileId: number | string, datasetVersionId: string): string {
+    if (datasetVersionId === DatasetNotNumberedVersion.DRAFT) {
+      return this.buildApiEndpoint(this.filesResourceName, 'draft', fileId);
+    }
+    if (datasetVersionId === DatasetNotNumberedVersion.LATEST) {
+      return this.buildApiEndpoint(this.filesResourceName, '', fileId);
+    }
+    // TODO: Implement once it is supported by the API https://github.com/IQSS/dataverse/issues/10280
+    throw new Error(
+      `Requesting a file by its dataset version is not yet supported. Requested version: ${datasetVersionId}. Please try using the :latest or :draft version instead.`,
+    );
   }
 
   private applyFileSearchCriteriaToQueryParams(
