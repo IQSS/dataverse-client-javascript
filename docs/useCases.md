@@ -20,6 +20,7 @@ The different use cases currently available in the package are classified below,
     - [List All Datasets](#list-all-datasets)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
+    - [Get a File](#get-a-file)
     - [Get File Counts in a Dataset](#get-file-counts-in-a-dataset)
     - [Get File Data Tables](#get-file-data-tables)
     - [Get File Download Count](#get-file-download-count)
@@ -237,6 +238,33 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 ## Files
 
 ### Files read use cases
+
+#### Get a File
+
+Returns a [File](../src/files/domain/models/Dataset.ts) instance, given the search parameters to identify it.
+
+##### Example call:
+
+```typescript
+import { getFile } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const fileId = 2;
+const datasetVersionId = '1.0';
+
+getFile.execute(fileId, datasetVersionId).then((file: File) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFile.ts)_ definition.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
 #### Get File Counts in a Dataset
 
