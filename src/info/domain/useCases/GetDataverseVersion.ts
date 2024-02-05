@@ -9,6 +9,11 @@ export class GetDataverseVersion implements UseCase<DataverseVersion> {
     this.dataverseInfoRepository = dataverseInfoRepository;
   }
 
+  /**
+   * Returns a DataverseVersion object, which contains version information for the Dataverse backend installation.
+   *
+   * @returns {Promise<DataverseVersion>}
+   */
   async execute(): Promise<DataverseVersion> {
     return await this.dataverseInfoRepository.getDataverseVersion();
   }

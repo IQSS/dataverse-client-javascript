@@ -33,6 +33,7 @@ The different use cases currently available in the package are classified below,
   - [Users read use cases](#users-read-use-cases)
     - [Get Current Authenticated User](#get-current-authenticated-user)
 - [Info](#Info)
+  - [Get Dataverse Backend Version](#get-dataverse-backend-version)
 
 ## Datasets
 
@@ -540,4 +541,22 @@ _See [use case](../src/users/domain/useCases/GetCurrentAuthenticatedUser.ts) imp
 
 ## Info
 
-TODO
+#### Get Dataverse Backend Version
+
+Returns a [DataverseVersion](../src/info/domain/models/DataverseVersion.ts) object, which contains version information for the Dataverse backend installation.
+
+##### Example call:
+
+```typescript
+import { getDataverseVersion } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+getDataverseVersion.execute().then((version: DataverseVersion) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/info/domain/useCases/GetDataverseVersion.ts) implementation_.
