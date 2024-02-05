@@ -35,6 +35,7 @@ The different use cases currently available in the package are classified below,
 - [Info](#Info)
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
+  - [Get ZIP Download Limit](#get-zip-download-limit)
 
 ## Datasets
 
@@ -581,3 +582,23 @@ getMaxEmbargoDurationInMonths.execute().then((months: number) => {
 ```
 
 _See [use case](../src/info/domain/useCases/GetMaxEmbargoDurationInMonths.ts) implementation_.
+
+#### Get ZIP Download Limit
+
+Returns a number indicating the configured ZIP download limit in bytes.
+
+##### Example call:
+
+```typescript
+import { getZipDownloadLimit } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+getZipDownloadLimit.execute().then((downloadLimit: number) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/info/domain/useCases/GetZipDownloadLimit.ts) implementation_.
