@@ -38,4 +38,4 @@ We abide by the upstream Code of Conduct at https://github.com/IQSS/dataverse/bl
 Please, do not hesitate to contact us through:
 
 - Zulip: https://dataverse.zulipchat.com/#narrow/stream/410361-ui-dev
-- Google Groups: https://groups.google.com/g/dataverse-dev
+- Google Group: https://groups.google.com/g/dataverse-dev
