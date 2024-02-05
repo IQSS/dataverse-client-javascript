@@ -241,7 +241,7 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 
 #### Get a File
 
-Returns a [File](../src/files/domain/models/Dataset.ts) instance, given the search parameters to identify it.
+Returns a [File](../src/files/domain/models/File.ts) instance, given the search parameters to identify it.
 
 ##### Example call:
 
