@@ -9,7 +9,7 @@ export class GetAllDatasetPreviews implements UseCase<DatasetPreviewSubset> {
     this.datasetsRepository = datasetsRepository;
   }
 
-  async execute(limit?: number, offset?: number): Promise<DatasetPreviewSubset> {
-    return await this.datasetsRepository.getAllDatasetPreviews(limit, offset);
+  async execute(limit?: number, offset?: number, collectionId?: string): Promise<DatasetPreviewSubset> {
+    return await this.datasetsRepository.getAllDatasetPreviews(limit, offset, collectionId);
   }
 }

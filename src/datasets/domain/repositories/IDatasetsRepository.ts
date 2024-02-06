@@ -11,5 +11,5 @@ export interface IDatasetsRepository {
   getPrivateUrlDatasetCitation(token: string): Promise<string>;
   getDatasetUserPermissions(datasetId: number | string): Promise<DatasetUserPermissions>;
   getDatasetLocks(datasetId: number | string): Promise<DatasetLock[]>;
-  getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreviewSubset>;
+  getAllDatasetPreviews(limit?: number, offset?: number, collectionId?: string): Promise<DatasetPreviewSubset>;
 }
