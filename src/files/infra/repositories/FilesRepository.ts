@@ -153,6 +153,16 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
+  public async getFileCitation(
+    fileId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+  ): Promise<string> {
+    return Promise.resolve(
+      `Requesting a file citation is not yet supported. ${fileId} ${datasetVersionId} ${includeDeaccessioned}`,
+    );
+  }
+
   private getFileEndpoint(fileId: number | string, datasetVersionId: string): string {
     if (datasetVersionId === DatasetNotNumberedVersion.DRAFT) {
       return this.buildApiEndpoint(this.filesResourceName, 'draft', fileId);
