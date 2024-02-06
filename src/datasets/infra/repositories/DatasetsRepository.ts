@@ -43,7 +43,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true,
       {
         includeDeaccessioned: includeDeaccessioned,
-        includeFiles: false,
+        excludeFiles: true,
       },
     )
       .then((response) => transformVersionResponseToDataset(response))
