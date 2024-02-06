@@ -12,6 +12,7 @@ import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number;
   start?: number;
+  subtree?: string;
 }
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
@@ -92,13 +93,20 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       });
   }
 
-  public async getAllDatasetPreviews(limit?: number, offset?: number): Promise<DatasetPreviewSubset> {
+  public async getAllDatasetPreviews(
+    limit?: number,
+    offset?: number,
+    collectionId?: string,
+  ): Promise<DatasetPreviewSubset> {
     const queryParams: GetAllDatasetPreviewsQueryParams = {};
     if (limit !== undefined) {
       queryParams.per_page = limit;
     }
     if (offset !== undefined) {
       queryParams.start = offset;
+    }
+    if (collectionId !== undefined) {
+      queryParams.subtree = collectionId;
     }
     return this.doGet('/search?q=*&type=dataset&sort=date&order=desc', true, queryParams)
       .then((response) => transformDatasetPreviewsResponseToDatasetPreviewSubset(response))

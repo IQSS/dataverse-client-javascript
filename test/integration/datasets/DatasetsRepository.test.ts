@@ -28,29 +28,44 @@ describe('DatasetsRepository', () => {
 
     test('should return all dataset previews when no pagination params are defined', async () => {
       const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews();
-      assert.match(actual.datasetPreviews.length, 2);
-      assert.match(actual.datasetPreviews[0].title, 'Second Dataset');
-      assert.match(actual.totalDatasetCount, 2);
+      assert.match(actual.datasetPreviews.length, 3);
+      assert.match(actual.datasetPreviews[0].title, 'Third Dataset');
+      assert.match(actual.totalDatasetCount, 3);
     });
 
     test('should return first dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 0);
       assert.match(actual.datasetPreviews.length, 1);
-      assert.match(actual.datasetPreviews[0].title, 'Second Dataset');
-      assert.match(actual.totalDatasetCount, 2);
+      assert.match(actual.datasetPreviews[0].title, 'Third Dataset');
+      assert.match(actual.totalDatasetCount, 3);
     });
 
     test('should return second dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 1);
       assert.match(actual.datasetPreviews.length, 1);
-      assert.match(actual.datasetPreviews[0].title, 'First Dataset');
-      assert.match(actual.totalDatasetCount, 2);
+      assert.match(actual.datasetPreviews[0].title, 'Second Dataset');
+      assert.match(actual.totalDatasetCount, 3);
     });
 
     test('should return third dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 2);
+      assert.match(actual.datasetPreviews.length, 1);
+      assert.match(actual.datasetPreviews[0].title, 'First Dataset');
+      assert.match(actual.totalDatasetCount, 3);
+    });
+
+    test('should return forth dataset preview page', async () => {
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 3);
       assert.match(actual.datasetPreviews.length, 0);
-      assert.match(actual.totalDatasetCount, 2);
+      assert.match(actual.totalDatasetCount, 3);
+    });
+
+    test('should return datasets in the specified collection', async () => {
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 0, 'firstCollection');
+
+      assert.match(actual.datasetPreviews[0].title, 'Third Dataset');
+      assert.match(actual.datasetPreviews.length, 1);
+      assert.match(actual.totalDatasetCount, 1);
     });
   });
 
@@ -64,11 +79,6 @@ describe('DatasetsRepository', () => {
 
   describe('getDataset', () => {
     describe('by numeric id', () => {
-      test('should return dataset when it exists filtering by id and version id', async () => {
-        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_1_ID, latestVersionId, false);
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID);
-      });
-
       test('should return dataset when it exists filtering by id and version id', async () => {
         const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_1_ID, latestVersionId, false);
         expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID);

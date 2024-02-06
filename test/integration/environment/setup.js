@@ -4,6 +4,8 @@ const axios = require('axios');
 const { TestConstants } = require('../../testHelpers/TestConstants');
 const datasetJson1 = require('../../testHelpers/datasets/test-dataset-1.json');
 const datasetJson2 = require('../../testHelpers/datasets/test-dataset-2.json');
+const datasetJson3 = require('../../testHelpers/datasets/test-dataset-3.json');
+const collectionJson = require('../../testHelpers/collections/test-collection-1.json');
 
 const COMPOSE_FILE = 'docker-compose.yml';
 
@@ -59,12 +61,27 @@ async function setupTestFixtures() {
     .catch((error) => {
       console.error('Tests setup: Error while creating test Dataset 2');
     });
+  console.log('Creating test collections...');
+  await createCollectionViaApi(collectionJson)
+      .then()
+      .catch((error) => {
+        console.error('Tests setup: Error while creating test Collection 1');
+      });
+  await createDatasetViaApi(datasetJson3, collectionJson.alias)
+      .then()
+      .catch((error) => {
+        console.error('Tests setup: Error while creating test Dataset 3');
+      });
   console.log('Test datasets created');
   await waitForDatasetsIndexingInSolr();
 }
 
-async function createDatasetViaApi(datasetJson) {
-  return await axios.post(`${TestConstants.TEST_API_URL}/dataverses/root/datasets`, datasetJson, buildRequestHeaders());
+async function createCollectionViaApi( collectionJson) {
+  return await axios.post(`${TestConstants.TEST_API_URL}/dataverses/root`, collectionJson, buildRequestHeaders());
+}
+
+async function createDatasetViaApi(datasetJson, collectionId = 'root') {
+  return await axios.post(`${TestConstants.TEST_API_URL}/dataverses/${collectionId}/datasets`, datasetJson, buildRequestHeaders());
 }
 
 async function waitForDatasetsIndexingInSolr() {
@@ -76,7 +93,7 @@ async function waitForDatasetsIndexingInSolr() {
       .get(`${TestConstants.TEST_API_URL}/search?q=*&type=dataset`, buildRequestHeaders())
       .then((response) => {
         const nDatasets = response.data.data.items.length;
-        if (nDatasets == 2) {
+        if (nDatasets == 3) {
           datasetsIndexed = true;
         }
       })
