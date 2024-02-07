@@ -1,50 +1,70 @@
-import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
-import { ApiConfig, DataverseApiAuthMechanism } from './ApiConfig';
-import { ReadError } from '../../domain/repositories/ReadError';
-import { WriteError } from '../../domain/repositories/WriteError';
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios'
+import { ApiConfig, DataverseApiAuthMechanism } from './ApiConfig'
+import { ReadError } from '../../domain/repositories/ReadError'
+import { WriteError } from '../../domain/repositories/WriteError'
 
 export abstract class ApiRepository {
-  public async doGet(apiEndpoint: string, authRequired = false, queryParams: object = {}): Promise<AxiosResponse> {
+  public async doGet(
+    apiEndpoint: string,
+    authRequired = false,
+    queryParams: object = {}
+  ): Promise<AxiosResponse> {
     return await axios
       .get(this.buildRequestUrl(apiEndpoint), this.buildRequestConfig(authRequired, queryParams))
       .then((response) => response)
       .catch((error) => {
         throw new ReadError(
-          `[${error.response.status}]${error.response.data ? ` ${error.response.data.message}` : ''}`,
-        );
-      });
+          `[${error.response.status}]${
+            error.response.data ? ` ${error.response.data.message}` : ''
+          }`
+        )
+      })
   }
 
-  public async doPost(apiEndpoint: string, data: string | object, queryParams: object = {}): Promise<AxiosResponse> {
+  public async doPost(
+    apiEndpoint: string,
+    data: string | object,
+    queryParams: object = {}
+  ): Promise<AxiosResponse> {
     return await axios
-      .post(this.buildRequestUrl(apiEndpoint), JSON.stringify(data), this.buildRequestConfig(true, queryParams))
+      .post(
+        this.buildRequestUrl(apiEndpoint),
+        JSON.stringify(data),
+        this.buildRequestConfig(true, queryParams)
+      )
       .then((response) => response)
       .catch((error) => {
         throw new WriteError(
-          `[${error.response.status}]${error.response.data ? ` ${error.response.data.message}` : ''}`,
-        );
-      });
+          `[${error.response.status}]${
+            error.response.data ? ` ${error.response.data.message}` : ''
+          }`
+        )
+      })
   }
 
-  protected buildApiEndpoint(resourceName: string, operation: string, resourceId: number | string = undefined) {
-    let endpoint;
+  protected buildApiEndpoint(
+    resourceName: string,
+    operation: string,
+    resourceId: number | string = undefined
+  ) {
+    let endpoint
     if (typeof resourceId === 'number') {
-      endpoint = `/${resourceName}/${resourceId}/${operation}`;
+      endpoint = `/${resourceName}/${resourceId}/${operation}`
     } else if (typeof resourceId === 'string') {
-      endpoint = `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`;
+      endpoint = `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`
     } else {
-      endpoint = `/${resourceName}/${operation}`;
+      endpoint = `/${resourceName}/${operation}`
     }
-    return endpoint;
+    return endpoint
   }
 
   private buildRequestConfig(authRequired: boolean, queryParams: object): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
       params: queryParams,
-      headers: { 'Content-Type': 'application/json' },
-    };
+      headers: { 'Content-Type': 'application/json' }
+    }
     if (!authRequired) {
-      return requestConfig;
+      return requestConfig
     }
     switch (ApiConfig.dataverseApiAuthMechanism) {
       case DataverseApiAuthMechanism.SESSION_COOKIE:
@@ -53,16 +73,16 @@ export abstract class ApiRepository {
           This is required, along with the session auth feature flag enabled in the backend, to be able to authenticate using the JSESSIONID cookie.
           Auth mechanisms like this are configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth).
         */
-        requestConfig.withCredentials = true;
-        break;
+        requestConfig.withCredentials = true
+        break
       case DataverseApiAuthMechanism.API_KEY:
-        requestConfig.headers['X-Dataverse-Key'] = ApiConfig.dataverseApiKey;
-        break;
+        requestConfig.headers['X-Dataverse-Key'] = ApiConfig.dataverseApiKey
+        break
     }
-    return requestConfig;
+    return requestConfig
   }
 
   private buildRequestUrl(apiEndpoint: string): string {
-    return `${ApiConfig.dataverseApiUrl}${apiEndpoint}`;
+    return `${ApiConfig.dataverseApiUrl}${apiEndpoint}`
   }
 }

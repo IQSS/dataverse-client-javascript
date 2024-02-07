@@ -1,4 +1,4 @@
 export interface DataverseVersion {
-  number: string;
-  build: string;
+  number: string
+  build: string
 }

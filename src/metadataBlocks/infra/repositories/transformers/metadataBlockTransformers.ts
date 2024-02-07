@@ -1,23 +1,28 @@
-import { AxiosResponse } from 'axios';
-import { MetadataBlock, MetadataFieldInfo } from '../../../domain/models/MetadataBlock';
+import { AxiosResponse } from 'axios'
+import { MetadataBlock, MetadataFieldInfo } from '../../../domain/models/MetadataBlock'
 
-export const transformMetadataBlockResponseToMetadataBlock = (response: AxiosResponse): MetadataBlock => {
-  const metadataBlockPayload = response.data.data;
-  const metadataFields: Record<string, MetadataFieldInfo> = {};
-  const metadataBlockFieldsPayload = metadataBlockPayload.fields;
+export const transformMetadataBlockResponseToMetadataBlock = (
+  response: AxiosResponse
+): MetadataBlock => {
+  const metadataBlockPayload = response.data.data
+  const metadataFields: Record<string, MetadataFieldInfo> = {}
+  const metadataBlockFieldsPayload = metadataBlockPayload.fields
   Object.keys(metadataBlockFieldsPayload).map((metadataFieldKey) => {
-    const metadataFieldInfoPayload = metadataBlockFieldsPayload[metadataFieldKey];
-    metadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(metadataFieldInfoPayload);
-  });
+    const metadataFieldInfoPayload = metadataBlockFieldsPayload[metadataFieldKey]
+    metadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(metadataFieldInfoPayload)
+  })
   return {
     id: metadataBlockPayload.id,
     name: metadataBlockPayload.name,
     displayName: metadataBlockPayload.displayName,
-    metadataFields: metadataFields,
-  };
-};
+    metadataFields: metadataFields
+  }
+}
 
-const transformPayloadMetadataFieldInfo = (metadataFieldInfoPayload: any, isChild = false): MetadataFieldInfo => {
+const transformPayloadMetadataFieldInfo = (
+  metadataFieldInfoPayload: any,
+  isChild = false
+): MetadataFieldInfo => {
   const metadataFieldInfo: MetadataFieldInfo = {
     name: metadataFieldInfoPayload.name,
     displayName: metadataFieldInfoPayload.displayName,
@@ -27,18 +32,18 @@ const transformPayloadMetadataFieldInfo = (metadataFieldInfoPayload: any, isChil
     description: metadataFieldInfoPayload.description,
     multiple: metadataFieldInfoPayload.multiple,
     isControlledVocabulary: metadataFieldInfoPayload.isControlledVocabulary,
-    displayFormat: metadataFieldInfoPayload.displayFormat,
-  };
-  if (!isChild && metadataFieldInfoPayload.hasOwnProperty('childFields')) {
-    const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields;
-    const childMetadataFields: Record<string, MetadataFieldInfo> = {};
+    displayFormat: metadataFieldInfoPayload.displayFormat
+  }
+  if (!isChild && 'childFields' in metadataFieldInfoPayload) {
+    const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields
+    const childMetadataFields: Record<string, MetadataFieldInfo> = {}
     Object.keys(childMetadataFieldsPayload).map((metadataFieldKey) => {
       childMetadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(
         childMetadataFieldsPayload[metadataFieldKey],
-        true,
-      );
-    });
-    metadataFieldInfo.childMetadataFields = childMetadataFields;
+        true
+      )
+    })
+    metadataFieldInfo.childMetadataFields = childMetadataFields
   }
-  return metadataFieldInfo;
-};
+  return metadataFieldInfo
+}

@@ -49,16 +49,16 @@ Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given th
 ##### Example call:
 
 ```typescript
-import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript';
+import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId = 'doi:10.77777/FK2/AAAAAA';
-const datasetVersionId = '1.0';
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+const datasetVersionId = '1.0'
 
 getDataset.execute(datasetId, datasetVersionId).then((dataset: Dataset) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -76,15 +76,15 @@ There is an optional third parameter called `includeDeaccessioned`, which indica
 Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given an associated Private URL Token.
 
 ```typescript
-import { getPrivateUrlDataset } from '@iqss/dataverse-client-javascript';
+import { getPrivateUrlDataset } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const token = 'a56444bc-7697-4711-8964-e0577f055fd2';
+const token = 'a56444bc-7697-4711-8964-e0577f055fd2'
 
 getPrivateUrlDataset.execute(token).then((dataset: Dataset) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -98,16 +98,16 @@ Returns the Dataset citation text.
 ##### Example call:
 
 ```typescript
-import { getDatasetCitation } from '@iqss/dataverse-client-javascript';
+import { getDatasetCitation } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId = 2;
-const datasetVersionId = '1.0';
+const datasetId = 2
+const datasetVersionId = '1.0'
 
 getDatasetCitation.execute(datasetId, datasetVersionId).then((citationText: string) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -125,15 +125,15 @@ Returns the Dataset citation text, given an associated Private URL Token.
 ##### Example call:
 
 ```typescript
-import { getPrivateUrlDatasetCitation } from '@iqss/dataverse-client-javascript';
+import { getPrivateUrlDatasetCitation } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const token = 'a56444bc-7697-4711-8964-e0577f055fd2';
+const token = 'a56444bc-7697-4711-8964-e0577f055fd2'
 
 getPrivateUrlDatasetCitation.execute(token).then((citationText: string) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -147,15 +147,15 @@ Returns a [DatasetLock](../src/datasets/domain/models/DatasetLock.ts) array of a
 ##### Example call:
 
 ```typescript
-import { getDatasetLocks } from '@iqss/dataverse-client-javascript';
+import { getDatasetLocks } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId = 'doi:10.77777/FK2/AAAAAA';
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
 
 getDatasetLocks.execute(datasetId).then((datasetLocks: DatasetLock[]) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -171,13 +171,13 @@ Returns the names of the dataset summary fields configured in the installation.
 ##### Example call:
 
 ```typescript
-import { getDatasetSummaryFieldNames } from '@iqss/dataverse-client-javascript';
+import { getDatasetSummaryFieldNames } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 getDatasetSummaryFieldNames.execute().then((names: string[]) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -191,15 +191,15 @@ Returns an instance of [DatasetUserPermissions](../src/datasets/domain/models/Da
 ##### Example call:
 
 ```typescript
-import { getDatasetUserPermissions } from '@iqss/dataverse-client-javascript';
+import { getDatasetUserPermissions } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId = 'doi:10.77777/FK2/AAAAAA';
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
 
 getDatasetUserPermissions.execute(datasetId).then((permissions: DatasetUserPermissions) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -215,16 +215,16 @@ Returns an instance of [DatasetPreviewSubset](../src/datasets/domain/models/Data
 ##### Example call:
 
 ```typescript
-import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript';
+import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const limit = 10;
-const offset = 20;
+const limit = 10
+const offset = 20
 
 getAllDatasetPreviews.execute(limit, offset).then((subset: DatasetPreviewSubset) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -246,16 +246,16 @@ Returns a [File](../src/files/domain/models/File.ts) instance, given the search 
 ##### Example call:
 
 ```typescript
-import { getFile } from '@iqss/dataverse-client-javascript';
+import { getFile } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const fileId = 2;
-const datasetVersionId = '1.0';
+const fileId = 2
+const datasetVersionId = '1.0'
 
 getFile.execute(fileId, datasetVersionId).then((file: File) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -278,16 +278,16 @@ Returns an instance of [FileCounts](../src/files/domain/models/FileCounts.ts), c
 ##### Example call:
 
 ```typescript
-import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript';
+import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId = 2;
-const datasetVersionId = '1.0';
+const datasetId = 2
+const datasetVersionId = '1.0'
 
 getDatasetFileCounts.execute(datasetId, datasetVersionId).then((fileCounts: FileCounts) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -303,22 +303,22 @@ An optional fourth parameter `fileSearchCriteria` receives a [FileSearchCriteria
 ##### Example call using optional parameters:
 
 ```typescript
-import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript';
+import { getDatasetFileCounts } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId: number = 2;
-const datasetVersionId: string = '1.0';
-const includeDeaccessioned: boolean = true;
+const datasetId: number = 2
+const datasetVersionId: string = '1.0'
+const includeDeaccessioned: boolean = true
 const searchCriteria: FileSearchCriteria = {
-  categoryName: 'physics',
-};
+  categoryName: 'physics'
+}
 
 getDatasetFileCounts
   .execute(datasetId, datasetVersionId, includeDeaccessioned, searchCriteria)
   .then((fileCounts: FileCounts) => {
     /* ... */
-  });
+  })
 
 /* ... */
 ```
@@ -330,15 +330,15 @@ This use case is oriented toward tabular files and provides an array of [FileDat
 ##### Example call:
 
 ```typescript
-import { getFileDataTables } from '@iqss/dataverse-client-javascript';
+import { getFileDataTables } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const fileId = 2;
+const fileId = 2
 
 getFileDataTables.execute(fileId).then((dataTables: FileDataTable[]) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -354,15 +354,15 @@ Provides the download count for a particular File.
 ##### Example call:
 
 ```typescript
-import { getFileDownloadCount } from '@iqss/dataverse-client-javascript';
+import { getFileDownloadCount } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const fileId: number = 2;
+const fileId: number = 2
 
 getFileDownloadCount.execute(fileId).then((count: number) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -378,16 +378,16 @@ Returns the combined size in bytes of all the files available for download from 
 ##### Example call:
 
 ```typescript
-import { getDatasetFilesTotalDownloadSize } from '@iqss/dataverse-client-javascript';
+import { getDatasetFilesTotalDownloadSize } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId: number = 2;
-const datasetVersionId: string = '1.0';
+const datasetId: number = 2
+const datasetVersionId: string = '1.0'
 
 getDatasetFilesTotalDownloadSize.execute(datasetId, datasetVersionId).then((size: number) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -409,23 +409,23 @@ An optional fifth parameter called `includeDeaccessioned` indicates whether to c
 ##### Example call using optional parameters:
 
 ```typescript
-import { getDatasetFilesTotalDownloadSize } from '@iqss/dataverse-client-javascript';
+import { getDatasetFilesTotalDownloadSize } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId: number = 2;
-const datasetVersionId: string = '1.0';
-const mode: FileDownloadSizeMode = FileDownloadSizeMode.ARCHIVAL;
+const datasetId: number = 2
+const datasetVersionId: string = '1.0'
+const mode: FileDownloadSizeMode = FileDownloadSizeMode.ARCHIVAL
 const searchCriteria: FileDownloadSizeMode = {
-  categoryName: 'physics',
-};
-const includeDeaccessioned: boolean = true;
+  categoryName: 'physics'
+}
+const includeDeaccessioned: boolean = true
 
 getDatasetFilesTotalDownloadSize
   .execute(datasetId, datasetVersionId, mode, searchCriteria, includeDeaccessioned)
   .then((size: number) => {
     /* ... */
-  });
+  })
 
 /* ... */
 ```
@@ -443,15 +443,15 @@ The returned _FileUserPermissions_ object contains the following permissions, as
 ##### Example call:
 
 ```typescript
-import { getFileUserPermissions } from '@iqss/dataverse-client-javascript';
+import { getFileUserPermissions } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const fileId: number = 2;
+const fileId: number = 2
 
 getFileUserPermissions.execute(fileId).then((permissions: FileUserPermissions) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -467,16 +467,16 @@ Returns an instance of [FilesSubset](../src/files/domain/models/FilesSubset.ts),
 ##### Example call:
 
 ```typescript
-import { getDatasetFiles } from '@iqss/dataverse-client-javascript';
+import { getDatasetFiles } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId = 2;
-const datasetVersionId = '1.0';
+const datasetId = 2
+const datasetVersionId = '1.0'
 
 getDatasetFiles.execute(datasetId, datasetVersionId).then((subset: FilesSubset) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -496,25 +496,33 @@ This use case supports the following optional parameters depending on the search
 ##### Example call using optional parameters:
 
 ```typescript
-import { getDatasetFiles } from '@iqss/dataverse-client-javascript';
+import { getDatasetFiles } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const datasetId: number = 2;
-const datasetVersionId: string = '1.0';
-const includeDeaccessioned: boolean = true;
-const limit: number = 10;
-const offset: number = 20;
+const datasetId: number = 2
+const datasetVersionId: string = '1.0'
+const includeDeaccessioned: boolean = true
+const limit: number = 10
+const offset: number = 20
 const searchCriteria: FileSearchCriteria = {
-  searchText: 'file title',
-};
-const orderCriteria: FileOrderCriteria = FileOrderCriteria.NEWEST;
+  searchText: 'file title'
+}
+const orderCriteria: FileOrderCriteria = FileOrderCriteria.NEWEST
 
 getDatasetFiles
-  .execute(datasetId, datasetVersionId, includeDeaccessioned, limit, offset, searchCriteria, orderCriteria)
+  .execute(
+    datasetId,
+    datasetVersionId,
+    includeDeaccessioned,
+    limit,
+    offset,
+    searchCriteria,
+    orderCriteria
+  )
   .then((subset: FilesSubset) => {
     /* ... */
-  });
+  })
 
 /* ... */
 ```
@@ -530,15 +538,15 @@ Returns a [MetadataBlock](../src/metadataBlocks/domain/models/MetadataBlock.ts) 
 ##### Example call:
 
 ```typescript
-import { getMetadataBlockByName } from '@iqss/dataverse-client-javascript';
+import { getMetadataBlockByName } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const name = 'citation';
+const name = 'citation'
 
 getMetadataBlockByName.execute(name).then((metadataBlock: MetadataBlock) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -556,13 +564,13 @@ Returns the current [AuthenticatedUser](../src/users/domain/models/Authenticated
 ##### Example call:
 
 ```typescript
-import { getCurrentAuthenticatedUser } from '@iqss/dataverse-client-javascript';
+import { getCurrentAuthenticatedUser } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 getCurrentAuthenticatedUser.execute().then((user: AuthenticatedUser) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -578,13 +586,13 @@ Returns a [DataverseVersion](../src/info/domain/models/DataverseVersion.ts) obje
 ##### Example call:
 
 ```typescript
-import { getDataverseVersion } from '@iqss/dataverse-client-javascript';
+import { getDataverseVersion } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 getDataverseVersion.execute().then((version: DataverseVersion) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -598,13 +606,13 @@ Returns a number indicating the configured maximum embargo duration in months.
 ##### Example call:
 
 ```typescript
-import { getMaxEmbargoDurationInMonths } from '@iqss/dataverse-client-javascript';
+import { getMaxEmbargoDurationInMonths } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 getMaxEmbargoDurationInMonths.execute().then((months: number) => {
   /* ... */
-});
+})
 
 /* ... */
 ```
@@ -618,13 +626,13 @@ Returns a number indicating the configured ZIP download limit in bytes.
 ##### Example call:
 
 ```typescript
-import { getZipDownloadLimit } from '@iqss/dataverse-client-javascript';
+import { getZipDownloadLimit } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 getZipDownloadLimit.execute().then((downloadLimit: number) => {
   /* ... */
-});
+})
 
 /* ... */
 ```

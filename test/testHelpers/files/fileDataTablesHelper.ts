@@ -1,8 +1,8 @@
 import {
   FileDataTable,
   FileDataVariableIntervalType,
-  FileDataVariableFormatType,
-} from '../../../src/files/domain/models/FileDataTable';
+  FileDataVariableFormatType
+} from '../../../src/files/domain/models/FileDataTable'
 
 export const createFileDataTableModel = (): FileDataTable => {
   return {
@@ -24,8 +24,8 @@ export const createFileDataTableModel = (): FileDataTable => {
         summaryStatistics: {
           medn: '28.27591',
           mode: '.',
-          min: '27.6741',
-        },
+          min: '27.6741'
+        }
       },
       {
         id: 15,
@@ -37,11 +37,11 @@ export const createFileDataTableModel = (): FileDataTable => {
         isOrderedCategorical: false,
         fileOrder: 1,
         UNF: 'UNF:6:KPoFCWSEsLpy11Lh11CXWQ==',
-        variableMetadata: [],
-      },
-    ],
-  };
-};
+        variableMetadata: []
+      }
+    ]
+  }
+}
 
 export const createFileDataTablePayload = (): any => {
   return {
@@ -63,8 +63,8 @@ export const createFileDataTablePayload = (): any => {
         summaryStatistics: {
           medn: '28.27591',
           mode: '.',
-          min: '27.6741',
-        },
+          min: '27.6741'
+        }
       },
       {
         id: 15,
@@ -76,8 +76,8 @@ export const createFileDataTablePayload = (): any => {
         isOrderedCategorical: false,
         fileOrder: 1,
         UNF: 'UNF:6:KPoFCWSEsLpy11Lh11CXWQ==',
-        variableMetadata: [],
-      },
-    ],
-  };
-};
+        variableMetadata: []
+      }
+    ]
+  }
+}

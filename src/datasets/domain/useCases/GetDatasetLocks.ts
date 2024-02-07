@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IDatasetsRepository } from '../repositories/IDatasetsRepository';
-import { DatasetLock } from '../models/DatasetLock';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
+import { DatasetLock } from '../models/DatasetLock'
 
 export class GetDatasetLocks implements UseCase<DatasetLock[]> {
-  private datasetsRepository: IDatasetsRepository;
+  private datasetsRepository: IDatasetsRepository
 
   constructor(datasetsRepository: IDatasetsRepository) {
-    this.datasetsRepository = datasetsRepository;
+    this.datasetsRepository = datasetsRepository
   }
 
   /**
@@ -16,6 +16,6 @@ export class GetDatasetLocks implements UseCase<DatasetLock[]> {
    * @returns {Promise<DatasetLock[]>}
    */
   async execute(datasetId: number | string): Promise<DatasetLock[]> {
-    return await this.datasetsRepository.getDatasetLocks(datasetId);
+    return await this.datasetsRepository.getDatasetLocks(datasetId)
   }
 }

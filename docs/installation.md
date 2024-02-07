@@ -40,20 +40,24 @@ function App() {
 }
 
 export default App
-````
+```
 
 The same example but with example values set:
 
 ```typescript
-ApiConfig.init('http://localhost:8000/api/v1', DataverseApiAuthMechanism.API_KEY, 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')
+ApiConfig.init(
+  'http://localhost:8000/api/v1',
+  DataverseApiAuthMechanism.API_KEY,
+  'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+)
 
 function App() {
   /* Yor App code */
 }
 
 export default App
-````
+```
 
-We can initialize the `ApiConfig` object as an unauthenticated user, by setting `undefined` as the API Key value. 
+We can initialize the `ApiConfig` object as an unauthenticated user, by setting `undefined` as the API Key value.
 
 This will allow use cases that do not require authentication to be successfully executed, but those that do require authentication will fail.

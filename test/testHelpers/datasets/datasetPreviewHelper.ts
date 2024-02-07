@@ -1,13 +1,13 @@
-import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview';
-import { DatasetVersionState } from '../../../src/datasets/domain/models/Dataset';
-import { DatasetPreviewPayload } from '../../../src/datasets/infra/repositories/transformers/datasetPreviewsTransformers';
+import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview'
+import { DatasetVersionState } from '../../../src/datasets/domain/models/Dataset'
+import { DatasetPreviewPayload } from '../../../src/datasets/infra/repositories/transformers/datasetPreviewsTransformers'
 
-const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z';
-const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z';
-const DATASET_RELEASE_TIME_STR = '2023-05-15T08:21:03Z';
+const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z'
+const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z'
+const DATASET_RELEASE_TIME_STR = '2023-05-15T08:21:03Z'
 
 const DATASET_CITATION =
-  'Doe, John, 2023, "Test Dataset 1", https://doi.org/10.5072/FK2/XXXXXX, Root, V1, UNF:6:AAc5A5tAI9AVodAAAsOysA== [fileUNF]';
+  'Doe, John, 2023, "Test Dataset 1", https://doi.org/10.5072/FK2/XXXXXX, Root, V1, UNF:6:AAc5A5tAI9AVodAAAsOysA== [fileUNF]'
 
 export const createDatasetPreviewModel = (): DatasetPreview => {
   const datasetPreviewModel: DatasetPreview = {
@@ -20,13 +20,13 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
       state: DatasetVersionState.RELEASED,
       createTime: new Date(DATASET_CREATE_TIME_STR),
       lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
-      releaseTime: new Date(DATASET_RELEASE_TIME_STR),
+      releaseTime: new Date(DATASET_RELEASE_TIME_STR)
     },
     citation: DATASET_CITATION,
-    description: 'test',
-  };
-  return datasetPreviewModel;
-};
+    description: 'test'
+  }
+  return datasetPreviewModel
+}
 
 export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
   return {
@@ -40,6 +40,6 @@ export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
     updatedAt: DATASET_UPDATE_TIME_STR,
     published_at: DATASET_RELEASE_TIME_STR,
     citation: DATASET_CITATION,
-    description: 'test',
-  };
-};
+    description: 'test'
+  }
+}

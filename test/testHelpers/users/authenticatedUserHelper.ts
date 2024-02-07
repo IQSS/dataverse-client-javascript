@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from '../../../src/users/domain/models/AuthenticatedUser';
+import { AuthenticatedUser } from '../../../src/users/domain/models/AuthenticatedUser'
 
 export const createAuthenticatedUser = (): AuthenticatedUser => {
   return {
@@ -14,6 +14,6 @@ export const createAuthenticatedUser = (): AuthenticatedUser => {
     createdTime: '2023-04-14T11:52:28Z',
     authenticationProviderId: 'builtin',
     lastLoginTime: '2023-04-14T11:52:28Z',
-    lastApiUseTime: '2023-04-14T15:53:32Z',
-  };
-};
+    lastApiUseTime: '2023-04-14T15:53:32Z'
+  }
+}

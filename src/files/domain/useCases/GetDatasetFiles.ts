@@ -1,14 +1,14 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IFilesRepository } from '../repositories/IFilesRepository';
-import { FilesSubset } from '../models/FilesSubset';
-import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria';
-import { DatasetNotNumberedVersion } from '../../../datasets';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IFilesRepository } from '../repositories/IFilesRepository'
+import { FilesSubset } from '../models/FilesSubset'
+import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria'
+import { DatasetNotNumberedVersion } from '../../../datasets'
 
 export class GetDatasetFiles implements UseCase<FilesSubset> {
-  private filesRepository: IFilesRepository;
+  private filesRepository: IFilesRepository
 
   constructor(filesRepository: IFilesRepository) {
-    this.filesRepository = filesRepository;
+    this.filesRepository = filesRepository
   }
 
   /**
@@ -30,7 +30,7 @@ export class GetDatasetFiles implements UseCase<FilesSubset> {
     limit?: number,
     offset?: number,
     fileSearchCriteria?: FileSearchCriteria,
-    fileOrderCriteria: FileOrderCriteria = FileOrderCriteria.NAME_AZ,
+    fileOrderCriteria: FileOrderCriteria = FileOrderCriteria.NAME_AZ
   ): Promise<FilesSubset> {
     return await this.filesRepository.getDatasetFiles(
       datasetId,
@@ -39,7 +39,7 @@ export class GetDatasetFiles implements UseCase<FilesSubset> {
       fileOrderCriteria,
       limit,
       offset,
-      fileSearchCriteria,
-    );
+      fileSearchCriteria
+    )
   }
 }

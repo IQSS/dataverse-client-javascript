@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IUsersRepository } from '../repositories/IUsersRepository';
-import { AuthenticatedUser } from '../models/AuthenticatedUser';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IUsersRepository } from '../repositories/IUsersRepository'
+import { AuthenticatedUser } from '../models/AuthenticatedUser'
 
 export class GetCurrentAuthenticatedUser implements UseCase<AuthenticatedUser> {
-  private usersRepository: IUsersRepository;
+  private usersRepository: IUsersRepository
 
   constructor(usersRepository: IUsersRepository) {
-    this.usersRepository = usersRepository;
+    this.usersRepository = usersRepository
   }
 
   /**
@@ -15,6 +15,6 @@ export class GetCurrentAuthenticatedUser implements UseCase<AuthenticatedUser> {
    * @returns {Promise<AuthenticatedUser>}
    */
   async execute(): Promise<AuthenticatedUser> {
-    return await this.usersRepository.getCurrentAuthenticatedUser();
+    return await this.usersRepository.getCurrentAuthenticatedUser()
   }
 }

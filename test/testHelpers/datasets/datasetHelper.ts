@@ -1,22 +1,26 @@
-import { Dataset, DatasetVersionState, DatasetLicense } from '../../../src/datasets/domain/models/Dataset';
-import TurndownService from 'turndown';
-import axios, { AxiosResponse } from 'axios';
-import { TestConstants } from '../TestConstants';
+import {
+  Dataset,
+  DatasetVersionState,
+  DatasetLicense
+} from '../../../src/datasets/domain/models/Dataset'
+import TurndownService from 'turndown'
+import axios, { AxiosResponse } from 'axios'
+import { TestConstants } from '../TestConstants'
 
-const turndownService = new TurndownService();
+const turndownService = new TurndownService()
 
-const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z';
-const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z';
-const DATASET_RELEASE_TIME_STR = '2023-05-15T08:21:03Z';
+const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z'
+const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z'
+const DATASET_RELEASE_TIME_STR = '2023-05-15T08:21:03Z'
 
-const DATASET_PUBLICATION_DATE_STR = '2023-05-15';
+const DATASET_PUBLICATION_DATE_STR = '2023-05-15'
 
 const DATASET_HTML_DESCRIPTION =
-  '<div><h1 class="test-class-to-ignore">Title 1</h1><p>Test paragraph 1</p><p>Test paragraph 2</p><p>Hello world</p><h2>Title 2</h2><h3>Title 3</h3></div>';
+  '<div><h1 class="test-class-to-ignore">Title 1</h1><p>Test paragraph 1</p><p>Test paragraph 2</p><p>Hello world</p><h2>Title 2</h2><h3>Title 3</h3></div>'
 
 const DATAVERSE_API_REQUEST_HEADERS = {
-  headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY },
-};
+  headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
+}
 
 export const createDatasetModel = (license?: DatasetLicense): Dataset => {
   const datasetModel: Dataset = {
@@ -29,7 +33,7 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
       state: DatasetVersionState.RELEASED,
       createTime: new Date(DATASET_CREATE_TIME_STR),
       lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
-      releaseTime: new Date(DATASET_RELEASE_TIME_STR),
+      releaseTime: new Date(DATASET_RELEASE_TIME_STR)
     },
     publicationDate: DATASET_PUBLICATION_DATE_STR,
     metadataBlocks: [
@@ -40,34 +44,34 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
           author: [
             {
               authorName: 'Admin, Dataverse',
-              authorAffiliation: 'Dataverse.org',
+              authorAffiliation: 'Dataverse.org'
             },
             {
               authorName: 'Owner, Dataverse',
-              authorAffiliation: 'Dataverse.org',
-            },
+              authorAffiliation: 'Dataverse.org'
+            }
           ],
           subject: ['Subject1', 'Subject2'],
           dsDescription: [
             {
-              dsDescriptionValue: turndownService.turndown(DATASET_HTML_DESCRIPTION),
-            },
+              dsDescriptionValue: turndownService.turndown(DATASET_HTML_DESCRIPTION)
+            }
           ],
           datasetContact: [
             {
               datasetContactName: 'Admin, Dataverse',
-              datasetContactEmail: 'someemail@test.com',
-            },
-          ],
-        },
-      },
-    ],
-  };
-  if (license !== undefined) {
-    datasetModel.license = license;
+              datasetContactEmail: 'someemail@test.com'
+            }
+          ]
+        }
+      }
+    ]
   }
-  return datasetModel;
-};
+  if (license !== undefined) {
+    datasetModel.license = license
+  }
+  return datasetModel
+}
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
@@ -85,7 +89,7 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
     license: {
       name: 'CC0 1.0',
       uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
-      iconUri: 'https://licensebuttons.net/p/zero/1.0/88x31.png',
+      iconUri: 'https://licensebuttons.net/p/zero/1.0/88x31.png'
     },
     metadataBlocks: {
       citation: {
@@ -95,7 +99,7 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
             typeName: 'title',
             multiple: false,
             typeClass: 'primitive',
-            value: 'test',
+            value: 'test'
           },
           {
             typeName: 'author',
@@ -107,36 +111,36 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
                   typeName: 'authorName',
                   multiple: false,
                   typeClass: 'primitive',
-                  value: 'Admin, Dataverse',
+                  value: 'Admin, Dataverse'
                 },
                 authorAffiliation: {
                   typeName: 'authorAffiliation',
                   multiple: false,
                   typeClass: 'primitive',
-                  value: 'Dataverse.org',
-                },
+                  value: 'Dataverse.org'
+                }
               },
               {
                 authorName: {
                   typeName: 'authorName',
                   multiple: false,
                   typeClass: 'primitive',
-                  value: 'Owner, Dataverse',
+                  value: 'Owner, Dataverse'
                 },
                 authorAffiliation: {
                   typeName: 'authorAffiliation',
                   multiple: false,
                   typeClass: 'primitive',
-                  value: 'Dataverse.org',
-                },
-              },
-            ],
+                  value: 'Dataverse.org'
+                }
+              }
+            ]
           },
           {
             typeName: 'subject',
             multiple: true,
             typeClass: 'controlledVocabulary',
-            value: ['Subject1', 'Subject2'],
+            value: ['Subject1', 'Subject2']
           },
           {
             typeName: 'dsDescription',
@@ -148,10 +152,10 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
                   typeName: 'dsDescriptionValue',
                   multiple: false,
                   typeClass: 'primitive',
-                  value: DATASET_HTML_DESCRIPTION,
-                },
-              },
-            ],
+                  value: DATASET_HTML_DESCRIPTION
+                }
+              }
+            ]
           },
           {
             typeName: 'datasetContact',
@@ -163,87 +167,94 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
                   typeName: 'datasetContactName',
                   multiple: false,
                   typeClass: 'primitive',
-                  value: 'Admin, Dataverse',
+                  value: 'Admin, Dataverse'
                 },
                 datasetContactEmail: {
                   typeName: 'datasetContactEmail',
                   multiple: false,
                   typeClass: 'primitive',
-                  value: 'someemail@test.com',
-                },
-              },
-            ],
-          },
-        ],
-      },
+                  value: 'someemail@test.com'
+                }
+              }
+            ]
+          }
+        ]
+      }
     },
-    files: [],
-  };
-  if (license !== undefined) {
-    datasetPayload.license = license;
+    files: []
   }
-  return datasetPayload;
-};
+  if (license !== undefined) {
+    datasetPayload.license = license
+  }
+  return datasetPayload
+}
 
-export const createDatasetLicenseModel = (withIconUri: boolean = true): DatasetLicense => {
+export const createDatasetLicenseModel = (withIconUri = true): DatasetLicense => {
   const datasetLicense: DatasetLicense = {
     name: 'CC0 1.0',
-    uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
-  };
-  if (withIconUri) {
-    datasetLicense.iconUri = 'https://licensebuttons.net/p/zero/1.0/88x31.png';
+    uri: 'https://creativecommons.org/publicdomain/zero/1.0/'
   }
-  return datasetLicense;
-};
+  if (withIconUri) {
+    datasetLicense.iconUri = 'https://licensebuttons.net/p/zero/1.0/88x31.png'
+  }
+  return datasetLicense
+}
 
 export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResponse> => {
   return await axios.post(
     `${TestConstants.TEST_API_URL}/datasets/${datasetId}/actions/:publish?type=major`,
     {},
-    DATAVERSE_API_REQUEST_HEADERS,
-  );
-};
+    DATAVERSE_API_REQUEST_HEADERS
+  )
+}
 
-export const deaccessionDatasetViaApi = async (datasetId: number, versionId: string): Promise<AxiosResponse> => {
-  const data = { deaccessionReason: 'Test reason.' };
+export const deaccessionDatasetViaApi = async (
+  datasetId: number,
+  versionId: string
+): Promise<AxiosResponse> => {
+  const data = { deaccessionReason: 'Test reason.' }
   return await axios.post(
     `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
     JSON.stringify(data),
-    DATAVERSE_API_REQUEST_HEADERS,
-  );
-};
+    DATAVERSE_API_REQUEST_HEADERS
+  )
+}
 
 export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosResponse> => {
   return await axios.post(
     `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,
     {},
-    DATAVERSE_API_REQUEST_HEADERS,
-  );
-};
+    DATAVERSE_API_REQUEST_HEADERS
+  )
+}
 
-export const waitForNoLocks = async (datasetId: number, maxRetries = 20, delay = 1000): Promise<void> => {
-  let hasLocks = true;
-  let retry = 0;
+export const waitForNoLocks = async (
+  datasetId: number,
+  maxRetries = 20,
+  delay = 1000
+): Promise<void> => {
+  let hasLocks = true
+  let retry = 0
   while (hasLocks && retry < maxRetries) {
     await axios
       .get(`${TestConstants.TEST_API_URL}/datasets/${datasetId}/locks`)
       .then((response) => {
-        const nLocks = response.data.data.length;
+        const nLocks = response.data.data.length
         if (nLocks == 0) {
-          hasLocks = false;
+          hasLocks = false
         }
       })
       .catch((error) => {
         console.log(
           `Error while waiting for no dataset locks: [${error.response.status}]${
             error.response.data ? ` ${error.response.data.message}` : ''
-          }`,
-        );
-      });
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    retry++;
+          }`
+        )
+      })
+    await new Promise((resolve) => setTimeout(resolve, delay))
+    retry++
   }
   if (hasLocks) {
-    throw new Error('Max retries reached.');
+    throw new Error('Max retries reached.')
   }
-};
+}

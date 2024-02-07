@@ -1,6 +1,6 @@
-import { DatasetPreview } from './DatasetPreview';
+import { DatasetPreview } from './DatasetPreview'
 
 export interface DatasetPreviewSubset {
-  datasetPreviews: DatasetPreview[];
-  totalDatasetCount: number;
+  datasetPreviews: DatasetPreview[]
+  totalDatasetCount: number
 }

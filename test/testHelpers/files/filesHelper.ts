@@ -1,8 +1,8 @@
-import { File } from '../../../src/files/domain/models/File';
-import axios, { AxiosResponse } from 'axios';
-import { TestConstants } from '../TestConstants';
-import { readFile } from 'fs/promises';
-import {FilesSubset} from "../../../src/files/domain/models/FilesSubset";
+import { File } from '../../../src/files/domain/models/File'
+import axios, { AxiosResponse } from 'axios'
+import { TestConstants } from '../TestConstants'
+import { readFile } from 'fs/promises'
+import { FilesSubset } from '../../../src/files/domain/models/FilesSubset'
 
 interface FileMetadata {
   categories?: string[]
@@ -27,27 +27,27 @@ export const createFileModel = (): File => {
     creationDate: new Date('2023-07-11'),
     embargo: {
       dateAvailable: new Date('2023-07-11'),
-      reason: 'test',
+      reason: 'test'
     },
     checksum: {
       type: 'MD5',
-      value: '29e413e0c881e17314ce8116fed4d1a7',
+      value: '29e413e0c881e17314ce8116fed4d1a7'
     },
     deleted: false,
     tabularData: false,
-    fileAccessRequest: true,
-  };
-};
+    fileAccessRequest: true
+  }
+}
 
 export const createManyFilesModel = (amount: number): File[] => {
-  return Array.from({ length: amount }, () => createFileModel());
+  return Array.from({ length: amount }, () => createFileModel())
 }
 
 export const createFilesSubsetModel = (amount: number): FilesSubset => {
-    return {
-        files: createManyFilesModel(amount),
-        totalFilesCount: amount,
-    };
+  return {
+    files: createManyFilesModel(amount),
+    totalFilesCount: amount
+  }
 }
 
 export const createFilePayload = (): any => {
@@ -73,57 +73,75 @@ export const createFilePayload = (): any => {
       varGroups: [],
       embargo: {
         dateAvailable: '2023-07-11',
-        reason: 'test',
+        reason: 'test'
       },
       checksum: {
         type: 'MD5',
-        value: '29e413e0c881e17314ce8116fed4d1a7',
+        value: '29e413e0c881e17314ce8116fed4d1a7'
       },
       deleted: false,
       tabularData: false,
-      fileAccessRequest: true,
-    },
-  };
-};
-
-export const createManyFilesPayload = (amount: number): any[] => {
-    return Array.from({ length: amount }, () => createFilePayload());
+      fileAccessRequest: true
+    }
+  }
 }
 
-export const uploadFileViaApi = async (datasetId: number, fileName: string, fileMetadata?: FileMetadata): Promise<AxiosResponse> => {
-  const formData = new FormData();
-  const file = await readFile(`${__dirname}/${fileName}`);
+export const createManyFilesPayload = (amount: number): any[] => {
+  return Array.from({ length: amount }, () => createFilePayload())
+}
 
-  formData.append('file', new Blob([file]), fileName);
+export const uploadFileViaApi = async (
+  datasetId: number,
+  fileName: string,
+  fileMetadata?: FileMetadata
+): Promise<AxiosResponse> => {
+  const formData = new FormData()
+  const file = await readFile(`${__dirname}/${fileName}`)
 
-  if(fileMetadata){
-    formData.append('jsonData', JSON.stringify(fileMetadata));
+  formData.append('file', new Blob([file]), fileName)
+
+  if (fileMetadata) {
+    formData.append('jsonData', JSON.stringify(fileMetadata))
   }
 
   return await axios.post(`${TestConstants.TEST_API_URL}/datasets/${datasetId}/add`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
-      'X-Dataverse-Key': process.env.TEST_API_KEY,
-    },
-  });
-};
+      'X-Dataverse-Key': process.env.TEST_API_KEY
+    }
+  })
+}
 
 export const registerFileViaApi = async (fileId: number): Promise<AxiosResponse> => {
-  return await  enableFilePIDs().then(() => axios.get(`${TestConstants.TEST_API_URL}/admin/${fileId}/registerDataFile`, {
+  return await enableFilePIDs().then(() =>
+    axios.get(`${TestConstants.TEST_API_URL}/admin/${fileId}/registerDataFile`, {
       headers: {
-        'X-Dataverse-Key': process.env.TEST_API_KEY,
+        'X-Dataverse-Key': process.env.TEST_API_KEY
       }
-  }));
+    })
+  )
 }
 
 const enableFilePIDs = async (): Promise<AxiosResponse> => {
-  return await axios.put(`${TestConstants.TEST_API_URL}/admin/settings/:AllowEnablingFilePIDsPerCollection`, "true", {
-    headers: {
-      'X-Dataverse-Key': process.env.TEST_API_KEY,
-    },
-  }).then(() => axios.put(`${TestConstants.TEST_API_URL}/dataverses/root/attribute/filePIDsEnabled?value=true`, {}, {
-    headers: {
-      'X-Dataverse-Key': process.env.TEST_API_KEY,
-    },
-  }));
-};
+  return await axios
+    .put(
+      `${TestConstants.TEST_API_URL}/admin/settings/:AllowEnablingFilePIDsPerCollection`,
+      'true',
+      {
+        headers: {
+          'X-Dataverse-Key': process.env.TEST_API_KEY
+        }
+      }
+    )
+    .then(() =>
+      axios.put(
+        `${TestConstants.TEST_API_URL}/dataverses/root/attribute/filePIDsEnabled?value=true`,
+        {},
+        {
+          headers: {
+            'X-Dataverse-Key': process.env.TEST_API_KEY
+          }
+        }
+      )
+    )
+}

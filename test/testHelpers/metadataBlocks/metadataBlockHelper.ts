@@ -1,4 +1,4 @@
-import { MetadataBlock } from '../../../src/metadataBlocks/domain/models/MetadataBlock';
+import { MetadataBlock } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 
 export const createMetadataBlockModel = (): MetadataBlock => {
   return {
@@ -15,7 +15,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         description: 'testDescription1',
         multiple: false,
         isControlledVocabulary: false,
-        displayFormat: '#VALUE',
+        displayFormat: '#VALUE'
       },
       testField2: {
         name: 'testName2',
@@ -37,7 +37,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             description: 'testDescription3',
             multiple: false,
             isControlledVocabulary: false,
-            displayFormat: '#VALUE',
+            displayFormat: '#VALUE'
           },
           testField4: {
             name: 'testName4',
@@ -48,13 +48,13 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             description: 'testDescription4',
             multiple: false,
             isControlledVocabulary: false,
-            displayFormat: '#VALUE',
-          },
-        },
-      },
-    },
-  };
-};
+            displayFormat: '#VALUE'
+          }
+        }
+      }
+    }
+  }
+}
 
 export const createMetadataBlockPayload = (): any => {
   return {
@@ -71,7 +71,7 @@ export const createMetadataBlockPayload = (): any => {
         description: 'testDescription1',
         multiple: false,
         isControlledVocabulary: false,
-        displayFormat: '#VALUE',
+        displayFormat: '#VALUE'
       },
       testField2: {
         name: 'testName2',
@@ -93,7 +93,7 @@ export const createMetadataBlockPayload = (): any => {
             description: 'testDescription3',
             multiple: false,
             isControlledVocabulary: false,
-            displayFormat: '#VALUE',
+            displayFormat: '#VALUE'
           },
           testField4: {
             name: 'testName4',
@@ -104,10 +104,10 @@ export const createMetadataBlockPayload = (): any => {
             description: 'testDescription4',
             multiple: false,
             isControlledVocabulary: false,
-            displayFormat: '#VALUE',
-          },
-        },
-      },
-    },
-  };
-};
+            displayFormat: '#VALUE'
+          }
+        }
+      }
+    }
+  }
+}

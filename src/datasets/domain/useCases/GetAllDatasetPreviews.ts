@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IDatasetsRepository } from '../repositories/IDatasetsRepository';
-import { DatasetPreviewSubset } from '../models/DatasetPreviewSubset';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
+import { DatasetPreviewSubset } from '../models/DatasetPreviewSubset'
 
 export class GetAllDatasetPreviews implements UseCase<DatasetPreviewSubset> {
-  private datasetsRepository: IDatasetsRepository;
+  private datasetsRepository: IDatasetsRepository
 
   constructor(datasetsRepository: IDatasetsRepository) {
-    this.datasetsRepository = datasetsRepository;
+    this.datasetsRepository = datasetsRepository
   }
 
   /**
@@ -17,6 +17,6 @@ export class GetAllDatasetPreviews implements UseCase<DatasetPreviewSubset> {
    * @returns {Promise<DatasetPreviewSubset>}
    */
   async execute(limit?: number, offset?: number): Promise<DatasetPreviewSubset> {
-    return await this.datasetsRepository.getAllDatasetPreviews(limit, offset);
+    return await this.datasetsRepository.getAllDatasetPreviews(limit, offset)
   }
 }

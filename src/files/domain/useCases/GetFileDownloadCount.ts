@@ -1,11 +1,11 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IFilesRepository } from '../repositories/IFilesRepository';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IFilesRepository } from '../repositories/IFilesRepository'
 
 export class GetFileDownloadCount implements UseCase<number> {
-  private filesRepository: IFilesRepository;
+  private filesRepository: IFilesRepository
 
   constructor(filesRepository: IFilesRepository) {
-    this.filesRepository = filesRepository;
+    this.filesRepository = filesRepository
   }
 
   /**
@@ -15,6 +15,6 @@ export class GetFileDownloadCount implements UseCase<number> {
    * @returns {Promise<number>}
    */
   async execute(fileId: number | string): Promise<number> {
-    return await this.filesRepository.getFileDownloadCount(fileId);
+    return await this.filesRepository.getFileDownloadCount(fileId)
   }
 }

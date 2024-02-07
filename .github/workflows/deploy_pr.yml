@@ -38,9 +38,9 @@ jobs:
 
       - name: Build package
         run: npm run build
-      
+
       - name: Update package version
-        run: |      
+        run: |
           SHORT_SHA=$(git rev-parse --short "${{ github.event.pull_request.head.sha }}")
           CURRENT_PACKAGE_VERSION=$(cat package.json | jq -r '.version')
           npm version "${CURRENT_PACKAGE_VERSION}-pr${{ github.event.number }}.${SHORT_SHA}" --no-git-tag-version
