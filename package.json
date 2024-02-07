@@ -13,6 +13,7 @@
     "test:unit": "jest -c jest.config.unit.ts",
     "test:integration": "jest -c jest.config.integration.ts",
     "test:coverage": "jest --coverage -c jest.config.ts",
+    "test:coverage:check": "jest --coverage --ci --config jest.config.ts",
     "lint": "npm run lint:eslint && npm run lint:prettier",
     "lint:fix": "eslint --fix --ext .ts ./src --ignore-path .gitignore .",
     "lint:eslint": "eslint --ignore-path .gitignore .",
@@ -26,8 +27,7 @@
     "typecheck",
     "lint:fix",
     "git:add",
-    "test:unit",
-    "test:coverage"
+    "test:coverage:check"
   ],
   "repository": {
     "type": "git",
