@@ -12,4 +12,4 @@ const config: Config = {
   testTimeout: 25000
 }
 
-export default config;
+export default config
