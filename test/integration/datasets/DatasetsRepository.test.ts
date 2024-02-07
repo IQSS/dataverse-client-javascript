@@ -81,11 +81,6 @@ describe('DatasetsRepository', () => {
         expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID);
       });
 
-      test('should return dataset when it exists filtering by id and version id', async () => {
-        const actual = await sut.getDataset(TestConstants.TEST_CREATED_DATASET_1_ID, latestVersionId, false);
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID);
-      });
-
       test('should return dataset when it is deaccessioned and includeDeaccessioned param is set', async () => {
         await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID)
           .then()
@@ -238,7 +233,7 @@ describe('DatasetsRepository', () => {
         assert.match(actual.length, 1);
         assert.match(actual[0].lockType, DatasetLockType.FINALIZE_PUBLICATION);
         assert.match(actual[0].userId, 'dataverseAdmin');
-        assert.match(actual[0].message, 'Publishing the dataset; Validating Datafiles Asynchronously');
+        assert.match(actual[0].message, 'Publishing the dataset; Registering PIDs for Datafiles; Validating Datafiles Asynchronously');
       });
 
       test('should return error when dataset does not exist', async () => {

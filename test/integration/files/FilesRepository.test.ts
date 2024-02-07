@@ -11,6 +11,7 @@ import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { FileCounts } from '../../../src/files/domain/models/FileCounts';
 import { FileDownloadSizeMode } from '../../../src';
 import { fail } from 'assert';
+import {deaccessionDatasetViaApi, publishDatasetViaApi, waitForNoLocks} from "../../testHelpers/datasets/datasetHelper";
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
@@ -517,6 +518,53 @@ describe('FilesRepository', () => {
             `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
         );
       });
+    });
+  });
+  describe('getFileCitation', () => {
+    test('should return citation when file exists', async () => {
+      const actualFileCitation = await sut.getFileCitation(
+          testFileId,
+          DatasetNotNumberedVersion.LATEST,
+          false,
+      );
+      expect(typeof actualFileCitation).to.be.a('string');
+    });
+
+    test('should return citation when dataset is deaccessioned', async () => {
+      await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_1_ID)
+          .then()
+          .catch(() => {
+            assert.fail('Error while publishing test Dataset');
+          });
+
+      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_1_ID, 10)
+          .then()
+          .catch(() => {
+            assert.fail('Error while waiting for no locks');
+          });
+
+      await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, '1.0')
+          .then()
+          .catch(() => {
+            assert.fail('Error while deaccessioning test Dataset');
+          });
+
+      const actualFileCitation = await sut.getFileCitation(
+          testFileId,
+          DatasetNotNumberedVersion.LATEST,
+          true,
+      );
+      expect(typeof actualFileCitation).to.be.a('string');
+    });
+
+    test('should return error when file does not exist', async () => {
+      let error: ReadError = undefined;
+      await sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false).catch((e) => (error = e));
+
+      assert.match(
+          error.message,
+          `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
+      );
     });
   });
 });

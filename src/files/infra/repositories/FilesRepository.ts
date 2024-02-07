@@ -158,9 +158,15 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     datasetVersionId: string,
     includeDeaccessioned: boolean,
   ): Promise<string> {
-    return Promise.resolve(
-      `Requesting a file citation is not yet supported. ${fileId} ${datasetVersionId} ${includeDeaccessioned}`,
-    );
+    return this.doGet(
+      this.buildApiEndpoint(this.filesResourceName, `versions/${datasetVersionId}/citation`, fileId),
+      true,
+      { includeDeaccessioned: includeDeaccessioned },
+    )
+      .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error;
+      });
   }
 
   private getFileEndpoint(fileId: number | string, datasetVersionId: string): string {
