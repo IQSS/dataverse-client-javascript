@@ -20,6 +20,7 @@ export const transformMetadataBlockResponseToMetadataBlock = (
 }
 
 const transformPayloadMetadataFieldInfo = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadataFieldInfoPayload: any,
   isChild = false
 ): MetadataFieldInfo => {

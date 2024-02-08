@@ -75,6 +75,7 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const datasetPayload: any = {
     id: 19,
     datasetId: 1,

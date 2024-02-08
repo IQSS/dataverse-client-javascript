@@ -43,6 +43,7 @@ export const createFileDataTableModel = (): FileDataTable => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createFileDataTablePayload = (): any => {
   return {
     varQuantity: 21,

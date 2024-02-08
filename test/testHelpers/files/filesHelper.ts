@@ -50,6 +50,7 @@ export const createFilesSubsetModel = (amount: number): FilesSubset => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createFilePayload = (): any => {
   return {
     label: 'test',
@@ -86,6 +87,7 @@ export const createFilePayload = (): any => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createManyFilesPayload = (amount: number): any[] => {
   return Array.from({ length: amount }, () => createFilePayload())
 }

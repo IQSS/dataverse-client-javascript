@@ -54,6 +54,7 @@ async function setupTestFixtures(): Promise<void> {
   await waitForDatasetsIndexingInSolr()
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function createDatasetViaApi(datasetJson: any): Promise<void> {
   await axios.post(
     `${TestConstants.TEST_API_URL}/dataverses/root/datasets`,
@@ -92,6 +93,7 @@ async function waitForDatasetsIndexingInSolr(): Promise<void> {
   console.log('Datasets indexed in Solr')
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildRequestHeaders(): any {
   return {
     headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }

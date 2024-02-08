@@ -56,6 +56,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createMetadataBlockPayload = (): any => {
   return {
     id: 1,

@@ -58,8 +58,9 @@ const transformPayloadToDatasetLicense = (licensePayload: any): DatasetLicense =
   }
   return datasetLicense
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+
 const transformPayloadToDatasetMetadataBlocks = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadataBlocksPayload: any
 ): DatasetMetadataBlocks => {
   return Object.keys(metadataBlocksPayload).map((metadataBlockKey) => {
@@ -71,8 +72,9 @@ const transformPayloadToDatasetMetadataBlocks = (
     }
   }) as DatasetMetadataBlocks
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+
 const transformPayloadToDatasetMetadataFields = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadataFieldsPayload: any
 ): DatasetMetadataFields => {
   const metadataFieldKeys = Object.keys(metadataFieldsPayload)
@@ -86,8 +88,9 @@ const transformPayloadToDatasetMetadataFields = (
   }
   return metadataFields
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+
 const transformPayloadToDatasetMetadataFieldValue = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   metadataFieldValuePayload: any
 ): DatasetMetadataFieldValue => {
   let metadataFieldValue: DatasetMetadataFieldValue

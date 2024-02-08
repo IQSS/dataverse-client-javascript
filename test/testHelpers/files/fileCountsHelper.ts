@@ -29,6 +29,7 @@ export const createFileCountsModel = (): FileCounts => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createFileCountsPayload = (): any => {
   return {
     total: 4,

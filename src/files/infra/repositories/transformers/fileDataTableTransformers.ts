@@ -38,6 +38,7 @@ const transformPayloadToFileDataTable = (fileDataTablePayload: any): FileDataTab
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToDataVariables = (fileDataVariablesPayload: any): FileDataVariable[] => {
   const fileDataVariables: FileDataVariable[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fileDataVariablesPayload.forEach(function (fileDataVariablePayload: any) {
     fileDataVariables.push({
       id: fileDataVariablePayload.id,
@@ -93,11 +94,12 @@ const transformPayloadToDataVariables = (fileDataVariablesPayload: any): FileDat
   return fileDataVariables
 }
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToFileVariableMetadata = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fileVariableMetadataPayload: any
 ): FileDataVariableMetadata[] => {
   const fileDataVariableMetadata: FileDataVariableMetadata[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fileVariableMetadataPayload.forEach(function (fileVariableMetadataElementPayload: any) {
     fileDataVariableMetadata.push({
       id: fileVariableMetadataElementPayload.id,
@@ -133,11 +135,12 @@ const transformPayloadToFileVariableMetadata = (
   return fileDataVariableMetadata
 }
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToFileDataVariableCategoryMetadatas = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   categoryMetadatasPayload: any
 ): FileDataVariableCategoryMetadata[] => {
   const fileDataVariableCategoryMetadatas: FileDataVariableCategoryMetadata[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   categoryMetadatasPayload.forEach(function (categoryMetadataPayload: any) {
     fileDataVariableCategoryMetadatas.push({
       ...(categoryMetadataPayload.wFreq && { wFreq: categoryMetadataPayload.wFreq }),
@@ -149,11 +152,12 @@ const transformPayloadToFileDataVariableCategoryMetadatas = (
   return fileDataVariableCategoryMetadatas
 }
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToDataVariableInvalidRanges = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dataVariableInvalidRangesPayload: any
 ): FileDataVariableInvalidRanges[] => {
   const dataVariableInvalidRanges: FileDataVariableInvalidRanges[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dataVariableInvalidRangesPayload.forEach(function (dataVariableInvalidRangePayload: any) {
     dataVariableInvalidRanges.push({
       ...(dataVariableInvalidRangePayload.beginValue && {
@@ -176,11 +180,12 @@ const transformPayloadToDataVariableInvalidRanges = (
   return dataVariableInvalidRanges
 }
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const transformPayloadToFileDataVariableCategories = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fileDataVariableCategoriesPayload: any
 ): FileDataVariableCategory[] => {
   const fileDataVariableCategories: FileDataVariableCategory[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fileDataVariableCategoriesPayload.forEach(function (fileDataVariableCategoryPayload: any) {
     fileDataVariableCategories.push({
       ...(fileDataVariableCategoryPayload.label && {

@@ -17,8 +17,8 @@ export const transformFileCountsResponseToFileCounts = (response: AxiosResponse)
   }
 }
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export const transformCountsPerContentTypePayload = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   countsPerContentTypePayload: any
 ): FileContentTypeCount[] => {
   const fileContentTypeCounts: FileContentTypeCount[] = []
@@ -32,8 +32,8 @@ export const transformCountsPerContentTypePayload = (
   return fileContentTypeCounts
 }
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export const transformCountsPerCategoryNamePayload = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   countsPerCategoryNamePayload: any
 ): FileCategoryNameCount[] => {
   const fileCategoryNameCounts: FileCategoryNameCount[] = []
@@ -47,8 +47,8 @@ export const transformCountsPerCategoryNamePayload = (
   return fileCategoryNameCounts
 }
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 export const transformCountsPerAccessStatusPayload = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   countsPerAccessStatusPayload: any
 ): FileAccessStatusCount[] => {
   const fileAccessStatusCounts: FileAccessStatusCount[] = []
