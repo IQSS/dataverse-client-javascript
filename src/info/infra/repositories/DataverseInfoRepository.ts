@@ -16,7 +16,7 @@ export class DataverseInfoRepository extends ApiRepository implements IDataverse
 
   public async getZipDownloadLimit(): Promise<number> {
     return this.doGet(this.buildApiEndpoint(this.infoResourceName, `zipDownloadLimit`))
-      .then((response) => response.data.data as number)
+      .then((response) => parseInt(response.data.data))
       .catch((error) => {
         throw error
       })
@@ -26,7 +26,7 @@ export class DataverseInfoRepository extends ApiRepository implements IDataverse
     return this.doGet(
       this.buildApiEndpoint(this.infoResourceName, `settings/:MaxEmbargoDurationInMonths`)
     )
-      .then((response) => response.data.data.message as number)
+      .then((response) => parseInt(response.data.data.message))
       .catch((error) => {
         throw error
       })

@@ -1,7 +1,5 @@
 import { AuthRepository } from '../../../src/auth/infra/repositories/AuthRepository'
-import { assert, createSandbox, SinonSandbox } from 'sinon'
 import axios from 'axios'
-import { expect } from 'chai'
 import {
   ApiConfig,
   DataverseApiAuthMechanism
@@ -10,7 +8,6 @@ import { WriteError } from '../../../src/core/domain/repositories/WriteError'
 import { TestConstants } from '../../testHelpers/TestConstants'
 
 describe('logout', () => {
-  const sandbox: SinonSandbox = createSandbox()
   const sut: AuthRepository = new AuthRepository()
 
   beforeEach(() => {
@@ -19,10 +16,6 @@ describe('logout', () => {
       DataverseApiAuthMechanism.API_KEY,
       TestConstants.TEST_DUMMY_API_KEY
     )
-  })
-
-  afterEach(() => {
-    sandbox.restore()
   })
 
   test('should not return error on successful response', async () => {
@@ -34,14 +27,13 @@ describe('logout', () => {
         }
       }
     }
-    const axiosPostStub = sandbox.stub(axios, 'post').resolves(testSuccessfulResponse)
+    jest.spyOn(axios, 'post').mockResolvedValue(testSuccessfulResponse)
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/logout`
 
     // API Key auth
     await sut.logout()
 
-    assert.calledWithExactly(
-      axiosPostStub,
+    expect(axios.post).toHaveBeenCalledWith(
       expectedApiEndpoint,
       JSON.stringify(''),
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
@@ -52,8 +44,7 @@ describe('logout', () => {
 
     await sut.logout()
 
-    assert.calledWithExactly(
-      axiosPostStub,
+    expect(axios.post).toHaveBeenCalledWith(
       expectedApiEndpoint,
       JSON.stringify(''),
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
@@ -61,17 +52,16 @@ describe('logout', () => {
   })
 
   test('should return error result on error response', async () => {
-    const axiosPostStub = sandbox.stub(axios, 'post').rejects(TestConstants.TEST_ERROR_RESPONSE)
+    jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
     let error: WriteError = undefined
     await sut.logout().catch((e) => (error = e))
 
-    assert.calledWithExactly(
-      axiosPostStub,
+    expect(axios.post).toHaveBeenCalledWith(
       `${TestConstants.TEST_API_URL}/logout`,
       JSON.stringify(''),
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
     )
-    expect(error).to.be.instanceOf(Error)
+    expect(error).toBeInstanceOf(Error)
   })
 })

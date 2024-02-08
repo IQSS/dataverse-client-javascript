@@ -138,7 +138,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
 
   public async getFileDownloadCount(fileId: number | string): Promise<number> {
     return this.doGet(this.buildApiEndpoint(this.filesResourceName, `downloadCount`, fileId), true)
-      .then((response) => response.data.data.message as number)
+      .then((response) => parseInt(response.data.data.message))
       .catch((error) => {
         throw error
       })

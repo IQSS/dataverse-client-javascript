@@ -1,4 +1,3 @@
-import { assert, createSandbox, SinonSandbox } from 'sinon'
 import { IFilesRepository } from '../../../src/files/domain/repositories/IFilesRepository'
 import {
   DatasetNotNumberedVersion,
@@ -10,25 +9,20 @@ import {
 import { GetDatasetFilesTotalDownloadSize } from '../../../src/files/domain/useCases/GetDatasetFilesTotalDownloadSize'
 
 describe('execute', () => {
-  const sandbox: SinonSandbox = createSandbox()
-
   const testDatasetTotalDownloadSize = 123456789
 
-  afterEach(() => {
-    sandbox.restore()
-  })
-
   test('should return dataset files total download size of the latest version given a dataset id', async () => {
-    const filesRepositoryStub = <IFilesRepository>{}
-    const getDatasetTotalDownloadSizeStub = sandbox.stub().returns(testDatasetTotalDownloadSize)
-    filesRepositoryStub.getDatasetFilesTotalDownloadSize = getDatasetTotalDownloadSizeStub
+    const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+    filesRepositoryStub.getDatasetFilesTotalDownloadSize = jest
+      .fn()
+      .mockResolvedValue(testDatasetTotalDownloadSize)
+
     const sut = new GetDatasetFilesTotalDownloadSize(filesRepositoryStub)
 
     const actual = await sut.execute(1)
 
-    assert.match(actual, testDatasetTotalDownloadSize)
-    assert.calledWithExactly(
-      getDatasetTotalDownloadSizeStub,
+    expect(actual).toEqual(testDatasetTotalDownloadSize)
+    expect(filesRepositoryStub.getDatasetFilesTotalDownloadSize).toHaveBeenCalledWith(
       1,
       DatasetNotNumberedVersion.LATEST,
       false,
@@ -38,9 +32,10 @@ describe('execute', () => {
   })
 
   test('should return dataset files total download size given a dataset id, version, file download size mode and search criteria', async () => {
-    const filesRepositoryStub = <IFilesRepository>{}
-    const getDatasetTotalDownloadSizeStub = sandbox.stub().returns(testDatasetTotalDownloadSize)
-    filesRepositoryStub.getDatasetFilesTotalDownloadSize = getDatasetTotalDownloadSizeStub
+    const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+    filesRepositoryStub.getDatasetFilesTotalDownloadSize = jest
+      .fn()
+      .mockResolvedValue(testDatasetTotalDownloadSize)
     const sut = new GetDatasetFilesTotalDownloadSize(filesRepositoryStub)
 
     const testVersionId = '1.0'
@@ -57,9 +52,8 @@ describe('execute', () => {
       testFileSearchCriteria
     )
 
-    assert.match(actual, testDatasetTotalDownloadSize)
-    assert.calledWithExactly(
-      getDatasetTotalDownloadSizeStub,
+    expect(actual).toEqual(testDatasetTotalDownloadSize)
+    expect(filesRepositoryStub.getDatasetFilesTotalDownloadSize).toHaveBeenCalledWith(
       1,
       testVersionId,
       false,
@@ -69,16 +63,12 @@ describe('execute', () => {
   })
 
   test('should return error result on repository error', async () => {
-    const filesRepositoryStub = <IFilesRepository>{}
-    const testReadError = new ReadError()
-    filesRepositoryStub.getDatasetFilesTotalDownloadSize = sandbox
-      .stub()
-      .throwsException(testReadError)
+    const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+    filesRepositoryStub.getDatasetFilesTotalDownloadSize = jest
+      .fn()
+      .mockRejectedValue(new ReadError())
     const sut = new GetDatasetFilesTotalDownloadSize(filesRepositoryStub)
 
-    let actualError: ReadError = undefined
-    await sut.execute(1).catch((e: ReadError) => (actualError = e))
-
-    assert.match(actualError, testReadError)
+    await expect(sut.execute(1)).rejects.toThrow(ReadError)
   })
 })

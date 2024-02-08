@@ -86,11 +86,6 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
     releaseTime: DATASET_RELEASE_TIME_STR,
     createTime: DATASET_CREATE_TIME_STR,
     publicationDate: DATASET_PUBLICATION_DATE_STR,
-    license: {
-      name: 'CC0 1.0',
-      uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
-      iconUri: 'https://licensebuttons.net/p/zero/1.0/88x31.png'
-    },
     metadataBlocks: {
       citation: {
         name: 'citation',

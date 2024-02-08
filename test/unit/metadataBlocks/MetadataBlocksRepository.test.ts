@@ -1,7 +1,4 @@
 import { MetadataBlocksRepository } from '../../../src/metadataBlocks/infra/repositories/MetadataBlocksRepository'
-import { assert, createSandbox, SinonSandbox } from 'sinon'
-import axios from 'axios'
-import { expect } from 'chai'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
   ApiConfig,
@@ -12,9 +9,9 @@ import {
   createMetadataBlockPayload
 } from '../../testHelpers/metadataBlocks/metadataBlockHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
+import axios from 'axios'
 
 describe('getMetadataBlockByName', () => {
-  const sandbox: SinonSandbox = createSandbox()
   const sut: MetadataBlocksRepository = new MetadataBlocksRepository()
   const testMetadataBlockName = 'test'
 
@@ -26,10 +23,6 @@ describe('getMetadataBlockByName', () => {
     )
   })
 
-  afterEach(() => {
-    sandbox.restore()
-  })
-
   test('should return metadata block on successful response', async () => {
     const testSuccessfulResponse = {
       data: {
@@ -37,16 +30,15 @@ describe('getMetadataBlockByName', () => {
         data: createMetadataBlockPayload()
       }
     }
-    const axiosGetStub = sandbox.stub(axios, 'get').resolves(testSuccessfulResponse)
+    jest.spyOn(axios, 'get').mockResolvedValue(testSuccessfulResponse)
 
     const actual = await sut.getMetadataBlockByName(testMetadataBlockName)
 
-    assert.calledWithExactly(
-      axiosGetStub,
+    expect(axios.get).toHaveBeenCalledWith(
       `${TestConstants.TEST_API_URL}/metadatablocks/${testMetadataBlockName}`,
       TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
     )
-    assert.match(actual, createMetadataBlockModel())
+    expect(actual).toMatchObject(createMetadataBlockModel())
   })
 
   test('should return error result on error response', async () => {
@@ -56,16 +48,15 @@ describe('getMetadataBlockByName', () => {
         message: 'test'
       }
     }
-    const axiosGetStub = sandbox.stub(axios, 'get').rejects(testErrorResponse)
+    jest.spyOn(axios, 'get').mockRejectedValue(testErrorResponse)
 
     let error: ReadError = undefined
     await sut.getMetadataBlockByName(testMetadataBlockName).catch((e) => (error = e))
 
-    assert.calledWithExactly(
-      axiosGetStub,
+    expect(axios.get).toHaveBeenCalledWith(
       `${TestConstants.TEST_API_URL}/metadatablocks/${testMetadataBlockName}`,
       TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
     )
-    expect(error).to.be.instanceOf(Error)
+    expect(error).toBeInstanceOf(Error)
   })
 })

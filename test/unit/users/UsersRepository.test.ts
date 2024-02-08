@@ -1,17 +1,14 @@
 import { UsersRepository } from '../../../src/users/infra/repositories/UsersRepository'
-import { assert, createSandbox, SinonSandbox } from 'sinon'
 import axios from 'axios'
-import { expect } from 'chai'
-import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import { createAuthenticatedUser } from '../../testHelpers/users/authenticatedUserHelper'
 import {
   ApiConfig,
   DataverseApiAuthMechanism
 } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
+import { ReadError } from '../../../src'
 
 describe('getCurrentAuthenticatedUser', () => {
-  const sandbox: SinonSandbox = createSandbox()
   const sut: UsersRepository = new UsersRepository()
 
   beforeEach(() => {
@@ -20,10 +17,6 @@ describe('getCurrentAuthenticatedUser', () => {
       DataverseApiAuthMechanism.API_KEY,
       TestConstants.TEST_DUMMY_API_KEY
     )
-  })
-
-  afterEach(() => {
-    sandbox.restore()
   })
 
   test('should return authenticated user on successful response', async () => {
@@ -48,44 +41,39 @@ describe('getCurrentAuthenticatedUser', () => {
         }
       }
     }
-    const axiosGetStub = sandbox.stub(axios, 'get').resolves(testSuccessfulResponse)
+    jest.spyOn(axios, 'get').mockResolvedValue(testSuccessfulResponse)
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/users/:me`
 
     // API Key auth
     let actual = await sut.getCurrentAuthenticatedUser()
 
-    assert.calledWithExactly(
-      axiosGetStub,
+    expect(axios.get).toHaveBeenCalledWith(
       expectedApiEndpoint,
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
     )
-
-    assert.match(actual, testAuthenticatedUser)
+    expect(actual).toMatchObject(testAuthenticatedUser)
 
     // Session cookie auth
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
     actual = await sut.getCurrentAuthenticatedUser()
 
-    assert.calledWithExactly(
-      axiosGetStub,
+    expect(axios.get).toHaveBeenCalledWith(
       expectedApiEndpoint,
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
     )
-
-    assert.match(actual, testAuthenticatedUser)
+    expect(actual).toMatchObject(testAuthenticatedUser)
   })
 
   test('should return error result on error response', async () => {
-    const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE)
+    jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
     let error: ReadError = undefined
     await sut.getCurrentAuthenticatedUser().catch((e) => (error = e))
 
-    assert.calledWithExactly(
-      axiosGetStub,
+    expect(axios.get).toHaveBeenCalledWith(
       `${TestConstants.TEST_API_URL}/users/:me`,
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
     )
-    expect(error).to.be.instanceOf(Error)
+    expect(error).toBeInstanceOf(Error)
   })
 })
