@@ -169,6 +169,32 @@ describe('DatasetsRepository', () => {
         expect(actual).toStrictEqual(createDatasetModel(testDatasetLicenseWithoutIconUri))
       })
 
+      test('should return dataset with alternative persistent id, publication date and citation date when they are present in the response', async () => {
+        const testDatasetVersionWithAlternativePersistentIdAndDatesSuccessfulResponse = {
+          data: {
+            status: 'OK',
+            data: createDatasetVersionPayload(undefined, true)
+          }
+        }
+        jest
+          .spyOn(axios, 'get')
+          .mockResolvedValue(
+            testDatasetVersionWithAlternativePersistentIdAndDatesSuccessfulResponse
+          )
+
+        const actual = await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(
+          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`,
+          expectedRequestConfigApiKey
+        )
+        expect(actual).toStrictEqual(createDatasetModel(undefined, true))
+      })
+
       test('should return error on repository read error', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 

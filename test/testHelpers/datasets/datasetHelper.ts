@@ -22,7 +22,10 @@ const DATAVERSE_API_REQUEST_HEADERS = {
   headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
 }
 
-export const createDatasetModel = (license?: DatasetLicense): Dataset => {
+export const createDatasetModel = (
+  license?: DatasetLicense,
+  addOptionalParameters = false
+): Dataset => {
   const datasetModel: Dataset = {
     id: 1,
     persistentId: 'doi:10.5072/FK2/HC6KTB',
@@ -70,11 +73,19 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
   if (license !== undefined) {
     datasetModel.license = license
   }
+  if (addOptionalParameters) {
+    datasetModel.alternativePersistentId = 'doi:10.5072/FK2/HC6KTB'
+    datasetModel.publicationDate = '2021-01-01'
+    datasetModel.citationDate = '2021-01-01'
+  }
   return datasetModel
 }
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
+export const createDatasetVersionPayload = (
+  license?: DatasetLicense,
+  addOptionalProperties = false
+): any => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const datasetPayload: any = {
     id: 19,
@@ -181,6 +192,11 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
   }
   if (license !== undefined) {
     datasetPayload.license = license
+  }
+  if (addOptionalProperties) {
+    datasetPayload.alternativePersistentId = 'doi:10.5072/FK2/HC6KTB'
+    datasetPayload.publicationDate = '2021-01-01'
+    datasetPayload.citationDate = '2021-01-01'
   }
   return datasetPayload
 }
