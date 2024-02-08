@@ -1,5 +1,4 @@
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
-import { assert } from 'sinon'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   createPrivateUrlViaApi,
@@ -13,7 +12,6 @@ import {
   DatasetLockType,
   DatasetPreviewSubset
 } from '../../../src/datasets'
-import { fail } from 'assert'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 
@@ -36,29 +34,29 @@ describe('DatasetsRepository', () => {
 
     test('should return all dataset previews when no pagination params are defined', async () => {
       const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews()
-      assert.match(actual.datasetPreviews.length, 2)
-      assert.match(actual.datasetPreviews[0].title, 'Second Dataset')
-      assert.match(actual.totalDatasetCount, 2)
+      expect(actual.datasetPreviews.length).toBe(2)
+      expect(actual.datasetPreviews[0].title).toBe('Second Dataset')
+      expect(actual.totalDatasetCount).toBe(2)
     })
 
     test('should return first dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 0)
-      assert.match(actual.datasetPreviews.length, 1)
-      assert.match(actual.datasetPreviews[0].title, 'Second Dataset')
-      assert.match(actual.totalDatasetCount, 2)
+      expect(actual.datasetPreviews.length).toBe(1)
+      expect(actual.datasetPreviews[0].title).toBe('Second Dataset')
+      expect(actual.totalDatasetCount).toBe(2)
     })
 
     test('should return second dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 1)
-      assert.match(actual.datasetPreviews.length, 1)
-      assert.match(actual.datasetPreviews[0].title, 'First Dataset')
-      assert.match(actual.totalDatasetCount, 2)
+      expect(actual.datasetPreviews.length).toBe(1)
+      expect(actual.datasetPreviews[0].title).toBe('First Dataset')
+      expect(actual.totalDatasetCount).toBe(2)
     })
 
     test('should return third dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 2)
-      assert.match(actual.datasetPreviews.length, 0)
-      assert.match(actual.totalDatasetCount, 2)
+      expect(actual.datasetPreviews.length).toBe(0)
+      expect(actual.totalDatasetCount).toBe(2)
     })
   })
 
@@ -66,7 +64,7 @@ describe('DatasetsRepository', () => {
     test('should return not empty field list on successful response', async () => {
       const actual = await sut.getDatasetSummaryFieldNames()
 
-      assert.pass(actual.length > 0)
+      expect(actual.length).toBeGreaterThan(0)
     })
   })
 
@@ -82,15 +80,13 @@ describe('DatasetsRepository', () => {
       })
 
       test('should return error when dataset does not exist', async () => {
-        let error: ReadError = undefined
-        await sut
-          .getDataset(nonExistentTestDatasetId, latestVersionId, false)
-          .catch((e) => (error = e))
-
-        assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+        const expectedError = new ReadError(
+          `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
         )
+
+        await expect(
+          sut.getDataset(nonExistentTestDatasetId, latestVersionId, false)
+        ).rejects.toThrow(expectedError)
       })
     })
     describe('by persistent id', () => {
@@ -105,24 +101,20 @@ describe('DatasetsRepository', () => {
       })
 
       test('should return error when dataset does not exist', async () => {
-        let error: ReadError = undefined
-
         const testWrongPersistentId = 'wrongPersistentId'
-        await sut
-          .getDataset(testWrongPersistentId, latestVersionId, false)
-          .catch((e) => (error = e))
+        const expectedError = new ReadError(
+          `[404] Dataset with Persistent ID ${testWrongPersistentId} not found.`
+        )
 
-        assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [404] Dataset with Persistent ID ${testWrongPersistentId} not found.`
+        await expect(sut.getDataset(testWrongPersistentId, latestVersionId, false)).rejects.toThrow(
+          expectedError
         )
       })
     })
   })
 
   describe('Private URLs', () => {
-    const expectedErrorInvalidToken =
-      'There was an error when reading the resource. Reason was: [404] Private URL user not found'
+    const expectedErrorInvalidToken = '[404] Private URL user not found'
     let privateUrlToken: string = undefined
 
     beforeAll(async () => {
@@ -131,7 +123,7 @@ describe('DatasetsRepository', () => {
           privateUrlToken = response.data.data.token
         })
         .catch(() => {
-          fail('Tests beforeAll(): Error while creating Dataset private URL')
+          throw new Error('Tests beforeAll(): Error while creating Dataset private URL')
         })
     })
 
@@ -143,11 +135,9 @@ describe('DatasetsRepository', () => {
       })
 
       test('should return error when token is not valid', async () => {
-        let error: ReadError = undefined
+        const expectedError = new ReadError(expectedErrorInvalidToken)
 
-        await sut.getPrivateUrlDataset('invalidToken').catch((e) => (error = e))
-
-        assert.match(error.message, expectedErrorInvalidToken)
+        await expect(sut.getPrivateUrlDataset('invalidToken')).rejects.toThrow(expectedError)
       })
     })
 
@@ -159,32 +149,31 @@ describe('DatasetsRepository', () => {
       })
 
       test('should return error when token is not valid', async () => {
-        let error: ReadError = undefined
+        const expectedError = new ReadError(expectedErrorInvalidToken)
 
-        await sut.getPrivateUrlDataset('invalidToken').catch((e) => (error = e))
-
-        assert.match(error.message, expectedErrorInvalidToken)
+        await expect(sut.getPrivateUrlDatasetCitation('invalidToken')).rejects.toThrow(
+          expectedError
+        )
       })
     })
 
     describe('getDatasetUserPermissions', () => {
       test('should return user permissions filtering by dataset id', async () => {
         const actual = await sut.getDatasetUserPermissions(TestConstants.TEST_CREATED_DATASET_1_ID)
-        assert.match(actual.canViewUnpublishedDataset, true)
-        assert.match(actual.canEditDataset, true)
-        assert.match(actual.canPublishDataset, true)
-        assert.match(actual.canManageDatasetPermissions, true)
-        assert.match(actual.canDeleteDatasetDraft, true)
+        expect(actual.canViewUnpublishedDataset).toBe(true)
+        expect(actual.canEditDataset).toBe(true)
+        expect(actual.canPublishDataset).toBe(true)
+        expect(actual.canManageDatasetPermissions).toBe(true)
+        expect(actual.canDeleteDatasetDraft).toBe(true)
       })
 
       test('should return error when dataset does not exist', async () => {
-        let error: ReadError = undefined
+        const expectedError = new ReadError(
+          `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+        )
 
-        await sut.getDatasetUserPermissions(nonExistentTestDatasetId).catch((e) => (error = e))
-
-        assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+        await expect(sut.getDatasetUserPermissions(nonExistentTestDatasetId)).rejects.toThrow(
+          expectedError
         )
       })
     })
@@ -194,27 +183,23 @@ describe('DatasetsRepository', () => {
         await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID)
           .then()
           .catch(() => {
-            assert.fail('Error while publishing test Dataset')
+            throw new Error('Error while publishing test Dataset')
           })
         const actual = await sut.getDatasetLocks(TestConstants.TEST_CREATED_DATASET_2_ID)
-        assert.match(actual.length, 1)
-        assert.match(actual[0].lockType, DatasetLockType.FINALIZE_PUBLICATION)
-        assert.match(actual[0].userId, 'dataverseAdmin')
-        assert.match(
-          actual[0].message,
+        expect(actual.length).toBe(1)
+        expect(actual[0].lockType).toBe(DatasetLockType.FINALIZE_PUBLICATION)
+        expect(actual[0].userId).toBe('dataverseAdmin')
+        expect(actual[0].message).toBe(
           'Publishing the dataset; Validating Datafiles Asynchronously'
         )
       })
 
       test('should return error when dataset does not exist', async () => {
-        let error: ReadError = undefined
-
-        await sut.getDatasetLocks(nonExistentTestDatasetId).catch((e) => (error = e))
-
-        assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+        const expectedError = new ReadError(
+          `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
         )
+
+        await expect(sut.getDatasetLocks(nonExistentTestDatasetId)).rejects.toThrow(expectedError)
       })
     })
   })
@@ -230,29 +215,26 @@ describe('DatasetsRepository', () => {
     })
 
     test('should return error when dataset does not exist', async () => {
-      let error: ReadError = undefined
-      await sut
-        .getDatasetCitation(nonExistentTestDatasetId, latestVersionId, false)
-        .catch((e) => (error = e))
-
-      assert.match(
-        error.message,
-        `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      const expectedError = new ReadError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
       )
+
+      await expect(
+        sut.getDatasetCitation(nonExistentTestDatasetId, latestVersionId, false)
+      ).rejects.toThrow(expectedError)
     })
 
     test('should return citation when dataset is deaccessioned', async () => {
       await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_2_ID, 10)
         .then()
         .catch(() => {
-          assert.fail('Error while waiting for no locks')
+          throw new Error('Error while waiting for no locks')
         })
 
       await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID, '1.0')
         .then()
-        .catch((error) => {
-          console.log(JSON.stringify(error))
-          assert.fail('Error while deaccessioning test Dataset')
+        .catch(() => {
+          throw new Error('Error while deaccessioning test Dataset')
         })
 
       const actualDatasetCitation = await sut.getDatasetCitation(

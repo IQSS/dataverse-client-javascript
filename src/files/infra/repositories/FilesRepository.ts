@@ -15,6 +15,7 @@ import { FileCounts } from '../../domain/models/FileCounts'
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers'
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode'
 import { DatasetNotNumberedVersion } from '../../../datasets'
+import { ReadError } from '../../../core'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -179,7 +180,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       return this.buildApiEndpoint(this.filesResourceName, '', fileId)
     }
     // TODO: Implement once it is supported by the API https://github.com/IQSS/dataverse/issues/10280
-    throw new Error(
+    throw new ReadError(
       `Requesting a file by its dataset version is not yet supported. Requested version: ${datasetVersionId}. Please try using the :latest or :draft version instead.`
     )
   }

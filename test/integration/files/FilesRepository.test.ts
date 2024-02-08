@@ -3,8 +3,6 @@ import {
   ApiConfig,
   DataverseApiAuthMechanism
 } from '../../../src/core/infra/repositories/ApiConfig'
-import { assert } from 'sinon'
-import { expect } from 'chai'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { registerFileViaApi, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
@@ -17,7 +15,6 @@ import {
 import { DatasetNotNumberedVersion } from '../../../src/datasets'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
 import { FileDownloadSizeMode } from '../../../src'
-import { fail } from 'assert'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -51,28 +48,28 @@ describe('FilesRepository', () => {
       .then()
       .catch((e) => {
         console.log(e)
-        fail(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
+        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
       })
     // Uploading test file 2
     await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTextFile2Name)
       .then()
       .catch((e) => {
         console.log(e)
-        fail(`Tests beforeAll(): Error while uploading file ${testTextFile2Name}`)
+        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile2Name}`)
       })
     // Uploading test file 3
     await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTextFile3Name)
       .then()
       .catch((e) => {
         console.log(e)
-        fail(`Tests beforeAll(): Error while uploading file ${testTextFile3Name}`)
+        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile3Name}`)
       })
     // Uploading test file 4
     await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTabFile4Name)
       .then()
       .catch((e) => {
         console.log(e)
-        fail(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`)
+        throw new Error(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`)
       })
     // Registering test file 1
     await registerFileViaApi(uploadFileResponse.data.data.files[0].dataFile.id)
@@ -99,12 +96,13 @@ describe('FilesRepository', () => {
           false,
           FileOrderCriteria.NAME_AZ
         )
-        assert.match(actual.files.length, 4)
-        assert.match(actual.files[0].name, testTextFile1Name)
-        assert.match(actual.files[1].name, testTextFile2Name)
-        assert.match(actual.files[2].name, testTextFile3Name)
-        assert.match(actual.files[3].name, testTabFile4Name)
-        assert.match(actual.totalFilesCount, 4)
+
+        expect(actual.files).toHaveLength(4)
+        expect(actual.files[0].name).toBe(testTextFile1Name)
+        expect(actual.files[1].name).toBe(testTextFile2Name)
+        expect(actual.files[2].name).toBe(testTextFile3Name)
+        expect(actual.files[3].name).toBe(testTabFile4Name)
+        expect(actual.totalFilesCount).toBe(4)
       })
 
       test('should return correct files filtering by dataset id, version id, and paginating', async () => {
@@ -117,9 +115,10 @@ describe('FilesRepository', () => {
           3,
           undefined
         )
-        assert.match(actual.files.length, 1)
-        assert.match(actual.files[0].name, testTabFile4Name)
-        assert.match(actual.totalFilesCount, 4)
+
+        expect(actual.files).toHaveLength(1)
+        expect(actual.files[0].name).toBe(testTabFile4Name)
+        expect(actual.totalFilesCount).toBe(4)
       })
 
       test('should return correct files filtering by dataset id, version id, and applying newest file criteria', async () => {
@@ -132,30 +131,28 @@ describe('FilesRepository', () => {
           undefined,
           testFileCriteria
         )
-        assert.match(actual.files.length, 3)
-        assert.match(actual.files[0].name, testTextFile3Name)
-        assert.match(actual.files[1].name, testTextFile2Name)
-        assert.match(actual.files[2].name, testTextFile1Name)
-        assert.match(actual.totalFilesCount, 3)
+
+        expect(actual.files).toHaveLength(3)
+        expect(actual.files[0].name).toBe(testTextFile3Name)
+        expect(actual.files[1].name).toBe(testTextFile2Name)
+        expect(actual.files[2].name).toBe(testTextFile1Name)
+        expect(actual.totalFilesCount).toBe(3)
       })
 
       test('should return error when dataset does not exist', async () => {
-        let error: ReadError = undefined
-
         const nonExistentTestDatasetId = 100
-        await sut
-          .getDatasetFiles(
+        const errorExpected: ReadError = new ReadError(
+          `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+        )
+
+        await expect(
+          sut.getDatasetFiles(
             nonExistentTestDatasetId,
             latestDatasetVersionId,
             false,
             FileOrderCriteria.NAME_AZ
           )
-          .catch((e) => (error = e))
-
-        assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [404] Dataset with ID ${nonExistentTestDatasetId} not found.`
-        )
+        ).rejects.toThrow(errorExpected)
       })
     })
 
@@ -172,12 +169,13 @@ describe('FilesRepository', () => {
           false,
           FileOrderCriteria.NAME_AZ
         )
-        assert.match(actual.files.length, 4)
-        assert.match(actual.files[0].name, testTextFile1Name)
-        assert.match(actual.files[1].name, testTextFile2Name)
-        assert.match(actual.files[2].name, testTextFile3Name)
-        assert.match(actual.files[3].name, testTabFile4Name)
-        assert.match(actual.totalFilesCount, 4)
+
+        expect(actual.files).toHaveLength(4)
+        expect(actual.files[0].name).toBe(testTextFile1Name)
+        expect(actual.files[1].name).toBe(testTextFile2Name)
+        expect(actual.files[2].name).toBe(testTextFile3Name)
+        expect(actual.files[3].name).toBe(testTabFile4Name)
+        expect(actual.totalFilesCount).toBe(4)
       })
 
       test('should return correct files filtering by persistent id, version id, and paginating', async () => {
@@ -195,9 +193,10 @@ describe('FilesRepository', () => {
           3,
           undefined
         )
-        assert.match(actual.files.length, 1)
-        assert.match(actual.files[0].name, testTabFile4Name)
-        assert.match(actual.totalFilesCount, 4)
+
+        expect(actual.files).toHaveLength(1)
+        expect(actual.files[0].name).toBe(testTabFile4Name)
+        expect(actual.totalFilesCount).toBe(4)
       })
 
       test('should return correct files filtering by persistent id, version id, and applying newest file criteria', async () => {
@@ -215,30 +214,28 @@ describe('FilesRepository', () => {
           undefined,
           testFileCriteria
         )
-        assert.match(actual.files.length, 3)
-        assert.match(actual.files[0].name, testTextFile3Name)
-        assert.match(actual.files[1].name, testTextFile2Name)
-        assert.match(actual.files[2].name, testTextFile1Name)
-        assert.match(actual.totalFilesCount, 3)
+
+        expect(actual.files).toHaveLength(3)
+        expect(actual.files[0].name).toBe(testTextFile3Name)
+        expect(actual.files[1].name).toBe(testTextFile2Name)
+        expect(actual.files[2].name).toBe(testTextFile1Name)
+        expect(actual.totalFilesCount).toBe(3)
       })
 
       test('should return error when dataset does not exist', async () => {
-        let error: ReadError = undefined
-
         const testWrongPersistentId = 'wrongPersistentId'
-        await sut
-          .getDatasetFiles(
+        const errorExpected = new ReadError(
+          `[404] Dataset with Persistent ID ${testWrongPersistentId} not found.`
+        )
+
+        await expect(
+          sut.getDatasetFiles(
             testWrongPersistentId,
             latestDatasetVersionId,
             false,
             FileOrderCriteria.NAME_AZ
           )
-          .catch((e) => (error = e))
-
-        assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [404] Dataset with Persistent ID ${testWrongPersistentId} not found.`
-        )
+        ).rejects.toThrow(errorExpected)
       })
     })
   })
@@ -276,10 +273,13 @@ describe('FilesRepository', () => {
         latestDatasetVersionId,
         false
       )
-      assert.match(actual.total, expectedFileCounts.total)
-      expect(actual.perContentType).to.have.deep.members(expectedFileCounts.perContentType)
-      expect(actual.perAccessStatus).to.have.deep.members(expectedFileCounts.perAccessStatus)
-      expect(actual.perCategoryName).to.have.deep.members(expectedFileCounts.perCategoryName)
+
+      expect(actual.total).toBe(expectedFileCounts.total)
+      expect(actual.perContentType).toEqual(
+        expect.arrayContaining(expectedFileCounts.perContentType)
+      )
+      expect(actual.perAccessStatus).toEqual(expectedFileCounts.perAccessStatus)
+      expect(actual.perCategoryName).toEqual(expectedFileCounts.perCategoryName)
     })
 
     test('should return file count filtering by numeric id and applying category criteria', async () => {
@@ -311,16 +311,11 @@ describe('FilesRepository', () => {
         false,
         testCriteria
       )
-      assert.match(actual.total, expectedFileCountsForCriteria.total)
-      expect(actual.perContentType).to.have.deep.members(
-        expectedFileCountsForCriteria.perContentType
-      )
-      expect(actual.perAccessStatus).to.have.deep.members(
-        expectedFileCountsForCriteria.perAccessStatus
-      )
-      expect(actual.perCategoryName).to.have.deep.members(
-        expectedFileCountsForCriteria.perCategoryName
-      )
+
+      expect(actual.total).toBe(expectedFileCountsForCriteria.total)
+      expect(actual.perContentType).toEqual(expectedFileCountsForCriteria.perContentType)
+      expect(actual.perAccessStatus).toEqual(expectedFileCountsForCriteria.perAccessStatus)
+      expect(actual.perCategoryName).toEqual(expectedFileCountsForCriteria.perCategoryName)
     })
 
     test('should return file count filtering by persistent id', async () => {
@@ -334,10 +329,13 @@ describe('FilesRepository', () => {
         latestDatasetVersionId,
         false
       )
-      assert.match(actual.total, expectedFileCounts.total)
-      expect(actual.perContentType).to.have.deep.members(expectedFileCounts.perContentType)
-      expect(actual.perAccessStatus).to.have.deep.members(expectedFileCounts.perAccessStatus)
-      expect(actual.perCategoryName).to.have.deep.members(expectedFileCounts.perCategoryName)
+
+      expect(actual.total).toBe(expectedFileCounts.total)
+      expect(actual.perContentType).toEqual(
+        expect.arrayContaining(expectedFileCounts.perContentType)
+      )
+      expect(actual.perAccessStatus).toEqual(expectedFileCounts.perAccessStatus)
+      expect(actual.perCategoryName).toEqual(expectedFileCounts.perCategoryName)
     })
   })
 
@@ -351,7 +349,7 @@ describe('FilesRepository', () => {
         false,
         FileDownloadSizeMode.ORIGINAL
       )
-      assert.match(actual, expectedTotalDownloadSize)
+      expect(actual).toBe(expectedTotalDownloadSize)
     })
 
     test('should return total download size filtering by persistent id and ignoring original tabular size', async () => {
@@ -366,7 +364,7 @@ describe('FilesRepository', () => {
         false,
         FileDownloadSizeMode.ORIGINAL
       )
-      assert.match(actual, expectedTotalDownloadSize)
+      expect(actual).toBe(expectedTotalDownloadSize)
     })
 
     test('should return total download size filtering by numeric id, ignoring original tabular size and applying category criteria', async () => {
@@ -379,7 +377,7 @@ describe('FilesRepository', () => {
         FileDownloadSizeMode.ORIGINAL,
         testCriteria
       )
-      assert.match(actual, expectedTotalDownloadSizeForCriteria)
+      expect(actual).toBe(expectedTotalDownloadSizeForCriteria)
     })
   })
 
@@ -393,18 +391,13 @@ describe('FilesRepository', () => {
       )
       const testFile = currentTestFilesSubset.files[0]
       const actual = await sut.getFileDownloadCount(testFile.id)
-      assert.match(actual, 0)
+      expect(actual).toBe(0)
     })
 
     test('should return error when file does not exist', async () => {
-      let error: ReadError = undefined
+      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
-      await sut.getFileDownloadCount(nonExistentFiledId).catch((e) => (error = e))
-
-      assert.match(
-        error.message,
-        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`
-      )
+      await expect(sut.getFileDownloadCount(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
   })
 
@@ -418,20 +411,16 @@ describe('FilesRepository', () => {
       )
       const testFile = currentTestFilesSubset.files[0]
       const actual = await sut.getFileUserPermissions(testFile.id)
-      assert.match(actual.canDownloadFile, true)
-      assert.match(actual.canManageFilePermissions, true)
-      assert.match(actual.canEditOwnerDataset, true)
+
+      expect(actual.canDownloadFile).toBe(true)
+      expect(actual.canManageFilePermissions).toBe(true)
+      expect(actual.canEditOwnerDataset).toBe(true)
     })
 
     test('should return error when file does not exist', async () => {
-      let error: ReadError = undefined
+      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
-      await sut.getFileUserPermissions(nonExistentFiledId).catch((e) => (error = e))
-
-      assert.match(
-        error.message,
-        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`
-      )
+      await expect(sut.getFileUserPermissions(nonExistentFiledId)).rejects.toThrow(errorExpected)
     })
   })
 
@@ -445,7 +434,7 @@ describe('FilesRepository', () => {
       )
       const testFile = currentTestFilesSubset.files[3]
       const actual = await sut.getFileDataTables(testFile.id)
-      assert.match(actual[0].varQuantity, 3)
+      expect(actual[0].varQuantity).toBe(3)
     })
 
     test('should return error when file is not tabular and version id', async () => {
@@ -457,25 +446,17 @@ describe('FilesRepository', () => {
       )
       const testFile = currentTestFilesSubset.files[0]
 
-      let error: ReadError = undefined
-
-      await sut.getFileDataTables(testFile.id).catch((e) => (error = e))
-
-      assert.match(
-        error.message,
-        'There was an error when reading the resource. Reason was: [400] This operation is only available for tabular files.'
+      const errorExpected = new ReadError(
+        '[400] This operation is only available for tabular files.'
       )
+
+      await expect(sut.getFileDataTables(testFile.id)).rejects.toThrow(errorExpected)
     })
 
     test('should return error when file does not exist', async () => {
-      let error: ReadError = undefined
+      const errorExpected = new ReadError('[404] File not found for given id.')
 
-      await sut.getFileDataTables(nonExistentFiledId).catch((e) => (error = e))
-
-      assert.match(
-        error.message,
-        'There was an error when reading the resource. Reason was: [404] File not found for given id.'
-      )
+      await expect(sut.getFileDataTables(nonExistentFiledId)).rejects.toThrow(errorExpected)
     })
   })
 
@@ -484,77 +465,62 @@ describe('FilesRepository', () => {
       test('should return file when providing a valid id', async () => {
         const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.LATEST)
 
-        assert.match(actual.name, testTextFile1Name)
+        expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return file draft when providing a valid id and version is draft', async () => {
         const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT)
 
-        assert.match(actual.name, testTextFile1Name)
+        expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return Not Implemented Yet error when when providing a valid id and version is different than latest and draft', async () => {
         // This tests can be removed once the API supports getting a file by version
-        let error: ReadError = undefined
-
-        await sut.getFile(testFileId, '1.0').catch((e) => (error = e))
-
-        assert.match(
-          error.message,
+        const errorExpected = new ReadError(
           `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`
         )
+
+        await expect(sut.getFile(testFileId, '1.0')).rejects.toThrow(errorExpected)
       })
 
       test('should return error when file does not exist', async () => {
-        let error: ReadError = undefined
+        const errorExpected = new ReadError(`[400] Error attempting get the requested data file.`)
 
-        await sut
-          .getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST)
-          .catch((e) => (error = e))
-
-        assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`
-        )
+        await expect(
+          sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST)
+        ).rejects.toThrow(errorExpected)
       })
     })
     describe('by persistent id', () => {
       test('should return file when providing a valid persistent id', async () => {
         const actual = await sut.getFile(testFilePersistentId, DatasetNotNumberedVersion.LATEST)
 
-        assert.match(actual.name, testTextFile1Name)
+        expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return file draft when providing a valid persistent id and version is draft', async () => {
         const actual = await sut.getFile(testFilePersistentId, DatasetNotNumberedVersion.DRAFT)
 
-        assert.match(actual.name, testTextFile1Name)
+        expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return Not Implemented Yet error when when providing a valid persistent id and version is different than latest and draft', async () => {
         // This tests can be removed once the API supports getting a file by version
-        let error: ReadError = undefined
-
-        await sut.getFile(testFilePersistentId, '1.0').catch((e) => (error = e))
-
-        assert.match(
-          error.message,
+        const errorExpected = new ReadError(
           `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`
         )
+
+        await expect(sut.getFile(testFilePersistentId, '1.0')).rejects.toThrow(errorExpected)
       })
 
       test('should return error when file does not exist', async () => {
-        let error: ReadError = undefined
+        const errorExpected = new ReadError(`[400] Error attempting get the requested data file.`)
 
         const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId'
-        await sut
-          .getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST)
-          .catch((e) => (error = e))
 
-        assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`
-        )
+        await expect(
+          sut.getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST)
+        ).rejects.toThrow(errorExpected)
       })
     })
   })
