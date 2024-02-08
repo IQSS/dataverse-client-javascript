@@ -1,15 +1,9 @@
 import { GetDatasetCitation } from '../../../src/datasets/domain/useCases/GetDatasetCitation'
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
-import { createSandbox, SinonSandbox } from 'sinon'
 
 describe('execute', () => {
-  const sandbox: SinonSandbox = createSandbox()
   const testId = 1
-
-  afterEach(() => {
-    sandbox.restore()
-  })
 
   test('should return successful result with citation on repository success', async () => {
     const testCitation = 'test citation'

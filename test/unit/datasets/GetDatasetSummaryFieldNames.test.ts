@@ -1,15 +1,8 @@
 import { GetDatasetSummaryFieldNames } from '../../../src/datasets/domain/useCases/GetDatasetSummaryFieldNames'
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
-import { createSandbox, SinonSandbox } from 'sinon'
 
 describe('execute', () => {
-  const sandbox: SinonSandbox = createSandbox()
-
-  afterEach(() => {
-    sandbox.restore()
-  })
-
   test('should return successful result with field names on repository success', async () => {
     const testFieldNames = ['test1', 'test2']
     const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
