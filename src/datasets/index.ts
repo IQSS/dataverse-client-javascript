@@ -7,6 +7,12 @@ import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDat
 import { GetDatasetUserPermissions } from './domain/useCases/GetDatasetUserPermissions';
 import { GetDatasetLocks } from './domain/useCases/GetDatasetLocks';
 import { GetAllDatasetPreviews } from './domain/useCases/GetAllDatasetPreviews';
+import { NewDatasetResourceValidator } from './domain/useCases/validators/NewDatasetResourceValidator';
+import { MetadataBlocksRepository } from '../metadataBlocks/infra/repositories/MetadataBlocksRepository';
+import { CreateDataset } from './domain/useCases/CreateDataset';
+import { MetadataFieldValidator } from './domain/useCases/validators/MetadataFieldValidator';
+import { SingleMetadataFieldValidator } from './domain/useCases/validators/SingleMetadataFieldValidator';
+import { MultipleMetadataFieldValidator } from './domain/useCases/validators/MultipleMetadataFieldValidator';
 
 const datasetsRepository = new DatasetsRepository();
 
@@ -18,6 +24,16 @@ const getPrivateUrlDatasetCitation = new GetPrivateUrlDatasetCitation(datasetsRe
 const getDatasetUserPermissions = new GetDatasetUserPermissions(datasetsRepository);
 const getDatasetLocks = new GetDatasetLocks(datasetsRepository);
 const getAllDatasetPreviews = new GetAllDatasetPreviews(datasetsRepository);
+const singleMetadataFieldValidator = new SingleMetadataFieldValidator();
+const metadataFieldValidator = new MetadataFieldValidator(
+  new SingleMetadataFieldValidator(),
+  new MultipleMetadataFieldValidator(singleMetadataFieldValidator),
+);
+const createDataset = new CreateDataset(
+  datasetsRepository,
+  new MetadataBlocksRepository(),
+  new NewDatasetResourceValidator(metadataFieldValidator),
+);
 
 export {
   getDatasetSummaryFieldNames,
@@ -28,6 +44,7 @@ export {
   getDatasetUserPermissions,
   getDatasetLocks,
   getAllDatasetPreviews,
+  createDataset,
 };
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion';
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions';
@@ -45,3 +62,11 @@ export {
 } from './domain/models/Dataset';
 export { DatasetPreview } from './domain/models/DatasetPreview';
 export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset';
+export {
+  NewDatasetDTO as NewDataset,
+  NewDatasetMetadataBlockValuesDTO as NewDatasetMetadataBlockValues,
+  NewDatasetMetadataFieldsDTO as NewDatasetMetadataFields,
+  NewDatasetMetadataFieldValueDTO as NewDatasetMetadataFieldValue,
+  NewDatasetMetadataChildFieldValueDTO as NewDatasetMetadataChildFieldValue,
+} from './domain/dtos/NewDatasetDTO';
+export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers';

@@ -16,6 +16,9 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
+        isRequired: true,
+        displayOrder: 0,
+        typeClass: 'primitive',
       },
       testField2: {
         name: 'testName2',
@@ -27,6 +30,9 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         multiple: true,
         isControlledVocabulary: false,
         displayFormat: '',
+        isRequired: true,
+        displayOrder: 0,
+        typeClass: 'compound',
         childMetadataFields: {
           testField3: {
             name: 'testName3',
@@ -38,6 +44,9 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 0,
+            typeClass: 'primitive',
           },
           testField4: {
             name: 'testName4',
@@ -49,6 +58,9 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 0,
+            typeClass: 'primitive',
           },
         },
       },
@@ -72,6 +84,9 @@ export const createMetadataBlockPayload = (): any => {
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
+        isRequired: true,
+        displayOrder: 0,
+        typeClass: 'primitive',
       },
       testField2: {
         name: 'testName2',
@@ -83,6 +98,9 @@ export const createMetadataBlockPayload = (): any => {
         multiple: true,
         isControlledVocabulary: false,
         displayFormat: '',
+        isRequired: true,
+        displayOrder: 0,
+        typeClass: 'compound',
         childFields: {
           testField3: {
             name: 'testName3',
@@ -94,6 +112,9 @@ export const createMetadataBlockPayload = (): any => {
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 0,
+            typeClass: 'primitive',
           },
           testField4: {
             name: 'testName4',
@@ -105,6 +126,9 @@ export const createMetadataBlockPayload = (): any => {
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
+            isRequired: true,
+            displayOrder: 0,
+            typeClass: 'primitive',
           },
         },
       },
