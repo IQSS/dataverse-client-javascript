@@ -11,7 +11,7 @@ export class GetFileCitation implements UseCase<string> {
 
   async execute(
     fileId: number,
-    datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
+    datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST_PUBLISHED,
     includeDeaccessioned = false,
   ): Promise<string> {
     return await this.filesRepository.getFileCitation(fileId, datasetVersionId, includeDeaccessioned);

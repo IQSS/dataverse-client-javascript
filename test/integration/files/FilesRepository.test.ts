@@ -3,7 +3,7 @@ import { ApiConfig, DataverseApiAuthMechanism } from '../../../src/core/infra/re
 import { assert } from 'sinon';
 import { expect } from 'chai';
 import { TestConstants } from '../../testHelpers/TestConstants';
-import {registerFileViaApi, uploadFileViaApi} from '../../testHelpers/files/filesHelper';
+import { registerFileViaApi, uploadFileViaApi } from '../../testHelpers/files/filesHelper';
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { FileSearchCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
@@ -11,7 +11,11 @@ import { DatasetNotNumberedVersion } from '../../../src/datasets';
 import { FileCounts } from '../../../src/files/domain/models/FileCounts';
 import { FileDownloadSizeMode } from '../../../src';
 import { fail } from 'assert';
-import {deaccessionDatasetViaApi, publishDatasetViaApi, waitForNoLocks} from "../../testHelpers/datasets/datasetHelper";
+import {
+  deaccessionDatasetViaApi,
+  publishDatasetViaApi,
+  waitForNoLocks,
+} from '../../testHelpers/datasets/datasetHelper';
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository();
@@ -33,7 +37,9 @@ describe('FilesRepository', () => {
   beforeAll(async () => {
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, process.env.TEST_API_KEY);
     // Uploading test file 1 with some categories
-    const uploadFileResponse = await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTextFile1Name, { categories: [testCategoryName] })
+    const uploadFileResponse = await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTextFile1Name, {
+      categories: [testCategoryName],
+    })
       .then()
       .catch((e) => {
         console.log(e);
@@ -63,11 +69,11 @@ describe('FilesRepository', () => {
     // Registering test file 1
     await registerFileViaApi(uploadFileResponse.data.data.files[0].dataFile.id);
     const filesSubset = await sut.getDatasetFiles(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ,
-    )
+      TestConstants.TEST_CREATED_DATASET_1_ID,
+      latestDatasetVersionId,
+      false,
+      FileOrderCriteria.NAME_AZ,
+    );
     testFileId = filesSubset.files[0].id;
     testFilePersistentId = filesSubset.files[0].persistentId;
   });
@@ -447,11 +453,11 @@ describe('FilesRepository', () => {
 
   describe('getFile', () => {
     describe('by numeric id', () => {
-        test('should return file when providing a valid id', async () => {
-          const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.LATEST);
+      test('should return file when providing a valid id', async () => {
+        const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.LATEST);
 
-          assert.match(actual.name, testTextFile1Name);
-        });
+        assert.match(actual.name, testTextFile1Name);
+      });
 
       test('should return file draft when providing a valid id and version is draft', async () => {
         const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT);
@@ -466,21 +472,21 @@ describe('FilesRepository', () => {
         await sut.getFile(testFileId, '1.0').catch((e) => (error = e));
 
         assert.match(
-            error.message,
-            `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`,
+          error.message,
+          `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`,
         );
       });
 
-        test('should return error when file does not exist', async () => {
-          let error: ReadError = undefined;
+      test('should return error when file does not exist', async () => {
+        let error: ReadError = undefined;
 
-          await sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST).catch((e) => (error = e));
+        await sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST).catch((e) => (error = e));
 
-          assert.match(
-            error.message,
-            `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
-          );
-        });
+        assert.match(
+          error.message,
+          `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
+        );
+      });
     });
     describe('by persistent id', () => {
       test('should return file when providing a valid persistent id', async () => {
@@ -502,8 +508,8 @@ describe('FilesRepository', () => {
         await sut.getFile(testFilePersistentId, '1.0').catch((e) => (error = e));
 
         assert.match(
-            error.message,
-            `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`,
+          error.message,
+          `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`,
         );
       });
 
@@ -514,56 +520,54 @@ describe('FilesRepository', () => {
         await sut.getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST).catch((e) => (error = e));
 
         assert.match(
-            error.message,
-            `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
+          error.message,
+          `There was an error when reading the resource. Reason was: [400] Error attempting get the requested data file.`,
         );
       });
     });
   });
   describe('getFileCitation', () => {
     test('should return citation when file exists', async () => {
-      const actualFileCitation = await sut.getFileCitation(
-          testFileId,
-          DatasetNotNumberedVersion.LATEST,
-          false,
-      );
+      const actualFileCitation = await sut.getFileCitation(testFileId, DatasetNotNumberedVersion.DRAFT, false);
       expect(typeof actualFileCitation).to.be.a('string');
     });
 
     test('should return citation when dataset is deaccessioned', async () => {
       await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_1_ID)
-          .then()
-          .catch(() => {
-            assert.fail('Error while publishing test Dataset');
-          });
+        .then()
+        .catch(() => {
+          assert.fail('Error while publishing test Dataset');
+        });
 
       await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_1_ID, 10)
-          .then()
-          .catch(() => {
-            assert.fail('Error while waiting for no locks');
-          });
+        .then()
+        .catch(() => {
+          assert.fail('Error while waiting for no locks');
+        });
 
       await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, '1.0')
-          .then()
-          .catch(() => {
-            assert.fail('Error while deaccessioning test Dataset');
-          });
+        .then()
+        .catch(() => {
+          assert.fail('Error while deaccessioning test Dataset');
+        });
 
       const actualFileCitation = await sut.getFileCitation(
-          testFileId,
-          DatasetNotNumberedVersion.LATEST,
-          true,
+        testFileId,
+        DatasetNotNumberedVersion.LATEST_PUBLISHED,
+        true,
       );
       expect(typeof actualFileCitation).to.be.a('string');
     });
 
     test('should return error when file does not exist', async () => {
       let error: ReadError = undefined;
-      await sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false).catch((e) => (error = e));
+      await sut
+        .getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST_PUBLISHED, false)
+        .catch((e) => (error = e));
 
       assert.match(
-          error.message,
-          `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
+        error.message,
+        `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
       );
     });
   });
