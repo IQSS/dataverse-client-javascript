@@ -1,8 +1,8 @@
 # Installation
 
-## NPM
+Recommended versions node >=16 and npm >=8.
 
-### Stable version
+## Getting Started with the Stable version
 
 A stable 1.x version of this package is available as `js-dataverse` at https://www.npmjs.com/package/js-dataverse
 
@@ -12,11 +12,60 @@ Install the package stable version using npm:
 npm install js-dataverse
 ```
 
-### Development versions
+## Getting Started with the Development Version
 
 An unstable 2.x version of this package with breaking changes is under development.
 
 Until a 2.0 version is officially released, it can be installed from https://github.com/IQSS/dataverse-client-javascript/pkgs/npm/dataverse-client-javascript
+
+
+### Create a `.npmrc` file and add a token
+
+To install the [@iqss/dataverse-client-javascript](https://github.com/IQSS/dataverse-client-javascript/pkgs/npm/dataverse-client-javascript)
+from the GitHub registry, follow these steps to create an `.npmrc` file in the root of your project using your GitHub token.
+
+1. **Create `.npmrc`** in your project's root directory.
+
+   ```bash
+   touch .npmrc
+   ```
+
+2. **Replace the Token**
+
+   Open the newly created `.npmrc` file and replace `YOUR_GITHUB_TOKEN` with your actual GitHub token.
+
+   ```plaintext
+   legacy-peer-deps=true
+
+    //npm.pkg.github.com/:_authToken=<YOUR_GITHUB_AUTH_TOKEN>
+    @iqss:registry=https://npm.pkg.github.com/
+   ```
+
+#### How to Get a GitHub Token
+
+If you don't have a GitHub token yet, follow these steps:
+
+1. Go to your GitHub account settings.
+
+2. Navigate to "Developer settings" -> "Personal access tokens."
+
+3. Click "Personal access tokens" -> "Tokens (classic)" -> "Generate new token (classic)".
+
+4. Give the token a name and select the "read:packages" scope.
+
+5. Copy the generated token.
+
+6. Replace `YOUR_GITHUB_AUTH_TOKEN` in the `.npmrc` file with the copied token.
+
+Now, you should be able to install the Dataverse JavaScript client using npm.
+
+### Install the package
+
+Install the package development version using npm:
+
+```bash
+npm install @iqss/dataverse-client-javascript
+```
 
 ## Initialization
 
