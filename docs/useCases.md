@@ -295,7 +295,7 @@ getDatasetFileCounts.execute(datasetId, datasetVersionId).then((fileCounts: File
 _See [use case](../src/files/domain/useCases/GetDatasetFileCounts.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
-
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
 An optional fourth parameter `fileSearchCriteria` receives a [FileSearchCriteria](../src/files/domain/models/FileCriteria.ts) object to retrieve counts only for files that match the specified criteria.
@@ -395,7 +395,7 @@ getDatasetFilesTotalDownloadSize.execute(datasetId, datasetVersionId).then((size
 _See [use case](../src/files/domain/useCases/GetDatasetFilesTotalDownloadSize.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
-
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 There is a third optional parameter called `fileDownloadSizeMode` which receives an enum type of [FileDownloadSizeMode](../src/files/domain/models/FileDownloadSizeMode.ts), and applies a filter criteria to the operation. This parameter supports the following values:
 
 - `FileDownloadSizeMode.ALL` (Default): Includes both archival and original sizes for tabular files
@@ -484,7 +484,7 @@ getDatasetFiles.execute(datasetId, datasetVersionId).then((subset: FilesSubset) 
 _See [use case](../src/files/domain/useCases/GetDatasetFiles.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
-
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 This use case supports the following optional parameters depending on the search goals:
 
 - **includeDeaccessioned**: (boolean) Indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
