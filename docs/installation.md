@@ -2,7 +2,7 @@
 
 Recommended versions node >=16 and npm >=8.
 
-## Getting Started with the Stable version
+## Getting Started with the Stable Version
 
 A stable 1.x version of this package is available as `js-dataverse` at https://www.npmjs.com/package/js-dataverse
 

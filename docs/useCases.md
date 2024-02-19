@@ -593,7 +593,10 @@ _See [use case](../src/info/domain/useCases/GetDataverseVersion.ts) implementati
 
 #### Get Maximum Embargo Duration In Months
 
-Returns a number indicating the configured maximum embargo duration in months.
+Returns a number indicating the configured maximum embargo duration in months. For information on the possible values 
+that can be returned, please refer to the `MaxEmbargoDurationInMonths` property in the Dataverse documentation: 
+[MaxEmbargoDurationInMonths](https://guides.dataverse.org/en/latest/installation/config.html#maxembargodurationinmonths).
+
 
 ##### Example call:
 
