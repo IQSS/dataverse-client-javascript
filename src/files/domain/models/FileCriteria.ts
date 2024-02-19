@@ -70,6 +70,6 @@ export enum FileOrderCriteria {
 export enum FileAccessStatus {
   PUBLIC = 'Public',
   RESTRICTED = 'Restricted',
-  EMBARGOED = 'EmbargoedThenRestricted',
-  EMBARGOED_RESTRICTED = 'EmbargoedThenPublic',
+  EMBARGOED = 'EmbargoedThenPublic',
+  EMBARGOED_RESTRICTED = 'EmbargoedThenRestricted',
 }
