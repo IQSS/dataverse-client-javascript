@@ -26,7 +26,7 @@ Currently, the supported authentication mechanisms are:
 
 - **API Key**: The recommended authentication mechanism. The API Key should correspond to a particular Dataverse user account.
 
-- **Session Cookie**: This is an experimental feature primarily designed for Dataverse SPA development. It is necessary to enable the corresponding feature flag in the Dataverse installation to use this mechanism (See https://guides.dataverse.org/en/latest/installation/config.html?#feature-flags). It is recommended not to use this mechanism and instead use API Key authentication.
+- **Session Cookie**: This is an experimental feature primarily designed for Dataverse SPA development. To use this mechanism, you must enable the corresponding feature flag in the Dataverse installation (See https://guides.dataverse.org/en/latest/installation/config.html?#feature-flags). It is recommended not to use this mechanism and instead use API Key authentication.
 
 It is recommended to globally initialize the `ApiConfig` object from the consuming application, as the configuration will be read on every API call made by the package's use cases.
 
