@@ -264,7 +264,7 @@ _See [use case](../src/files/domain/useCases/GetFile.ts)_ definition.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
 #### Get File Counts in a Dataset
 
