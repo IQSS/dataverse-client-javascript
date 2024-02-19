@@ -49,7 +49,7 @@ Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given th
 ##### Example call:
 
 ```typescript
-import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript';
+import { getDataset } from '@iqss/dataverse-client-javascript';
 
 /* ... */
 
@@ -67,7 +67,7 @@ _See [use case](../src/datasets/domain/useCases/GetDataset.ts)_ definition.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
@@ -264,7 +264,7 @@ _See [use case](../src/files/domain/useCases/GetFile.ts)_ definition.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
 #### Get File Counts in a Dataset
 
