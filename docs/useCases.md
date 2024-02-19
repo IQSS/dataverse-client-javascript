@@ -49,7 +49,7 @@ Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given th
 ##### Example call:
 
 ```typescript
-import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript';
+import { getDataset } from '@iqss/dataverse-client-javascript';
 
 /* ... */
 
