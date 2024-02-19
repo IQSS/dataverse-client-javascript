@@ -395,7 +395,7 @@ getDatasetFilesTotalDownloadSize.execute(datasetId, datasetVersionId).then((size
 _See [use case](../src/files/domain/useCases/GetDatasetFilesTotalDownloadSize.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
-
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 There is a third optional parameter called `fileDownloadSizeMode` which receives an enum type of [FileDownloadSizeMode](../src/files/domain/models/FileDownloadSizeMode.ts), and applies a filter criteria to the operation. This parameter supports the following values:
 
 - `FileDownloadSizeMode.ALL` (Default): Includes both archival and original sizes for tabular files
