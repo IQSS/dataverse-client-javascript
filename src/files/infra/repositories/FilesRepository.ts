@@ -153,6 +153,22 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
+  public async getFileCitation(
+    fileId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+  ): Promise<string> {
+    return this.doGet(
+      this.buildApiEndpoint(this.filesResourceName, `versions/${datasetVersionId}/citation`, fileId),
+      true,
+      { includeDeaccessioned: includeDeaccessioned },
+    )
+      .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   private getFileEndpoint(fileId: number | string, datasetVersionId: string): string {
     if (datasetVersionId === DatasetNotNumberedVersion.DRAFT) {
       return this.buildApiEndpoint(this.filesResourceName, 'draft', fileId);

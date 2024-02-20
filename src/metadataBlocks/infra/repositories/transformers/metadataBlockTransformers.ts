@@ -28,6 +28,9 @@ const transformPayloadMetadataFieldInfo = (metadataFieldInfoPayload: any, isChil
     multiple: metadataFieldInfoPayload.multiple,
     isControlledVocabulary: metadataFieldInfoPayload.isControlledVocabulary,
     displayFormat: metadataFieldInfoPayload.displayFormat,
+    isRequired: metadataFieldInfoPayload.isRequired,
+    displayOrder: metadataFieldInfoPayload.displayOrder,
+    typeClass: metadataFieldInfoPayload.typeClass,
   };
   if (!isChild && metadataFieldInfoPayload.hasOwnProperty('childFields')) {
     const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields;

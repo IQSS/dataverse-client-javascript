@@ -4,6 +4,7 @@ const axios = require('axios');
 const { TestConstants } = require('../../testHelpers/TestConstants');
 const datasetJson1 = require('../../testHelpers/datasets/test-dataset-1.json');
 const datasetJson2 = require('../../testHelpers/datasets/test-dataset-2.json');
+const datasetJson3 = require('../../testHelpers/datasets/test-dataset-3.json');
 
 const COMPOSE_FILE = 'docker-compose.yml';
 
@@ -51,13 +52,17 @@ async function setupTestFixtures() {
   console.log('Creating test datasets...');
   await createDatasetViaApi(datasetJson1)
     .then()
-    .catch((error) => {
+    .catch(() => {
       console.error('Tests setup: Error while creating test Dataset 1');
     });
   await createDatasetViaApi(datasetJson2)
+    .catch(() => {
+      console.error('Tests setup: Error while creating test Dataset 2');
+    });
+  await createDatasetViaApi(datasetJson3)
     .then()
     .catch((error) => {
-      console.error('Tests setup: Error while creating test Dataset 2');
+      console.error('Tests setup: Error while creating test Dataset 3');
     });
   console.log('Test datasets created');
   await waitForDatasetsIndexingInSolr();
@@ -76,7 +81,7 @@ async function waitForDatasetsIndexingInSolr() {
       .get(`${TestConstants.TEST_API_URL}/search?q=*&type=dataset`, buildRequestHeaders())
       .then((response) => {
         const nDatasets = response.data.data.items.length;
-        if (nDatasets == 2) {
+        if (nDatasets == 3) {
           datasetsIndexed = true;
         }
       })

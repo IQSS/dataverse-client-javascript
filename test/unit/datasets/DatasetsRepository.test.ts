@@ -17,6 +17,12 @@ import {
   createDatasetPreviewModel,
   createDatasetPreviewPayload,
 } from '../../testHelpers/datasets/datasetPreviewHelper';
+import {
+  createNewDatasetDTO,
+  createNewDatasetMetadataBlockModel,
+  createNewDatasetRequestPayload,
+} from '../../testHelpers/datasets/newDatasetHelper';
+import { WriteError } from '../../../src';
 
 describe('DatasetsRepository', () => {
   const sandbox: SinonSandbox = createSandbox();
@@ -87,11 +93,11 @@ describe('DatasetsRepository', () => {
   describe('getDataset', () => {
     const testIncludeDeaccessioned = false;
     const expectedRequestConfigApiKey = {
-      params: { includeDeaccessioned: testIncludeDeaccessioned, includeFiles: false },
+      params: { includeDeaccessioned: testIncludeDeaccessioned, excludeFiles: true },
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
     };
     const expectedRequestConfigSessionCookie = {
-      params: { includeDeaccessioned: testIncludeDeaccessioned, includeFiles: false },
+      params: { includeDeaccessioned: testIncludeDeaccessioned, excludeFiles: true },
       withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
     };
@@ -595,6 +601,75 @@ describe('DatasetsRepository', () => {
       assert.calledWithExactly(
         axiosGetStub,
         expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+      expect(error).to.be.instanceOf(Error);
+    });
+  });
+
+  describe('createDataset', () => {
+    const testNewDataset = createNewDatasetDTO();
+    const testMetadataBlocks = [createNewDatasetMetadataBlockModel()];
+    const testCollectionName = 'test';
+    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createNewDatasetRequestPayload());
+
+    const testCreatedDatasetIdentifiers = {
+      persistentId: 'test',
+      numericId: 1,
+    };
+
+    const testCreateDatasetResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          id: testCreatedDatasetIdentifiers.numericId,
+          persistentId: testCreatedDatasetIdentifiers.persistentId,
+        },
+      },
+    };
+
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionName}/datasets`;
+
+    test('should call the API with a correct request payload', async () => {
+      const axiosPostStub = sandbox.stub(axios, 'post').resolves(testCreateDatasetResponse);
+
+      // API Key auth
+      let actual = await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
+
+      assert.calledWithExactly(
+        axiosPostStub,
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      );
+
+      assert.match(actual, testCreatedDatasetIdentifiers);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      actual = await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName);
+
+      assert.calledWithExactly(
+        axiosPostStub,
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+      );
+
+      assert.match(actual, testCreatedDatasetIdentifiers);
+    });
+
+    test('should return error result on error response', async () => {
+      const axiosPostStub = sandbox.stub(axios, 'post').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+      let error: WriteError = undefined;
+      await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName).catch((e) => (error = e));
+
+      assert.calledWithExactly(
+        axiosPostStub,
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
       );
       expect(error).to.be.instanceOf(Error);
