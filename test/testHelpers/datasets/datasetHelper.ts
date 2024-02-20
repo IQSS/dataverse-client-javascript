@@ -2,6 +2,7 @@ import { Dataset, DatasetVersionState, DatasetLicense } from '../../../src/datas
 import TurndownService from 'turndown';
 import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
+import { DatasetPayload } from '../../../src/datasets/infra/repositories/transformers/DatasetPayload';
 
 const turndownService = new TurndownService();
 
@@ -69,9 +70,8 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
   return datasetModel;
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
-  const datasetPayload: any = {
+export const createDatasetVersionPayload = (license?: DatasetLicense): DatasetPayload => {
+  const datasetPayload: DatasetPayload = {
     id: 19,
     datasetId: 1,
     datasetPersistentId: 'doi:10.5072/FK2/HC6KTB',
@@ -185,7 +185,7 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
   return datasetPayload;
 };
 
-export const createDatasetLicenseModel = (withIconUri: boolean = true): DatasetLicense => {
+export const createDatasetLicenseModel = (withIconUri = true): DatasetLicense => {
   const datasetLicense: DatasetLicense = {
     name: 'CC0 1.0',
     uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
