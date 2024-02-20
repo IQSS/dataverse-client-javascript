@@ -1,8 +1,8 @@
 import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File';
 import { AxiosResponse } from 'axios';
 import { FilesSubset } from '../../../domain/models/FilesSubset';
-import { DvObjectOwner, DvObjectType } from '../../../../dv-object/domain/models/DvObjectOwner';
-import { ChecksumPayload, EmbargoPayload, FilePayload, OwnerPayload } from './FilePayload';
+import { ChecksumPayload, EmbargoPayload, FilePayload } from './FilePayload';
+import { transformOwnerPayloadToOwner } from '../../../../dv-object/infra/repositories/transformers/dvObjectOwnerTransformer';
 
 export const transformFilesResponseToFilesSubset = (response: AxiosResponse): FilesSubset => {
   const filesPayload = response.data.data;
@@ -73,14 +73,5 @@ const transformChecksumPayloadToChecksum = (checksumPayload: ChecksumPayload): F
   return {
     type: checksumPayload.type,
     value: checksumPayload.value,
-  };
-};
-
-const transformOwnerPayloadToOwner = (ownerPayload: OwnerPayload): DvObjectOwner => {
-  return {
-    type: ownerPayload.type as DvObjectType,
-    identifier: ownerPayload.identifier,
-    displayName: ownerPayload.displayName,
-    ...(ownerPayload.owner && { owner: transformOwnerPayloadToOwner(ownerPayload.owner) }),
   };
 };

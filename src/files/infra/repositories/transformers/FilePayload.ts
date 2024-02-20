@@ -1,3 +1,5 @@
+import { OwnerPayload } from '../../../../dv-object/infra/repositories/transformers/OwnerPayload';
+
 export interface FilePayload {
   dataFile: {
     id: number;
@@ -47,11 +49,4 @@ export interface EmbargoPayload {
 export interface ChecksumPayload {
   type: string;
   value: string;
-}
-
-export interface OwnerPayload {
-  type: string;
-  identifier: string;
-  displayName: string;
-  owner?: OwnerPayload;
 }

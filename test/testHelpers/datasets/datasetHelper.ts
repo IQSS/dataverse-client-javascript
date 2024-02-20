@@ -3,6 +3,7 @@ import TurndownService from 'turndown';
 import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
 import { DatasetPayload } from '../../../src/datasets/infra/repositories/transformers/DatasetPayload';
+import { DvObjectType } from '../../../src/dv-object/domain/models/DvObjectOwner';
 
 const turndownService = new TurndownService();
 
@@ -63,6 +64,7 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
         },
       },
     ],
+    owner: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
   };
   if (license !== undefined) {
     datasetModel.license = license;
@@ -178,6 +180,7 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): DatasetPa
       },
     },
     files: [],
+    owner: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
   };
   if (license !== undefined) {
     datasetPayload.license = license;

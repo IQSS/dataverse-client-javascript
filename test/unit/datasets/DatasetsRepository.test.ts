@@ -93,11 +93,11 @@ describe('DatasetsRepository', () => {
   describe('getDataset', () => {
     const testIncludeDeaccessioned = false;
     const expectedRequestConfigApiKey = {
-      params: { includeDeaccessioned: testIncludeDeaccessioned, excludeFiles: true },
+      params: { includeDeaccessioned: testIncludeDeaccessioned, excludeFiles: true, returnOwners: true },
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
     };
     const expectedRequestConfigSessionCookie = {
-      params: { includeDeaccessioned: testIncludeDeaccessioned, excludeFiles: true },
+      params: { includeDeaccessioned: testIncludeDeaccessioned, excludeFiles: true, returnOwners: true },
       withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
     };
