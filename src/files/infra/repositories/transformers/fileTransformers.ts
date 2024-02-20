@@ -1,12 +1,13 @@
 import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File';
 import { AxiosResponse } from 'axios';
 import { FilesSubset } from '../../../domain/models/FilesSubset';
+import { DvObjectOwner, DvObjectType } from '../../../../dv-object/domain/models/DvObjectOwner';
+import { ChecksumPayload, EmbargoPayload, FilePayload, OwnerPayload } from './FilePayload';
 
 export const transformFilesResponseToFilesSubset = (response: AxiosResponse): FilesSubset => {
   const filesPayload = response.data.data;
   const files: File[] = [];
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  filesPayload.forEach(function (filePayload: any) {
+  filesPayload.forEach(function (filePayload: FilePayload) {
     files.push(transformFilePayloadToFile(filePayload));
   });
 
@@ -21,8 +22,7 @@ export const transformFileResponseToFile = (response: AxiosResponse): File => {
   return transformFilePayloadToFile(filePayload);
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformFilePayloadToFile = (filePayload: any): File => {
+const transformFilePayloadToFile = (filePayload: FilePayload): File => {
   return {
     id: filePayload.dataFile.id,
     persistentId: filePayload.dataFile.persistentId,
@@ -58,21 +58,29 @@ const transformFilePayloadToFile = (filePayload: any): File => {
     deleted: filePayload.dataFile.deleted,
     tabularData: filePayload.dataFile.tabularData,
     ...(filePayload.dataFile.fileAccessRequest && { fileAccessRequest: filePayload.dataFile.fileAccessRequest }),
+    ...(filePayload.dataFile.owner && { owner: transformOwnerPayloadToOwner(filePayload.dataFile.owner) }),
   };
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformEmbargoPayloadToEmbargo = (embargoPayload: any): FileEmbargo => {
+const transformEmbargoPayloadToEmbargo = (embargoPayload: EmbargoPayload): FileEmbargo => {
   return {
     dateAvailable: new Date(embargoPayload.dateAvailable),
     ...(embargoPayload.reason && { reason: embargoPayload.reason }),
   };
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformChecksumPayloadToChecksum = (checksumPayload: any): FileChecksum => {
+const transformChecksumPayloadToChecksum = (checksumPayload: ChecksumPayload): FileChecksum => {
   return {
     type: checksumPayload.type,
     value: checksumPayload.value,
+  };
+};
+
+const transformOwnerPayloadToOwner = (ownerPayload: OwnerPayload): DvObjectOwner => {
+  return {
+    type: ownerPayload.type as DvObjectType,
+    identifier: ownerPayload.identifier,
+    displayName: ownerPayload.displayName,
+    ...(ownerPayload.owner && { owner: transformOwnerPayloadToOwner(ownerPayload.owner) }),
   };
 };

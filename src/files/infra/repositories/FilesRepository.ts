@@ -146,7 +146,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   }
 
   public async getFile(fileId: number | string, datasetVersionId: string): Promise<File> {
-    return this.doGet(this.getFileEndpoint(fileId, datasetVersionId), true)
+    return this.doGet(this.getFileEndpoint(fileId, datasetVersionId), true, { returnOwners: true })
       .then((response) => transformFileResponseToFile(response))
       .catch((error) => {
         throw error;
