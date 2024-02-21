@@ -356,6 +356,8 @@ getFileCitation.execute(fileId, datasetVersionId).then((citationText: string) =>
 
 _See [use case](../src/files/domain/useCases/GetFileCitation.ts) implementation_.
 
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
 
 #### Get File Counts in a Dataset
