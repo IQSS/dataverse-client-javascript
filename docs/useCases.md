@@ -23,6 +23,7 @@ The different use cases currently available in the package are classified below,
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
+    - [Get File Citation Text](#get-file-citation-text)
     - [Get File Counts in a Dataset](#get-file-counts-in-a-dataset)
     - [Get File Data Tables](#get-file-data-tables)
     - [Get File Download Count](#get-file-download-count)
@@ -331,6 +332,31 @@ _See [use case](../src/files/domain/useCases/GetFile.ts)_ definition.
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+
+#### Get File Citation Text
+
+Returns the File citation text.
+
+##### Example call:
+
+```typescript
+import { getFileCitation } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const fileId = 3;
+const datasetVersionId = '1.0';
+
+getFileCitation.execute(fileId, datasetVersionId).then((citationText: string) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileCitation.ts) implementation_.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
 
 #### Get File Counts in a Dataset
 
