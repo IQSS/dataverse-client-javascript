@@ -18,6 +18,8 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
     - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
     - [List All Datasets](#list-all-datasets)
+  - [Datasets write use cases](#datasets-write-use-cases)
+    - [Create a Dataset](#create-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -234,6 +236,70 @@ _See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) implem
 Note that `limit` and `offset` are optional parameters for pagination.
 
 The `DatasetPreviewSubset`returned instance contains a property called `totalDatasetCount` which is necessary for pagination.
+
+### Datasets Write Use Cases
+
+#### Create a Dataset
+
+Creates a new Dataset in a collection, given a [NewDatasetDTO](../src/datasets/domain/dtos/NewDatasetDTO.ts) object and an optional collection identifier, which defaults to `root`.
+
+This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
+
+##### Example call:
+
+```typescript
+import { createDataset } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const newDatasetDTO: NewDatasetDTO = {
+  metadataBlockValues: [
+    {
+      name: 'citation',
+      fields: {
+        title: 'New Dataset',
+        author: [
+          {
+            authorName: 'John Doe',
+            authorAffiliation: 'Dataverse',
+          },
+          {
+            authorName: 'John Lee',
+            authorAffiliation: 'Dataverse',
+          },
+        ],
+        datasetContact: [
+          {
+            datasetContactEmail: 'johndoe@dataverse.com',
+            datasetContactName: 'John',
+          },
+        ],
+        dsDescription: [
+          {
+            dsDescriptionValue: 'This is the description of our new dataset',
+          },
+        ],
+        subject: 'Earth and Environmental Sciences',
+
+        /* Rest of field values... */
+
+      },
+    },
+  ],
+};
+
+createDataset.execute(newDatasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
+
+The above example creates the new dataset in the `root` collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call.
+
+The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 
 ## Files
 
@@ -593,10 +659,9 @@ _See [use case](../src/info/domain/useCases/GetDataverseVersion.ts) implementati
 
 #### Get Maximum Embargo Duration In Months
 
-Returns a number indicating the configured maximum embargo duration in months. For information on the possible values 
-that can be returned, please refer to the `MaxEmbargoDurationInMonths` property in the Dataverse documentation: 
+Returns a number indicating the configured maximum embargo duration in months. For information on the possible values
+that can be returned, please refer to the `MaxEmbargoDurationInMonths` property in the Dataverse documentation:
 [MaxEmbargoDurationInMonths](https://guides.dataverse.org/en/latest/installation/config.html#maxembargodurationinmonths).
-
 
 ##### Example call:
 
