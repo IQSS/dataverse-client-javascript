@@ -1,5 +1,5 @@
 import { FilePayload } from '../../../../files/infra/repositories/transformers/FilePayload';
-import { OwnerPayload } from '../../../../dv-object/infra/repositories/transformers/OwnerPayload';
+import { OwnerNodePayload } from '../../../../dv-object/infra/repositories/transformers/OwnerNodePayload';
 
 export interface DatasetPayload {
   datasetId: number;
@@ -17,7 +17,7 @@ export interface DatasetPayload {
   publicationDate?: string;
   citationDate?: string;
   files: FilePayload[];
-  owner: OwnerPayload;
+  isPartOf: OwnerNodePayload;
 }
 
 export interface LicensePayload {

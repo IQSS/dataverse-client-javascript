@@ -1,4 +1,4 @@
-import { OwnerPayload } from '../../../../dv-object/infra/repositories/transformers/OwnerPayload';
+import { OwnerNodePayload } from '../../../../dv-object/infra/repositories/transformers/OwnerNodePayload';
 
 export interface FilePayload {
   dataFile: {
@@ -33,7 +33,7 @@ export interface FilePayload {
     deleted: boolean;
     tabularData: boolean;
     fileAccessRequest?: boolean;
-    owner?: OwnerPayload;
+    isPartOf?: OwnerNodePayload;
   };
   version: number;
   restricted: boolean;

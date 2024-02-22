@@ -1,8 +1,8 @@
-export interface DvObjectOwner {
+export interface DvObjectOwnerNode {
   type: DvObjectType;
   identifier: string;
   displayName: string;
-  owner?: DvObjectOwner;
+  isPartOf?: DvObjectOwnerNode;
 }
 
 export enum DvObjectType {

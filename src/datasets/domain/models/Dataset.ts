@@ -1,4 +1,4 @@
-import { DvObjectOwner } from '../../../dv-object/domain/models/DvObjectOwner';
+import { DvObjectOwnerNode } from '../../../dv-object/domain/models/DvObjectOwnerNode';
 
 export interface Dataset {
   id: number;
@@ -10,7 +10,7 @@ export interface Dataset {
   publicationDate?: string;
   citationDate?: string;
   metadataBlocks: DatasetMetadataBlocks;
-  owner: DvObjectOwner;
+  isPartOf: DvObjectOwnerNode;
 }
 
 export interface DatasetVersionInfo {

@@ -18,7 +18,7 @@ import {
   MetadataFieldPayload,
   MetadataFieldValuePayload,
 } from './DatasetPayload';
-import { transformOwnerPayloadToOwner } from '../../../../dv-object/infra/repositories/transformers/dvObjectOwnerTransformer';
+import { transformPayloadToOwnerNode } from '../../../../dv-object/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
 
 const turndownService = new TurndownService();
 
@@ -41,7 +41,7 @@ const transformVersionPayloadToDataset = (versionPayload: DatasetPayload): Datas
       releaseTime: new Date(versionPayload.releaseTime),
     },
     metadataBlocks: transformPayloadToDatasetMetadataBlocks(versionPayload.metadataBlocks),
-    owner: transformOwnerPayloadToOwner(versionPayload.owner),
+    isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf),
   };
   if ('license' in versionPayload) {
     datasetModel.license = transformPayloadToDatasetLicense(versionPayload.license);

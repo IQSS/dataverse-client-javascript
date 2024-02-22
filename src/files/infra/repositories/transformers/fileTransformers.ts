@@ -2,7 +2,7 @@ import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File';
 import { AxiosResponse } from 'axios';
 import { FilesSubset } from '../../../domain/models/FilesSubset';
 import { ChecksumPayload, EmbargoPayload, FilePayload } from './FilePayload';
-import { transformOwnerPayloadToOwner } from '../../../../dv-object/infra/repositories/transformers/dvObjectOwnerTransformer';
+import { transformPayloadToOwnerNode } from '../../../../dv-object/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
 
 export const transformFilesResponseToFilesSubset = (response: AxiosResponse): FilesSubset => {
   const filesPayload = response.data.data;
@@ -58,7 +58,7 @@ const transformFilePayloadToFile = (filePayload: FilePayload): File => {
     deleted: filePayload.dataFile.deleted,
     tabularData: filePayload.dataFile.tabularData,
     ...(filePayload.dataFile.fileAccessRequest && { fileAccessRequest: filePayload.dataFile.fileAccessRequest }),
-    ...(filePayload.dataFile.owner && { owner: transformOwnerPayloadToOwner(filePayload.dataFile.owner) }),
+    ...(filePayload.dataFile.isPartOf && { isPartOf: transformPayloadToOwnerNode(filePayload.dataFile.isPartOf) }),
   };
 };
 

@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
 import { readFile } from 'fs/promises';
 import { FilesSubset } from '../../../src/files/domain/models/FilesSubset';
-import { DvObjectType } from '../../../src/dv-object/domain/models/DvObjectOwner';
+import { DvObjectType } from '../../../src/dv-object/domain/models/DvObjectOwnerNode';
 import { FilePayload } from '../../../src/files/infra/repositories/transformers/FilePayload';
 
 interface FileMetadata {
@@ -38,11 +38,11 @@ export const createFileModel = (): File => {
     deleted: false,
     tabularData: false,
     fileAccessRequest: true,
-    owner: {
+    isPartOf: {
       type: DvObjectType.DATASET,
-      identifier: 'doi:10.5072/FK2/WTBMGC',
+      identifier: 'doi:10.5072/FK2/HEGZLV&version=DRAFT',
       displayName: 'First Dataset',
-      owner: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
+      isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
     },
   };
 };
@@ -90,11 +90,11 @@ export const createFilePayload = (): FilePayload => {
       deleted: false,
       tabularData: false,
       fileAccessRequest: true,
-      owner: {
+      isPartOf: {
         type: DvObjectType.DATASET,
-        identifier: 'doi:10.5072/FK2/WTBMGC',
+        identifier: 'doi:10.5072/FK2/HEGZLV&version=DRAFT',
         displayName: 'First Dataset',
-        owner: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
+        isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
       },
     },
   };
