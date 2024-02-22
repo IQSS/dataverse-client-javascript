@@ -5,3 +5,4 @@ export * from './auth';
 export * from './datasets';
 export * from './metadataBlocks';
 export * from './files';
+export * from './dv-object';
