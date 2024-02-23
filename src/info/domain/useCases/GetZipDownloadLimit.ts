@@ -8,6 +8,11 @@ export class GetZipDownloadLimit implements UseCase<number> {
     this.dataverseInfoRepository = dataverseInfoRepository;
   }
 
+  /**
+   * Returns a number indicating the configured ZIP download limit in bytes.
+   *
+   * @returns {Promise<number>}
+   */
   async execute(): Promise<number> {
     return await this.dataverseInfoRepository.getZipDownloadLimit();
   }
