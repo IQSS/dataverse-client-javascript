@@ -49,7 +49,7 @@ export const transformMetadataBlockModelsToRequestPayload = (
   newDatasetMetadataBlocksValues: NewDatasetMetadataBlockValuesDTO[],
   metadataBlocks: MetadataBlock[],
 ): Record<string, MetadataBlockRequestPayload> => {
-  let metadataBlocksRequestPayload: Record<string, MetadataBlockRequestPayload> = {};
+  const metadataBlocksRequestPayload: Record<string, MetadataBlockRequestPayload> = {};
   newDatasetMetadataBlocksValues.forEach(function (newDatasetMetadataBlockValues: NewDatasetMetadataBlockValuesDTO) {
     const metadataBlock: MetadataBlock = metadataBlocks.find(
       (metadataBlock) => metadataBlock.name == newDatasetMetadataBlockValues.name,
@@ -69,7 +69,7 @@ export const transformMetadataFieldModelsToRequestPayload = (
   newDatasetMetadataFields: NewDatasetMetadataFieldsDTO,
   metadataBlockFields: Record<string, MetadataFieldInfo>,
 ): MetadataFieldRequestPayload[] => {
-  let metadataFieldsRequestPayload: MetadataFieldRequestPayload[] = [];
+  const metadataFieldsRequestPayload: MetadataFieldRequestPayload[] = [];
   for (const metadataFieldKey of Object.keys(newDatasetMetadataFields)) {
     const newDatasetMetadataChildFieldValue: NewDatasetMetadataFieldValueDTO =
       newDatasetMetadataFields[metadataFieldKey];
@@ -124,7 +124,7 @@ export const transformMetadataChildFieldValueToRequestPayload = (
   newDatasetMetadataChildFieldValue: NewDatasetMetadataChildFieldValueDTO,
   metadataBlockFieldInfo: MetadataFieldInfo,
 ): Record<string, MetadataFieldRequestPayload> => {
-  let metadataChildFieldRequestPayload: Record<string, MetadataFieldRequestPayload> = {};
+  const metadataChildFieldRequestPayload: Record<string, MetadataFieldRequestPayload> = {};
   for (const metadataChildFieldKey of Object.keys(newDatasetMetadataChildFieldValue)) {
     const childMetadataFieldInfo: MetadataFieldInfo = metadataBlockFieldInfo.childMetadataFields[metadataChildFieldKey];
     const value: string = newDatasetMetadataChildFieldValue[metadataChildFieldKey] as unknown as string;

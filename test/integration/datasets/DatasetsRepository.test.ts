@@ -67,6 +67,14 @@ describe('DatasetsRepository', () => {
       assert.match(actual.datasetPreviews.length, 0);
       assert.match(actual.totalDatasetCount, expectedTotalDatasetCount);
     });
+
+    test('should return datasets in the specified collection', async () => {
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 0, 'firstCollection');
+
+      assert.match(actual.datasetPreviews[0].title, 'Third Dataset');
+      assert.match(actual.datasetPreviews.length, 1);
+      assert.match(actual.totalDatasetCount, 1);
+    });
   });
 
   describe('getDatasetSummaryFieldNames', () => {
@@ -227,16 +235,20 @@ describe('DatasetsRepository', () => {
 
     describe('getDatasetLocks', () => {
       test('should return list of dataset locks by dataset id for a dataset while publishing', async () => {
-        await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_3_ID)
+        await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID)
           .then()
-          .catch(() => {
+          .catch((error) => {
+            console.log(JSON.stringify(error));
             assert.fail('Error while publishing test Dataset');
           });
-        const actual = await sut.getDatasetLocks(TestConstants.TEST_CREATED_DATASET_3_ID);
+        const actual = await sut.getDatasetLocks(TestConstants.TEST_CREATED_DATASET_2_ID);
         assert.match(actual.length, 1);
         assert.match(actual[0].lockType, DatasetLockType.FINALIZE_PUBLICATION);
         assert.match(actual[0].userId, 'dataverseAdmin');
-        assert.match(actual[0].message, 'Publishing the dataset; Registering PIDs for Datafiles; Validating Datafiles Asynchronously');
+        assert.match(
+          actual[0].message,
+          'Publishing the dataset; Registering PIDs for Datafiles; Validating Datafiles Asynchronously',
+        );
       });
 
       test('should return error when dataset does not exist', async () => {
