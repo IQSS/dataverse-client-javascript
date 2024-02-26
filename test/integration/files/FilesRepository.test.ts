@@ -465,18 +465,6 @@ describe('FilesRepository', () => {
         assert.match(actual.name, testTextFile1Name);
       });
 
-      test('should return Not Implemented Yet error when when providing a valid id and version is different than latest and draft', async () => {
-        // This tests can be removed once the API supports getting a file by version
-        let error: ReadError = undefined;
-
-        await sut.getFile(testFileId, '1.0').catch((e) => (error = e));
-
-        assert.match(
-          error.message,
-          `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`,
-        );
-      });
-
       test('should return error when file does not exist', async () => {
         let error: ReadError = undefined;
 
@@ -484,7 +472,7 @@ describe('FilesRepository', () => {
 
         assert.match(
           error.message,
-          `There was an error when reading the resource. Reason was: [404] File with ID 200 not found.`,
+          `There was an error when reading the resource. Reason was: [404] File with ID ${nonExistentFiledId} not found.`,
         );
       });
     });
@@ -501,18 +489,6 @@ describe('FilesRepository', () => {
         assert.match(actual.name, testTextFile1Name);
       });
 
-      test('should return Not Implemented Yet error when when providing a valid persistent id and version is different than latest and draft', async () => {
-        // This tests can be removed once the API supports getting a file by version
-        let error: ReadError = undefined;
-
-        await sut.getFile(testFilePersistentId, '1.0').catch((e) => (error = e));
-
-        assert.match(
-          error.message,
-          `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`,
-        );
-      });
-
       test('should return error when file does not exist', async () => {
         let error: ReadError = undefined;
 
@@ -521,11 +497,12 @@ describe('FilesRepository', () => {
 
         assert.match(
           error.message,
-          `There was an error when reading the resource. Reason was: [404] Datafile with Persistent ID nonExistentFiledPersistentId not found.`,
+          `There was an error when reading the resource. Reason was: [404] Datafile with Persistent ID ${nonExistentFiledPersistentId} not found.`,
         );
       });
     });
   });
+
   describe('getFileCitation', () => {
     test('should return citation when file exists', async () => {
       const actualFileCitation = await sut.getFileCitation(testFileId, DatasetNotNumberedVersion.LATEST, false);
