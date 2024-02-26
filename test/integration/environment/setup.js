@@ -53,35 +53,36 @@ async function setupTestFixtures() {
   console.log('Creating test datasets...');
   await createDatasetViaApi(datasetJson1)
     .then()
-    .catch((error) => {
+    .catch(() => {
       console.error('Tests setup: Error while creating test Dataset 1');
     });
-  await createDatasetViaApi(datasetJson2)
+  await createDatasetViaApi(datasetJson2).catch(() => {
+    console.error('Tests setup: Error while creating test Dataset 2');
+  });
+  await createCollectionViaApi(collectionJson)
     .then()
     .catch((error) => {
-      console.error('Tests setup: Error while creating test Dataset 2');
+      console.error('Tests setup: Error while creating test Collection 1');
     });
-  console.log('Creating test collections...');
-  await createCollectionViaApi(collectionJson)
-      .then()
-      .catch((error) => {
-        console.error('Tests setup: Error while creating test Collection 1');
-      });
   await createDatasetViaApi(datasetJson3, collectionJson.alias)
-      .then()
-      .catch((error) => {
-        console.error('Tests setup: Error while creating test Dataset 3');
-      });
+    .then()
+    .catch((error) => {
+      console.error('Tests setup: Error while creating test Dataset 3');
+    });
   console.log('Test datasets created');
   await waitForDatasetsIndexingInSolr();
 }
 
-async function createCollectionViaApi( collectionJson) {
+async function createCollectionViaApi(collectionJson) {
   return await axios.post(`${TestConstants.TEST_API_URL}/dataverses/root`, collectionJson, buildRequestHeaders());
 }
 
 async function createDatasetViaApi(datasetJson, collectionId = 'root') {
-  return await axios.post(`${TestConstants.TEST_API_URL}/dataverses/${collectionId}/datasets`, datasetJson, buildRequestHeaders());
+  return await axios.post(
+    `${TestConstants.TEST_API_URL}/dataverses/${collectionId}/datasets`,
+    datasetJson,
+    buildRequestHeaders(),
+  );
 }
 
 async function waitForDatasetsIndexingInSolr() {

@@ -9,6 +9,12 @@ export class GetMetadataBlockByName implements UseCase<MetadataBlock> {
     this.metadataBlocksRepository = metadataBlocksRepository;
   }
 
+  /**
+   * Returns a MetadataBlock instance, given its name.
+   *
+   * @param {string} [metadataBlockName] - The requested metadata block name.
+   * @returns {Promise<MetadataBlock>}
+   */
   async execute(metadataBlockName: string): Promise<MetadataBlock> {
     return await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockName);
   }

@@ -8,6 +8,10 @@ import { DatasetLock } from '../../domain/models/DatasetLock';
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers';
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers';
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset';
+import { NewDatasetDTO } from '../../domain/dtos/NewDatasetDTO';
+import { MetadataBlock } from '../../../metadataBlocks';
+import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers';
+import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers';
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number;
@@ -44,7 +48,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true,
       {
         includeDeaccessioned: includeDeaccessioned,
-        includeFiles: false,
+        excludeFiles: true,
       },
     )
       .then((response) => transformVersionResponseToDataset(response))
@@ -110,6 +114,27 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     }
     return this.doGet('/search?q=*&type=dataset&sort=date&order=desc', true, queryParams)
       .then((response) => transformDatasetPreviewsResponseToDatasetPreviewSubset(response))
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  public async createDataset(
+    newDataset: NewDatasetDTO,
+    datasetMetadataBlocks: MetadataBlock[],
+    collectionId: string,
+  ): Promise<CreatedDatasetIdentifiers> {
+    return this.doPost(
+      `/dataverses/${collectionId}/datasets`,
+      transformNewDatasetModelToRequestPayload(newDataset, datasetMetadataBlocks),
+    )
+      .then((response) => {
+        const responseData = response.data.data;
+        return {
+          persistentId: responseData.persistentId,
+          numericId: responseData.id,
+        };
+      })
       .catch((error) => {
         throw error;
       });

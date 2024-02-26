@@ -8,9 +8,7 @@ import {
   DatasetMetadataBlocks,
 } from '../../../domain/models/Dataset';
 import { AxiosResponse } from 'axios';
-import TurndownService from 'turndown';
-
-const turndownService = new TurndownService();
+import { NodeHtmlMarkdown } from 'node-html-markdown';
 
 export const transformVersionResponseToDataset = (response: AxiosResponse): Dataset => {
   const versionPayload = response.data.data;
@@ -104,5 +102,5 @@ const transformPayloadToDatasetMetadataFieldValue = (metadataFieldValuePayload: 
 };
 
 const transformHtmlToMarkdown = (source: string): string => {
-  return turndownService.turndown(source);
+  return NodeHtmlMarkdown.translate(source);
 };

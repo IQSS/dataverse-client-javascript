@@ -9,6 +9,11 @@ export class GetCurrentAuthenticatedUser implements UseCase<AuthenticatedUser> {
     this.usersRepository = usersRepository;
   }
 
+  /**
+   * Returns the current AuthenticatedUser corresponding to the authentication mechanism provided through ApiConfig.
+   *
+   * @returns {Promise<AuthenticatedUser>}
+   */
   async execute(): Promise<AuthenticatedUser> {
     return await this.usersRepository.getCurrentAuthenticatedUser();
   }

@@ -60,7 +60,7 @@
             "value": [
               {
                 "dsDescriptionValue": {
-                  "value": "This is the description of the second dataset.",
+                  "value": "This is the description of the third dataset.",
                   "multiple": false,
                   "typeClass": "primitive",
                   "typeName": "dsDescriptionValue"

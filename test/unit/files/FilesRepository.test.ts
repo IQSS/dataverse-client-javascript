@@ -874,4 +874,57 @@ describe('FilesRepository', () => {
         });
     });
   });
+
+  describe('getFileCitation', () => {
+    const testIncludeDeaccessioned = true;
+    const testCitation = 'test citation';
+    const testCitationSuccessfulResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          message: testCitation,
+        },
+      },
+    };
+    test('should return citation when response is successful', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').resolves(testCitationSuccessfulResponse);
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/versions/${DatasetNotNumberedVersion.LATEST}/citation`;
+
+      // API Key auth
+      let actual = await sut.getFileCitation(testFile.id, DatasetNotNumberedVersion.LATEST, testIncludeDeaccessioned);
+
+      assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY_INCLUDE_DEACCESSIONED,
+      );
+      assert.match(actual, testCitation);
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+      actual = await sut.getFileCitation(testFile.id, DatasetNotNumberedVersion.LATEST, testIncludeDeaccessioned);
+
+      assert.calledWithExactly(
+          axiosGetStub,
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE_INCLUDE_DEACCESSIONED,
+      );
+      assert.match(actual, testCitation);
+    });
+
+    test('should return error on repository read error', async () => {
+      const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
+
+      let error: ReadError = undefined;
+      await sut.getFileCitation(1, DatasetNotNumberedVersion.LATEST, testIncludeDeaccessioned).catch((e) => (error = e));
+
+      assert.calledWithExactly(
+          axiosGetStub,
+          `${TestConstants.TEST_API_URL}/files/${testFile.id}/versions/${DatasetNotNumberedVersion.LATEST}/citation`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY_INCLUDE_DEACCESSIONED,
+      );
+      expect(error).to.be.instanceOf(Error);
+    });
+  });
 });
