@@ -62,7 +62,7 @@ describe('DatasetsRepository', () => {
       assert.match(actual.totalDatasetCount, expectedTotalDatasetCount);
     });
 
-    test('should return forth dataset preview page', async () => {
+    test('should return fourth dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 3);
       assert.match(actual.datasetPreviews.length, 0);
       assert.match(actual.totalDatasetCount, expectedTotalDatasetCount);
