@@ -310,6 +310,8 @@ The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models
 
 Returns a [File](../src/files/domain/models/File.ts) instance, given the search parameters to identify it.
 
+The use case will only return a [File](../src/files/domain/models/File.ts) object if the `returnDatasetVersion` optional parameter is not set or is false. If `returnDatasetVersion` is true, the use case will return a tuple of [File](../src/files/domain/models/File.ts) and [Dataset](../src/datasets/domain/models/Dataset.ts) objects (`[File, Dataset]`). The returned dataset object corresponds to the dataset version associated with the requested file.
+
 ##### Example call:
 
 ```typescript
@@ -332,6 +334,23 @@ _See [use case](../src/files/domain/useCases/GetFile.ts)_ definition.
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+
+##### Example call using returnDatasetVersion optional parameter:
+
+```typescript
+import { getFile } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const fileId = 2;
+const datasetVersionId = '1.0';
+
+getFile.execute(fileId, datasetVersionId, true).then((fileAndDataset: [File, Dataset]) => {
+  /* ... */
+});
+
+/* ... */
+```
 
 #### Get File Citation Text
 
