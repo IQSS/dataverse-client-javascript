@@ -21,7 +21,7 @@ describe('execute', () => {
         const actual = await sut.execute(1);
 
         assert.match(actual, testFile);
-        assert.calledWithExactly(getFileStub, 1, DatasetNotNumberedVersion.LATEST);
+        assert.calledWithExactly(getFileStub, 1, DatasetNotNumberedVersion.LATEST, false);
     })
 
     test('should return file on repository success when passing string id', async () => {
@@ -34,7 +34,7 @@ describe('execute', () => {
         const actual = await sut.execute('doi:10.5072/FK2/J8SJZB');
 
         assert.match(actual, testFile);
-        assert.calledWithExactly(getFileStub, 'doi:10.5072/FK2/J8SJZB', DatasetNotNumberedVersion.LATEST);
+        assert.calledWithExactly(getFileStub, 'doi:10.5072/FK2/J8SJZB', DatasetNotNumberedVersion.LATEST, false);
     })
 
     test('should return file on repository success when passing string id and version id', async () => {
@@ -47,7 +47,7 @@ describe('execute', () => {
         const actual = await sut.execute('doi:10.5072/FK2/J8SJZB', '2.0');
 
         assert.match(actual, testFile);
-        assert.calledWithExactly(getFileStub, 'doi:10.5072/FK2/J8SJZB', '2.0');
+        assert.calledWithExactly(getFileStub, 'doi:10.5072/FK2/J8SJZB', '2.0', false);
     })
 
     test('should return error result on repository error', async () => {

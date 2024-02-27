@@ -15,7 +15,7 @@ export const transformVersionResponseToDataset = (response: AxiosResponse): Data
   return transformVersionPayloadToDataset(versionPayload);
 };
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
+export const transformVersionPayloadToDataset = (versionPayload: any): Dataset => {
   const datasetModel: Dataset = {
     id: versionPayload.datasetId,
     persistentId: versionPayload.datasetPersistentId,

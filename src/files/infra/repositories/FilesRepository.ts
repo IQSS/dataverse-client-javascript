@@ -11,6 +11,7 @@ import { FileSearchCriteria, FileOrderCriteria } from '../../domain/models/FileC
 import { FileCounts } from '../../domain/models/FileCounts';
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers';
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode';
+import { Dataset } from '../../../datasets';
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean;
@@ -144,9 +145,15 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       });
   }
 
-  public async getFile(fileId: number | string, datasetVersionId: string): Promise<File> {
-    return this.doGet(this.buildApiEndpoint(this.filesResourceName, `versions/${datasetVersionId}`, fileId), true)
-      .then((response) => transformFileResponseToFile(response))
+  public async getFile(
+    fileId: number | string,
+    datasetVersionId: string,
+    returnDatasetVersion: boolean,
+  ): Promise<File | [File, Dataset]> {
+    return this.doGet(this.buildApiEndpoint(this.filesResourceName, `versions/${datasetVersionId}`, fileId), true, {
+      returnDatasetVersion: returnDatasetVersion,
+    })
+      .then((response) => transformFileResponseToFile(response, returnDatasetVersion))
       .catch((error) => {
         throw error;
       });

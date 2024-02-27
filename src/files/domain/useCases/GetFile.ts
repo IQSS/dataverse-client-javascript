@@ -1,8 +1,9 @@
 import { IFilesRepository } from '../repositories/IFilesRepository';
 import { File } from '../models/File';
-import { DatasetNotNumberedVersion } from '../../../datasets';
+import { DatasetNotNumberedVersion, Dataset } from '../../../datasets';
+import { UseCase } from '../../../core/domain/useCases/UseCase';
 
-export class GetFile {
+export class GetFile implements UseCase<File | [File, Dataset]> {
   constructor(private readonly filesRepository: IFilesRepository) {}
 
   /**
@@ -10,12 +11,14 @@ export class GetFile {
    *
    * @param {number | string} [fileId] - The File identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {string | DatasetNotNumberedVersion} [datasetVersionId=DatasetNotNumberedVersion.LATEST] - The dataset version identifier, which can be a version-specific numeric string (for example, 1.0) or a DatasetNotNumberedVersion enum value. If this parameter is not set, the default value is: DatasetNotNumberedVersion.LATEST
-   * @returns {Promise<File>}
+   * @param {boolean} [returnDatasetVersion=false] - Indicates whether or not to return the dataset version associated with the file. The default value is false.
+   * @returns {Promise<File | [File, Dataset]>} - The use case will only return a File object if returnDatasetVersion is false. If returnDatasetVersion is true, the use case would return a File and a Dataset object.
    */
   async execute(
     fileId: number | string,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
-  ): Promise<File> {
-    return await this.filesRepository.getFile(fileId, datasetVersionId);
+    returnDatasetVersion = false,
+  ): Promise<File | [File, Dataset]> {
+    return await this.filesRepository.getFile(fileId, datasetVersionId, returnDatasetVersion);
   }
 }

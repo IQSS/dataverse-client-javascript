@@ -1,6 +1,8 @@
 import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File';
 import { AxiosResponse } from 'axios';
 import { FilesSubset } from '../../../domain/models/FilesSubset';
+import { Dataset } from '../../../../datasets';
+import { transformVersionPayloadToDataset } from '../../../../datasets/infra/repositories/transformers/datasetTransformers';
 
 export const transformFilesResponseToFilesSubset = (response: AxiosResponse): FilesSubset => {
   const filesPayload = response.data.data;
@@ -16,8 +18,14 @@ export const transformFilesResponseToFilesSubset = (response: AxiosResponse): Fi
   };
 };
 
-export const transformFileResponseToFile = (response: AxiosResponse): File => {
+export const transformFileResponseToFile = (
+  response: AxiosResponse,
+  returnDatasetVersion: boolean,
+): File | [File, Dataset] => {
   const filePayload = response.data.data;
+  if (returnDatasetVersion) {
+    return [transformFilePayloadToFile(filePayload), transformVersionPayloadToDataset(filePayload.datasetVersion)];
+  }
   return transformFilePayloadToFile(filePayload);
 };
 

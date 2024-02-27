@@ -5,6 +5,7 @@ import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria';
 import { FileCounts } from '../models/FileCounts';
 import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode';
 import { File } from '../models/File';
+import { Dataset } from '../../../datasets';
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -38,7 +39,11 @@ export interface IFilesRepository {
 
   getFileDataTables(fileId: number | string): Promise<FileDataTable[]>;
 
-  getFile(fileId: number | string, datasetVersionId: string): Promise<File>;
+  getFile(
+    fileId: number | string,
+    datasetVersionId: string,
+    returnDatasetVersion: boolean,
+  ): Promise<File | [File, Dataset]>;
 
   getFileCitation(fileId: number | string, datasetVersionId: string, includeDeaccessioned: boolean): Promise<string>;
 }
