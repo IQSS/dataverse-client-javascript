@@ -25,7 +25,7 @@ export const transformVersionResponseToDataset = (response: AxiosResponse): Data
   return transformVersionPayloadToDataset(versionPayload);
 };
 
-const transformVersionPayloadToDataset = (versionPayload: DatasetPayload): Dataset => {
+export const transformVersionPayloadToDataset = (versionPayload: DatasetPayload): Dataset => {
   const datasetModel: Dataset = {
     id: versionPayload.datasetId,
     persistentId: versionPayload.datasetPersistentId,
@@ -39,7 +39,7 @@ const transformVersionPayloadToDataset = (versionPayload: DatasetPayload): Datas
       releaseTime: new Date(versionPayload.releaseTime),
     },
     metadataBlocks: transformPayloadToDatasetMetadataBlocks(versionPayload.metadataBlocks),
-    isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf),
+    ...(versionPayload.isPartOf && { isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf) }),
   };
   if ('license' in versionPayload) {
     datasetModel.license = transformPayloadToDatasetLicense(versionPayload.license);

@@ -7,7 +7,8 @@ import { registerFileViaApi, uploadFileViaApi } from '../../testHelpers/files/fi
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository';
 import { ReadError } from '../../../src/core/domain/repositories/ReadError';
 import { FileSearchCriteria, FileAccessStatus, FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria';
-import { DatasetNotNumberedVersion } from '../../../src/datasets';
+import { DatasetNotNumberedVersion, Dataset } from '../../../src/datasets';
+import { File } from '../../../src/files/domain/models/File';
 import { FileCounts } from '../../../src/files/domain/models/FileCounts';
 import { FileDownloadSizeMode } from '../../../src';
 import { fail } from 'assert';
@@ -454,21 +455,28 @@ describe('FilesRepository', () => {
   describe('getFile', () => {
     describe('by numeric id', () => {
       test('should return file when providing a valid id', async () => {
-        const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.LATEST);
+        const actual: File = (await sut.getFile(testFileId, DatasetNotNumberedVersion.LATEST, false)) as File;
 
         assert.match(actual.name, testTextFile1Name);
       });
 
       test('should return file draft when providing a valid id and version is draft', async () => {
-        const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT);
+        const actual: File = (await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT, false)) as File;
 
         assert.match(actual.name, testTextFile1Name);
+      });
+
+      test('should return file and dataset when providing id, version, and returnDatasetVersion is true', async () => {
+        const actual = (await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT, true)) as [File, Dataset];
+
+        assert.match(actual[0].name, testTextFile1Name);
+        assert.match(actual[1].id, TestConstants.TEST_CREATED_DATASET_1_ID);
       });
 
       test('should return error when file does not exist', async () => {
         let error: ReadError = undefined;
 
-        await sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST).catch((e) => (error = e));
+        await sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false).catch((e) => (error = e));
 
         assert.match(
           error.message,
@@ -478,13 +486,13 @@ describe('FilesRepository', () => {
     });
     describe('by persistent id', () => {
       test('should return file when providing a valid persistent id', async () => {
-        const actual = await sut.getFile(testFilePersistentId, DatasetNotNumberedVersion.LATEST);
+        const actual = (await sut.getFile(testFilePersistentId, DatasetNotNumberedVersion.LATEST, false)) as File;
 
         assert.match(actual.name, testTextFile1Name);
       });
 
       test('should return file draft when providing a valid persistent id and version is draft', async () => {
-        const actual = await sut.getFile(testFilePersistentId, DatasetNotNumberedVersion.DRAFT);
+        const actual = (await sut.getFile(testFilePersistentId, DatasetNotNumberedVersion.DRAFT, false)) as File;
 
         assert.match(actual.name, testTextFile1Name);
       });
@@ -493,7 +501,9 @@ describe('FilesRepository', () => {
         let error: ReadError = undefined;
 
         const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId';
-        await sut.getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST).catch((e) => (error = e));
+        await sut
+          .getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST, false)
+          .catch((e) => (error = e));
 
         assert.match(
           error.message,

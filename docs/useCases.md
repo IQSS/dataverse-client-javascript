@@ -23,6 +23,7 @@ The different use cases currently available in the package are classified below,
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
+    - [Get a File and its Dataset](#get-a-file-and-its-dataset)
     - [Get File Citation Text](#get-file-citation-text)
     - [Get File Counts in a Dataset](#get-file-counts-in-a-dataset)
     - [Get File Data Tables](#get-file-data-tables)
@@ -331,6 +332,35 @@ getFile.execute(fileId, datasetVersionId).then((file: File) => {
 ```
 
 _See [use case](../src/files/domain/useCases/GetFile.ts)_ definition.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+
+#### Get a File and its Dataset
+
+Returns a tuple of [File](../src/files/domain/models/File.ts) and [Dataset](../src/datasets/domain/models/Dataset.ts) objects (`[File, Dataset]`), given the search parameters to identify the file. 
+
+The returned dataset object corresponds to the dataset version associated with the requested file.
+
+##### Example call:
+
+```typescript
+import { getFileAndDataset } from '@iqss/dataverse-client-javascript';
+
+/* ... */
+
+const fileId = 2;
+const datasetVersionId = '1.0';
+
+getFileAndDataset.execute(fileId, datasetVersionId).then((fileAndDataset: [File, Dataset]) => {
+  /* ... */
+});
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileAndDataset.ts)_ definition.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 

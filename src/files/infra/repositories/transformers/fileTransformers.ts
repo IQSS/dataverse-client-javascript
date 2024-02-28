@@ -1,6 +1,8 @@
 import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File';
 import { AxiosResponse } from 'axios';
 import { FilesSubset } from '../../../domain/models/FilesSubset';
+import { Dataset } from '../../../../datasets';
+import { transformVersionPayloadToDataset } from '../../../../datasets/infra/repositories/transformers/datasetTransformers';
 import { ChecksumPayload, EmbargoPayload, FilePayload } from './FilePayload';
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
 
@@ -17,8 +19,14 @@ export const transformFilesResponseToFilesSubset = (response: AxiosResponse): Fi
   };
 };
 
-export const transformFileResponseToFile = (response: AxiosResponse): File => {
+export const transformFileResponseToFile = (
+  response: AxiosResponse,
+  returnDatasetVersion: boolean,
+): File | [File, Dataset] => {
   const filePayload = response.data.data;
+  if (returnDatasetVersion) {
+    return [transformFilePayloadToFile(filePayload), transformVersionPayloadToDataset(filePayload.datasetVersion)];
+  }
   return transformFilePayloadToFile(filePayload);
 };
 
