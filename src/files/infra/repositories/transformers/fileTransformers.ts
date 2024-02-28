@@ -2,7 +2,7 @@ import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File';
 import { AxiosResponse } from 'axios';
 import { FilesSubset } from '../../../domain/models/FilesSubset';
 import { ChecksumPayload, EmbargoPayload, FilePayload } from './FilePayload';
-import { transformPayloadToOwnerNode } from '../../../../dv-object/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
+import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
 
 export const transformFilesResponseToFilesSubset = (response: AxiosResponse): FilesSubset => {
   const filesPayload = response.data.data;

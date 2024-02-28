@@ -1,4 +1,4 @@
-import { DvObjectOwnerNode } from '../../../dv-object/domain/models/DvObjectOwnerNode';
+import { DvObjectOwnerNode } from '../../../core/domain/models/DvObjectOwnerNode';
 
 export interface Dataset {
   id: number;

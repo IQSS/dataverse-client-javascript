@@ -17,7 +17,7 @@ import {
   MetadataFieldPayload,
   MetadataFieldValuePayload,
 } from './DatasetPayload';
-import { transformPayloadToOwnerNode } from '../../../../dv-object/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
+import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
 import { NodeHtmlMarkdown } from 'node-html-markdown';
 
 export const transformVersionResponseToDataset = (response: AxiosResponse): Dataset => {

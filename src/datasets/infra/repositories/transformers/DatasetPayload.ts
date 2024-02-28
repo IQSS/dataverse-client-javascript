@@ -1,5 +1,5 @@
 import { FilePayload } from '../../../../files/infra/repositories/transformers/FilePayload';
-import { OwnerNodePayload } from '../../../../dv-object/infra/repositories/transformers/OwnerNodePayload';
+import { OwnerNodePayload } from '../../../../core/infra/repositories/transformers/OwnerNodePayload';
 
 export interface DatasetPayload {
   datasetId: number;

@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
 import { readFile } from 'fs/promises';
 import { FilesSubset } from '../../../src/files/domain/models/FilesSubset';
-import { DvObjectType } from '../../../src/dv-object/domain/models/DvObjectOwnerNode';
+import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode';
 import { FilePayload } from '../../../src/files/infra/repositories/transformers/FilePayload';
 
 interface FileMetadata {

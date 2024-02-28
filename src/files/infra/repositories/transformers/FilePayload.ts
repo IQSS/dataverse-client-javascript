@@ -1,4 +1,4 @@
-import { OwnerNodePayload } from '../../../../dv-object/infra/repositories/transformers/OwnerNodePayload';
+import { OwnerNodePayload } from '../../../../core/infra/repositories/transformers/OwnerNodePayload';
 
 export interface FilePayload {
   dataFile: {
