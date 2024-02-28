@@ -9,6 +9,12 @@ export class GetPrivateUrlDataset implements UseCase<Dataset> {
     this.datasetsRepository = datasetsRepository;
   }
 
+  /**
+   * Returns a Dataset instance, given an associated Private URL Token.
+   *
+   * @param {string} [token] - A Private URL token.
+   * @returns {Promise<Dataset>}
+   */
   async execute(token: string): Promise<Dataset> {
     return await this.datasetsRepository.getPrivateUrlDataset(token);
   }

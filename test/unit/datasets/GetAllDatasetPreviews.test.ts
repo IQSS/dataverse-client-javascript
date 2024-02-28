@@ -22,7 +22,33 @@ describe('execute', () => {
     const actual = await sut.execute();
 
     assert.match(actual, testDatasetPreviews);
-    assert.calledWithExactly(getAllDatasetPreviewsStub, undefined, undefined);
+    assert.calledWithExactly(getAllDatasetPreviewsStub, undefined, undefined, undefined);
+  });
+
+  test('should return dataset previews with limit and offset on repository success', async () => {
+      const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()];
+      const datasetsRepositoryStub = <IDatasetsRepository>{};
+      const getAllDatasetPreviewsStub = sandbox.stub().returns(testDatasetPreviews);
+      datasetsRepositoryStub.getAllDatasetPreviews = getAllDatasetPreviewsStub;
+      const sut = new GetAllDatasetPreviews(datasetsRepositoryStub);
+
+      const actual = await sut.execute(10, 20);
+
+      assert.match(actual, testDatasetPreviews);
+      assert.calledWithExactly(getAllDatasetPreviewsStub, 10, 20, undefined);
+  });
+
+  test('should return dataset previews with limit, offset, and collectionId on repository success', async () => {
+      const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()];
+      const datasetsRepositoryStub = <IDatasetsRepository>{};
+      const getAllDatasetPreviewsStub = sandbox.stub().returns(testDatasetPreviews);
+      datasetsRepositoryStub.getAllDatasetPreviews = getAllDatasetPreviewsStub;
+      const sut = new GetAllDatasetPreviews(datasetsRepositoryStub);
+
+      const actual = await sut.execute(10, 20, 'collectionId');
+
+      assert.match(actual, testDatasetPreviews);
+      assert.calledWithExactly(getAllDatasetPreviewsStub, 10, 20, 'collectionId');
   });
 
   test('should return error result on repository error', async () => {

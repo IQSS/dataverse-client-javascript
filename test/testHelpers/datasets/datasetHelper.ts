@@ -1,11 +1,9 @@
 import { Dataset, DatasetVersionState, DatasetLicense } from '../../../src/datasets/domain/models/Dataset';
-import TurndownService from 'turndown';
+import { NodeHtmlMarkdown } from 'node-html-markdown';
 import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
 import { DatasetPayload } from '../../../src/datasets/infra/repositories/transformers/DatasetPayload';
 import { DvObjectType } from '../../../src/dv-object/domain/models/DvObjectOwnerNode';
-
-const turndownService = new TurndownService();
 
 const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z';
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z';
@@ -52,7 +50,7 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
           subject: ['Subject1', 'Subject2'],
           dsDescription: [
             {
-              dsDescriptionValue: turndownService.turndown(DATASET_HTML_DESCRIPTION),
+              dsDescriptionValue: NodeHtmlMarkdown.translate(DATASET_HTML_DESCRIPTION),
             },
           ],
           datasetContact: [

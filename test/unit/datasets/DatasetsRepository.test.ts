@@ -596,6 +596,41 @@ describe('DatasetsRepository', () => {
       assert.match(actual, testDatasetPreviewSubset);
     });
 
+    it('should return dataset previews when providing collection id and response is successful', async () => {
+        const axiosGetStub = sandbox.stub(axios, 'get').resolves(testDatasetPreviewsResponse);
+
+        const testCollectionId = 'testCollectionId';
+
+        // API Key auth
+        let actual = await sut.getAllDatasetPreviews(undefined, undefined, testCollectionId);
+
+        const expectedRequestParamsWithCollectionId = {
+            subtree: testCollectionId,
+        };
+
+        const expectedRequestConfigApiKeyWithCollectionId = {
+            params: expectedRequestParamsWithCollectionId,
+            headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+        };
+
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigApiKeyWithCollectionId);
+        assert.match(actual, testDatasetPreviewSubset);
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE);
+
+        actual = await sut.getAllDatasetPreviews(undefined, undefined, testCollectionId);
+
+        const expectedRequestConfigSessionCookieWithCollectionId = {
+            params: expectedRequestParamsWithCollectionId,
+            headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+            withCredentials: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
+        };
+
+        assert.calledWithExactly(axiosGetStub, expectedApiEndpoint, expectedRequestConfigSessionCookieWithCollectionId);
+        assert.match(actual, testDatasetPreviewSubset);
+    })
+
     test('should return error result on error response', async () => {
       const axiosGetStub = sandbox.stub(axios, 'get').rejects(TestConstants.TEST_ERROR_RESPONSE);
 

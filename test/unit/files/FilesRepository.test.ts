@@ -786,7 +786,7 @@ describe('FilesRepository', () => {
       params: { returnOwners: true },
     };
     describe('by numeric id', () => {
-      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/`;
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/versions/${DatasetNotNumberedVersion.LATEST}`;
       const testGetFileResponse = {
         data: {
           status: 'OK',
@@ -822,7 +822,7 @@ describe('FilesRepository', () => {
       });
     });
     describe('by persistent id', () => {
-      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId/?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId/versions/${DatasetNotNumberedVersion.LATEST}?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`;
       const testGetFileResponse = {
         data: {
           status: 'OK',

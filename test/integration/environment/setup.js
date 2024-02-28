@@ -5,6 +5,7 @@ const { TestConstants } = require('../../testHelpers/TestConstants');
 const datasetJson1 = require('../../testHelpers/datasets/test-dataset-1.json');
 const datasetJson2 = require('../../testHelpers/datasets/test-dataset-2.json');
 const datasetJson3 = require('../../testHelpers/datasets/test-dataset-3.json');
+const collectionJson = require('../../testHelpers/collections/test-collection-1.json');
 
 const COMPOSE_FILE = 'docker-compose.yml';
 
@@ -55,11 +56,15 @@ async function setupTestFixtures() {
     .catch(() => {
       console.error('Tests setup: Error while creating test Dataset 1');
     });
-  await createDatasetViaApi(datasetJson2)
-    .catch(() => {
-      console.error('Tests setup: Error while creating test Dataset 2');
+  await createDatasetViaApi(datasetJson2).catch(() => {
+    console.error('Tests setup: Error while creating test Dataset 2');
+  });
+  await createCollectionViaApi(collectionJson)
+    .then()
+    .catch((error) => {
+      console.error('Tests setup: Error while creating test Collection 1');
     });
-  await createDatasetViaApi(datasetJson3)
+  await createDatasetViaApi(datasetJson3, collectionJson.alias)
     .then()
     .catch((error) => {
       console.error('Tests setup: Error while creating test Dataset 3');
@@ -68,8 +73,16 @@ async function setupTestFixtures() {
   await waitForDatasetsIndexingInSolr();
 }
 
-async function createDatasetViaApi(datasetJson) {
-  return await axios.post(`${TestConstants.TEST_API_URL}/dataverses/root/datasets`, datasetJson, buildRequestHeaders());
+async function createCollectionViaApi(collectionJson) {
+  return await axios.post(`${TestConstants.TEST_API_URL}/dataverses/root`, collectionJson, buildRequestHeaders());
+}
+
+async function createDatasetViaApi(datasetJson, collectionId = 'root') {
+  return await axios.post(
+    `${TestConstants.TEST_API_URL}/dataverses/${collectionId}/datasets`,
+    datasetJson,
+    buildRequestHeaders(),
+  );
 }
 
 async function waitForDatasetsIndexingInSolr() {
