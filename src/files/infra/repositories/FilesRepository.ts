@@ -152,6 +152,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   ): Promise<File | [File, Dataset]> {
     return this.doGet(this.buildApiEndpoint(this.filesResourceName, `versions/${datasetVersionId}`, fileId), true, {
       returnDatasetVersion: returnDatasetVersion,
+      returnOwners: true,
     })
       .then((response) => transformFileResponseToFile(response, returnDatasetVersion))
       .catch((error) => {

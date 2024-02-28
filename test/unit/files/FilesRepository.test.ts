@@ -779,6 +779,7 @@ describe('FilesRepository', () => {
   describe('getFile', () => {
     const expectedRequestParams = {
       returnDatasetVersion: false,
+      returnOwners: true
     };
 
     const expectedRequestConfigApiKey = {

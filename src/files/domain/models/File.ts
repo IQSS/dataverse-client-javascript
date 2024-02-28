@@ -1,3 +1,5 @@
+import { DvObjectOwnerNode } from '../../../core/domain/models/DvObjectOwnerNode';
+
 export interface File {
   id: number;
   persistentId: string;
@@ -31,6 +33,7 @@ export interface File {
   deleted: boolean;
   tabularData: boolean;
   fileAccessRequest?: boolean;
+  isPartOf?: DvObjectOwnerNode;
 }
 
 export interface FileEmbargo {

@@ -3,12 +3,13 @@ import { AxiosResponse } from 'axios';
 import { FilesSubset } from '../../../domain/models/FilesSubset';
 import { Dataset } from '../../../../datasets';
 import { transformVersionPayloadToDataset } from '../../../../datasets/infra/repositories/transformers/datasetTransformers';
+import { ChecksumPayload, EmbargoPayload, FilePayload } from './FilePayload';
+import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
 
 export const transformFilesResponseToFilesSubset = (response: AxiosResponse): FilesSubset => {
   const filesPayload = response.data.data;
   const files: File[] = [];
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  filesPayload.forEach(function (filePayload: any) {
+  filesPayload.forEach(function (filePayload: FilePayload) {
     files.push(transformFilePayloadToFile(filePayload));
   });
 
@@ -29,8 +30,7 @@ export const transformFileResponseToFile = (
   return transformFilePayloadToFile(filePayload);
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformFilePayloadToFile = (filePayload: any): File => {
+const transformFilePayloadToFile = (filePayload: FilePayload): File => {
   return {
     id: filePayload.dataFile.id,
     persistentId: filePayload.dataFile.persistentId,
@@ -66,19 +66,18 @@ const transformFilePayloadToFile = (filePayload: any): File => {
     deleted: filePayload.dataFile.deleted,
     tabularData: filePayload.dataFile.tabularData,
     ...(filePayload.dataFile.fileAccessRequest && { fileAccessRequest: filePayload.dataFile.fileAccessRequest }),
+    ...(filePayload.dataFile.isPartOf && { isPartOf: transformPayloadToOwnerNode(filePayload.dataFile.isPartOf) }),
   };
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformEmbargoPayloadToEmbargo = (embargoPayload: any): FileEmbargo => {
+const transformEmbargoPayloadToEmbargo = (embargoPayload: EmbargoPayload): FileEmbargo => {
   return {
     dateAvailable: new Date(embargoPayload.dateAvailable),
     ...(embargoPayload.reason && { reason: embargoPayload.reason }),
   };
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const transformChecksumPayloadToChecksum = (checksumPayload: any): FileChecksum => {
+const transformChecksumPayloadToChecksum = (checksumPayload: ChecksumPayload): FileChecksum => {
   return {
     type: checksumPayload.type,
     value: checksumPayload.value,

@@ -224,8 +224,9 @@ import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript';
 
 const limit = 10;
 const offset = 20;
+const collectionId = 'subcollection1';
 
-getAllDatasetPreviews.execute(limit, offset).then((subset: DatasetPreviewSubset) => {
+getAllDatasetPreviews.execute(limit, offset, collectionId).then((subset: DatasetPreviewSubset) => {
   /* ... */
 });
 
@@ -235,6 +236,8 @@ getAllDatasetPreviews.execute(limit, offset).then((subset: DatasetPreviewSubset)
 _See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) implementation_.
 
 Note that `limit` and `offset` are optional parameters for pagination.
+
+Note that `collectionId` is an optional parameter to filter datasets by collection. If not set, the default value is `root`.
 
 The `DatasetPreviewSubset`returned instance contains a property called `totalDatasetCount` which is necessary for pagination.
 
