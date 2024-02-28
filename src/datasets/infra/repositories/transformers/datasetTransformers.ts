@@ -18,7 +18,9 @@ import {
   MetadataFieldValuePayload,
 } from './DatasetPayload';
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer';
-import { NodeHtmlMarkdown } from 'node-html-markdown';
+import TurndownService from 'turndown';
+
+const turndownService = new TurndownService();
 
 export const transformVersionResponseToDataset = (response: AxiosResponse): Dataset => {
   const versionPayload = response.data.data;
@@ -136,5 +138,5 @@ const transformPayloadToDatasetMetadataSubfieldValue = (
 };
 
 const transformHtmlToMarkdown = (source: string): string => {
-  return NodeHtmlMarkdown.translate(source);
+  return turndownService.turndown(source);
 };
