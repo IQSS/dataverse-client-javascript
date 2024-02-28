@@ -2,6 +2,8 @@ import { Dataset, DatasetVersionState, DatasetLicense } from '../../../src/datas
 import { NodeHtmlMarkdown } from 'node-html-markdown';
 import axios, { AxiosResponse } from 'axios';
 import { TestConstants } from '../TestConstants';
+import { DatasetPayload } from '../../../src/datasets/infra/repositories/transformers/DatasetPayload';
+import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode';
 
 const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z';
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z';
@@ -60,6 +62,7 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
         },
       },
     ],
+    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
   };
   if (license !== undefined) {
     datasetModel.license = license;
@@ -67,9 +70,8 @@ export const createDatasetModel = (license?: DatasetLicense): Dataset => {
   return datasetModel;
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
-  const datasetPayload: any = {
+export const createDatasetVersionPayload = (license?: DatasetLicense): DatasetPayload => {
+  const datasetPayload: DatasetPayload = {
     id: 19,
     datasetId: 1,
     datasetPersistentId: 'doi:10.5072/FK2/HC6KTB',
@@ -176,6 +178,7 @@ export const createDatasetVersionPayload = (license?: DatasetLicense): any => {
       },
     },
     files: [],
+    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
   };
   if (license !== undefined) {
     datasetPayload.license = license;

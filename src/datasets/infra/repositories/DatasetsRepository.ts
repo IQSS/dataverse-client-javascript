@@ -31,7 +31,9 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getPrivateUrlDataset(token: string): Promise<Dataset> {
-    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, `privateUrlDatasetVersion/${token}`))
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, `privateUrlDatasetVersion/${token}`), false, {
+      returnOwners: true,
+    })
       .then((response) => transformVersionResponseToDataset(response))
       .catch((error) => {
         throw error;
@@ -49,6 +51,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       {
         includeDeaccessioned: includeDeaccessioned,
         excludeFiles: true,
+        returnOwners: true,
       },
     )
       .then((response) => transformVersionResponseToDataset(response))
