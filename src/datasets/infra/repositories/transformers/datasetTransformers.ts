@@ -39,7 +39,7 @@ export const transformVersionPayloadToDataset = (versionPayload: DatasetPayload)
       releaseTime: new Date(versionPayload.releaseTime),
     },
     metadataBlocks: transformPayloadToDatasetMetadataBlocks(versionPayload.metadataBlocks),
-    isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf),
+    ...(versionPayload.isPartOf && { isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf) }),
   };
   if ('license' in versionPayload) {
     datasetModel.license = transformPayloadToDatasetLicense(versionPayload.license);
