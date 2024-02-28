@@ -83,10 +83,16 @@ const transformPayloadToDatasetMetadataBlocks = (
 const transformPayloadToDatasetMetadataFields = (
   metadataFieldsPayload: MetadataFieldPayload[],
 ): DatasetMetadataFields => {
-  return metadataFieldsPayload.reduce((acc: DatasetMetadataFields, field: MetadataFieldPayload) => {
-    acc[field.typeName] = transformPayloadToDatasetMetadataFieldValue(field.value, field.typeClass);
-    return acc;
-  }, {});
+  return metadataFieldsPayload.reduce(
+    (datasetMetadataFieldsMap: DatasetMetadataFields, field: MetadataFieldPayload) => {
+      datasetMetadataFieldsMap[field.typeName] = transformPayloadToDatasetMetadataFieldValue(
+        field.value,
+        field.typeClass,
+      );
+      return datasetMetadataFieldsMap;
+    },
+    {},
+  );
 };
 
 const transformPayloadToDatasetMetadataFieldValue = (
@@ -107,7 +113,9 @@ const transformPayloadToDatasetMetadataFieldValue = (
     return transformHtmlToMarkdown(metadataFieldValuePayload);
   } else if (Array.isArray(metadataFieldValuePayload)) {
     if (isArrayOfSubfieldValue(metadataFieldValuePayload)) {
-      return metadataFieldValuePayload.map((v) => transformPayloadToDatasetMetadataSubfieldValue(v));
+      return metadataFieldValuePayload.map((metadataSubfieldValuePayload) =>
+        transformPayloadToDatasetMetadataSubfieldValue(metadataSubfieldValuePayload),
+      );
     } else {
       return metadataFieldValuePayload.map(transformHtmlToMarkdown);
     }
