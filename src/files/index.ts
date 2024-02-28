@@ -7,6 +7,7 @@ import { GetFileDataTables } from './domain/useCases/GetFileDataTables';
 import { GetDatasetFilesTotalDownloadSize } from './domain/useCases/GetDatasetFilesTotalDownloadSize';
 import { GetFile } from './domain/useCases/GetFile';
 import { GetFileCitation } from './domain/useCases/GetFileCitation';
+import { GetFileAndDataset } from './domain/useCases/GetFileAndDataset';
 
 const filesRepository = new FilesRepository();
 
@@ -17,6 +18,7 @@ const getFileUserPermissions = new GetFileUserPermissions(filesRepository);
 const getFileDataTables = new GetFileDataTables(filesRepository);
 const getDatasetFilesTotalDownloadSize = new GetDatasetFilesTotalDownloadSize(filesRepository);
 const getFile = new GetFile(filesRepository);
+const getFileAndDataset = new GetFileAndDataset(filesRepository);
 const getFileCitation = new GetFileCitation(filesRepository);
 
 export {
@@ -27,6 +29,7 @@ export {
   getDatasetFileCounts,
   getDatasetFilesTotalDownloadSize,
   getFile,
+  getFileAndDataset,
   getFileCitation,
 };
 
