@@ -40,7 +40,9 @@ export const createFileModel = (): File => {
     fileAccessRequest: true,
     isPartOf: {
       type: DvObjectType.DATASET,
-      identifier: 'doi:10.5072/FK2/HEGZLV&version=DRAFT',
+      identifier: '223',
+      persistentIdentifier: 'doi:10.5072/FK2/HEGZLV',
+      version: 'DRAFT',
       displayName: 'First Dataset',
       isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
     },
@@ -92,7 +94,9 @@ export const createFilePayload = (): FilePayload => {
       fileAccessRequest: true,
       isPartOf: {
         type: DvObjectType.DATASET,
-        identifier: 'doi:10.5072/FK2/HEGZLV&version=DRAFT',
+        identifier: '223',
+        persistentIdentifier: 'doi:10.5072/FK2/HEGZLV',
+        version: 'DRAFT',
         displayName: 'First Dataset',
         isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
       },

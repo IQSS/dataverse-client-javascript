@@ -4,8 +4,12 @@ import { DvObjectOwnerNode, DvObjectType } from '../../../domain/models/DvObject
 export const transformPayloadToOwnerNode = (ownerNodePayload: OwnerNodePayload): DvObjectOwnerNode => {
   return {
     type: ownerNodePayload.type as DvObjectType,
-    identifier: ownerNodePayload.identifier,
     displayName: ownerNodePayload.displayName,
+    identifier: ownerNodePayload.identifier,
+    ...(ownerNodePayload.persistentIdentifier && {
+      persistentIdentifier: ownerNodePayload.persistentIdentifier,
+    }),
+    ...(ownerNodePayload.version && { version: ownerNodePayload.version }),
     ...(ownerNodePayload.isPartOf && { isPartOf: transformPayloadToOwnerNode(ownerNodePayload.isPartOf) }),
   };
 };

@@ -1,7 +1,9 @@
 export interface DvObjectOwnerNode {
   type: DvObjectType;
-  identifier: string;
   displayName: string;
+  identifier: string;
+  persistentIdentifier?: string;
+  version?: string;
   isPartOf?: DvObjectOwnerNode;
 }
 

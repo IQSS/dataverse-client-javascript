@@ -1,6 +1,8 @@
 export interface OwnerNodePayload {
   type: string;
-  identifier: string;
   displayName: string;
+  identifier: string;
+  persistentIdentifier?: string;
+  version?: string;
   isPartOf?: OwnerNodePayload;
 }
