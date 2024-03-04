@@ -2,7 +2,7 @@ import {
   NewDatasetDTO,
   NewDatasetMetadataFieldValueDTO
 } from '../../../src/datasets/domain/dtos/NewDatasetDTO'
-import { MetadataBlock } from '../../../src'
+import { DatasetLicense, MetadataBlock } from '../../../src'
 import { NewDatasetRequestPayload } from '../../../src/datasets/infra/repositories/transformers/newDatasetTransformers'
 
 export const createNewDatasetDTO = (
@@ -10,7 +10,8 @@ export const createNewDatasetDTO = (
   authorFieldValue?: NewDatasetMetadataFieldValueDTO,
   alternativeRequiredTitleValue?: NewDatasetMetadataFieldValueDTO,
   timePeriodCoveredStartValue?: NewDatasetMetadataFieldValueDTO,
-  contributorTypeValue?: NewDatasetMetadataFieldValueDTO
+  contributorTypeValue?: NewDatasetMetadataFieldValueDTO,
+  license?: DatasetLicense
 ): NewDatasetDTO => {
   const validTitle = 'test dataset'
   const validAuthorFieldValue = [
@@ -25,6 +26,7 @@ export const createNewDatasetDTO = (
   ]
   const validAlternativeRequiredTitleValue = ['alternative1', 'alternative2']
   return {
+    ...(license && { license }),
     metadataBlockValues: [
       {
         name: 'citation',
@@ -257,9 +259,12 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
   }
 }
 
-export const createNewDatasetRequestPayload = (): NewDatasetRequestPayload => {
+export const createNewDatasetRequestPayload = (
+  license?: DatasetLicense
+): NewDatasetRequestPayload => {
   return {
     datasetVersion: {
+      ...(license && { license }),
       metadataBlocks: {
         citation: {
           fields: [

@@ -45,7 +45,15 @@ export const createFileModel = (): File => {
       version: 'DRAFT',
       displayName: 'First Dataset',
       isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
-    }
+    },
+    description: 'description',
+    directoryLabel: 'directoryLabel',
+    datasetVersionId: 1,
+    originalFormat: 'originalFormat',
+    originalSize: 127426,
+    originalName: 'originalName',
+    tabularTags: ['tag1', 'tag2'],
+    publicationDate: new Date('2023-07-11')
   }
 }
 
@@ -99,7 +107,15 @@ export const createFilePayload = (): FilePayload => {
         version: 'DRAFT',
         displayName: 'First Dataset',
         isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
-      }
+      },
+      description: 'description',
+      directoryLabel: 'directoryLabel',
+      datasetVersionId: 1,
+      originalFormat: 'originalFormat',
+      originalSize: 127426,
+      originalName: 'originalName',
+      tabularTags: ['tag1', 'tag2'],
+      publicationDate: '2023-07-11'
     }
   }
 }
