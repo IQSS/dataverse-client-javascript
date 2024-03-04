@@ -1,3 +1,5 @@
+import { DvObjectOwnerNode } from '../../../core/domain/models/DvObjectOwnerNode'
+
 export interface Dataset {
   id: number
   persistentId: string
@@ -8,6 +10,7 @@ export interface Dataset {
   publicationDate?: string
   citationDate?: string
   metadataBlocks: DatasetMetadataBlocks
+  isPartOf: DvObjectOwnerNode
 }
 
 export interface DatasetVersionInfo {

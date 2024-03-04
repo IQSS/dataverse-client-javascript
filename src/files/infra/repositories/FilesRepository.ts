@@ -14,8 +14,7 @@ import { FileSearchCriteria, FileOrderCriteria } from '../../domain/models/FileC
 import { FileCounts } from '../../domain/models/FileCounts'
 import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers'
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode'
-import { DatasetNotNumberedVersion } from '../../../datasets'
-import { ReadError } from '../../../core'
+import { Dataset } from '../../../datasets'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -164,25 +163,43 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       })
   }
 
-  public async getFile(fileId: number | string, datasetVersionId: string): Promise<File> {
-    return this.doGet(this.getFileEndpoint(fileId, datasetVersionId), true)
-      .then((response) => transformFileResponseToFile(response))
+  public async getFile(
+    fileId: number | string,
+    datasetVersionId: string,
+    returnDatasetVersion: boolean
+  ): Promise<File | [File, Dataset]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.filesResourceName, `versions/${datasetVersionId}`, fileId),
+      true,
+      {
+        returnDatasetVersion: returnDatasetVersion,
+        returnOwners: true
+      }
+    )
+      .then((response) => transformFileResponseToFile(response, returnDatasetVersion))
       .catch((error) => {
         throw error
       })
   }
 
-  private getFileEndpoint(fileId: number | string, datasetVersionId: string): string {
-    if (datasetVersionId === DatasetNotNumberedVersion.DRAFT) {
-      return this.buildApiEndpoint(this.filesResourceName, 'draft', fileId)
-    }
-    if (datasetVersionId === DatasetNotNumberedVersion.LATEST) {
-      return this.buildApiEndpoint(this.filesResourceName, '', fileId)
-    }
-    // TODO: Implement once it is supported by the API https://github.com/IQSS/dataverse/issues/10280
-    throw new ReadError(
-      `Requesting a file by its dataset version is not yet supported. Requested version: ${datasetVersionId}. Please try using the :latest or :draft version instead.`
+  public async getFileCitation(
+    fileId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean
+  ): Promise<string> {
+    return this.doGet(
+      this.buildApiEndpoint(
+        this.filesResourceName,
+        `versions/${datasetVersionId}/citation`,
+        fileId
+      ),
+      true,
+      { includeDeaccessioned: includeDeaccessioned }
     )
+      .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error
+      })
   }
 
   private applyFileSearchCriteriaToQueryParams(

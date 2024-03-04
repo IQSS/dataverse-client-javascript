@@ -3,6 +3,8 @@ import axios, { AxiosResponse } from 'axios'
 import { TestConstants } from '../TestConstants'
 import { readFile } from 'fs/promises'
 import { FilesSubset } from '../../../src/files/domain/models/FilesSubset'
+import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode'
+import { FilePayload } from '../../../src/files/infra/repositories/transformers/FilePayload'
 
 interface FileMetadata {
   categories?: string[]
@@ -17,10 +19,6 @@ export const createFileModel = (): File => {
     version: 1,
     restricted: false,
     latestRestricted: false,
-    description: 'some description',
-    originalSize: 127426,
-    originalName: 'test.png',
-    tabularTags: [],
     contentType: 'image/png',
     friendlyType: 'PNG Image',
     storageIdentifier: 'local://18945a85439-9fa52783e5cb',
@@ -39,7 +37,15 @@ export const createFileModel = (): File => {
     },
     deleted: false,
     tabularData: false,
-    fileAccessRequest: true
+    fileAccessRequest: true,
+    isPartOf: {
+      type: DvObjectType.DATASET,
+      identifier: '223',
+      persistentIdentifier: 'doi:10.5072/FK2/HEGZLV',
+      version: 'DRAFT',
+      displayName: 'First Dataset',
+      isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
+    }
   }
 }
 
@@ -54,8 +60,7 @@ export const createFilesSubsetModel = (amount: number): FilesSubset => {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createFilePayload = (): any => {
+export const createFilePayload = (): FilePayload => {
   return {
     label: 'test',
     restricted: false,
@@ -63,12 +68,9 @@ export const createFilePayload = (): any => {
     datasetVersionId: 2,
     dataFile: {
       id: 1,
+      version: 1,
       persistentId: '',
       filename: 'test',
-      description: 'some description',
-      originalSize: 127426,
-      originalName: 'test.png',
-      tabularTags: [],
       contentType: 'image/png',
       friendlyType: 'PNG Image',
       filesize: 127426,
@@ -79,7 +81,6 @@ export const createFilePayload = (): any => {
       md5: '29e413e0c881e17314ce8116fed4d1a7',
       fileMetadataId: 4,
       creationDate: '2023-07-11',
-      varGroups: [],
       embargo: {
         dateAvailable: '2023-07-11',
         reason: 'test'
@@ -90,13 +91,20 @@ export const createFilePayload = (): any => {
       },
       deleted: false,
       tabularData: false,
-      fileAccessRequest: true
+      fileAccessRequest: true,
+      isPartOf: {
+        type: DvObjectType.DATASET,
+        identifier: '223',
+        persistentIdentifier: 'doi:10.5072/FK2/HEGZLV',
+        version: 'DRAFT',
+        displayName: 'First Dataset',
+        isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
+      }
     }
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createManyFilesPayload = (amount: number): any[] => {
+export const createManyFilesPayload = (amount: number): FilePayload[] => {
   return Array.from({ length: amount }, () => createFilePayload())
 }
 

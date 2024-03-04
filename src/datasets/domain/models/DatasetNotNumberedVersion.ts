@@ -1,4 +1,5 @@
 export enum DatasetNotNumberedVersion {
   DRAFT = ':draft',
-  LATEST = ':latest'
+  LATEST = ':latest',
+  LATEST_PUBLISHED = ':latest-published'
 }

@@ -12,9 +12,15 @@ import {
   FileAccessStatus,
   FileOrderCriteria
 } from '../../../src/files/domain/models/FileCriteria'
-import { DatasetNotNumberedVersion } from '../../../src/datasets'
+import { DatasetNotNumberedVersion, Dataset } from '../../../src/datasets'
+import { File } from '../../../src/files/domain/models/File'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
 import { FileDownloadSizeMode } from '../../../src'
+import {
+  deaccessionDatasetViaApi,
+  publishDatasetViaApi,
+  waitForNoLocks
+} from '../../testHelpers/datasets/datasetHelper'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -463,65 +469,122 @@ describe('FilesRepository', () => {
   describe('getFile', () => {
     describe('by numeric id', () => {
       test('should return file when providing a valid id', async () => {
-        const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.LATEST)
+        const actual: File = (await sut.getFile(
+          testFileId,
+          DatasetNotNumberedVersion.LATEST,
+          false
+        )) as File
 
         expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return file draft when providing a valid id and version is draft', async () => {
-        const actual = await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT)
+        const actual: File = (await sut.getFile(
+          testFileId,
+          DatasetNotNumberedVersion.DRAFT,
+          false
+        )) as File
 
         expect(actual.name).toBe(testTextFile1Name)
       })
 
-      test('should return Not Implemented Yet error when when providing a valid id and version is different than latest and draft', async () => {
-        // This tests can be removed once the API supports getting a file by version
-        const errorExpected = new ReadError(
-          `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`
-        )
+      test('should return file and dataset when providing id, version, and returnDatasetVersion is true', async () => {
+        const actual = (await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT, true)) as [
+          File,
+          Dataset
+        ]
 
-        await expect(sut.getFile(testFileId, '1.0')).rejects.toThrow(errorExpected)
+        expect(actual[0].name).toBe(testTextFile1Name)
+        expect(actual[1].id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID)
       })
 
       test('should return error when file does not exist', async () => {
-        const errorExpected = new ReadError(`[400] Error attempting get the requested data file.`)
+        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
         await expect(
-          sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST)
-        ).rejects.toThrow(errorExpected)
+          sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
+        ).rejects.toThrow(expectedError)
       })
     })
     describe('by persistent id', () => {
       test('should return file when providing a valid persistent id', async () => {
-        const actual = await sut.getFile(testFilePersistentId, DatasetNotNumberedVersion.LATEST)
+        const actual = (await sut.getFile(
+          testFilePersistentId,
+          DatasetNotNumberedVersion.LATEST,
+          false
+        )) as File
 
         expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return file draft when providing a valid persistent id and version is draft', async () => {
-        const actual = await sut.getFile(testFilePersistentId, DatasetNotNumberedVersion.DRAFT)
+        const actual = (await sut.getFile(
+          testFilePersistentId,
+          DatasetNotNumberedVersion.DRAFT,
+          false
+        )) as File
 
         expect(actual.name).toBe(testTextFile1Name)
       })
 
-      test('should return Not Implemented Yet error when when providing a valid persistent id and version is different than latest and draft', async () => {
-        // This tests can be removed once the API supports getting a file by version
-        const errorExpected = new ReadError(
-          `Requesting a file by its dataset version is not yet supported. Requested version: 1.0. Please try using the :latest or :draft version instead.`
+      test('should return error when file does not exist', async () => {
+        const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId'
+        const expectedError = new ReadError(
+          `[404] Datafile with Persistent ID ${nonExistentFiledPersistentId} not found.`
         )
 
-        await expect(sut.getFile(testFilePersistentId, '1.0')).rejects.toThrow(errorExpected)
-      })
-
-      test('should return error when file does not exist', async () => {
-        const errorExpected = new ReadError(`[400] Error attempting get the requested data file.`)
-
-        const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId'
-
         await expect(
-          sut.getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST)
-        ).rejects.toThrow(errorExpected)
+          sut.getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST, false)
+        ).rejects.toThrow(expectedError)
       })
+    })
+  })
+
+  describe('getFileCitation', () => {
+    test('should return citation when file exists', async () => {
+      const actualFileCitation = await sut.getFileCitation(
+        testFileId,
+        DatasetNotNumberedVersion.LATEST,
+        false
+      )
+
+      expect(typeof actualFileCitation).toEqual(expect.any(String))
+    })
+
+    test('should return citation when dataset is deaccessioned', async () => {
+      await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_1_ID)
+        .then()
+        .catch(() => {
+          throw new Error('Error while publishing test Dataset')
+        })
+
+      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_1_ID, 10)
+        .then()
+        .catch(() => {
+          throw new Error('Error while waiting for no locks')
+        })
+
+      await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, '1.0')
+        .then()
+        .catch(() => {
+          throw new Error('Error while deaccessioning test Dataset')
+        })
+
+      const actualFileCitation = await sut.getFileCitation(
+        testFileId,
+        DatasetNotNumberedVersion.LATEST,
+        true
+      )
+
+      expect(typeof actualFileCitation).toEqual(expect.any(String))
+    })
+
+    test('should return error when file does not exist', async () => {
+      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+      await expect(
+        sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
+      ).rejects.toThrow(errorExpected)
     })
   })
 })

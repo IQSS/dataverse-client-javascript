@@ -21,6 +21,12 @@ import {
   createDatasetPreviewModel,
   createDatasetPreviewPayload
 } from '../../testHelpers/datasets/datasetPreviewHelper'
+import {
+  createNewDatasetDTO,
+  createNewDatasetMetadataBlockModel,
+  createNewDatasetRequestPayload
+} from '../../testHelpers/datasets/newDatasetHelper'
+import { WriteError } from '../../../src'
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository()
@@ -88,11 +94,19 @@ describe('DatasetsRepository', () => {
   describe('getDataset', () => {
     const testIncludeDeaccessioned = false
     const expectedRequestConfigApiKey = {
-      params: { includeDeaccessioned: testIncludeDeaccessioned, includeFiles: false },
+      params: {
+        includeDeaccessioned: testIncludeDeaccessioned,
+        excludeFiles: true,
+        returnOwners: true
+      },
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
     }
     const expectedRequestConfigSessionCookie = {
-      params: { includeDeaccessioned: testIncludeDeaccessioned, includeFiles: false },
+      params: {
+        includeDeaccessioned: testIncludeDeaccessioned,
+        excludeFiles: true,
+        returnOwners: true
+      },
       withCredentials:
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers
@@ -259,6 +273,10 @@ describe('DatasetsRepository', () => {
   })
 
   describe('getPrivateUrlDataset', () => {
+    const expectedRequestConfig = {
+      params: { returnOwners: true },
+      headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+    }
     test('should return Dataset when response is successful', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
 
@@ -266,7 +284,7 @@ describe('DatasetsRepository', () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`,
-        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+        expectedRequestConfig
       )
       expect(actual).toStrictEqual(testDatasetModel)
     })
@@ -279,7 +297,7 @@ describe('DatasetsRepository', () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`,
-        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+        expectedRequestConfig
       )
       expect(error).toBeInstanceOf(Error)
     })
@@ -636,6 +654,48 @@ describe('DatasetsRepository', () => {
       expect(actual).toStrictEqual(testDatasetPreviewSubset)
     })
 
+    it('should return dataset previews when providing collection id and response is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testDatasetPreviewsResponse)
+
+      const testCollectionId = 'testCollectionId'
+
+      // API Key auth
+      let actual = await sut.getAllDatasetPreviews(undefined, undefined, testCollectionId)
+
+      const expectedRequestParamsWithCollectionId = {
+        subtree: testCollectionId
+      }
+
+      const expectedRequestConfigApiKeyWithCollectionId = {
+        params: expectedRequestParamsWithCollectionId,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedRequestConfigApiKeyWithCollectionId
+      )
+      expect(actual).toStrictEqual(testDatasetPreviewSubset)
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.getAllDatasetPreviews(undefined, undefined, testCollectionId)
+
+      const expectedRequestConfigSessionCookieWithCollectionId = {
+        params: expectedRequestParamsWithCollectionId,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedRequestConfigSessionCookieWithCollectionId
+      )
+      expect(actual).toStrictEqual(testDatasetPreviewSubset)
+    })
+
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
@@ -644,6 +704,72 @@ describe('DatasetsRepository', () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('createDataset', () => {
+    const testNewDataset = createNewDatasetDTO()
+    const testMetadataBlocks = [createNewDatasetMetadataBlockModel()]
+    const testCollectionName = 'test'
+    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createNewDatasetRequestPayload())
+
+    const testCreatedDatasetIdentifiers = {
+      persistentId: 'test',
+      numericId: 1
+    }
+
+    const testCreateDatasetResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          id: testCreatedDatasetIdentifiers.numericId,
+          persistentId: testCreatedDatasetIdentifiers.persistentId
+        }
+      }
+    }
+
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionName}/datasets`
+
+    test('should call the API with a correct request payload', async () => {
+      jest.spyOn(axios, 'post').mockResolvedValue(testCreateDatasetResponse)
+
+      // API Key auth
+      let actual = await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName)
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toStrictEqual(testCreatedDatasetIdentifiers)
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.createDataset(testNewDataset, testMetadataBlocks, testCollectionName)
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+      )
+      expect(actual).toStrictEqual(testCreatedDatasetIdentifiers)
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: WriteError = undefined
+      await sut
+        .createDataset(testNewDataset, testMetadataBlocks, testCollectionName)
+        .catch((e) => (error = e))
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
       )
       expect(error).toBeInstanceOf(Error)

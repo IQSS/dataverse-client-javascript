@@ -33,7 +33,10 @@ const transformPayloadMetadataFieldInfo = (
     description: metadataFieldInfoPayload.description,
     multiple: metadataFieldInfoPayload.multiple,
     isControlledVocabulary: metadataFieldInfoPayload.isControlledVocabulary,
-    displayFormat: metadataFieldInfoPayload.displayFormat
+    displayFormat: metadataFieldInfoPayload.displayFormat,
+    isRequired: metadataFieldInfoPayload.isRequired,
+    displayOrder: metadataFieldInfoPayload.displayOrder,
+    typeClass: metadataFieldInfoPayload.typeClass
   }
   if (!isChild && 'childFields' in metadataFieldInfoPayload) {
     const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields

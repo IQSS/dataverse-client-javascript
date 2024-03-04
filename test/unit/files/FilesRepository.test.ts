@@ -836,104 +836,156 @@ describe('FilesRepository', () => {
       })
     })
   })
+
   describe('getFile', () => {
-    describe('by numeric id', () => {
-      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/`
-      const testGetFileResponse = {
-        data: {
-          status: 'OK',
-          data: createFilePayload()
-        }
+    const testGetFileResponse = {
+      data: {
+        status: 'OK',
+        data: createFilePayload()
       }
+    }
+
+    const expectedRequestParams = {
+      returnDatasetVersion: false,
+      returnOwners: true
+    }
+
+    const expectedRequestConfigApiKey = {
+      params: expectedRequestParams,
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+    }
+
+    const expectedRequestConfigSessionCookie = {
+      params: expectedRequestParams,
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials
+    }
+
+    describe('by numeric id', () => {
+      beforeEach(() => {
+        jest.clearAllMocks()
+      })
+
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/versions/${DatasetNotNumberedVersion.LATEST}`
+
       test('should return file when providing id and response is successful', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testGetFileResponse)
 
         // API Key auth
-        let actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST)
-
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-        )
-        expect(actual).toStrictEqual(createFileModel())
+        let actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false)
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual).toEqual(createFileModel())
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
-
-        actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST)
-
+        actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false)
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+          expectedRequestConfigSessionCookie
         )
-        expect(actual).toStrictEqual(createFileModel())
+        expect(actual).toEqual(createFileModel())
       })
 
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
-        await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST).catch((e) => (error = e))
-
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-        )
-        expect(error).toBeInstanceOf(Error)
+        await expect(
+          sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false)
+        ).rejects.toThrow(ReadError)
       })
     })
+
     describe('by persistent id', () => {
-      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId/?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`
-      const testGetFileResponse = {
-        data: {
-          status: 'OK',
-          data: createFilePayload()
-        }
-      }
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId/versions/${DatasetNotNumberedVersion.LATEST}?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`
+
       test('should return file when providing persistent id and response is successful', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testGetFileResponse)
 
         // API Key auth
         let actual = await sut.getFile(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
-          DatasetNotNumberedVersion.LATEST
+          DatasetNotNumberedVersion.LATEST,
+          false
         )
-
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-        )
-        expect(actual).toStrictEqual(createFileModel())
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual).toEqual(createFileModel())
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
-
         actual = await sut.getFile(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
-          DatasetNotNumberedVersion.LATEST
+          DatasetNotNumberedVersion.LATEST,
+          false
         )
-
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+          expectedRequestConfigSessionCookie
         )
-        expect(actual).toStrictEqual(createFileModel())
+        expect(actual).toEqual(createFileModel())
       })
 
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
-        await sut
-          .getFile(TestConstants.TEST_DUMMY_PERSISTENT_ID, DatasetNotNumberedVersion.LATEST)
-          .catch((e) => (error = e))
-
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-        )
-        expect(error).toBeInstanceOf(Error)
+        await expect(
+          sut.getFile(
+            TestConstants.TEST_DUMMY_PERSISTENT_ID,
+            DatasetNotNumberedVersion.LATEST,
+            false
+          )
+        ).rejects.toThrow(ReadError)
       })
+    })
+  })
+  describe('getFileCitation', () => {
+    const testIncludeDeaccessioned = true
+    const testCitation = 'test citation'
+    const testCitationSuccessfulResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          message: testCitation
+        }
+      }
+    }
+
+    test('should return citation when response is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testCitationSuccessfulResponse)
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}/versions/${DatasetNotNumberedVersion.LATEST}/citation`
+
+      // API Key auth
+      let actual = await sut.getFileCitation(
+        testFile.id,
+        DatasetNotNumberedVersion.LATEST,
+        testIncludeDeaccessioned
+      )
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY_INCLUDE_DEACCESSIONED
+      )
+      expect(actual).toEqual(testCitation)
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+      actual = await sut.getFileCitation(
+        testFile.id,
+        DatasetNotNumberedVersion.LATEST,
+        testIncludeDeaccessioned
+      )
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE_INCLUDE_DEACCESSIONED
+      )
+      expect(actual).toEqual(testCitation)
+    })
+
+    test('should return error on repository read error', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      await expect(
+        sut.getFileCitation(testFile.id, DatasetNotNumberedVersion.LATEST, testIncludeDeaccessioned)
+      ).rejects.toThrow(ReadError)
     })
   })
 })

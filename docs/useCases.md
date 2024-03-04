@@ -18,9 +18,13 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
     - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
     - [List All Datasets](#list-all-datasets)
+  - [Datasets write use cases](#datasets-write-use-cases)
+    - [Create a Dataset](#create-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
+    - [Get a File and its Dataset](#get-a-file-and-its-dataset)
+    - [Get File Citation Text](#get-file-citation-text)
     - [Get File Counts in a Dataset](#get-file-counts-in-a-dataset)
     - [Get File Data Tables](#get-file-data-tables)
     - [Get File Download Count](#get-file-download-count)
@@ -49,7 +53,7 @@ Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given th
 ##### Example call:
 
 ```typescript
-import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript'
+import { getDataset } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
@@ -67,7 +71,7 @@ _See [use case](../src/datasets/domain/useCases/GetDataset.ts)_ definition.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
@@ -221,8 +225,9 @@ import { getAllDatasetPreviews } from '@iqss/dataverse-client-javascript'
 
 const limit = 10
 const offset = 20
+const collectionId = 'subcollection1'
 
-getAllDatasetPreviews.execute(limit, offset).then((subset: DatasetPreviewSubset) => {
+getAllDatasetPreviews.execute(limit, offset, collectionId).then((subset: DatasetPreviewSubset) => {
   /* ... */
 })
 
@@ -233,7 +238,72 @@ _See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) implem
 
 Note that `limit` and `offset` are optional parameters for pagination.
 
+Note that `collectionId` is an optional parameter to filter datasets by collection. If not set, the default value is `root`.
+
 The `DatasetPreviewSubset`returned instance contains a property called `totalDatasetCount` which is necessary for pagination.
+
+### Datasets Write Use Cases
+
+#### Create a Dataset
+
+Creates a new Dataset in a collection, given a [NewDatasetDTO](../src/datasets/domain/dtos/NewDatasetDTO.ts) object and an optional collection identifier, which defaults to `root`.
+
+This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
+
+##### Example call:
+
+```typescript
+import { createDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const newDatasetDTO: NewDatasetDTO = {
+  metadataBlockValues: [
+    {
+      name: 'citation',
+      fields: {
+        title: 'New Dataset',
+        author: [
+          {
+            authorName: 'John Doe',
+            authorAffiliation: 'Dataverse'
+          },
+          {
+            authorName: 'John Lee',
+            authorAffiliation: 'Dataverse'
+          }
+        ],
+        datasetContact: [
+          {
+            datasetContactEmail: 'johndoe@dataverse.com',
+            datasetContactName: 'John'
+          }
+        ],
+        dsDescription: [
+          {
+            dsDescriptionValue: 'This is the description of our new dataset'
+          }
+        ],
+        subject: 'Earth and Environmental Sciences'
+
+        /* Rest of field values... */
+      }
+    }
+  ]
+}
+
+createDataset.execute(newDatasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
+
+The above example creates the new dataset in the `root` collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call.
+
+The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 
 ## Files
 
@@ -264,7 +334,63 @@ _See [use case](../src/files/domain/useCases/GetFile.ts)_ definition.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+
+#### Get a File and its Dataset
+
+Returns a tuple of [File](../src/files/domain/models/File.ts) and [Dataset](../src/datasets/domain/models/Dataset.ts) objects (`[File, Dataset]`), given the search parameters to identify the file.
+
+The returned dataset object corresponds to the dataset version associated with the requested file.
+
+##### Example call:
+
+```typescript
+import { getFileAndDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 2
+const datasetVersionId = '1.0'
+
+getFileAndDataset.execute(fileId, datasetVersionId).then((fileAndDataset: [File, Dataset]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileAndDataset.ts)_ definition.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+
+#### Get File Citation Text
+
+Returns the File citation text.
+
+##### Example call:
+
+```typescript
+import { getFileCitation } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 3
+const datasetVersionId = '1.0'
+
+getFileCitation.execute(fileId, datasetVersionId).then((citationText: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileCitation.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
 
 #### Get File Counts in a Dataset
 
@@ -295,7 +421,7 @@ getDatasetFileCounts.execute(datasetId, datasetVersionId).then((fileCounts: File
 _See [use case](../src/files/domain/useCases/GetDatasetFileCounts.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
-
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
 An optional fourth parameter `fileSearchCriteria` receives a [FileSearchCriteria](../src/files/domain/models/FileCriteria.ts) object to retrieve counts only for files that match the specified criteria.
@@ -395,7 +521,7 @@ getDatasetFilesTotalDownloadSize.execute(datasetId, datasetVersionId).then((size
 _See [use case](../src/files/domain/useCases/GetDatasetFilesTotalDownloadSize.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
-
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 There is a third optional parameter called `fileDownloadSizeMode` which receives an enum type of [FileDownloadSizeMode](../src/files/domain/models/FileDownloadSizeMode.ts), and applies a filter criteria to the operation. This parameter supports the following values:
 
 - `FileDownloadSizeMode.ALL` (Default): Includes both archival and original sizes for tabular files
@@ -484,7 +610,7 @@ getDatasetFiles.execute(datasetId, datasetVersionId).then((subset: FilesSubset) 
 _See [use case](../src/files/domain/useCases/GetDatasetFiles.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
-
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 This use case supports the following optional parameters depending on the search goals:
 
 - **includeDeaccessioned**: (boolean) Indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
@@ -601,7 +727,9 @@ _See [use case](../src/info/domain/useCases/GetDataverseVersion.ts) implementati
 
 #### Get Maximum Embargo Duration In Months
 
-Returns a number indicating the configured maximum embargo duration in months.
+Returns a number indicating the configured maximum embargo duration in months. For information on the possible values
+that can be returned, please refer to the `MaxEmbargoDurationInMonths` property in the Dataverse documentation:
+[MaxEmbargoDurationInMonths](https://guides.dataverse.org/en/latest/installation/config.html#maxembargodurationinmonths).
 
 ##### Example call:
 

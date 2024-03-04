@@ -15,7 +15,7 @@ export class GetDatasetCitation implements UseCase<string> {
    * @param {number} [datasetId] - The dataset identifier.
    * @param {string | DatasetNotNumberedVersion} [datasetVersionId=DatasetNotNumberedVersion.LATEST] - The dataset version identifier, which can be a version-specific numeric string (for example, 1.0) or a DatasetNotNumberedVersion enum value. If this parameter is not set, the default value is: DatasetNotNumberedVersion.LATEST
    * @param {boolean} [includeDeaccessioned=false] - Indicates whether to consider deaccessioned versions in the dataset search or not. The default value is false
-   * @returns {Promise<DatasetPreviewSubset>}
+   * @returns {Promise<string>}
    */
   async execute(
     datasetId: number,

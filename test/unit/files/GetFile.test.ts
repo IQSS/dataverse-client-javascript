@@ -13,7 +13,11 @@ describe('execute', () => {
     const actual = await sut.execute(1)
 
     expect(actual).toEqual(testFile)
-    expect(filesRepositoryStub.getFile).toHaveBeenCalledWith(1, DatasetNotNumberedVersion.LATEST)
+    expect(filesRepositoryStub.getFile).toHaveBeenCalledWith(
+      1,
+      DatasetNotNumberedVersion.LATEST,
+      false
+    )
   })
 
   test('should return file on repository success when passing string id', async () => {
@@ -28,7 +32,8 @@ describe('execute', () => {
     expect(actual).toEqual(testFile)
     expect(filesRepositoryStub.getFile).toHaveBeenCalledWith(
       'doi:10.5072/FK2/J8SJZB',
-      DatasetNotNumberedVersion.LATEST
+      DatasetNotNumberedVersion.LATEST,
+      false
     )
   })
 
@@ -42,7 +47,7 @@ describe('execute', () => {
     const actual = await sut.execute('doi:10.5072/FK2/J8SJZB', '2.0')
 
     expect(actual).toEqual(testFile)
-    expect(filesRepositoryStub.getFile).toHaveBeenCalledWith('doi:10.5072/FK2/J8SJZB', '2.0')
+    expect(filesRepositoryStub.getFile).toHaveBeenCalledWith('doi:10.5072/FK2/J8SJZB', '2.0', false)
   })
 
   test('should return error result on repository error', async () => {

@@ -14,6 +14,39 @@ describe('execute', () => {
     const actual = await sut.execute()
 
     expect(actual).toEqual(testDatasetPreviews)
+    expect(datasetsRepositoryStub.getAllDatasetPreviews).toHaveBeenCalledWith(
+      undefined,
+      undefined,
+      undefined
+    )
+  })
+
+  test('should return dataset previews with limit and offset on repository success', async () => {
+    const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()]
+    const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
+    datasetsRepositoryStub.getAllDatasetPreviews = jest.fn().mockResolvedValue(testDatasetPreviews)
+    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub)
+
+    const actual = await sut.execute(10, 20)
+
+    expect(actual).toEqual(testDatasetPreviews)
+    expect(datasetsRepositoryStub.getAllDatasetPreviews).toHaveBeenCalledWith(10, 20, undefined)
+  })
+
+  test('should return dataset previews with limit, offset, and collectionId on repository success', async () => {
+    const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()]
+    const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
+    datasetsRepositoryStub.getAllDatasetPreviews = jest.fn().mockResolvedValue(testDatasetPreviews)
+    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub)
+
+    const actual = await sut.execute(10, 20, 'collectionId')
+
+    expect(actual).toEqual(testDatasetPreviews)
+    expect(datasetsRepositoryStub.getAllDatasetPreviews).toHaveBeenCalledWith(
+      10,
+      20,
+      'collectionId'
+    )
   })
 
   test('should return error result on repository error', async () => {
