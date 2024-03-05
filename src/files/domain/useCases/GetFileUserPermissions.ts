@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IFilesRepository } from '../repositories/IFilesRepository';
-import { FileUserPermissions } from '../models/FileUserPermissions';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IFilesRepository } from '../repositories/IFilesRepository'
+import { FileUserPermissions } from '../models/FileUserPermissions'
 
 export class GetFileUserPermissions implements UseCase<FileUserPermissions> {
-  private filesRepository: IFilesRepository;
+  private filesRepository: IFilesRepository
 
   constructor(filesRepository: IFilesRepository) {
-    this.filesRepository = filesRepository;
+    this.filesRepository = filesRepository
   }
 
   /**
@@ -16,6 +16,6 @@ export class GetFileUserPermissions implements UseCase<FileUserPermissions> {
    * @returns {Promise<FileUserPermissions>}
    */
   async execute(fileId: number | string): Promise<FileUserPermissions> {
-    return await this.filesRepository.getFileUserPermissions(fileId);
+    return await this.filesRepository.getFileUserPermissions(fileId)
   }
 }

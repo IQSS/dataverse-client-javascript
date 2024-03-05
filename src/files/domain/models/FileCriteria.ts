@@ -4,7 +4,7 @@ export class FileSearchCriteria {
     public readonly accessStatus?: FileAccessStatus,
     public readonly categoryName?: string,
     public readonly tabularTagName?: string,
-    public readonly searchText?: string,
+    public readonly searchText?: string
   ) {}
 
   withContentType(contentType: string | undefined): FileSearchCriteria {
@@ -13,8 +13,8 @@ export class FileSearchCriteria {
       this.accessStatus,
       this.categoryName,
       this.tabularTagName,
-      this.searchText,
-    );
+      this.searchText
+    )
   }
 
   withAccessStatus(accessStatus: FileAccessStatus | undefined): FileSearchCriteria {
@@ -23,8 +23,8 @@ export class FileSearchCriteria {
       accessStatus,
       this.categoryName,
       this.tabularTagName,
-      this.searchText,
-    );
+      this.searchText
+    )
   }
 
   withCategoryName(categoryName: string | undefined): FileSearchCriteria {
@@ -33,8 +33,8 @@ export class FileSearchCriteria {
       this.accessStatus,
       categoryName,
       this.tabularTagName,
-      this.searchText,
-    );
+      this.searchText
+    )
   }
 
   withTabularTagName(tabularTagName: string | undefined): FileSearchCriteria {
@@ -43,8 +43,8 @@ export class FileSearchCriteria {
       this.accessStatus,
       this.categoryName,
       tabularTagName,
-      this.searchText,
-    );
+      this.searchText
+    )
   }
 
   withSearchText(searchText: string | undefined): FileSearchCriteria {
@@ -53,8 +53,8 @@ export class FileSearchCriteria {
       this.accessStatus,
       this.categoryName,
       this.tabularTagName,
-      searchText,
-    );
+      searchText
+    )
   }
 }
 
@@ -64,12 +64,12 @@ export enum FileOrderCriteria {
   NEWEST = 'Newest',
   OLDEST = 'Oldest',
   SIZE = 'Size',
-  TYPE = 'Type',
+  TYPE = 'Type'
 }
 
 export enum FileAccessStatus {
   PUBLIC = 'Public',
   RESTRICTED = 'Restricted',
   EMBARGOED = 'EmbargoedThenPublic',
-  EMBARGOED_RESTRICTED = 'EmbargoedThenRestricted',
+  EMBARGOED_RESTRICTED = 'EmbargoedThenRestricted'
 }

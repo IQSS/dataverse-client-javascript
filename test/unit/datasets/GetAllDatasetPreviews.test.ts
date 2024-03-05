@@ -1,65 +1,59 @@
-import { GetAllDatasetPreviews } from '../../../src/datasets/domain/useCases/GetAllDatasetPreviews';
-import { assert, createSandbox, SinonSandbox } from 'sinon';
-import { ReadError } from '../../../src/core/domain/repositories/ReadError';
-import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview';
-import { createDatasetPreviewModel } from '../../testHelpers/datasets/datasetPreviewHelper';
-import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository';
+import { GetAllDatasetPreviews } from '../../../src/datasets/domain/useCases/GetAllDatasetPreviews'
+import { ReadError } from '../../../src/core/domain/repositories/ReadError'
+import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview'
+import { createDatasetPreviewModel } from '../../testHelpers/datasets/datasetPreviewHelper'
+import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository'
 
 describe('execute', () => {
-  const sandbox: SinonSandbox = createSandbox();
-
-  afterEach(() => {
-    sandbox.restore();
-  });
-
   test('should return dataset previews on repository success', async () => {
-    const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()];
-    const datasetsRepositoryStub = <IDatasetsRepository>{};
-    const getAllDatasetPreviewsStub = sandbox.stub().returns(testDatasetPreviews);
-    datasetsRepositoryStub.getAllDatasetPreviews = getAllDatasetPreviewsStub;
-    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub);
+    const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()]
+    const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
+    datasetsRepositoryStub.getAllDatasetPreviews = jest.fn().mockResolvedValue(testDatasetPreviews)
+    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub)
 
-    const actual = await sut.execute();
+    const actual = await sut.execute()
 
-    assert.match(actual, testDatasetPreviews);
-    assert.calledWithExactly(getAllDatasetPreviewsStub, undefined, undefined, undefined);
-  });
+    expect(actual).toEqual(testDatasetPreviews)
+    expect(datasetsRepositoryStub.getAllDatasetPreviews).toHaveBeenCalledWith(
+      undefined,
+      undefined,
+      undefined
+    )
+  })
 
   test('should return dataset previews with limit and offset on repository success', async () => {
-      const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()];
-      const datasetsRepositoryStub = <IDatasetsRepository>{};
-      const getAllDatasetPreviewsStub = sandbox.stub().returns(testDatasetPreviews);
-      datasetsRepositoryStub.getAllDatasetPreviews = getAllDatasetPreviewsStub;
-      const sut = new GetAllDatasetPreviews(datasetsRepositoryStub);
+    const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()]
+    const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
+    datasetsRepositoryStub.getAllDatasetPreviews = jest.fn().mockResolvedValue(testDatasetPreviews)
+    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub)
 
-      const actual = await sut.execute(10, 20);
+    const actual = await sut.execute(10, 20)
 
-      assert.match(actual, testDatasetPreviews);
-      assert.calledWithExactly(getAllDatasetPreviewsStub, 10, 20, undefined);
-  });
+    expect(actual).toEqual(testDatasetPreviews)
+    expect(datasetsRepositoryStub.getAllDatasetPreviews).toHaveBeenCalledWith(10, 20, undefined)
+  })
 
   test('should return dataset previews with limit, offset, and collectionId on repository success', async () => {
-      const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()];
-      const datasetsRepositoryStub = <IDatasetsRepository>{};
-      const getAllDatasetPreviewsStub = sandbox.stub().returns(testDatasetPreviews);
-      datasetsRepositoryStub.getAllDatasetPreviews = getAllDatasetPreviewsStub;
-      const sut = new GetAllDatasetPreviews(datasetsRepositoryStub);
+    const testDatasetPreviews: DatasetPreview[] = [createDatasetPreviewModel()]
+    const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
+    datasetsRepositoryStub.getAllDatasetPreviews = jest.fn().mockResolvedValue(testDatasetPreviews)
+    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub)
 
-      const actual = await sut.execute(10, 20, 'collectionId');
+    const actual = await sut.execute(10, 20, 'collectionId')
 
-      assert.match(actual, testDatasetPreviews);
-      assert.calledWithExactly(getAllDatasetPreviewsStub, 10, 20, 'collectionId');
-  });
+    expect(actual).toEqual(testDatasetPreviews)
+    expect(datasetsRepositoryStub.getAllDatasetPreviews).toHaveBeenCalledWith(
+      10,
+      20,
+      'collectionId'
+    )
+  })
 
   test('should return error result on repository error', async () => {
-    const datasetsRepositoryStub = <IDatasetsRepository>{};
-    const testReadError = new ReadError();
-    datasetsRepositoryStub.getAllDatasetPreviews = sandbox.stub().throwsException(testReadError);
-    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub);
+    const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
+    datasetsRepositoryStub.getAllDatasetPreviews = jest.fn().mockRejectedValue(new ReadError())
+    const sut = new GetAllDatasetPreviews(datasetsRepositoryStub)
 
-    let actualError: ReadError = undefined;
-    await sut.execute().catch((e: ReadError) => (actualError = e));
-
-    assert.match(actualError, testReadError);
-  });
-});
+    await expect(sut.execute()).rejects.toThrow(ReadError)
+  })
+})

@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IMetadataBlocksRepository } from '../repositories/IMetadataBlocksRepository';
-import { MetadataBlock } from '../models/MetadataBlock';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IMetadataBlocksRepository } from '../repositories/IMetadataBlocksRepository'
+import { MetadataBlock } from '../models/MetadataBlock'
 
 export class GetMetadataBlockByName implements UseCase<MetadataBlock> {
-  private metadataBlocksRepository: IMetadataBlocksRepository;
+  private metadataBlocksRepository: IMetadataBlocksRepository
 
   constructor(metadataBlocksRepository: IMetadataBlocksRepository) {
-    this.metadataBlocksRepository = metadataBlocksRepository;
+    this.metadataBlocksRepository = metadataBlocksRepository
   }
 
   /**
@@ -16,6 +16,6 @@ export class GetMetadataBlockByName implements UseCase<MetadataBlock> {
    * @returns {Promise<MetadataBlock>}
    */
   async execute(metadataBlockName: string): Promise<MetadataBlock> {
-    return await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockName);
+    return await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockName)
   }
 }

@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IDatasetsRepository } from '../repositories/IDatasetsRepository';
-import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
+import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion'
 
 export class GetDatasetCitation implements UseCase<string> {
-  private datasetsRepository: IDatasetsRepository;
+  private datasetsRepository: IDatasetsRepository
 
   constructor(datasetsRepository: IDatasetsRepository) {
-    this.datasetsRepository = datasetsRepository;
+    this.datasetsRepository = datasetsRepository
   }
 
   /**
@@ -20,8 +20,12 @@ export class GetDatasetCitation implements UseCase<string> {
   async execute(
     datasetId: number,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
-    includeDeaccessioned = false,
+    includeDeaccessioned = false
   ): Promise<string> {
-    return await this.datasetsRepository.getDatasetCitation(datasetId, datasetVersionId, includeDeaccessioned);
+    return await this.datasetsRepository.getDatasetCitation(
+      datasetId,
+      datasetVersionId,
+      includeDeaccessioned
+    )
   }
 }

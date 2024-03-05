@@ -1,19 +1,19 @@
-import { ApiRepository } from '../../../core/infra/repositories/ApiRepository';
-import { IUsersRepository } from '../../domain/repositories/IUsersRepository';
-import { AuthenticatedUser } from '../../domain/models/AuthenticatedUser';
-import { AxiosResponse } from 'axios';
+import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
+import { IUsersRepository } from '../../domain/repositories/IUsersRepository'
+import { AuthenticatedUser } from '../../domain/models/AuthenticatedUser'
+import { AxiosResponse } from 'axios'
 
 export class UsersRepository extends ApiRepository implements IUsersRepository {
   public async getCurrentAuthenticatedUser(): Promise<AuthenticatedUser> {
     return this.doGet('/users/:me', true)
       .then((response) => this.getAuthenticatedUserFromResponse(response))
       .catch((error) => {
-        throw error;
-      });
+        throw error
+      })
   }
 
   private getAuthenticatedUserFromResponse(response: AxiosResponse): AuthenticatedUser {
-    const responseData = response.data.data;
+    const responseData = response.data.data
     return {
       id: responseData.id,
       persistentUserId: responseData.persistentUserId,
@@ -31,7 +31,7 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
       deactivatedTime: responseData.deactivatedTime,
       affiliation: responseData.affiliation,
       position: responseData.position,
-      emailLastConfirmed: responseData.emailLastConfirmed,
-    };
+      emailLastConfirmed: responseData.emailLastConfirmed
+    }
   }
 }

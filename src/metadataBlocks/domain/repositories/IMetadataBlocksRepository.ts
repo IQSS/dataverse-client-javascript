@@ -1,5 +1,5 @@
-import { MetadataBlock } from '../models/MetadataBlock';
+import { MetadataBlock } from '../models/MetadataBlock'
 
 export interface IMetadataBlocksRepository {
-  getMetadataBlockByName(metadataBlockName: string): Promise<MetadataBlock>;
+  getMetadataBlockByName(metadataBlockName: string): Promise<MetadataBlock>
 }

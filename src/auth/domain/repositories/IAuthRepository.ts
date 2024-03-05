@@ -1,3 +1,3 @@
 export interface IAuthRepository {
-  logout(): Promise<void>;
+  logout(): Promise<void>
 }

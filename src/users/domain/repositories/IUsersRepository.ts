@@ -1,5 +1,5 @@
-import { AuthenticatedUser } from '../models/AuthenticatedUser';
+import { AuthenticatedUser } from '../models/AuthenticatedUser'
 
 export interface IUsersRepository {
-  getCurrentAuthenticatedUser(): Promise<AuthenticatedUser>;
+  getCurrentAuthenticatedUser(): Promise<AuthenticatedUser>
 }

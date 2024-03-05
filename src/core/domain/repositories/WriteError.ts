@@ -1,7 +1,7 @@
-import { RepositoryError } from './RepositoryError';
+import { RepositoryError } from './RepositoryError'
 
 export class WriteError extends RepositoryError {
   constructor(reason?: string) {
-    super('There was an error when writing the resource.', reason);
+    super('There was an error when writing the resource.', reason)
   }
 }

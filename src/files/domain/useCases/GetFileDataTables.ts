@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IFilesRepository } from '../repositories/IFilesRepository';
-import { FileDataTable } from '../models/FileDataTable';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IFilesRepository } from '../repositories/IFilesRepository'
+import { FileDataTable } from '../models/FileDataTable'
 
 export class GetFileDataTables implements UseCase<FileDataTable[]> {
-  private filesRepository: IFilesRepository;
+  private filesRepository: IFilesRepository
 
   constructor(filesRepository: IFilesRepository) {
-    this.filesRepository = filesRepository;
+    this.filesRepository = filesRepository
   }
 
   /**
@@ -16,6 +16,6 @@ export class GetFileDataTables implements UseCase<FileDataTable[]> {
    * @returns {Promise<FileDataTable[]>}
    */
   async execute(fileId: number | string): Promise<FileDataTable[]> {
-    return await this.filesRepository.getFileDataTables(fileId);
+    return await this.filesRepository.getFileDataTables(fileId)
   }
 }

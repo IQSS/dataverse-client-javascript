@@ -1,21 +1,21 @@
-import { DatasetLicense } from '../models/Dataset';
+import { DatasetLicense } from '../models/Dataset'
 
 export interface NewDatasetDTO {
-  license?: DatasetLicense;
-  metadataBlockValues: NewDatasetMetadataBlockValuesDTO[];
+  license?: DatasetLicense
+  metadataBlockValues: NewDatasetMetadataBlockValuesDTO[]
 }
 
 export interface NewDatasetMetadataBlockValuesDTO {
-  name: string;
-  fields: NewDatasetMetadataFieldsDTO;
+  name: string
+  fields: NewDatasetMetadataFieldsDTO
 }
 
-export type NewDatasetMetadataFieldsDTO = Record<string, NewDatasetMetadataFieldValueDTO>;
+export type NewDatasetMetadataFieldsDTO = Record<string, NewDatasetMetadataFieldValueDTO>
 
 export type NewDatasetMetadataFieldValueDTO =
   | string
   | string[]
   | NewDatasetMetadataChildFieldValueDTO
-  | NewDatasetMetadataChildFieldValueDTO[];
+  | NewDatasetMetadataChildFieldValueDTO[]
 
-export type NewDatasetMetadataChildFieldValueDTO = Record<string, string>;
+export type NewDatasetMetadataChildFieldValueDTO = Record<string, string>

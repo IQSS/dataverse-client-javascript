@@ -1,18 +1,18 @@
-import { FieldValidationError } from './FieldValidationError';
+import { FieldValidationError } from './FieldValidationError'
 
 export class ControlledVocabularyFieldError extends FieldValidationError {
   constructor(
     metadataFieldName: string,
     citationBlockName: string,
     parentMetadataFieldName?: string,
-    fieldPosition?: number,
+    fieldPosition?: number
   ) {
     super(
       metadataFieldName,
       citationBlockName,
       parentMetadataFieldName,
       fieldPosition,
-      'The field does not have a valid controlled vocabulary value.',
-    );
+      'The field does not have a valid controlled vocabulary value.'
+    )
   }
 }

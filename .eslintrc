@@ -1,10 +1,61 @@
 {
-    "root": true,
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint", "jest"],
+    "plugins":  ["@typescript-eslint", "simple-import-sort", "import", "unused-imports", "jest"],
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended",
         "plugin:jest/recommended"
-    ]
+    ],
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".ts"]
+            }
+        }
+    },
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "jest": true,
+        "node": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 2021,
+        "sourceType": "module",
+        "project": [
+            "./tsconfig.json"
+        ]
+    },
+    "rules": {
+        "@typescript-eslint/no-unused-vars": "off",
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": [
+            "warn",
+            {
+                "vars": "all",
+                "varsIgnorePattern": "^_",
+                "args": "after-used",
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "@typescript-eslint/no-empty-function": [
+            "error",
+            {
+                "allow": ["arrowFunctions"]
+            }
+        ],
+        "prettier/prettier": [
+            "error",
+            {
+                "semi": false,
+                "tabWidth": 2,
+                "printWidth": 100,
+                "singleQuote": true,
+                "trailingComma": "none",
+                "bracketSameLine": true
+            }
+        ]
+    }
 }

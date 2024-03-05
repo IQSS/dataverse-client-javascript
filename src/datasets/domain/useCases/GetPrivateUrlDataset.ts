@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IDatasetsRepository } from '../repositories/IDatasetsRepository';
-import { Dataset } from '../models/Dataset';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
+import { Dataset } from '../models/Dataset'
 
 export class GetPrivateUrlDataset implements UseCase<Dataset> {
-  private datasetsRepository: IDatasetsRepository;
+  private datasetsRepository: IDatasetsRepository
 
   constructor(datasetsRepository: IDatasetsRepository) {
-    this.datasetsRepository = datasetsRepository;
+    this.datasetsRepository = datasetsRepository
   }
 
   /**
@@ -16,6 +16,6 @@ export class GetPrivateUrlDataset implements UseCase<Dataset> {
    * @returns {Promise<Dataset>}
    */
   async execute(token: string): Promise<Dataset> {
-    return await this.datasetsRepository.getPrivateUrlDataset(token);
+    return await this.datasetsRepository.getPrivateUrlDataset(token)
   }
 }

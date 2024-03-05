@@ -1,6 +1,9 @@
-import { NewDatasetDTO, NewDatasetMetadataFieldValueDTO } from '../../../src/datasets/domain/dtos/NewDatasetDTO';
-import { MetadataBlock } from '../../../src';
-import { NewDatasetRequestPayload } from '../../../src/datasets/infra/repositories/transformers/newDatasetTransformers';
+import {
+  NewDatasetDTO,
+  NewDatasetMetadataFieldValueDTO
+} from '../../../src/datasets/domain/dtos/NewDatasetDTO'
+import { DatasetLicense, MetadataBlock } from '../../../src'
+import { NewDatasetRequestPayload } from '../../../src/datasets/infra/repositories/transformers/newDatasetTransformers'
 
 export const createNewDatasetDTO = (
   titleFieldValue?: NewDatasetMetadataFieldValueDTO,
@@ -8,20 +11,22 @@ export const createNewDatasetDTO = (
   alternativeRequiredTitleValue?: NewDatasetMetadataFieldValueDTO,
   timePeriodCoveredStartValue?: NewDatasetMetadataFieldValueDTO,
   contributorTypeValue?: NewDatasetMetadataFieldValueDTO,
+  license?: DatasetLicense
 ): NewDatasetDTO => {
-  const validTitle = 'test dataset';
+  const validTitle = 'test dataset'
   const validAuthorFieldValue = [
     {
       authorName: 'Admin, Dataverse',
-      authorAffiliation: 'Dataverse.org',
+      authorAffiliation: 'Dataverse.org'
     },
     {
       authorName: 'Owner, Dataverse',
-      authorAffiliation: 'Dataverse.org',
-    },
-  ];
-  const validAlternativeRequiredTitleValue = ['alternative1', 'alternative2'];
+      authorAffiliation: 'Dataverse.org'
+    }
+  ]
+  const validAlternativeRequiredTitleValue = ['alternative1', 'alternative2']
   return {
+    ...(license && { license }),
     metadataBlockValues: [
       {
         name: 'citation',
@@ -32,20 +37,22 @@ export const createNewDatasetDTO = (
             alternativeRequiredTitleValue !== undefined
               ? alternativeRequiredTitleValue
               : validAlternativeRequiredTitleValue,
-          ...(timePeriodCoveredStartValue && { timePeriodCoveredStart: timePeriodCoveredStartValue }),
+          ...(timePeriodCoveredStartValue && {
+            timePeriodCoveredStart: timePeriodCoveredStartValue
+          }),
           ...(contributorTypeValue && {
             contributor: [
               {
                 contributorName: 'Admin, Dataverse',
-                contributorType: contributorTypeValue as string,
-              },
-            ],
-          }),
-        },
-      },
-    ],
-  };
-};
+                contributorType: contributorTypeValue as string
+              }
+            ]
+          })
+        }
+      }
+    ]
+  }
+}
 
 export const createNewDatasetDTOWithoutFirstLevelRequiredField = (): NewDatasetDTO => {
   return {
@@ -53,12 +60,12 @@ export const createNewDatasetDTOWithoutFirstLevelRequiredField = (): NewDatasetD
       {
         name: 'citation',
         fields: {
-          title: 'test dataset',
-        },
-      },
-    ],
-  };
-};
+          title: 'test dataset'
+        }
+      }
+    ]
+  }
+}
 
 export const createNewDatasetDTOWithoutSecondLevelRequiredField = (): NewDatasetDTO => {
   return {
@@ -70,17 +77,17 @@ export const createNewDatasetDTOWithoutSecondLevelRequiredField = (): NewDataset
           author: [
             {
               authorName: 'Admin, Dataverse',
-              authorAffiliation: 'Dataverse.org',
+              authorAffiliation: 'Dataverse.org'
             },
             {
-              authorAffiliation: 'Dataverse.org',
-            },
-          ],
-        },
-      },
-    ],
-  };
-};
+              authorAffiliation: 'Dataverse.org'
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
 
 /**
  *
@@ -108,7 +115,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
-        typeClass: 'primitive',
+        typeClass: 'primitive'
       },
       author: {
         name: 'author',
@@ -136,7 +143,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 2,
-            typeClass: 'primitive',
+            typeClass: 'primitive'
           },
           authorAffiliation: {
             name: 'authorAffiliation',
@@ -150,9 +157,9 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: false,
             displayOrder: 3,
-            typeClass: 'primitive',
-          },
-        },
+            typeClass: 'primitive'
+          }
+        }
       },
       alternativeRequiredTitle: {
         name: 'alternativeRequiredTitle',
@@ -160,13 +167,14 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         title: 'Alternative Title',
         type: 'TEXT',
         watermark: '',
-        description: 'Either 1) a title commonly used to refer to the Dataset or 2) an abbreviation of the main title',
+        description:
+          'Either 1) a title commonly used to refer to the Dataset or 2) an abbreviation of the main title',
         multiple: true,
         isControlledVocabulary: false,
         displayFormat: '',
         isRequired: true,
         displayOrder: 4,
-        typeClass: 'primitive',
+        typeClass: 'primitive'
       },
       timePeriodCoveredStart: {
         name: 'timePeriodCoveredStart',
@@ -180,7 +188,7 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '#NAME: #VALUE ',
         isRequired: false,
         displayOrder: 5,
-        typeClass: 'primitive',
+        typeClass: 'primitive'
       },
       contributor: {
         name: 'contributor',
@@ -226,9 +234,9 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
               'Sponsor',
               'Supervisor',
               'Work Package Leader',
-              'Other',
+              'Other'
             ],
-            typeClass: 'controlledVocabulary',
+            typeClass: 'controlledVocabulary'
           },
           contributorName: {
             name: 'contributorName',
@@ -236,23 +244,27 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
             title: 'Name',
             type: 'TEXT',
             watermark: '1) FamilyName, GivenName or 2) Organization',
-            description: "The name of the contributor, e.g. the person's name or the name of an organization",
+            description:
+              "The name of the contributor, e.g. the person's name or the name of an organization",
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 8,
-            typeClass: 'primitive',
-          },
-        },
-      },
-    },
-  };
-};
+            typeClass: 'primitive'
+          }
+        }
+      }
+    }
+  }
+}
 
-export const createNewDatasetRequestPayload = (): NewDatasetRequestPayload => {
+export const createNewDatasetRequestPayload = (
+  license?: DatasetLicense
+): NewDatasetRequestPayload => {
   return {
     datasetVersion: {
+      ...(license && { license }),
       metadataBlocks: {
         citation: {
           fields: [
@@ -260,7 +272,7 @@ export const createNewDatasetRequestPayload = (): NewDatasetRequestPayload => {
               value: 'test dataset',
               typeClass: 'primitive',
               multiple: false,
-              typeName: 'title',
+              typeName: 'title'
             },
             {
               value: [
@@ -269,44 +281,44 @@ export const createNewDatasetRequestPayload = (): NewDatasetRequestPayload => {
                     value: 'Admin, Dataverse',
                     typeClass: 'primitive',
                     multiple: false,
-                    typeName: 'authorName',
+                    typeName: 'authorName'
                   },
                   authorAffiliation: {
                     value: 'Dataverse.org',
                     typeClass: 'primitive',
                     multiple: false,
-                    typeName: 'authorAffiliation',
-                  },
+                    typeName: 'authorAffiliation'
+                  }
                 },
                 {
                   authorName: {
                     value: 'Owner, Dataverse',
                     typeClass: 'primitive',
                     multiple: false,
-                    typeName: 'authorName',
+                    typeName: 'authorName'
                   },
                   authorAffiliation: {
                     value: 'Dataverse.org',
                     typeClass: 'primitive',
                     multiple: false,
-                    typeName: 'authorAffiliation',
-                  },
-                },
+                    typeName: 'authorAffiliation'
+                  }
+                }
               ],
               typeClass: 'compound',
               multiple: true,
-              typeName: 'author',
+              typeName: 'author'
             },
             {
               value: ['alternative1', 'alternative2'],
               typeClass: 'primitive',
               multiple: true,
-              typeName: 'alternativeRequiredTitle',
-            },
+              typeName: 'alternativeRequiredTitle'
+            }
           ],
-          displayName: 'Citation Metadata',
-        },
-      },
-    },
-  };
-};
+          displayName: 'Citation Metadata'
+        }
+      }
+    }
+  }
+}

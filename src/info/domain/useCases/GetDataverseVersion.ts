@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IDataverseInfoRepository } from '../repositories/IDataverseInfoRepository';
-import { DataverseVersion } from '../models/DataverseVersion';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IDataverseInfoRepository } from '../repositories/IDataverseInfoRepository'
+import { DataverseVersion } from '../models/DataverseVersion'
 
 export class GetDataverseVersion implements UseCase<DataverseVersion> {
-  private dataverseInfoRepository: IDataverseInfoRepository;
+  private dataverseInfoRepository: IDataverseInfoRepository
 
   constructor(dataverseInfoRepository: IDataverseInfoRepository) {
-    this.dataverseInfoRepository = dataverseInfoRepository;
+    this.dataverseInfoRepository = dataverseInfoRepository
   }
 
   /**
@@ -15,6 +15,6 @@ export class GetDataverseVersion implements UseCase<DataverseVersion> {
    * @returns {Promise<DataverseVersion>}
    */
   async execute(): Promise<DataverseVersion> {
-    return await this.dataverseInfoRepository.getDataverseVersion();
+    return await this.dataverseInfoRepository.getDataverseVersion()
   }
 }

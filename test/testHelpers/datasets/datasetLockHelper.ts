@@ -1,5 +1,5 @@
-import { DatasetLock, DatasetLockType } from '../../../src/datasets/domain/models/DatasetLock';
-import { DatasetLockPayload } from '../../../src/datasets/infra/repositories/transformers/datasetLocksTransformers';
+import { DatasetLock, DatasetLockType } from '../../../src/datasets/domain/models/DatasetLock'
+import { DatasetLockPayload } from '../../../src/datasets/infra/repositories/transformers/datasetLocksTransformers'
 
 export const createDatasetLockModel = (): DatasetLock => {
   return {
@@ -7,9 +7,9 @@ export const createDatasetLockModel = (): DatasetLock => {
     date: '2023-05-15T08:21:03Z',
     userId: '1',
     datasetPersistentId: 'doi:10.5072/FK2/QYOVTJ',
-    message: 'Test.',
-  };
-};
+    message: 'Test.'
+  }
+}
 
 export const createDatasetLockPayload = (): DatasetLockPayload => {
   return {
@@ -17,6 +17,6 @@ export const createDatasetLockPayload = (): DatasetLockPayload => {
     date: '2023-05-15T08:21:03Z',
     user: '1',
     dataset: 'doi:10.5072/FK2/QYOVTJ',
-    message: 'Test.',
-  };
-};
+    message: 'Test.'
+  }
+}

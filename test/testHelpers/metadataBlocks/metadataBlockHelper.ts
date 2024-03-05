@@ -1,4 +1,4 @@
-import { MetadataBlock } from '../../../src/metadataBlocks/domain/models/MetadataBlock';
+import { MetadataBlock } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 
 export const createMetadataBlockModel = (): MetadataBlock => {
   return {
@@ -18,7 +18,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
-        typeClass: 'primitive',
+        typeClass: 'primitive'
       },
       testField2: {
         name: 'testName2',
@@ -46,7 +46,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
-            typeClass: 'primitive',
+            typeClass: 'primitive'
           },
           testField4: {
             name: 'testName4',
@@ -60,14 +60,15 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
-            typeClass: 'primitive',
-          },
-        },
-      },
-    },
-  };
-};
+            typeClass: 'primitive'
+          }
+        }
+      }
+    }
+  }
+}
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createMetadataBlockPayload = (): any => {
   return {
     id: 1,
@@ -86,7 +87,7 @@ export const createMetadataBlockPayload = (): any => {
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
-        typeClass: 'primitive',
+        typeClass: 'primitive'
       },
       testField2: {
         name: 'testName2',
@@ -114,7 +115,7 @@ export const createMetadataBlockPayload = (): any => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
-            typeClass: 'primitive',
+            typeClass: 'primitive'
           },
           testField4: {
             name: 'testName4',
@@ -128,10 +129,10 @@ export const createMetadataBlockPayload = (): any => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
-            typeClass: 'primitive',
-          },
-        },
-      },
-    },
-  };
-};
+            typeClass: 'primitive'
+          }
+        }
+      }
+    }
+  }
+}

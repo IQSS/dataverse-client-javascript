@@ -18,7 +18,6 @@ An unstable 2.x version of this package with breaking changes is under developme
 
 Until a 2.0 version is officially released, it can be installed from https://github.com/IQSS/dataverse-client-javascript/pkgs/npm/dataverse-client-javascript
 
-
 ### Create a `.npmrc` file and add a token
 
 To install the [@iqss/dataverse-client-javascript](https://github.com/IQSS/dataverse-client-javascript/pkgs/npm/dataverse-client-javascript)
@@ -89,20 +88,24 @@ function App() {
 }
 
 export default App
-````
+```
 
 The same example but with example values set:
 
 ```typescript
-ApiConfig.init('http://localhost:8000/api/v1', DataverseApiAuthMechanism.API_KEY, 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')
+ApiConfig.init(
+  'http://localhost:8000/api/v1',
+  DataverseApiAuthMechanism.API_KEY,
+  'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+)
 
 function App() {
   /* Yor App code */
 }
 
 export default App
-````
+```
 
-We can initialize the `ApiConfig` object as an unauthenticated user, by setting `undefined` as the API Key value. 
+We can initialize the `ApiConfig` object as an unauthenticated user, by setting `undefined` as the API Key value.
 
 This will allow use cases that do not require authentication to be successfully executed, but those that do require authentication will fail.

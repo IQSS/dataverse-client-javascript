@@ -1,4 +1,4 @@
-import { DatasetUserPermissions } from '../../../src/datasets/domain/models/DatasetUserPermissions';
+import { DatasetUserPermissions } from '../../../src/datasets/domain/models/DatasetUserPermissions'
 
 export const createDatasetUserPermissionsModel = (): DatasetUserPermissions => {
   return {
@@ -6,6 +6,6 @@ export const createDatasetUserPermissionsModel = (): DatasetUserPermissions => {
     canEditDataset: true,
     canPublishDataset: true,
     canManageDatasetPermissions: true,
-    canDeleteDatasetDraft: true,
-  };
-};
+    canDeleteDatasetDraft: true
+  }
+}

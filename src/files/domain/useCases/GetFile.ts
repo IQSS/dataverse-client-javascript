@@ -1,7 +1,7 @@
-import { IFilesRepository } from '../repositories/IFilesRepository';
-import { File } from '../models/File';
-import { DatasetNotNumberedVersion } from '../../../datasets';
-import { UseCase } from '../../../core/domain/useCases/UseCase';
+import { IFilesRepository } from '../repositories/IFilesRepository'
+import { File } from '../models/File'
+import { DatasetNotNumberedVersion } from '../../../datasets'
+import { UseCase } from '../../../core/domain/useCases/UseCase'
 
 export class GetFile implements UseCase<File> {
   constructor(private readonly filesRepository: IFilesRepository) {}
@@ -15,8 +15,8 @@ export class GetFile implements UseCase<File> {
    */
   async execute(
     fileId: number | string,
-    datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
+    datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST
   ): Promise<File> {
-    return (await this.filesRepository.getFile(fileId, datasetVersionId, false)) as File;
+    return (await this.filesRepository.getFile(fileId, datasetVersionId, false)) as File
   }
 }

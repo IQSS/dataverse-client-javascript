@@ -1,196 +1,201 @@
-import { NewDatasetResourceValidator } from '../../../src/datasets/domain/useCases/validators/NewDatasetResourceValidator';
-import { assert } from 'sinon';
+import { NewDatasetResourceValidator } from '../../../src/datasets/domain/useCases/validators/NewDatasetResourceValidator'
 import {
   createNewDatasetDTO,
   createNewDatasetMetadataBlockModel,
-  createNewDatasetDTOWithoutFirstLevelRequiredField,
-} from '../../testHelpers/datasets/newDatasetHelper';
-import { fail } from 'assert';
-import { EmptyFieldError } from '../../../src/datasets/domain/useCases/validators/errors/EmptyFieldError';
-import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError';
-import { NewDatasetDTO, NewDatasetMetadataFieldValueDTO } from '../../../src/datasets/domain/dtos/NewDatasetDTO';
-import { SingleMetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/SingleMetadataFieldValidator';
-import { MetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/MetadataFieldValidator';
-import { MultipleMetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/MultipleMetadataFieldValidator';
+  createNewDatasetDTOWithoutFirstLevelRequiredField
+} from '../../testHelpers/datasets/newDatasetHelper'
+import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError'
+import { NewDatasetDTO } from '../../../src/datasets/domain/dtos/NewDatasetDTO'
+import { SingleMetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/SingleMetadataFieldValidator'
+import { MetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/MetadataFieldValidator'
+import { MultipleMetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/MultipleMetadataFieldValidator'
 
 describe('validate', () => {
-  const testMetadataBlocks = [createNewDatasetMetadataBlockModel()];
+  const testMetadataBlocks = [createNewDatasetMetadataBlockModel()]
 
-  const singleMetadataFieldValidator = new SingleMetadataFieldValidator();
+  const singleMetadataFieldValidator = new SingleMetadataFieldValidator()
   const metadataFieldValidator = new MetadataFieldValidator(
     new SingleMetadataFieldValidator(),
-    new MultipleMetadataFieldValidator(singleMetadataFieldValidator),
-  );
-  const sut = new NewDatasetResourceValidator(metadataFieldValidator);
+    new MultipleMetadataFieldValidator(singleMetadataFieldValidator)
+  )
+  const sut = new NewDatasetResourceValidator(metadataFieldValidator)
 
-  async function runValidateExpectingFieldValidationError<T extends FieldValidationError>(
+  const runValidateExpectingFieldValidationError = (
     newDataset: NewDatasetDTO,
     expectedMetadataFieldName: string,
     expectedErrorMessage: string,
     expectedParentMetadataFieldName?: string,
-    expectedPosition?: number,
-  ): Promise<void> {
-    await sut
-      .validate(newDataset, testMetadataBlocks)
-      .then(() => {
-        fail('Validation should fail');
-      })
-      .catch((error) => {
-        const fieldValidationError = error as T;
-        assert.match(fieldValidationError.citationBlockName, 'citation');
-        assert.match(fieldValidationError.metadataFieldName, expectedMetadataFieldName);
-        assert.match(fieldValidationError.parentMetadataFieldName, expectedParentMetadataFieldName);
-        assert.match(fieldValidationError.fieldPosition, expectedPosition);
-        assert.match(fieldValidationError.message, expectedErrorMessage);
-      });
+    expectedPosition?: number
+  ) => {
+    try {
+      sut.validate(newDataset, testMetadataBlocks)
+      throw new Error('Validation should fail')
+    } catch (error) {
+      expect(error).toBeInstanceOf(FieldValidationError)
+      expect(error.citationBlockName).toEqual('citation')
+      expect(error.metadataFieldName).toEqual(expectedMetadataFieldName)
+      expect(error.parentMetadataFieldName).toEqual(expectedParentMetadataFieldName)
+      expect(error.fieldPosition).toEqual(expectedPosition)
+      expect(error.message).toEqual(expectedErrorMessage)
+    }
   }
 
-  test('should not raise a validation error when a new dataset with only the required fields is valid', async () => {
-    const testNewDataset = createNewDatasetDTO();
-    await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
-  });
+  test('should not raise a validation error when a new dataset with only the required fields is valid', () => {
+    const testNewDataset = createNewDatasetDTO()
+    expect(() => sut.validate(testNewDataset, testMetadataBlocks)).not.toThrow()
+  })
 
-  test('should raise an empty field error when a first level required string field is missing', async () => {
-    await runValidateExpectingFieldValidationError<EmptyFieldError>(
+  test('should raise an empty field error when a first level required string field is missing', () => {
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
       createNewDatasetDTOWithoutFirstLevelRequiredField(),
       'author',
-      'There was an error when validating the field author from metadata block citation. Reason was: The field should not be empty.',
-    );
-  });
+      'There was an error when validating the field author from metadata block citation. Reason was: The field should not be empty.'
+    )
+  })
 
-  test('should raise an empty field error when a first level required array field is empty', async () => {
-    const invalidAuthorFieldValue: NewDatasetMetadataFieldValueDTO = [];
-    const testNewDataset = createNewDatasetDTO(undefined, invalidAuthorFieldValue, undefined);
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+  test('should raise an empty field error when a first level required array field is empty', () => {
+    expect.assertions(6)
+    const testNewDataset = createNewDatasetDTO(undefined, [], undefined)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'author',
-      'There was an error when validating the field author from metadata block citation. Reason was: The field should not be empty.',
-    );
-  });
+      'There was an error when validating the field author from metadata block citation. Reason was: The field should not be empty.'
+    )
+  })
 
-  test('should raise an error when the provided field value for an unique field is an array', async () => {
-    const invalidTitleFieldValue = ['title1', 'title2'];
-    const testNewDataset = createNewDatasetDTO(invalidTitleFieldValue, undefined, undefined);
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+  test('should raise an error when the provided field value for a unique field is an array', () => {
+    expect.assertions(6)
+    const testNewDataset = createNewDatasetDTO(['title1', 'title2'], undefined, undefined)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'title',
-      'There was an error when validating the field title from metadata block citation. Reason was: Expecting a single field, not an array.',
-    );
-  });
+      'There was an error when validating the field title from metadata block citation. Reason was: Expecting a single field, not an array.'
+    )
+  })
 
-  test('should raise an error when the provided field value is an object and the field expects a string', async () => {
-    const invalidTitleFieldValue = {
-      invalidChildField1: 'invalid value 1',
-      invalidChildField2: 'invalid value 2',
-    };
-    const testNewDataset = createNewDatasetDTO(invalidTitleFieldValue, undefined, undefined);
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+  test('should raise an error when the provided field value is an object and the field expects a string', () => {
+    const testNewDataset = createNewDatasetDTO(
+      { invalidChildField1: 'invalid value 1', invalidChildField2: 'invalid value 2' },
+      undefined,
+      undefined
+    )
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'title',
-      'There was an error when validating the field title from metadata block citation. Reason was: Expecting a string, not child fields.',
-    );
-  });
+      'There was an error when validating the field title from metadata block citation. Reason was: Expecting a string, not child fields.'
+    )
+  })
 
-  test('should raise an error when the provided field value for a multiple field is a string', async () => {
-    const invalidAuthorFieldValue = 'invalidValue';
-    const testNewDataset = createNewDatasetDTO(undefined, invalidAuthorFieldValue, undefined);
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+  test('should raise an error when the provided field value for a multiple field is a string', () => {
+    const testNewDataset = createNewDatasetDTO(undefined, 'invalidValue', undefined)
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'author',
-      'There was an error when validating the field author from metadata block citation. Reason was: Expecting an array of values.',
-    );
-  });
+      'There was an error when validating the field author from metadata block citation. Reason was: Expecting an array of values.'
+    )
+  })
 
-  test('should raise an error when the provided field value is an array of strings and the field expects an array of objects', async () => {
-    const invalidAuthorFieldValue = ['invalidValue1', 'invalidValue2'];
-    const testNewDataset = createNewDatasetDTO(undefined, invalidAuthorFieldValue, undefined);
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+  test('should raise an error when the provided field value is an array of strings and the field expects an array of objects', () => {
+    const invalidAuthorFieldValue = ['invalidValue1', 'invalidValue2']
+    const testNewDataset = createNewDatasetDTO(undefined, invalidAuthorFieldValue, undefined)
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'author',
-      'There was an error when validating the field author from metadata block citation. Reason was: Expecting an array of child fields, not strings',
-    );
-  });
+      'There was an error when validating the field author from metadata block citation. Reason was: Expecting an array of child fields, not strings.'
+    )
+  })
 
-  test('should raise an error when the provided field value is an array of objects and the field expects an array of strings', async () => {
+  test('should raise an error when the provided field value is an array of objects and the field expects an array of strings', () => {
     const invalidAlternativeTitleFieldValue = [
-      {
-        invalidChildField1: 'invalid value 1',
-        invalidChildField2: 'invalid value 2',
-      },
-      {
-        invalidChildField1: 'invalid value 1',
-        invalidChildField2: 'invalid value 2',
-      },
-    ];
-    const testNewDataset = createNewDatasetDTO(undefined, undefined, invalidAlternativeTitleFieldValue);
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      { invalidChildField1: 'invalid value 1', invalidChildField2: 'invalid value 2' },
+      { invalidChildField1: 'invalid value 1', invalidChildField2: 'invalid value 2' }
+    ]
+    const testNewDataset = createNewDatasetDTO(
+      undefined,
+      undefined,
+      invalidAlternativeTitleFieldValue
+    )
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'alternativeRequiredTitle',
-      'There was an error when validating the field alternativeRequiredTitle from metadata block citation. Reason was: Expecting an array of strings, not child fields',
-    );
-  });
+      'There was an error when validating the field alternativeRequiredTitle from metadata block citation. Reason was: Expecting an array of strings, not child fields.'
+    )
+  })
 
-  test('should raise an empty field error when a required child field is missing', async () => {
+  test('should raise an empty field error when a required child field is missing', () => {
     const invalidAuthorFieldValue = [
-      {
-        authorName: 'Admin, Dataverse',
-        authorAffiliation: 'Dataverse.org',
-      },
-      {
-        authorAffiliation: 'Dataverse.org',
-      },
-    ];
-    const testNewDataset = createNewDatasetDTO(undefined, invalidAuthorFieldValue, undefined);
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+      { authorName: 'Admin, Dataverse', authorAffiliation: 'Dataverse.org' },
+      { authorAffiliation: 'Dataverse.org' }
+    ]
+    const testNewDataset = createNewDatasetDTO(undefined, invalidAuthorFieldValue, undefined)
+
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'authorName',
       'There was an error when validating the field authorName from metadata block citation with parent field author in position 1. Reason was: The field should not be empty.',
       'author',
-      1,
-    );
-  });
+      1
+    )
+  })
 
-  test('should not raise an empty field error when a not required child field is missing', async () => {
+  test('should not raise an empty field error when a not required child field is missing', () => {
     const authorFieldValue = [
-      {
-        authorName: 'Admin, Dataverse',
-        authorAffiliation: 'Dataverse.org',
-      },
-      {
-        authorName: 'John, Doe',
-      },
-    ];
-    const testNewDataset = createNewDatasetDTO(undefined, authorFieldValue, undefined);
-    await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
-  });
+      { authorName: 'Admin, Dataverse', authorAffiliation: 'Dataverse.org' },
+      { authorName: 'John, Doe' }
+    ]
+    const testNewDataset = createNewDatasetDTO(undefined, authorFieldValue, undefined)
+    expect(() => sut.validate(testNewDataset, testMetadataBlocks)).not.toThrow()
+  })
 
-  test('should raise a date format validation error when a date field has an invalid format', async () => {
-    const testNewDataset = createNewDatasetDTO(undefined, undefined, undefined, '1-1-2020');
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+  test('should raise a date format validation error when a date field has an invalid format', () => {
+    const testNewDataset = createNewDatasetDTO(undefined, undefined, undefined, '1-1-2020')
+
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'timePeriodCoveredStart',
-      'There was an error when validating the field timePeriodCoveredStart from metadata block citation. Reason was: The field requires a valid date format (YYYY-MM-DD).',
-    );
-  });
+      'There was an error when validating the field timePeriodCoveredStart from metadata block citation. Reason was: The field requires a valid date format (YYYY-MM-DD).'
+    )
+  })
 
-  test('should not raise a date format validation error when a date field has a valid format', async () => {
-    const testNewDataset = createNewDatasetDTO(undefined, undefined, undefined, '2020-01-01');
-    await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
-  });
+  test('should not raise a date format validation error when a date field has a valid format', () => {
+    const testNewDataset = createNewDatasetDTO(undefined, undefined, undefined, '2020-01-01')
+    expect(() => sut.validate(testNewDataset, testMetadataBlocks)).not.toThrow()
+  })
 
-  test('should raise a controlled vocabulary error when a controlled vocabulary field has an invalid format', async () => {
-    const testNewDataset = createNewDatasetDTO(undefined, undefined, undefined, undefined, 'Wrong Value');
-    await runValidateExpectingFieldValidationError<FieldValidationError>(
+  test('should raise a controlled vocabulary error when a controlled vocabulary field has an invalid format', () => {
+    const testNewDataset = createNewDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'Wrong Value'
+    )
+
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
       testNewDataset,
       'contributorType',
       'There was an error when validating the field contributorType from metadata block citation with parent field contributor. Reason was: The field does not have a valid controlled vocabulary value.',
       'contributor',
-      0,
-    );
-  });
+      0
+    )
+  })
 
-  test('should not raise a controlled vocabulary error when the value for a controlled vocabulary field is correct', async () => {
-    const testNewDataset = createNewDatasetDTO(undefined, undefined, undefined, undefined, 'Project Member');
-    await sut.validate(testNewDataset, testMetadataBlocks).catch((e) => fail(e));
-  });
-});
+  test('should not raise a controlled vocabulary error when the value for a controlled vocabulary field is correct', () => {
+    const testNewDataset = createNewDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'Project Member'
+    )
+    expect(() => sut.validate(testNewDataset, testMetadataBlocks)).not.toThrow()
+  })
+})

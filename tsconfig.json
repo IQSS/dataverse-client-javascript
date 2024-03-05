@@ -1,19 +1,25 @@
 {
-	"compilerOptions": {
-        "declaration": true,
-        "declarationDir": "./dist",
-        "module": "commonjs",
-        "noImplicitAny": true,
-		"lib": ["es2017", "es7", "es6", "dom"],
-		"moduleResolution": "node",
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"sourceMap": true,
-		"target": "es5",
-		"outDir": "./dist",
-		"esModuleInterop": true,
-		"resolveJsonModule": true
-    },
-    "include": [ "src/**/*"],
-	"exclude": ["node_modules", "dist"]
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./dist",
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "lib": ["es2017", "es7", "es6", "dom"],
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "target": "es2015",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src/**/*",
+    "test",
+    "jest.config.integration.ts",
+    "jest.config.js",
+    "jest.config.unit.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
 }

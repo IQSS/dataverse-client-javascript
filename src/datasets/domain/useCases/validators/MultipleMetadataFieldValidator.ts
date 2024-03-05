@@ -1,39 +1,48 @@
-import { BaseMetadataFieldValidator, NewDatasetMetadataFieldAndValueInfo } from './BaseMetadataFieldValidator';
-import { NewDatasetMetadataFieldValueDTO } from '../../dtos/NewDatasetDTO';
-import { SingleMetadataFieldValidator } from './SingleMetadataFieldValidator';
+import {
+  BaseMetadataFieldValidator,
+  NewDatasetMetadataFieldAndValueInfo
+} from './BaseMetadataFieldValidator'
+import { NewDatasetMetadataFieldValueDTO } from '../../dtos/NewDatasetDTO'
+import { SingleMetadataFieldValidator } from './SingleMetadataFieldValidator'
 
 export class MultipleMetadataFieldValidator extends BaseMetadataFieldValidator {
   constructor(private singleMetadataFieldValidator: SingleMetadataFieldValidator) {
-    super();
+    super()
   }
 
   validate(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo): void {
-    const metadataFieldValue = newDatasetMetadataFieldAndValueInfo.metadataFieldValue;
-    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo;
+    const metadataFieldValue = newDatasetMetadataFieldAndValueInfo.metadataFieldValue
+    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo
     if (!Array.isArray(metadataFieldValue)) {
-      throw this.createGeneralValidationError(newDatasetMetadataFieldAndValueInfo, 'Expecting an array of values.');
+      throw this.createGeneralValidationError(
+        newDatasetMetadataFieldAndValueInfo,
+        'Expecting an array of values.'
+      )
     }
     if (this.isValidArrayType(metadataFieldValue, 'string') && metadataFieldInfo.type === 'NONE') {
       throw this.createGeneralValidationError(
         newDatasetMetadataFieldAndValueInfo,
-        'Expecting an array of child fields, not strings.',
-      );
-    } else if (this.isValidArrayType(metadataFieldValue, 'object') && metadataFieldInfo.type !== 'NONE') {
+        'Expecting an array of child fields, not strings.'
+      )
+    } else if (
+      this.isValidArrayType(metadataFieldValue, 'object') &&
+      metadataFieldInfo.type !== 'NONE'
+    ) {
       throw this.createGeneralValidationError(
         newDatasetMetadataFieldAndValueInfo,
-        'Expecting an array of strings, not child fields.',
-      );
+        'Expecting an array of strings, not child fields.'
+      )
     } else if (
       !this.isValidArrayType(metadataFieldValue, 'object') &&
       !this.isValidArrayType(metadataFieldValue, 'string')
     ) {
       throw this.createGeneralValidationError(
         newDatasetMetadataFieldAndValueInfo,
-        'The provided array of values is not valid.',
-      );
+        'The provided array of values is not valid.'
+      )
     }
 
-    const fieldValues = metadataFieldValue as NewDatasetMetadataFieldValueDTO[];
+    const fieldValues = metadataFieldValue as NewDatasetMetadataFieldValueDTO[]
     fieldValues.forEach((value, metadataFieldPosition) => {
       this.singleMetadataFieldValidator.validate({
         metadataFieldInfo: metadataFieldInfo,
@@ -41,15 +50,17 @@ export class MultipleMetadataFieldValidator extends BaseMetadataFieldValidator {
         metadataFieldValue: value,
         metadataBlockName: newDatasetMetadataFieldAndValueInfo.metadataBlockName,
         metadataParentFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
-        metadataFieldPosition: metadataFieldPosition,
-      });
-    });
+        metadataFieldPosition: metadataFieldPosition
+      })
+    })
   }
 
   private isValidArrayType(
     metadataFieldValue: Array<string | NewDatasetMetadataFieldValueDTO>,
-    expectedType: 'string' | 'object',
+    expectedType: 'string' | 'object'
   ): boolean {
-    return metadataFieldValue.every((item: string | NewDatasetMetadataFieldValueDTO) => typeof item === expectedType);
+    return metadataFieldValue.every(
+      (item: string | NewDatasetMetadataFieldValueDTO) => typeof item === expectedType
+    )
   }
 }

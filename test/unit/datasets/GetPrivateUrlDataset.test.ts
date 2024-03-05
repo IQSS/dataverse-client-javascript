@@ -1,39 +1,29 @@
-import { GetPrivateUrlDataset } from '../../../src/datasets/domain/useCases/GetPrivateUrlDataset';
-import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository';
-import { assert, createSandbox, SinonSandbox } from 'sinon';
-import { createDatasetModel } from '../../testHelpers/datasets/datasetHelper';
-import { ReadError } from '../../../src/core/domain/repositories/ReadError';
+import { GetPrivateUrlDataset } from '../../../src/datasets/domain/useCases/GetPrivateUrlDataset'
+import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository'
+import { createDatasetModel } from '../../testHelpers/datasets/datasetHelper'
+import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 
 describe('execute', () => {
-  const sandbox: SinonSandbox = createSandbox();
-  const testPrivateUrlToken = 'token';
-
-  afterEach(() => {
-    sandbox.restore();
-  });
+  const testPrivateUrlToken = 'token'
 
   test('should return dataset on repository success', async () => {
-    const testDataset = createDatasetModel();
-    const datasetsRepositoryStub = <IDatasetsRepository>{};
-    const getDatasetStub = sandbox.stub().returns(testDataset);
-    datasetsRepositoryStub.getPrivateUrlDataset = getDatasetStub;
-    const sut = new GetPrivateUrlDataset(datasetsRepositoryStub);
+    const testDataset = createDatasetModel()
+    const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
+    datasetsRepositoryStub.getPrivateUrlDataset = jest.fn().mockResolvedValue(testDataset)
+    const sut = new GetPrivateUrlDataset(datasetsRepositoryStub)
 
-    const actual = await sut.execute(testPrivateUrlToken);
+    const actual = await sut.execute(testPrivateUrlToken)
 
-    assert.match(actual, testDataset);
-    assert.calledWithExactly(getDatasetStub, testPrivateUrlToken);
-  });
+    expect(actual).toEqual(testDataset)
+    expect(datasetsRepositoryStub.getPrivateUrlDataset).toHaveBeenCalledWith(testPrivateUrlToken)
+  })
 
   test('should return error result on repository error', async () => {
-    const datasetsRepositoryStub = <IDatasetsRepository>{};
-    const testReadError = new ReadError();
-    datasetsRepositoryStub.getPrivateUrlDataset = sandbox.stub().throwsException(testReadError);
-    const sut = new GetPrivateUrlDataset(datasetsRepositoryStub);
+    const testReadError = new ReadError()
+    const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
+    datasetsRepositoryStub.getPrivateUrlDataset = jest.fn().mockRejectedValue(testReadError)
+    const sut = new GetPrivateUrlDataset(datasetsRepositoryStub)
 
-    let actualError: ReadError = undefined;
-    await sut.execute(testPrivateUrlToken).catch((e) => (actualError = e));
-
-    assert.match(actualError, testReadError);
-  });
-});
+    await expect(sut.execute(testPrivateUrlToken)).rejects.toThrow(testReadError)
+  })
+})

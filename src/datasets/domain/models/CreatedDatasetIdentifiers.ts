@@ -1,4 +1,4 @@
 export interface CreatedDatasetIdentifiers {
-  persistentId: string;
-  numericId: number;
+  persistentId: string
+  numericId: number
 }

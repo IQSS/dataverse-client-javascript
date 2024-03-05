@@ -1,11 +1,11 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IDataverseInfoRepository } from '../repositories/IDataverseInfoRepository';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IDataverseInfoRepository } from '../repositories/IDataverseInfoRepository'
 
 export class GetMaxEmbargoDurationInMonths implements UseCase<number> {
-  private dataverseInfoRepository: IDataverseInfoRepository;
+  private dataverseInfoRepository: IDataverseInfoRepository
 
   constructor(dataverseInfoRepository: IDataverseInfoRepository) {
-    this.dataverseInfoRepository = dataverseInfoRepository;
+    this.dataverseInfoRepository = dataverseInfoRepository
   }
 
   /**
@@ -14,6 +14,6 @@ export class GetMaxEmbargoDurationInMonths implements UseCase<number> {
    * @returns {Promise<number>}
    */
   async execute(): Promise<number> {
-    return await this.dataverseInfoRepository.getMaxEmbargoDurationInMonths();
+    return await this.dataverseInfoRepository.getMaxEmbargoDurationInMonths()
   }
 }

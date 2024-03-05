@@ -1,12 +1,12 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase';
-import { IFilesRepository } from '../repositories/IFilesRepository';
-import { DatasetNotNumberedVersion } from '../../../datasets';
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IFilesRepository } from '../repositories/IFilesRepository'
+import { DatasetNotNumberedVersion } from '../../../datasets'
 
 export class GetFileCitation implements UseCase<string> {
-  private filesRepository: IFilesRepository;
+  private filesRepository: IFilesRepository
 
   constructor(filesRepository: IFilesRepository) {
-    this.filesRepository = filesRepository;
+    this.filesRepository = filesRepository
   }
 
   /**
@@ -20,8 +20,12 @@ export class GetFileCitation implements UseCase<string> {
   async execute(
     fileId: number,
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
-    includeDeaccessioned = false,
+    includeDeaccessioned = false
   ): Promise<string> {
-    return await this.filesRepository.getFileCitation(fileId, datasetVersionId, includeDeaccessioned);
+    return await this.filesRepository.getFileCitation(
+      fileId,
+      datasetVersionId,
+      includeDeaccessioned
+    )
   }
 }
