@@ -12,6 +12,7 @@
     "test": "jest -c jest.config.ts",
     "test:unit": "jest -c jest.config.unit.ts",
     "test:integration": "jest -c jest.config.integration.ts",
+    "test:functional": "jest -c jest.config.functional.ts",
     "test:coverage": "jest --coverage -c jest.config.ts",
     "test:coverage:check": "jest --coverage --ci --config jest.config.ts",
     "lint": "npm run lint:eslint && npm run lint:prettier",

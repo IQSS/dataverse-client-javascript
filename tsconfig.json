@@ -19,7 +19,8 @@
     "test",
     "jest.config.integration.ts",
     "jest.config.js",
-    "jest.config.unit.ts"
+    "jest.config.unit.ts",
+    "jest.config.functional.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }
