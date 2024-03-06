@@ -7,9 +7,11 @@ export const transformMetadataBlockResponseToMetadataBlock = (
   const metadataBlockPayload = response.data.data
   const metadataFields: Record<string, MetadataFieldInfo> = {}
   const metadataBlockFieldsPayload = metadataBlockPayload.fields
-  Object.keys(metadataBlockFieldsPayload).map((metadataFieldKey) => {
+  Object.keys(metadataBlockFieldsPayload).forEach((metadataFieldKey) => {
     const metadataFieldInfoPayload = metadataBlockFieldsPayload[metadataFieldKey]
-    metadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(metadataFieldInfoPayload)
+    if (!metadataFieldIsAlreadyPresentAsChildField(metadataFields, metadataFieldKey)) {
+      metadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(metadataFieldInfoPayload)
+    }
   })
   return {
     id: metadataBlockPayload.id,
@@ -33,6 +35,9 @@ const transformPayloadMetadataFieldInfo = (
     description: metadataFieldInfoPayload.description,
     multiple: metadataFieldInfoPayload.multiple,
     isControlledVocabulary: metadataFieldInfoPayload.isControlledVocabulary,
+    ...(metadataFieldInfoPayload.controlledVocabularyValues && {
+      controlledVocabularyValues: metadataFieldInfoPayload.controlledVocabularyValues
+    }),
     displayFormat: metadataFieldInfoPayload.displayFormat,
     isRequired: metadataFieldInfoPayload.isRequired,
     displayOrder: metadataFieldInfoPayload.displayOrder,
@@ -50,4 +55,29 @@ const transformPayloadMetadataFieldInfo = (
     metadataFieldInfo.childMetadataFields = childMetadataFields
   }
   return metadataFieldInfo
+}
+
+/**
+ * This method checks if a new metadata field key is already present in the metadata fields.
+ * We need this method since child fields are returned as sub-objects and as root objects in the response payload, so we don't want to replicate this behavior in the model.
+ *
+ * @param {Record<string, MetadataFieldInfo>} [metadataFields] - The current transformed metadata fields
+ * @param {string} newMetadataFieldKey - The new metadata field key to transform
+ *
+ * @returns {boolean}
+ */
+const metadataFieldIsAlreadyPresentAsChildField = (
+  metadataFields: Record<string, MetadataFieldInfo>,
+  newMetadataFieldKey: string
+): boolean => {
+  let isPresent = false
+  Object.keys(metadataFields).forEach((metadataFieldKey) => {
+    if (
+      metadataFields[metadataFieldKey].childMetadataFields &&
+      metadataFields[metadataFieldKey].childMetadataFields[newMetadataFieldKey]
+    ) {
+      isPresent = true
+    }
+  })
+  return isPresent
 }
