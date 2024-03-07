@@ -18,7 +18,7 @@
     "src/**/*",
     "test",
     "jest.config.integration.ts",
-    "jest.config.js",
+    "jest.config.ts",
     "jest.config.unit.ts",
     "jest.config.functional.ts"
   ],
