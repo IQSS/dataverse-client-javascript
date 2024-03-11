@@ -1,21 +1,21 @@
 import {
   Dataset,
+  DatasetLicense,
   DatasetVersionState,
+  DatasetMetadataBlocks,
   DatasetMetadataFields,
   DatasetMetadataSubField,
   DatasetMetadataFieldValue,
-  DatasetLicense,
-  DatasetMetadataBlocks,
   ANONYMIZED_FIELD_VALUE
 } from '../../../domain/models/Dataset'
 import { AxiosResponse } from 'axios'
 import {
   DatasetPayload,
   LicensePayload,
-  MetadataBlocksPayload,
-  MetadataSubfieldValuePayload,
   MetadataFieldPayload,
-  MetadataFieldValuePayload
+  MetadataBlocksPayload,
+  MetadataFieldValuePayload,
+  MetadataSubfieldValuePayload,
 } from './DatasetPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import TurndownService from 'turndown'
@@ -30,8 +30,8 @@ export const transformVersionResponseToDataset = (response: AxiosResponse): Data
 export const transformVersionPayloadToDataset = (versionPayload: DatasetPayload): Dataset => {
   const datasetModel: Dataset = {
     id: versionPayload.datasetId,
-    persistentId: versionPayload.datasetPersistentId,
     versionId: versionPayload.id,
+    persistentId: versionPayload.datasetPersistentId,
     versionInfo: {
       majorNumber: versionPayload.versionNumber,
       minorNumber: versionPayload.versionMinorNumber,

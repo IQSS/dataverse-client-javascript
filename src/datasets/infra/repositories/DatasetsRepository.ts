@@ -1,17 +1,17 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
 import { Dataset } from '../../domain/models/Dataset'
-import { transformVersionResponseToDataset } from './transformers/datasetTransformers'
-import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
-import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
 import { DatasetLock } from '../../domain/models/DatasetLock'
-import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
-import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
+import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
+import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers'
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset'
 import { NewDatasetDTO } from '../../domain/dtos/NewDatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
+import { transformVersionResponseToDataset } from './transformers/datasetTransformers'
 import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers'
-import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers'
+import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
+import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
+import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
