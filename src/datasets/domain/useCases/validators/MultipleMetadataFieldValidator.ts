@@ -49,7 +49,6 @@ export class MultipleMetadataFieldValidator extends BaseMetadataFieldValidator {
         metadataFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
         metadataFieldValue: value,
         metadataBlockName: newDatasetMetadataFieldAndValueInfo.metadataBlockName,
-        metadataParentFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
         metadataFieldPosition: metadataFieldPosition
       })
     })

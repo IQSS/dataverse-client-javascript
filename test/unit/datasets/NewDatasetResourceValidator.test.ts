@@ -182,7 +182,7 @@ describe('validate', () => {
     runValidateExpectingFieldValidationError(
       testNewDataset,
       'contributorType',
-      'There was an error when validating the field contributorType from metadata block citation with parent field contributor. Reason was: The field does not have a valid controlled vocabulary value.',
+      'There was an error when validating the field contributorType from metadata block citation with parent field contributor in position 0. Reason was: The field does not have a valid controlled vocabulary value.',
       'contributor',
       0
     )

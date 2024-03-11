@@ -83,15 +83,19 @@ describe('execute', () => {
         }
       ]
     }
-
+    expect.assertions(5)
+    let fieldValidationError: FieldValidationError
     try {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      expect(error).toBeInstanceOf(FieldValidationError)
-      expect(error.citationBlockName).toEqual('citation')
-      expect(error.metadataFieldName).toEqual('title')
-      expect(error.message).toEqual(
+      fieldValidationError = error
+    } finally {
+      expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
+      expect(fieldValidationError.citationBlockName).toEqual('citation')
+      expect(fieldValidationError.metadataFieldName).toEqual('title')
+      expect(fieldValidationError.parentMetadataFieldName).toEqual(undefined)
+      expect(fieldValidationError.message).toEqual(
         'There was an error when validating the field title from metadata block citation. Reason was: The field should not be empty.'
       )
     }
@@ -129,18 +133,21 @@ describe('execute', () => {
         }
       ]
     }
-
+    expect.assertions(6)
+    let fieldValidationError: FieldValidationError
     try {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      expect(error).toBeInstanceOf(FieldValidationError)
-      expect(error.citationBlockName).toEqual('citation')
-      expect(error.metadataFieldName).toEqual('authorName')
-      expect(error.parentMetadataFieldName).toEqual('author')
-      expect(error.fieldPosition).toEqual(0)
-      expect(error.message).toEqual(
-        'There was an error when validating the field authorName from metadata block citation with parent field author. Reason was: The field should not be empty.'
+      fieldValidationError = error
+    } finally {
+      expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
+      expect(fieldValidationError.citationBlockName).toEqual('citation')
+      expect(fieldValidationError.metadataFieldName).toEqual('authorName')
+      expect(fieldValidationError.parentMetadataFieldName).toEqual('author')
+      expect(fieldValidationError.fieldPosition).toEqual(0)
+      expect(fieldValidationError.message).toEqual(
+        'There was an error when validating the field authorName from metadata block citation with parent field author in position 0. Reason was: The field should not be empty.'
       )
     }
   })
@@ -173,21 +180,26 @@ describe('execute', () => {
                 dsDescriptionValue: 'This is the description of the dataset.'
               }
             ],
-            subject: ['Wrong subject']
+            subject: ['Medicine, Health and Life Sciences', 'Wrong subject']
           }
         }
       ]
     }
-
+    expect.assertions(6)
+    let fieldValidationError: FieldValidationError
     try {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      expect(error).toBeInstanceOf(FieldValidationError)
-      expect(error.citationBlockName).toEqual('citation')
-      expect(error.metadataFieldName).toEqual('subject')
-      expect(error.message).toEqual(
-        'There was an error when validating the field subject from metadata block citation with parent field subject. Reason was: The field does not have a valid controlled vocabulary value.'
+      fieldValidationError = error
+    } finally {
+      expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
+      expect(fieldValidationError.citationBlockName).toEqual('citation')
+      expect(fieldValidationError.metadataFieldName).toEqual('subject')
+      expect(fieldValidationError.parentMetadataFieldName).toEqual(undefined)
+      expect(fieldValidationError.fieldPosition).toEqual(1)
+      expect(fieldValidationError.message).toEqual(
+        'There was an error when validating the field subject from metadata block citation in position 1. Reason was: The field does not have a valid controlled vocabulary value.'
       )
     }
   })
