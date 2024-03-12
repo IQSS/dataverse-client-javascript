@@ -28,9 +28,9 @@ export enum CollectionType {
   TEACHING_COURSES = "TEACHING_COURSES",
   UNCATEGORIZED = "UNCATEGORIZED",
 }
-
+// TODO: Do we need this later? Can stash before setting up PR
+/*
 export type CollectionMetadataBlocks = [CollectionMetadataBlock, ...CollectionMetadataBlock[]]
-
 export interface CollectionMetadataBlock {
   name: string
   fields: CollectionMetadataFields
@@ -40,10 +40,11 @@ export type CollectionMetadataFields = Record<string, DatasetMetadataFieldValue>
 
 export type DatasetMetadataFieldValue = string
 
-// TODO: Do we need this later?
-// export interface CollectionMetadataBlock extends CollectionMetadataBlock {
-//   name:
-//   fields: {
 
-//   }
-// }
+export interface CollectionMetadataBlock extends CollectionMetadataBlock {
+  name:
+  fields: {
+
+  }
+}
+*/
