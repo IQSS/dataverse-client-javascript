@@ -49,7 +49,7 @@ describe('execute', () => {
     expect.assertions(3)
     let createdDatasetIdentifiers: CreatedDatasetIdentifiers
     try {
-      await createDataset.execute(testNewDataset)
+      createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
     } catch (error) {
       throw new Error('Dataset should be created')
     } finally {

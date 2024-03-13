@@ -1,11 +1,11 @@
 import * as fs from 'fs'
 import { DockerComposeEnvironment, Wait } from 'testcontainers'
 import axios from 'axios'
-import { TestConstants } from '../../testHelpers/TestConstants'
-import datasetJson1 from '../../testHelpers/datasets/test-dataset-1.json'
-import datasetJson2 from '../../testHelpers/datasets/test-dataset-2.json'
-import datasetJson3 from '../../testHelpers/datasets/test-dataset-3.json'
-import collectionJson from '../../testHelpers/collections/test-collection-1.json'
+import { TestConstants } from '../testHelpers/TestConstants'
+import datasetJson1 from '../testHelpers/datasets/test-dataset-1.json'
+import datasetJson2 from '../testHelpers/datasets/test-dataset-2.json'
+import datasetJson3 from '../testHelpers/datasets/test-dataset-3.json'
+import collectionJson from '../testHelpers/collections/test-collection-1.json'
 
 const COMPOSE_FILE = 'docker-compose.yml'
 
