@@ -1,4 +1,4 @@
-import { createDataset } from '../../../src/datasets'
+import { createDataset, CreatedDatasetIdentifiers } from '../../../src/datasets'
 import { ApiConfig } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -46,9 +46,17 @@ describe('execute', () => {
         }
       ]
     }
-    await createDataset.execute(testNewDataset).catch(() => {
+    expect.assertions(3)
+    let createdDatasetIdentifiers: CreatedDatasetIdentifiers
+    try {
+      await createDataset.execute(testNewDataset)
+    } catch (error) {
       throw new Error('Dataset should be created')
-    })
+    } finally {
+      expect(createdDatasetIdentifiers).not.toBeNull()
+      expect(createdDatasetIdentifiers.numericId).not.toBeNull()
+      expect(createdDatasetIdentifiers.persistentId).not.toBeNull()
+    }
   })
 
   test('should throw an error when a first level required field is missing', async () => {
