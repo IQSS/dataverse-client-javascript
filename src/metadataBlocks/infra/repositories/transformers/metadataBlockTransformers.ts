@@ -24,11 +24,11 @@ export const transformMetadataBlockResponseToMetadataBlock = (
 }
 
 const getChildFieldKeys = (
-  metadataBlockFieldsPayload: Record<string, { childFields?: any }>
+  metadataBlockFieldsPayload: Record<string, unknown>
 ): Set<string> => {
   const childFieldKeys = new Set<string>()
   Object.values(metadataBlockFieldsPayload).forEach(
-    (fieldInfo: { childFields?: Record<string, any> }) => {
+    (fieldInfo: { childFields?: Record<string, unknown> }) => {
       if (fieldInfo.childFields) {
         Object.keys(fieldInfo.childFields).forEach((childKey) => {
           childFieldKeys.add(childKey)
