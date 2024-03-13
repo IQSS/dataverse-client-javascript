@@ -20,6 +20,9 @@ jobs:
       - name: Run integration tests
         run: npm run test:integration
 
+      - name: Run functional tests
+        run: npm run test:functional
+
   publish-gpr:
     needs: test
     runs-on: ubuntu-latest
