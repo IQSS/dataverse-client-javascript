@@ -46,4 +46,6 @@ export class TestConstants {
   static readonly TEST_CREATED_DATASET_1_ID = 2
   static readonly TEST_CREATED_DATASET_2_ID = 3
   static readonly TEST_CREATED_DATASET_3_ID = 4
+  static readonly TEST_DUMMY_COLLECTION_ID_STR = 'dummyCollectionId'
+  static readonly TEST_CREATED_COLLECTION_1_ID_STR = 'firstCollection' // Called 'alias' in the dv object. that's what is *actually* being searched for
 }

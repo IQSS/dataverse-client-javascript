@@ -1,4 +1,4 @@
-import { GetCollection } from "./domain/useCases/GetCollection";
+import { GetCollection } from './domain/useCases/GetCollection'
 // TODO
 // import { GetCollectionRoles } from "./domain/useCases/getCollectionRoles";
 // import { GetCollectionIsRoot } from "./domain/useCases/getCollectionIsRoot";
@@ -7,7 +7,7 @@ import { GetCollection } from "./domain/useCases/GetCollection";
 // import { GetCollectionStorageSize } from "./domain/useCases/getCollectionStorageSize";
 // import { GetCollectionMetadataBlocks } from "./domain/useCases/getCollectionMetadataBlocks";
 // import { GetCollectionRolesAssignments } from "./domain/useCases/getCollectionRolesAssignments";
-import { CollectionsRepository } from "./infra/repositories/CollectionsRepository";
+import { CollectionsRepository } from './infra/repositories/CollectionsRepository'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -32,8 +32,4 @@ export {
   // getCollectionMetadataBlocks()
   // getCollectionRolesAssignments()
 }
-export {
-  Collection,
-  CollectionType,
-  CollectionContacts
-} from './domain/models/Collection'
+export { Collection, CollectionType, CollectionContacts } from './domain/models/Collection'

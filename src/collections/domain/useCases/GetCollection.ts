@@ -1,9 +1,9 @@
-import { UseCase } from "../../../core/domain/useCases/UseCase";
-import { ICollectionsRepository } from "../repositories/ICollectionsRepository";
-import { Collection } from "../models/Collection";
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
+import { Collection } from '../models/Collection'
 
-export class GetCollection implements UseCase<Collection>{
-    private collectionsRepository: ICollectionsRepository
+export class GetCollection implements UseCase<Collection> {
+  private collectionsRepository: ICollectionsRepository
 
   constructor(collectionsRepository: ICollectionsRepository) {
     this.collectionsRepository = collectionsRepository
@@ -16,12 +16,7 @@ export class GetCollection implements UseCase<Collection>{
    * @param {string} [collectionId] - The collection identifier ...
    * @returns {Promise<Collection>}
    */
-  async execute(
-    collectionId: string,
-  ): Promise<Collection> {
-    return await this.collectionsRepository.getCollection(
-      collectionId
-    )
+  async execute(collectionId: string): Promise<Collection> {
+    return await this.collectionsRepository.getCollection(collectionId)
   }
-
 }

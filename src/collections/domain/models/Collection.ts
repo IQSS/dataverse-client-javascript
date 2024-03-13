@@ -1,15 +1,16 @@
+// NOTE: Props referenced from JsonPrinter.java
 export interface Collection {
   id: number
   name: string
   alias: string
-  ownerId: number
+  // ownerId: number
   affiliation: string
-  description?: string
-  creationDate: Date
-  collectionType: CollectionType
-  permissionRoot: boolean
+  // description?: string
+  // creationDate: Date
+  // collectionType: CollectionType
+  // permissionRoot: boolean
   // NOTE: Changed from Dataverse => Collection
-  collectionContacts: CollectionContacts
+  // collectionContacts: CollectionContacts
 }
 
 export interface CollectionContacts {
@@ -18,33 +19,13 @@ export interface CollectionContacts {
 }
 
 export enum CollectionType {
-  DEPARTMENT = "DEPARTMENT",
-  JOURNALS = "JOURNALS",
-  LABORATORY = "LABORATORY",
-  ORGANIZATIONS_INSTITUTIONS = "ORGANIZATIONS_INSTITUTIONS",
-  RESEARCHERS = "RESEARCHERS",
-  RESEARCH_GROUP = "RESEARCH_GROUP",
-  RESEARCH_PROJECTS = "RESEARCH_PROJECTS",
-  TEACHING_COURSES = "TEACHING_COURSES",
-  UNCATEGORIZED = "UNCATEGORIZED",
+  DEPARTMENT = 'DEPARTMENT',
+  JOURNALS = 'JOURNALS',
+  LABORATORY = 'LABORATORY',
+  ORGANIZATIONS_INSTITUTIONS = 'ORGANIZATIONS_INSTITUTIONS',
+  RESEARCHERS = 'RESEARCHERS',
+  RESEARCH_GROUP = 'RESEARCH_GROUP',
+  RESEARCH_PROJECTS = 'RESEARCH_PROJECTS',
+  TEACHING_COURSES = 'TEACHING_COURSES',
+  UNCATEGORIZED = 'UNCATEGORIZED'
 }
-// TODO: Do we need this later? Can stash before setting up PR
-/*
-export type CollectionMetadataBlocks = [CollectionMetadataBlock, ...CollectionMetadataBlock[]]
-export interface CollectionMetadataBlock {
-  name: string
-  fields: CollectionMetadataFields
-}
-
-export type CollectionMetadataFields = Record<string, DatasetMetadataFieldValue>
-
-export type DatasetMetadataFieldValue = string
-
-
-export interface CollectionMetadataBlock extends CollectionMetadataBlock {
-  name:
-  fields: {
-
-  }
-}
-*/

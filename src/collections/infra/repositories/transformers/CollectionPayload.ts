@@ -2,15 +2,13 @@ export interface CollectionPayload {
   id: number
   alias: string
   name: string
-  ownerId: number
-  creationDate: Date
+  // ownerId: number
+  // creationDate: Date
   affiliation: string
-  description: string
-  permissionRoot: boolean
-  // NOTE: Renamed to collectionType
-  dataverseType: CollectionType
-  // NOTE: Renamed to collectionContacts
-  dataverseContacts: CollectionContactsPayload
+  // description?: string
+  // permissionRoot: boolean
+  // dataverseType: CollectionType
+  // dataverseContacts?: CollectionContactsPayload
 }
 
 export interface CollectionContactsPayload {
@@ -19,13 +17,13 @@ export interface CollectionContactsPayload {
 }
 
 export enum CollectionType {
-  DEPARTMENT = "DEPARTMENT",
-  JOURNALS = "JOURNALS",
-  LABORATORY = "LABORATORY",
-  ORGANIZATIONS_INSTITUTIONS = "ORGANIZATIONS_INSTITUTIONS",
-  RESEARCHERS = "RESEARCHERS",
-  RESEARCH_GROUP = "RESEARCH_GROUP",
-  RESEARCH_PROJECTS = "RESEARCH_PROJECTS",
-  TEACHING_COURSES = "TEACHING_COURSES",
-  UNCATEGORIZED = "UNCATEGORIZED",
+  DEPARTMENT = 'DEPARTMENT',
+  JOURNALS = 'JOURNALS',
+  LABORATORY = 'LABORATORY',
+  ORGANIZATIONS_INSTITUTIONS = 'ORGANIZATIONS_INSTITUTIONS',
+  RESEARCHERS = 'RESEARCHERS',
+  RESEARCH_GROUP = 'RESEARCH_GROUP',
+  RESEARCH_PROJECTS = 'RESEARCH_PROJECTS',
+  TEACHING_COURSES = 'TEACHING_COURSES',
+  UNCATEGORIZED = 'UNCATEGORIZED'
 }

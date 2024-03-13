@@ -15,7 +15,7 @@ import {
   MetadataFieldPayload,
   MetadataBlocksPayload,
   MetadataFieldValuePayload,
-  MetadataSubfieldValuePayload,
+  MetadataSubfieldValuePayload
 } from './DatasetPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import TurndownService from 'turndown'
