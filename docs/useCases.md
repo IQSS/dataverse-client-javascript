@@ -45,7 +45,6 @@ The different use cases currently available in the package are classified below,
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
   - [Get ZIP Download Limit](#get-zip-download-limit)
 
-
 ## Collections
 
 ### Collections Read Use Cases
@@ -106,7 +105,6 @@ getDataset.execute(datasetId, datasetVersionId).then((dataset: Dataset) => {
 _See [use case](../src/datasets/domain/useCases/GetDataset.ts)_ definition.
 
 The `collectionId` parameter can be a string, for identifying by the collection alias, or a number, for numeric identifiers.
-
 
 #### Get Dataset By Private URL Token
 
