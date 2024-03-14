@@ -3,7 +3,7 @@ name: deploy_pr
 on: pull_request
 
 jobs:
-  test:
+  test-unit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,19 +16,37 @@ jobs:
 
       - name: Run unit tests
         run: npm run test:unit
+  
+  test-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 19
+
+      - name: Install npm dependencies
+        run: npm ci
 
       - name: Run integration tests
         run: npm run test:integration
+    
+  test-functional:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 19
 
-      - name: Grant permissions for deleting docker volumes
-        run: |
-          chmod -R 777 ./test/environment/docker-dev-volumes
+      - name: Install npm dependencies
+        run: npm ci
 
       - name: Run functional tests
         run: npm run test:functional
 
   publish-gpr:
-    needs: test
+    needs: [test-unit, test-integration, test-functional]
     runs-on: ubuntu-latest
     permissions:
       packages: write
