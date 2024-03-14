@@ -20,6 +20,10 @@ jobs:
       - name: Run integration tests
         run: npm run test:integration
 
+      - name: Grant permissions for deleting docker volumes
+        run: |
+          chmod -R 777 ./test/environment/docker-dev-volumes
+
       - name: Run functional tests
         run: npm run test:functional
 
