@@ -1,14 +1,16 @@
-// import { Collection } from "../../../src/collections";
-// import axios, { AxiosResponse } from "axios";
-// import { TestConstants } from "../TestConstants";
-// import { CollectionPayload } from "../../../src/collections/infra/repositories/transformers/CollectionPayload";
-// import TurndownService from 'turndown'
+import { Collection } from '../../../src/collections'
 
-// const turndownService = new TurndownService()
-// const COLLECTION_ID_STR = 'x'
-// const COLLECTION_NAME_STR = ''
-// const COLLECTION_ALIAS_STR = 'firstCollection'
-// const COLLECTION_AFFILIATION_STR = ''
-// const COLLECTION_API_REQUEST_HEADERS = {
-//   headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
-// }
+const COLLECTION_ID = 11111
+const COLLECTION_NAME_STR = 'Laboratory Research'
+const COLLECTION_ALIAS_STR = 'secondCollection'
+const COLLECTION_AFFILIATION_STR = 'Laboratory Research Corporation'
+
+export const createCollectionModel = (): Collection => {
+  const collectionModel: Collection = {
+    id: COLLECTION_ID,
+    name: COLLECTION_NAME_STR,
+    alias: COLLECTION_ALIAS_STR,
+    affiliation: COLLECTION_AFFILIATION_STR
+  }
+  return collectionModel
+}

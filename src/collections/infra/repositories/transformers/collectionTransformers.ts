@@ -13,22 +13,6 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     alias: collectionPayload.alias,
     name: collectionPayload.name,
     affiliation: collectionPayload.affiliation
-    // collectionContacts: transformPayloadToCollectionContacts(collectionPayload.dataverseContacts),
-    // permissionRoot: collectionPayload.permissionRoot,
-    // description: collectionPayload.description,
-    // collectionType: collectionPayload.dataverseType,
-    // ownerId: collectionPayload.ownerId,
-    // creationDate: collectionPayload.creationDate
   }
   return collectionModel
 }
-
-// const transformPayloadToCollectionContacts = (collectionContactsPayload: CollectionContactsPayload): CollectionContacts => {
-//   const collectionContacts: CollectionContacts = {
-//     displayOrder: collectionContactsPayload.displayOrder,
-//     contactEmail: collectionContactsPayload.contactEmail
-//   }
-//   return collectionContacts
-// }
-
-//
