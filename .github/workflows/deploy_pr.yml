@@ -16,7 +16,7 @@ jobs:
 
       - name: Run unit tests
         run: npm run test:unit
-  
+
   test-integration:
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +30,7 @@ jobs:
 
       - name: Run integration tests
         run: npm run test:integration
-    
+
   test-functional:
     runs-on: ubuntu-latest
     steps:
