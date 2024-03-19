@@ -3,4 +3,5 @@ export interface CollectionPayload {
   alias: string
   name: string
   affiliation: string
+  description: string
 }

@@ -47,15 +47,15 @@ export abstract class ApiRepository {
     operation: string,
     resourceId: number | string = undefined
   ) {
-    let endpoint
-    if (typeof resourceId === 'number') {
-      endpoint = `/${resourceName}/${resourceId}/${operation}`
-    } else if (typeof resourceId === 'string') {
-      endpoint = `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`
-    } else {
-      endpoint = `/${resourceName}/${operation}`
+    if (resourceName === 'dataverses') {
+      return `/${resourceName}/${resourceId}`
     }
-    return endpoint
+
+    return typeof resourceId === 'number'
+      ? `/${resourceName}/${resourceId}/${operation}`
+      : typeof resourceId === 'string'
+      ? `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`
+      : `/${resourceName}/${operation}`
   }
 
   private buildRequestConfig(authRequired: boolean, queryParams: object): AxiosRequestConfig {

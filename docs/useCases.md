@@ -59,23 +59,39 @@ Returns a [Collection](../src/collections/domain/models/Collection.ts) instance,
 import { getCollection } from '@iqss/dataverse-client-javascript'
 
 /* ... */
+// Case 1: Fetch Collection by its numerical ID
+const collectionObjectParameter = 12345
 
-const collectionId = 'collectionAlias'
+getCollection
+  .execute(collectionId)
+  .then((collection: Collection) => {
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
 
-getCollection.execute(collectionId).then((collection: Collection) => {
-  /* ... */
-})
+/* ... */
+
+// Case 2: Fetch Collection by its alias
+const collectionObjectParameter = 'classicLiterature'
+getCollection
+  .execute(collectionAlias)
+  .then((collection: Collection) => {
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
 
 /* ... */
 ```
 
 _See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition.
 
-The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+The `collectionObjectParameter` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
-The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
-
-There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
 
 ## Datasets
 
@@ -104,7 +120,11 @@ getDataset.execute(datasetId, datasetVersionId).then((dataset: Dataset) => {
 
 _See [use case](../src/datasets/domain/useCases/GetDataset.ts)_ definition.
 
-The `collectionId` parameter can be a string, for identifying by the collection alias, or a number, for numeric identifiers.
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
 #### Get Dataset By Private URL Token
 

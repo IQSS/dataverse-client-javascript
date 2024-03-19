@@ -47,7 +47,8 @@ export class TestConstants {
   static readonly TEST_CREATED_DATASET_2_ID = 3
   static readonly TEST_CREATED_DATASET_3_ID = 4
   static readonly TEST_DUMMY_COLLECTION_ID = 10001
-  static readonly TEST_DUMMY_COLLECTION_ID_STR = 'dummyCollectionId'
-  static readonly TEST_CREATED_COLLECTION_1_ID = 11111
-  static readonly TEST_CREATED_COLLECTION_1_ID_STR = 'firstCollection' // Called 'alias' in the dv object.
+  static readonly TEST_DUMMY_COLLECTION_ALIAS = 'dummyCollectionId'
+  static readonly TEST_CREATED_COLLECTION_1_ID = 4
+  static readonly TEST_CREATED_COLLECTION_1_ALIAS = 'firstCollection'
+  static readonly TEST_CREATED_COLLECTION_1_ROOT = 'root'
 }

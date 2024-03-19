@@ -12,11 +12,11 @@ export class GetCollection implements UseCase<Collection> {
   /**
    * Returns a Collection instance, given the search parameters to identify it.
    *
-   * https://guides.dataverse.org/en/6.0/api/native-api.html#view-a-dataverse-collection
-   * @param {number | string} [collectionId] - The collection identifier ...
+   * @param {number | string} [collectionObjectParameter = 'root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
+   * If this parameter is not set, the default value is: 'root'
    * @returns {Promise<Collection>}
    */
-  async execute(collectionId: number): Promise<Collection> {
-    return await this.collectionsRepository.getCollection(collectionId)
+  async execute(collectionObjectParameter: number | string = 'root'): Promise<Collection> {
+    return await this.collectionsRepository.getCollection(collectionObjectParameter)
   }
 }

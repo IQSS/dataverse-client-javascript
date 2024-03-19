@@ -1,7 +1,7 @@
 {
-  "id": 11111,
-  "name": "Scientific Research",
+  "id": 4,
   "alias": "firstCollection",
+  "name": "Scientific Research",
   "dataverseContacts": [
     {
       "contactEmail": "pi@example.edu"
