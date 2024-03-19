@@ -13,11 +13,7 @@ export abstract class ApiRepository {
       .get(this.buildRequestUrl(apiEndpoint), this.buildRequestConfig(authRequired, queryParams))
       .then((response) => response)
       .catch((error) => {
-        throw new ReadError(
-          `[${error.response.status}]${
-            error.response.data ? ` ${error.response.data.message}` : ''
-          }`
-        )
+        throw new ReadError(this.buildErrorMessage(error))
       })
   }
 
@@ -34,11 +30,7 @@ export abstract class ApiRepository {
       )
       .then((response) => response)
       .catch((error) => {
-        throw new WriteError(
-          `[${error.response.status}]${
-            error.response.data ? ` ${error.response.data.message}` : ''
-          }`
-        )
+        throw new WriteError(this.buildErrorMessage(error))
       })
   }
 
@@ -86,5 +78,13 @@ export abstract class ApiRepository {
 
   private buildRequestUrl(apiEndpoint: string): string {
     return `${ApiConfig.dataverseApiUrl}${apiEndpoint}`
+  }
+
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  private buildErrorMessage(error: any): string {
+    const status =
+      error.response && error.response.status ? error.response.status : 'unknown error status'
+    const message = error.response && error.response.data ? ` ${error.response.data.message}` : ''
+    return `[${status}]${message}`
   }
 }

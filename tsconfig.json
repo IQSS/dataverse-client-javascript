@@ -14,12 +14,13 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": [
-    "src/**/*",
-    "test",
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
     "jest.config.integration.ts",
-    "jest.config.js",
-    "jest.config.unit.ts"
-  ],
-  "exclude": ["node_modules", "dist"]
+    "jest.config.ts",
+    "jest.config.unit.ts",
+    "jest.config.functional.ts"
+  ]
 }

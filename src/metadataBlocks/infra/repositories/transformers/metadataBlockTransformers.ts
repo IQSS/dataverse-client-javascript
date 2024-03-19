@@ -7,9 +7,13 @@ export const transformMetadataBlockResponseToMetadataBlock = (
   const metadataBlockPayload = response.data.data
   const metadataFields: Record<string, MetadataFieldInfo> = {}
   const metadataBlockFieldsPayload = metadataBlockPayload.fields
-  Object.keys(metadataBlockFieldsPayload).map((metadataFieldKey) => {
-    const metadataFieldInfoPayload = metadataBlockFieldsPayload[metadataFieldKey]
-    metadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(metadataFieldInfoPayload)
+  const childFieldKeys = getChildFieldKeys(metadataBlockFieldsPayload)
+  Object.keys(metadataBlockFieldsPayload).forEach((metadataFieldKey) => {
+    const metadataFieldIsAlreadyPresentAsChildField = childFieldKeys.has(metadataFieldKey)
+    if (!metadataFieldIsAlreadyPresentAsChildField) {
+      const metadataFieldInfoPayload = metadataBlockFieldsPayload[metadataFieldKey]
+      metadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(metadataFieldInfoPayload)
+    }
   })
   return {
     id: metadataBlockPayload.id,
@@ -17,6 +21,20 @@ export const transformMetadataBlockResponseToMetadataBlock = (
     displayName: metadataBlockPayload.displayName,
     metadataFields: metadataFields
   }
+}
+
+const getChildFieldKeys = (metadataBlockFieldsPayload: Record<string, unknown>): Set<string> => {
+  const childFieldKeys = new Set<string>()
+  Object.values(metadataBlockFieldsPayload).forEach(
+    (fieldInfo: { childFields?: Record<string, unknown> }) => {
+      if (fieldInfo.childFields) {
+        Object.keys(fieldInfo.childFields).forEach((childKey) => {
+          childFieldKeys.add(childKey)
+        })
+      }
+    }
+  )
+  return childFieldKeys
 }
 
 const transformPayloadMetadataFieldInfo = (
@@ -33,6 +51,9 @@ const transformPayloadMetadataFieldInfo = (
     description: metadataFieldInfoPayload.description,
     multiple: metadataFieldInfoPayload.multiple,
     isControlledVocabulary: metadataFieldInfoPayload.isControlledVocabulary,
+    ...(metadataFieldInfoPayload.controlledVocabularyValues && {
+      controlledVocabularyValues: metadataFieldInfoPayload.controlledVocabularyValues
+    }),
     displayFormat: metadataFieldInfoPayload.displayFormat,
     isRequired: metadataFieldInfoPayload.isRequired,
     displayOrder: metadataFieldInfoPayload.displayOrder,

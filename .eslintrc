@@ -25,7 +25,8 @@
         "ecmaVersion": 2021,
         "sourceType": "module",
         "project": [
-            "./tsconfig.json"
+            "./tsconfig.json",
+            "./tsconfig.tests.json"
         ]
     },
     "rules": {
