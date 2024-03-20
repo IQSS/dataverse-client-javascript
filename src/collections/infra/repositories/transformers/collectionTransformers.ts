@@ -1,6 +1,7 @@
 import { Collection } from '../../../domain/models/Collection'
 import { AxiosResponse } from 'axios'
 import { CollectionPayload } from './CollectionPayload'
+// import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 
 export const transformCollectionIdResponseToPayload = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -14,6 +15,7 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     name: collectionPayload.name,
     affiliation: collectionPayload.affiliation,
     description: collectionPayload.description
+    // isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
   }
   return collectionModel
 }

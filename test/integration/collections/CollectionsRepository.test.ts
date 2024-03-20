@@ -27,6 +27,7 @@ describe('CollectionsRepository', () => {
     describe('by default `root` Id', () => {
       test('should return the root collection of the Dataverse installation if no parameter is passed AS `root`', async () => {
         const actual = await testGetCollection.getCollection()
+        console.log('getCollection -> :root: ', actual)
         expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ROOT)
       })
     })
@@ -36,6 +37,7 @@ describe('CollectionsRepository', () => {
         const actual = await testGetCollection.getCollection(
           TestConstants.TEST_CREATED_COLLECTION_1_ALIAS
         )
+        console.log('getCollection -> :alias: ', actual)
         expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ALIAS)
       })
 
@@ -54,6 +56,7 @@ describe('CollectionsRepository', () => {
         const actual = await testGetCollection.getCollection(
           TestConstants.TEST_CREATED_COLLECTION_1_ID
         )
+        console.log('getCollection -> :id: ', actual)
         expect(actual.id).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ID)
       })
 

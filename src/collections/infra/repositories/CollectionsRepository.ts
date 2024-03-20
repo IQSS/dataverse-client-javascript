@@ -15,7 +15,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         this.collectionsDefaultOperationType,
         collectionObjectParameter
       ),
-      true
+      true,
+      { returnOwners: true }
     )
       .then((response) => transformCollectionIdResponseToPayload(response))
       .catch((error) => {
