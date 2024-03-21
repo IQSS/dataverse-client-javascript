@@ -80,7 +80,7 @@ describe('DatasetsRepository', () => {
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      let error: ReadError = undefined
+      let error = undefined as unknown as ReadError
       await sut.getDatasetSummaryFieldNames().catch((e) => (error = e))
 
       expect(axios.get).toHaveBeenCalledWith(
@@ -212,7 +212,7 @@ describe('DatasetsRepository', () => {
       test('should return error on repository read error', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error = undefined as unknown as ReadError
         await sut
           .getDataset(testDatasetModel.id, testVersionId, testIncludeDeaccessioned)
           .catch((e) => (error = e))
@@ -258,7 +258,7 @@ describe('DatasetsRepository', () => {
       test('should return error on repository read error', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error = undefined as unknown as ReadError
         await sut
           .getDataset(testDatasetModel.persistentId, testVersionId, testIncludeDeaccessioned)
           .catch((e) => (error = e))
@@ -292,7 +292,7 @@ describe('DatasetsRepository', () => {
     test('should return error on repository read error', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      let error: ReadError = undefined
+      let error = undefined as unknown as ReadError
       await sut.getPrivateUrlDataset(testPrivateUrlToken).catch((e) => (error = e))
 
       expect(axios.get).toHaveBeenCalledWith(
@@ -341,7 +341,7 @@ describe('DatasetsRepository', () => {
     test('should return error on repository read error', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      let error: ReadError = undefined
+      let error = undefined as unknown as ReadError
       await sut
         .getDatasetCitation(1, testVersionId, testIncludeDeaccessioned)
         .catch((e) => (error = e))
@@ -370,7 +370,7 @@ describe('DatasetsRepository', () => {
     test('should return error on repository read error', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      let error: ReadError = undefined
+      let error = undefined as unknown as ReadError
       await sut.getPrivateUrlDatasetCitation(testPrivateUrlToken).catch((e) => (error = e))
 
       expect(axios.get).toHaveBeenCalledWith(
@@ -420,7 +420,7 @@ describe('DatasetsRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error = undefined as unknown as ReadError
         await sut.getDatasetUserPermissions(testDatasetModel.id).catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -460,7 +460,7 @@ describe('DatasetsRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error = undefined as unknown as ReadError
         await sut
           .getDatasetUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID)
           .catch((e) => (error = e))
@@ -513,7 +513,7 @@ describe('DatasetsRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error = undefined as unknown as ReadError
         await sut.getDatasetLocks(testDatasetModel.id).catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -553,7 +553,7 @@ describe('DatasetsRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error = undefined as unknown as ReadError
         await sut.getDatasetLocks(TestConstants.TEST_DUMMY_PERSISTENT_ID).catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -699,7 +699,7 @@ describe('DatasetsRepository', () => {
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      let error: ReadError = undefined
+      let error = undefined as unknown as ReadError
       await sut.getAllDatasetPreviews().catch((e) => (error = e))
 
       expect(axios.get).toHaveBeenCalledWith(
@@ -762,7 +762,7 @@ describe('DatasetsRepository', () => {
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      let error: WriteError = undefined
+      let error = undefined as unknown as WriteError
       await sut
         .createDataset(testNewDataset, testMetadataBlocks, testCollectionName)
         .catch((e) => (error = e))

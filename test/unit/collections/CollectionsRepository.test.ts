@@ -9,6 +9,7 @@ import {
   createCollectionPayload
 } from '../../testHelpers/collections/collectionHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
+import { ReadError } from '../../../src'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -34,19 +35,11 @@ describe('CollectionsRepository', () => {
       },
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
     }
-    const expectedRequestConfigSessionCookie = {
-      params: {
-        returnOwners: true
-      },
-      withCredentials:
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers
-    }
 
     describe('by numeric id', () => {
-      test('should return Dataset when providing id, version id, and response is successful', async () => {
+      test('should return Collection when providing a numeric id', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testCollectionSuccessfulResponse)
-        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/${testCollectionModel.id}`
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.id}`
 
         // API Key auth
         let actual = await sut.getCollection(testCollectionModel.id)
@@ -54,53 +47,72 @@ describe('CollectionsRepository', () => {
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toStrictEqual(testCollectionModel)
 
-        // Session cookie auth
-        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
         actual = await sut.getCollection(testCollectionModel.id)
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          expectedRequestConfigSessionCookie
-        )
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toStrictEqual(testCollectionModel)
       })
 
-      // test('should return Dataset when providing id, version id, and response with license is successful', async () => {
-      //   const testDatasetLicense = createDatasetLicenseModel()
-      //   const testDatasetVersionWithLicenseSuccessfulResponse = {
-      //     data: {
-      //       status: 'OK',
-      //       data: createDatasetVersionPayload(testDatasetLicense)
-      //     }
-      //   }
-      //   jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionWithLicenseSuccessfulResponse)
+      test('should return error on repository read error', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.id}`
+        let error = undefined as unknown as ReadError
 
-      //   const actual = await sut.getDataset(
-      //     testDatasetModel.id,
-      //     testVersionId,
-      //     testIncludeDeaccessioned
-      //   )
+        await sut.getCollection(testCollectionModel.id).catch((e) => (error = e))
 
-      //   expect(axios.get).toHaveBeenCalledWith(
-      //     `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`,
-      //     expectedRequestConfigApiKey
-      //   )
-      //   expect(actual).toStrictEqual(createDatasetModel(testDatasetLicense))
-      // })
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(error).toBeInstanceOf(Error)
+      })
+    })
+    describe('by alias id', () => {
+      test('should return a Collection when providing the Collection alias is successful', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testCollectionSuccessfulResponse)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.alias}`
 
-      // test('should return error on repository read error', async () => {
-      //   jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+        // API Key auth
+        let actual = await sut.getCollection(testCollectionModel.alias)
 
-      //   let error: ReadError = undefined
-      //   await sut
-      //     .getDataset(testDatasetModel.id, testVersionId, testIncludeDeaccessioned)
-      //     .catch((e) => (error = e))
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual).toStrictEqual(testCollectionModel)
 
-      //   expect(axios.get).toHaveBeenCalledWith(
-      //     `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`,
-      //     expectedRequestConfigApiKey
-      //   )
-      //   expect(error).toBeInstanceOf(Error)
-      // })
+        actual = await sut.getCollection(testCollectionModel.alias)
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual).toStrictEqual(testCollectionModel)
+      })
+
+      test('should return error on repository read error', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.alias}`
+        let error = undefined as unknown as ReadError
+
+        await sut.getCollection(testCollectionModel.alias).catch((e) => (error = e))
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(error).toBeInstanceOf(Error)
+      })
+    })
+    describe('by default root id', () => {
+      test('should return a Collection when no collection id, using ROOT instead is successful', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testCollectionSuccessfulResponse)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${TestConstants.TEST_CREATED_COLLECTION_1_ROOT}`
+
+        // API Key auth
+        const actual = await sut.getCollection()
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual).toStrictEqual(testCollectionModel)
+      })
+
+      test('should return error on repository read error', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${TestConstants.TEST_CREATED_COLLECTION_1_ROOT}`
+
+        let error = undefined as unknown as ReadError
+
+        await sut.getCollection().catch((e) => (error = e))
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(error).toBeInstanceOf(Error)
+      })
     })
   })
 })
