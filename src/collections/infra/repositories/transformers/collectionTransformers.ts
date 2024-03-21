@@ -15,7 +15,9 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     name: collectionPayload.name,
     affiliation: collectionPayload.affiliation,
     description: collectionPayload.description,
-    isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
+    ...(collectionPayload.isPartOf && {
+      isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
+    })
   }
   return collectionModel
 }
