@@ -42,12 +42,8 @@ describe('CollectionsRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.id}`
 
         // API Key auth
-        let actual = await sut.getCollection(testCollectionModel.id)
+        const actual = await sut.getCollection(testCollectionModel.id)
 
-        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testCollectionModel)
-
-        actual = await sut.getCollection(testCollectionModel.id)
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toStrictEqual(testCollectionModel)
       })
@@ -69,12 +65,8 @@ describe('CollectionsRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.alias}`
 
         // API Key auth
-        let actual = await sut.getCollection(testCollectionModel.alias)
+        const actual = await sut.getCollection(testCollectionModel.alias)
 
-        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testCollectionModel)
-
-        actual = await sut.getCollection(testCollectionModel.alias)
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toStrictEqual(testCollectionModel)
       })

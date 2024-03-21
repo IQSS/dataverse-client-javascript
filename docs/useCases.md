@@ -60,7 +60,7 @@ import { getCollection } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 // Case 1: Fetch Collection by its numerical ID
-const collectionObjectParameter = 12345
+const collectionIdOrAlias = 12345
 
 getCollection
   .execute(collectionId)
@@ -74,7 +74,7 @@ getCollection
 /* ... */
 
 // Case 2: Fetch Collection by its alias
-const collectionObjectParameter = 'classicLiterature'
+const collectionIdOrAlias = 'classicLiterature'
 getCollection
   .execute(collectionAlias)
   .then((collection: Collection) => {
@@ -89,7 +89,7 @@ getCollection
 
 _See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition.
 
-The `collectionObjectParameter` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
 

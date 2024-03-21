@@ -6,14 +6,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   private readonly collectionsResourceName: string = 'dataverses'
   private readonly collectionsDefaultOperationType: string = 'get'
 
-  public async getCollection(
-    collectionObjectParameter: number | string = 'root'
-  ): Promise<Collection> {
+  public async getCollection(collectionIdOrAlias: number | string = 'root'): Promise<Collection> {
     return this.doGet(
       this.buildApiEndpoint(
         this.collectionsResourceName,
         this.collectionsDefaultOperationType,
-        collectionObjectParameter
+        collectionIdOrAlias
       ),
       true,
       { returnOwners: true }
