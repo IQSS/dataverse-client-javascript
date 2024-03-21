@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios'
 import { CollectionPayload } from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 
-export const transformCollectionIdResponseToPayload = (response: AxiosResponse): Collection => {
+export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
   return transformPayloadToCollection(collectionPayload)
 }

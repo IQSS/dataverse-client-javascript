@@ -1,6 +1,6 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRepository'
-import { transformCollectionIdResponseToPayload } from './transformers/collectionTransformers'
+import { transformCollectionResponseToCollection } from './transformers/collectionTransformers'
 import { Collection } from '../../domain/models/Collection'
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
   private readonly collectionsResourceName: string = 'dataverses'
@@ -18,7 +18,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       true,
       { returnOwners: true }
     )
-      .then((response) => transformCollectionIdResponseToPayload(response))
+      .then((response) => transformCollectionResponseToCollection(response))
       .catch((error) => {
         throw error
       })
