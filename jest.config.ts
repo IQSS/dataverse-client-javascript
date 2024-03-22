@@ -8,7 +8,7 @@ const config: Config = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.ts$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   coveragePathIgnorePatterns: ['node_modules', 'testHelpers'],
-  globalSetup: '<rootDir>/test/integration/environment/setup.ts',
+  globalSetup: '<rootDir>/test/environment/setup.ts',
   testTimeout: 25000,
   coverageThreshold: {
     global: {

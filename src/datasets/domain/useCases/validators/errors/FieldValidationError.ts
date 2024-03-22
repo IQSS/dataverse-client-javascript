@@ -17,7 +17,7 @@ export class FieldValidationError extends ResourceValidationError {
     if (parentMetadataFieldName) {
       message += ` with parent field ${parentMetadataFieldName}`
     }
-    if (fieldPosition) {
+    if (fieldPosition != undefined) {
       message += ` in position ${fieldPosition}`
     }
     if (reason) {
