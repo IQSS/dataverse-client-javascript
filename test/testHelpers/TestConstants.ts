@@ -1,3 +1,5 @@
+import { ROOT_COLLECTION_ALIAS } from '../../src/collections/domain/models/Collection'
+
 export class TestConstants {
   static readonly TEST_API_URL = 'http://localhost:8080/api/v1'
   static readonly TEST_DUMMY_API_KEY = 'dummyApiKey'
@@ -50,5 +52,5 @@ export class TestConstants {
   static readonly TEST_DUMMY_COLLECTION_ALIAS = 'dummyCollectionId'
   static readonly TEST_CREATED_COLLECTION_1_ID = 4
   static readonly TEST_CREATED_COLLECTION_1_ALIAS = 'firstCollection'
-  static readonly TEST_CREATED_COLLECTION_1_ROOT = 'root'
+  static readonly TEST_CREATED_COLLECTION_1_ROOT = ROOT_COLLECTION_ALIAS
 }

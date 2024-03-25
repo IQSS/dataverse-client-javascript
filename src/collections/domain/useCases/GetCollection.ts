@@ -1,6 +1,6 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
-import { Collection } from '../models/Collection'
+import { Collection, ROOT_COLLECTION_ALIAS } from '../models/Collection'
 
 export class GetCollection implements UseCase<Collection> {
   private collectionsRepository: ICollectionsRepository
@@ -16,7 +16,7 @@ export class GetCollection implements UseCase<Collection> {
    * If this parameter is not set, the default value is: 'root'
    * @returns {Promise<Collection>}
    */
-  async execute(collectionIdOrAlias: number | string = 'root'): Promise<Collection> {
+  async execute(collectionIdOrAlias: number | string = ROOT_COLLECTION_ALIAS): Promise<Collection> {
     return await this.collectionsRepository.getCollection(collectionIdOrAlias)
   }
 }

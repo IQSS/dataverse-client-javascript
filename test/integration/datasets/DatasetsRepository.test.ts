@@ -20,6 +20,7 @@ import {
   DatasetContact,
   DatasetDescription
 } from '../../../src/datasets/domain/models/Dataset'
+import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository()
@@ -336,7 +337,7 @@ describe('DatasetsRepository', () => {
       const createdDataset = await sut.createDataset(
         testNewDataset,
         [citationMetadataBlock],
-        'root'
+        ROOT_COLLECTION_ALIAS
       )
       const actualCreatedDataset = await sut.getDataset(
         createdDataset.numericId,

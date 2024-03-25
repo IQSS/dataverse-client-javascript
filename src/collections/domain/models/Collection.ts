@@ -7,3 +7,5 @@ export interface Collection {
   description?: string
   isPartOf: DvObjectOwnerNode
 }
+
+export const ROOT_COLLECTION_ALIAS = 'root'
