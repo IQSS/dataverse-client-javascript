@@ -183,3 +183,8 @@ interface Software extends DatasetMetadataSubField {
   softwareName?: string
   softwareVersion?: string
 }
+
+export enum VersionUpdateType {
+  MAJOR = 'major',
+  MINOR = 'minor'
+}

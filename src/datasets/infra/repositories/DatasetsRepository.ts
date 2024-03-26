@@ -1,6 +1,6 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
-import { Dataset } from '../../domain/models/Dataset'
+import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
 import { transformVersionResponseToDataset } from './transformers/datasetTransformers'
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
@@ -153,6 +153,23 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
           numericId: responseData.id
         }
       })
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async publishDataset(
+    datasetId: string | number,
+    versionUpdateType: VersionUpdateType
+  ): Promise<void> {
+    return this.doPost(
+      this.buildApiEndpoint(this.datasetsResourceName, `actions/:publish`, datasetId),
+      {},
+      {
+        type: versionUpdateType
+      }
+    )
+      .then(() => undefined)
       .catch((error) => {
         throw error
       })
