@@ -32,4 +32,5 @@ export interface IDatasetsRepository {
     datasetMetadataBlocks: MetadataBlock[],
     collectionId: string
   ): Promise<CreatedDatasetIdentifiers>
+  publishDataset(datasetId: number | string, versionUpdateType: 'major' | 'minor'): Promise<void>
 }

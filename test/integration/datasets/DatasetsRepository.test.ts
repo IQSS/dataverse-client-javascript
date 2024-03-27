@@ -2,17 +2,18 @@ import { DatasetsRepository } from '../../../src/datasets/infra/repositories/Dat
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   createPrivateUrlViaApi,
-  publishDatasetViaApi,
   deaccessionDatasetViaApi,
+  publishDatasetViaApi,
   waitForNoLocks
 } from '../../testHelpers/datasets/datasetHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
-  DatasetNotNumberedVersion,
   DatasetLockType,
-  DatasetPreviewSubset
+  DatasetNotNumberedVersion,
+  DatasetPreviewSubset,
+  VersionUpdateType
 } from '../../../src/datasets'
-import { ApiConfig } from '../../../src'
+import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { MetadataBlocksRepository } from '../../../src/metadataBlocks/infra/repositories/MetadataBlocksRepository'
 import {
@@ -45,7 +46,7 @@ describe('DatasetsRepository', () => {
 
   describe('getAllDatasetPreviews', () => {
     const testPageLimit = 1
-    const expectedTotalDatasetCount = 3
+    const expectedTotalDatasetCount = 4
 
     test('should return all dataset previews when no pagination params are defined', async () => {
       const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews()
@@ -64,20 +65,21 @@ describe('DatasetsRepository', () => {
     test('should return second dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 1)
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].title).toMatch('Second Dataset')
+      expect(actual.datasetPreviews[0].title).toMatch('Fourth Dataset')
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return third dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 2)
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].title).toMatch('First Dataset')
+      expect(actual.datasetPreviews[0].title).toMatch('Second Dataset')
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return fourth dataset preview page', async () => {
       const actual = await sut.getAllDatasetPreviews(testPageLimit, 3)
-      expect(actual.datasetPreviews.length).toEqual(0)
+      expect(actual.datasetPreviews.length).toEqual(1)
+      expect(actual.datasetPreviews[0].title).toMatch('First Dataset')
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
@@ -374,6 +376,34 @@ describe('DatasetsRepository', () => {
       expect(actualCreatedDataset.metadataBlocks[0].fields.subject).toContain(
         'Medicine, Health and Life Sciences'
       )
+    })
+  })
+
+  describe('publishDataset', () => {
+    test('should publish a new dataset version', async () => {
+      const expectedMajorVersion = 1
+      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_4_ID, 10)
+
+      await sut.publishDataset(TestConstants.TEST_CREATED_DATASET_4_ID, VersionUpdateType.MAJOR)
+      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_4_ID, 10)
+
+      const newDatasetVersion = await sut.getDataset(
+        TestConstants.TEST_CREATED_DATASET_4_ID,
+        latestVersionId,
+        false
+      )
+
+      expect(newDatasetVersion.versionInfo.majorNumber).toBe(expectedMajorVersion)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(
+        sut.publishDataset(nonExistentTestDatasetId, VersionUpdateType.MAJOR)
+      ).rejects.toThrow(expectedError)
     })
   })
 })
