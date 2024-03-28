@@ -9,6 +9,7 @@ import {
 import { ResourceValidationError } from '../../../src/core/domain/useCases/validators/errors/ResourceValidationError'
 import { WriteError, ReadError } from '../../../src'
 import { IMetadataBlocksRepository } from '../../../src/metadataBlocks/domain/repositories/IMetadataBlocksRepository'
+import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 
 describe('execute', () => {
   const testDataset = createNewDatasetDTO()
@@ -50,7 +51,7 @@ describe('execute', () => {
     expect(datasetsRepositoryStub.createDataset).toHaveBeenCalledWith(
       testDataset,
       testMetadataBlocks,
-      'root'
+      ROOT_COLLECTION_ALIAS
     )
   })
 
@@ -110,7 +111,7 @@ describe('execute', () => {
     expect(datasetsRepositoryStub.createDataset).toHaveBeenCalledWith(
       testDataset,
       testMetadataBlocks,
-      'root'
+      ROOT_COLLECTION_ALIAS
     )
   })
 

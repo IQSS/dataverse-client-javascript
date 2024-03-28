@@ -9,3 +9,4 @@ coverage
 
 # ignore npm lock
 package-json.lock
+.npmrc
