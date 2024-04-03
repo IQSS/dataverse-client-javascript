@@ -8,4 +8,9 @@ const getMetadataBlockByName = new GetMetadataBlockByName(metadataBlocksReposito
 const getCollectionMetadataBlocks = new GetCollectionMetadataBlocks(metadataBlocksRepository)
 
 export { getMetadataBlockByName, getCollectionMetadataBlocks }
-export { MetadataBlock, MetadataFieldInfo } from './domain/models/MetadataBlock'
+export {
+  MetadataBlock,
+  MetadataFieldInfo,
+  MetadataFieldType,
+  MetadataFieldTypeClass
+} from './domain/models/MetadataBlock'
