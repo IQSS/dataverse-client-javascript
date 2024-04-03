@@ -1,17 +1,17 @@
-import { GetCollectionMetadataBlocks } from '../../../src/collections/domain/useCases/GetCollectionMetadataBlocks'
-import { ICollectionsRepository } from '../../../src/collections/domain/repositories/ICollectionsRepository'
 import { ReadError } from '../../../src'
 import { createMetadataBlockModel } from '../../testHelpers/metadataBlocks/metadataBlockHelper'
+import { IMetadataBlocksRepository } from '../../../src/metadataBlocks/domain/repositories/IMetadataBlocksRepository'
+import { GetCollectionMetadataBlocks } from '../../../src/metadataBlocks/domain/useCases/GetCollectionMetadataBlocks'
 
 describe('execute', () => {
   test('should return collection metadata blocks on repository success', async () => {
     const testMetadataBlocks = [createMetadataBlockModel()]
-    const collectionsRepositoryStub: ICollectionsRepository = {} as ICollectionsRepository
-    collectionsRepositoryStub.getCollectionMetadataBlocks = jest
+    const metadataBlocksRepositoryStub: IMetadataBlocksRepository = {} as IMetadataBlocksRepository
+    metadataBlocksRepositoryStub.getCollectionMetadataBlocks = jest
       .fn()
       .mockResolvedValue(testMetadataBlocks)
     const testGetCollectionMetadataBlocks = new GetCollectionMetadataBlocks(
-      collectionsRepositoryStub
+      metadataBlocksRepositoryStub
     )
 
     const actual = await testGetCollectionMetadataBlocks.execute(1)
@@ -20,12 +20,12 @@ describe('execute', () => {
   })
 
   test('should return error result on repository error', async () => {
-    const collectionRepositoryStub: ICollectionsRepository = {} as ICollectionsRepository
-    collectionRepositoryStub.getCollectionMetadataBlocks = jest
+    const metadataBlocksRepositoryStub: IMetadataBlocksRepository = {} as IMetadataBlocksRepository
+    metadataBlocksRepositoryStub.getCollectionMetadataBlocks = jest
       .fn()
       .mockRejectedValue(new ReadError())
     const testGetCollectionMetadataBlocks = new GetCollectionMetadataBlocks(
-      collectionRepositoryStub
+      metadataBlocksRepositoryStub
     )
 
     await expect(testGetCollectionMetadataBlocks.execute(1)).rejects.toThrow(ReadError)

@@ -1,13 +1,13 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
-import { MetadataBlock } from '../../../metadataBlocks'
-import { ROOT_COLLECTION_ALIAS } from '../models/Collection'
-import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
+import { MetadataBlock } from '../..'
+import { ROOT_COLLECTION_ALIAS } from '../../../collections/domain/models/Collection'
+import { IMetadataBlocksRepository } from '../repositories/IMetadataBlocksRepository'
 
 export class GetCollectionMetadataBlocks implements UseCase<MetadataBlock[]> {
-  private collectionsRepository: ICollectionsRepository
+  private metadataBlocksRepository: IMetadataBlocksRepository
 
-  constructor(collectionsRepository: ICollectionsRepository) {
-    this.collectionsRepository = collectionsRepository
+  constructor(metadataBlocksRepository: IMetadataBlocksRepository) {
+    this.metadataBlocksRepository = metadataBlocksRepository
   }
 
   /**
@@ -22,7 +22,7 @@ export class GetCollectionMetadataBlocks implements UseCase<MetadataBlock[]> {
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ALIAS,
     onlyDisplayedOnCreate = false
   ): Promise<MetadataBlock[]> {
-    return await this.collectionsRepository.getCollectionMetadataBlocks(
+    return await this.metadataBlocksRepository.getCollectionMetadataBlocks(
       collectionIdOrAlias,
       onlyDisplayedOnCreate
     )
