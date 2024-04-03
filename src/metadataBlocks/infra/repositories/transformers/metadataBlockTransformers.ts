@@ -1,5 +1,11 @@
 import { AxiosResponse } from 'axios'
-import { MetadataBlock, MetadataFieldInfo } from '../../../domain/models/MetadataBlock'
+import {
+  MetadataBlock,
+  MetadataFieldInfo,
+  MetadataFieldTypeClass,
+  MetadataFieldType,
+  MetadataFieldWatermark
+} from '../../../domain/models/MetadataBlock'
 import { MetadataBlockPayload } from './MetadataBlockPayload'
 
 export const transformMetadataBlocksResponseToMetadataBlocks = (
@@ -37,6 +43,7 @@ const transformMetadataBlockPayloadToMetadataBlock = (
     id: metadataBlockPayload.id,
     name: metadataBlockPayload.name,
     displayName: metadataBlockPayload.displayName,
+    displayOnCreate: metadataBlockPayload.displayOnCreate,
     metadataFields: metadataFields
   }
 }
@@ -64,8 +71,8 @@ const transformPayloadMetadataFieldInfo = (
     name: metadataFieldInfoPayload.name,
     displayName: metadataFieldInfoPayload.displayName,
     title: metadataFieldInfoPayload.title,
-    type: metadataFieldInfoPayload.type,
-    watermark: metadataFieldInfoPayload.watermark,
+    type: metadataFieldInfoPayload.type as MetadataFieldType,
+    watermark: metadataFieldInfoPayload.watermark as MetadataFieldWatermark,
     description: metadataFieldInfoPayload.description,
     multiple: metadataFieldInfoPayload.multiple,
     isControlledVocabulary: metadataFieldInfoPayload.isControlledVocabulary,
@@ -75,7 +82,8 @@ const transformPayloadMetadataFieldInfo = (
     displayFormat: metadataFieldInfoPayload.displayFormat,
     isRequired: metadataFieldInfoPayload.isRequired,
     displayOrder: metadataFieldInfoPayload.displayOrder,
-    typeClass: metadataFieldInfoPayload.typeClass
+    typeClass: metadataFieldInfoPayload.typeClass as MetadataFieldTypeClass,
+    displayOnCreate: metadataFieldInfoPayload.displayOnCreate
   }
   if (!isChild && 'childFields' in metadataFieldInfoPayload) {
     const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields
