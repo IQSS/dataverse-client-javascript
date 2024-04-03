@@ -1,10 +1,28 @@
 import { AxiosResponse } from 'axios'
 import { MetadataBlock, MetadataFieldInfo } from '../../../domain/models/MetadataBlock'
+import { MetadataBlockPayload } from './MetadataBlockPayload'
+
+export const transformMetadataBlocksResponseToMetadataBlocks = (
+  response: AxiosResponse
+): MetadataBlock[] => {
+  const metadataBlocksPayload = response.data.data
+  const metadataBlocks: MetadataBlock[] = []
+  metadataBlocksPayload.forEach(function (metadataBlockPayload: MetadataBlockPayload) {
+    metadataBlocks.push(transformMetadataBlockPayloadToMetadataBlock(metadataBlockPayload))
+  })
+  return metadataBlocks
+}
 
 export const transformMetadataBlockResponseToMetadataBlock = (
   response: AxiosResponse
 ): MetadataBlock => {
   const metadataBlockPayload = response.data.data
+  return transformMetadataBlockPayloadToMetadataBlock(metadataBlockPayload)
+}
+
+const transformMetadataBlockPayloadToMetadataBlock = (
+  metadataBlockPayload: MetadataBlockPayload
+): MetadataBlock => {
   const metadataFields: Record<string, MetadataFieldInfo> = {}
   const metadataBlockFieldsPayload = metadataBlockPayload.fields
   const childFieldKeys = getChildFieldKeys(metadataBlockFieldsPayload)

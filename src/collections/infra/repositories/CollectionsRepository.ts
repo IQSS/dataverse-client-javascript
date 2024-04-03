@@ -5,20 +5,13 @@ import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collectio
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
   private readonly collectionsResourceName: string = 'dataverses'
-  private readonly collectionsDefaultOperationType: string = 'get'
 
   public async getCollection(
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ALIAS
   ): Promise<Collection> {
-    return this.doGet(
-      this.buildApiEndpoint(
-        this.collectionsResourceName,
-        this.collectionsDefaultOperationType,
-        collectionIdOrAlias
-      ),
-      true,
-      { returnOwners: true }
-    )
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, true, {
+      returnOwners: true
+    })
       .then((response) => transformCollectionResponseToCollection(response))
       .catch((error) => {
         throw error

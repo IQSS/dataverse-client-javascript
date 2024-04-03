@@ -8,6 +8,7 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 
 describe('getMetadataBlockByName', () => {
   const sut: MetadataBlocksRepository = new MetadataBlocksRepository()
+  const citationMetadataBlockName = 'citation'
 
   ApiConfig.init(
     TestConstants.TEST_API_URL,
@@ -27,9 +28,16 @@ describe('getMetadataBlockByName', () => {
   })
 
   test('should return metadata block when it exists', async () => {
-    const citationMetadataBlockName = 'citation'
     const actual = await sut.getMetadataBlockByName(citationMetadataBlockName)
 
     expect(actual.name).toBe(citationMetadataBlockName)
+  })
+
+  test('should return collection metadata blocks', async () => {
+    const actual = await sut.getCollectionMetadataBlocks('root', true)
+
+    expect(actual.length).toBe(1)
+    expect(actual[0].name).toBe(citationMetadataBlockName)
+    expect(actual[0].metadataFields.title.name).toBe('title')
   })
 })
