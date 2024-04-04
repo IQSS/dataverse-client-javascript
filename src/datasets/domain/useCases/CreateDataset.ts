@@ -5,6 +5,7 @@ import { NewResourceValidator } from '../../../core/domain/useCases/validators/N
 import { IMetadataBlocksRepository } from '../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository'
 import { MetadataBlock } from '../../../metadataBlocks'
 import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers'
+import { ROOT_COLLECTION_ALIAS } from '../../../collections/domain/models/Collection'
 
 export class CreateDataset implements UseCase<CreatedDatasetIdentifiers> {
   private datasetsRepository: IDatasetsRepository
@@ -33,7 +34,7 @@ export class CreateDataset implements UseCase<CreatedDatasetIdentifiers> {
    */
   async execute(
     newDataset: NewDatasetDTO,
-    collectionId = 'root'
+    collectionId = ROOT_COLLECTION_ALIAS
   ): Promise<CreatedDatasetIdentifiers> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(newDataset)
 

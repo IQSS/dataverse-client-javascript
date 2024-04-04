@@ -39,15 +39,15 @@ export abstract class ApiRepository {
     operation: string,
     resourceId: number | string = undefined
   ) {
-    let endpoint
-    if (typeof resourceId === 'number') {
-      endpoint = `/${resourceName}/${resourceId}/${operation}`
-    } else if (typeof resourceId === 'string') {
-      endpoint = `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`
-    } else {
-      endpoint = `/${resourceName}/${operation}`
+    if (resourceName === 'dataverses') {
+      return `/${resourceName}/${resourceId}`
     }
-    return endpoint
+
+    return typeof resourceId === 'number'
+      ? `/${resourceName}/${resourceId}/${operation}`
+      : typeof resourceId === 'string'
+      ? `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`
+      : `/${resourceName}/${operation}`
   }
 
   private buildRequestConfig(authRequired: boolean, queryParams: object): AxiosRequestConfig {
@@ -61,7 +61,7 @@ export abstract class ApiRepository {
     switch (ApiConfig.dataverseApiAuthMechanism) {
       case DataverseApiAuthMechanism.SESSION_COOKIE:
         /*
-          We set { withCredentials: true } to send the JSESSIONID cookie in the requests for API authentication. 
+          We set { withCredentials: true } to send the JSESSIONID cookie in the requests for API authentication.
           This is required, along with the session auth feature flag enabled in the backend, to be able to authenticate using the JSESSIONID cookie.
           Auth mechanisms like this are configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth).
         */

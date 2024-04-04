@@ -5,13 +5,13 @@ import { transformVersionResponseToDataset } from './transformers/datasetTransfo
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
 import { DatasetLock } from '../../domain/models/DatasetLock'
-import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
-import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
+import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers'
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset'
 import { NewDatasetDTO } from '../../domain/dtos/NewDatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers'
-import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers'
+import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
+import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number

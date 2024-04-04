@@ -7,6 +7,7 @@ import datasetJson2 from '../testHelpers/datasets/test-dataset-2.json'
 import datasetJson3 from '../testHelpers/datasets/test-dataset-3.json'
 import datasetJson4 from '../testHelpers/datasets/test-dataset-4.json'
 import collectionJson from '../testHelpers/collections/test-collection-1.json'
+import { ROOT_COLLECTION_ALIAS } from '../../src/collections/domain/models/Collection'
 
 const NUMBER_OF_DATASETS = 4
 const COMPOSE_FILE = 'docker-compose.yml'
@@ -91,7 +92,10 @@ async function createCollectionViaApi(collectionJson: any): Promise<any> {
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-async function createDatasetViaApi(datasetJson: any, collectionId = 'root'): Promise<any> {
+async function createDatasetViaApi(
+  datasetJson: any,
+  collectionId = ROOT_COLLECTION_ALIAS
+): Promise<any> {
   return await axios.post(
     `${TestConstants.TEST_API_URL}/dataverses/${collectionId}/datasets`,
     datasetJson,

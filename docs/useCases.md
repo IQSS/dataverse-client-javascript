@@ -8,6 +8,9 @@ The different use cases currently available in the package are classified below,
 
 ## Table of Contents
 
+- [Collections](#Collections)
+  - [Collections read use cases](#collections-read-use-cases)
+    - [Get a Collection](#get-a-collection)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -42,6 +45,54 @@ The different use cases currently available in the package are classified below,
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
   - [Get ZIP Download Limit](#get-zip-download-limit)
+
+## Collections
+
+### Collections Read Use Cases
+
+#### Get a Collection
+
+Returns a [Collection](../src/collections/domain/models/Collection.ts) instance, given the search parameters to identify it.
+
+##### Example call:
+
+```typescript
+import { getCollection } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+// Case 1: Fetch Collection by its numerical ID
+const collectionIdOrAlias = 12345
+
+getCollection
+  .execute(collectionId)
+  .then((collection: Collection) => {
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+
+/* ... */
+
+// Case 2: Fetch Collection by its alias
+const collectionIdOrAlias = 'classicLiterature'
+getCollection
+  .execute(collectionAlias)
+  .then((collection: Collection) => {
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
 
 ## Datasets
 
