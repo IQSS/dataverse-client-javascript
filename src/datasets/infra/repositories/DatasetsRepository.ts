@@ -1,17 +1,17 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
-import { Dataset } from '../../domain/models/Dataset'
-import { DatasetLock } from '../../domain/models/DatasetLock'
+import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
+import { transformVersionResponseToDataset } from './transformers/datasetTransformers'
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
+import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
+import { DatasetLock } from '../../domain/models/DatasetLock'
 import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers'
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset'
 import { NewDatasetDTO } from '../../domain/dtos/NewDatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
-import { transformVersionResponseToDataset } from './transformers/datasetTransformers'
 import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers'
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
-import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -153,6 +153,23 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
           numericId: responseData.id
         }
       })
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async publishDataset(
+    datasetId: string | number,
+    versionUpdateType: VersionUpdateType
+  ): Promise<void> {
+    return this.doPost(
+      this.buildApiEndpoint(this.datasetsResourceName, `actions/:publish`, datasetId),
+      {},
+      {
+        type: versionUpdateType
+      }
+    )
+      .then(() => undefined)
       .catch((error) => {
         throw error
       })

@@ -13,6 +13,7 @@ import { GetDatasetSummaryFieldNames } from './domain/useCases/GetDatasetSummary
 import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDatasetCitation'
 import { SingleMetadataFieldValidator } from './domain/useCases/validators/SingleMetadataFieldValidator'
 import { MultipleMetadataFieldValidator } from './domain/useCases/validators/MultipleMetadataFieldValidator'
+import { PublishDataset } from './domain/useCases/PublishDataset'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -34,6 +35,7 @@ const createDataset = new CreateDataset(
   new MetadataBlocksRepository(),
   new NewDatasetResourceValidator(metadataFieldValidator)
 )
+const publishDataset = new PublishDataset(datasetsRepository)
 
 export {
   getDataset,
@@ -44,7 +46,8 @@ export {
   getDatasetUserPermissions,
   getDatasetSummaryFieldNames,
   getPrivateUrlDatasetCitation,
-  createDataset
+  createDataset,
+  publishDataset
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -70,3 +73,4 @@ export {
   NewDatasetMetadataChildFieldValueDTO as NewDatasetMetadataChildFieldValue
 } from './domain/dtos/NewDatasetDTO'
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers'
+export { VersionUpdateType } from './domain/models/Dataset'

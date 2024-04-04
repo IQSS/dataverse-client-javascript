@@ -5,9 +5,11 @@ import { TestConstants } from '../testHelpers/TestConstants'
 import datasetJson1 from '../testHelpers/datasets/test-dataset-1.json'
 import datasetJson2 from '../testHelpers/datasets/test-dataset-2.json'
 import datasetJson3 from '../testHelpers/datasets/test-dataset-3.json'
+import datasetJson4 from '../testHelpers/datasets/test-dataset-4.json'
 import collectionJson from '../testHelpers/collections/test-collection-1.json'
 import { ROOT_COLLECTION_ALIAS } from '../../src/collections/domain/models/Collection'
 
+const NUMBER_OF_DATASETS = 4
 const COMPOSE_FILE = 'docker-compose.yml'
 
 const CONTAINER_DATAVERSE_BOOTSTRAP_NAME = 'test_dataverse_bootstrap'
@@ -63,6 +65,9 @@ async function setupTestFixtures(): Promise<void> {
   await createDatasetViaApi(datasetJson2).catch(() => {
     console.error('Tests setup: Error while creating test Dataset 2')
   })
+  await createDatasetViaApi(datasetJson4).catch(() => {
+    console.error('Tests setup: Error while creating test Dataset 4')
+  })
   await createCollectionViaApi(collectionJson)
     .then()
     .catch(() => {
@@ -108,7 +113,7 @@ async function waitForDatasetsIndexingInSolr(): Promise<void> {
       .get(`${TestConstants.TEST_API_URL}/search?q=*&type=dataset`, buildRequestHeaders())
       .then((response) => {
         const nDatasets = response.data.data.items.length
-        if (nDatasets === 3) {
+        if (nDatasets === NUMBER_OF_DATASETS) {
           datasetsIndexed = true
         }
       })
