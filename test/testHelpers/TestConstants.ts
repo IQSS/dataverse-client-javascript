@@ -1,4 +1,3 @@
-import { ROOT_COLLECTION_ALIAS } from '../../src/collections/domain/models/Collection'
 import { NewDatasetDTO } from '../../src/datasets/domain/dtos/NewDatasetDTO'
 
 export class TestConstants {
@@ -46,16 +45,9 @@ export class TestConstants {
       'Content-Type': 'application/json'
     }
   }
-  static readonly TEST_CREATED_DATASET_1_ID = 2
-  static readonly TEST_CREATED_DATASET_2_ID = 3
-  static readonly TEST_CREATED_DATASET_3_ID = 5
-  static readonly TEST_CREATED_DATASET_4_ID = 4
   static readonly TEST_DUMMY_COLLECTION_ID = 10001
   static readonly TEST_DUMMY_COLLECTION_ALIAS = 'dummyCollectionId'
-  static readonly TEST_CREATED_COLLECTION_1_ID = 5
-  static readonly TEST_CREATED_COLLECTION_1_ALIAS = 'testCollection'
   static readonly TEST_CREATED_COLLECTION_ALIAS = 'testCollection'
-  static readonly TEST_CREATED_COLLECTION_1_ROOT = ROOT_COLLECTION_ALIAS
   static readonly TEST_NEW_DATASET_DTO: NewDatasetDTO = {
     license: {
       name: 'CC0 1.0',

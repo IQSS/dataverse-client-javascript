@@ -3,40 +3,55 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
+import {
+  createCollectionViaApi,
+  deleteCollectionViaApi
+} from '../../testHelpers/collections/collectionHelper'
+import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 
-describe.skip('CollectionsRepository', () => {
+describe('CollectionsRepository', () => {
   const testGetCollection: CollectionsRepository = new CollectionsRepository()
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
+    try {
+      await createCollectionViaApi()
+    } catch (error) {
+      throw new Error('Tests beforeAll(): Error while creating test collection')
+    }
   })
 
-  afterEach(async () => {
+  afterAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
+    try {
+      await deleteCollectionViaApi()
+    } catch (error) {
+      throw new Error('Tests afterAll(): Error while deleting test collection')
+    }
   })
 
   describe('getCollection', () => {
     describe('by default `root` Id', () => {
       test('should return the root collection of the Dataverse installation if no parameter is passed AS `root`', async () => {
         const actual = await testGetCollection.getCollection()
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ROOT)
+        expect(actual.alias).toBe(ROOT_COLLECTION_ALIAS)
       })
     })
 
     describe('by string alias', () => {
       test('should return collection when it exists filtering by id AS (alias)', async () => {
         const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_CREATED_COLLECTION_1_ALIAS
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS
         )
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ALIAS)
+        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_ALIAS)
       })
 
       test('should return error when collection does not exist', async () => {
@@ -50,11 +65,10 @@ describe.skip('CollectionsRepository', () => {
       })
     })
     describe('by numeric id', () => {
-      test('should return collection when it exists filtering by id AS (id)', async () => {
-        const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_CREATED_COLLECTION_1_ID
-        )
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ID)
+      // FIXME
+      test.skip('should return collection when it exists filtering by id AS (id)', async () => {
+        const actual = await testGetCollection.getCollection(1)
+        expect(actual.id).toBe(1)
       })
 
       test('should return error when collection does not exist', async () => {

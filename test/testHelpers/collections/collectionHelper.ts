@@ -46,3 +46,10 @@ export async function createCollectionViaApi(): Promise<void> {
     DATAVERSE_API_REQUEST_HEADERS
   )
 }
+
+export async function deleteCollectionViaApi(): Promise<void> {
+  return await axios.delete(
+    `${TestConstants.TEST_API_URL}/dataverses/${TestConstants.TEST_CREATED_COLLECTION_ALIAS}`,
+    DATAVERSE_API_REQUEST_HEADERS
+  )
+}

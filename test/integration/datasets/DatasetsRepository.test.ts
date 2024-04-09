@@ -27,7 +27,10 @@ import {
   DatasetDescription
 } from '../../../src/datasets/domain/models/Dataset'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
-import { createCollectionViaApi } from '../../testHelpers/collections/collectionHelper'
+import {
+  createCollectionViaApi,
+  deleteCollectionViaApi
+} from '../../testHelpers/collections/collectionHelper'
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository()
@@ -58,21 +61,28 @@ describe('DatasetsRepository', () => {
     let fourthDatasetIds: CreatedDatasetIdentifiers
 
     beforeAll(async () => {
+      await createCollection()
       await createDatasets()
     })
 
     afterAll(async () => {
       await deleteDatasets()
+      await deleteCollection()
     })
+
+    const createCollection = async () => {
+      try {
+        await createCollectionViaApi()
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while creating test collection')
+      }
+    }
 
     const createDatasets = async () => {
       try {
         firstDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
         secondDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
         thirdDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-
-        await createCollectionViaApi()
-
         fourthDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
           TestConstants.TEST_CREATED_COLLECTION_ALIAS
@@ -91,7 +101,15 @@ describe('DatasetsRepository', () => {
         await deleteUnpublishedDatasetViaApi(thirdDatasetIds.numericId)
         await deleteUnpublishedDatasetViaApi(fourthDatasetIds.numericId)
       } catch (error) {
-        throw new Error('Tests afterAll():Error while deleting test datasets')
+        throw new Error('Tests afterAll(): Error while deleting test datasets')
+      }
+    }
+
+    const deleteCollection = async () => {
+      try {
+        await deleteCollectionViaApi()
+      } catch (error) {
+        throw new Error('Tests afterAll(): Error while deleting test collection')
       }
     }
 
