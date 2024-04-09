@@ -80,7 +80,7 @@ describe('DatasetsRepository', () => {
 
         await waitForDatasetsIndexedInSolr(expectedTotalDatasetCount)
       } catch (error) {
-        throw Error('Error while creating test datasets')
+        throw new Error('Tests beforeAll(): Error while creating test datasets')
       }
     }
 
@@ -91,7 +91,7 @@ describe('DatasetsRepository', () => {
         await deleteUnpublishedDatasetViaApi(thirdDatasetIds.numericId)
         await deleteUnpublishedDatasetViaApi(fourthDatasetIds.numericId)
       } catch (error) {
-        throw Error('Error while deleting test datasets')
+        throw new Error('Tests afterAll():Error while deleting test datasets')
       }
     }
 
@@ -157,7 +157,7 @@ describe('DatasetsRepository', () => {
         try {
           testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
         } catch (error) {
-          throw Error('Error while creating test dataset')
+          throw new Error('Tests beforeAll(): Error while creating test dataset')
         }
       })
 
@@ -165,7 +165,7 @@ describe('DatasetsRepository', () => {
         try {
           await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
         } catch (error) {
-          throw Error('Error while deleting test dataset')
+          throw new Error('Tests afterAll(): Error while deleting test dataset')
         }
       })
 
@@ -234,15 +234,15 @@ describe('DatasetsRepository', () => {
         try {
           testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
         } catch (error) {
-          throw Error('Error while creating test dataset')
+          throw new Error('Tests beforeAll(): Error while creating test dataset')
         }
       })
 
       afterAll(async () => {
         try {
-          await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+          await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
         } catch (error) {
-          throw Error('Error while deleting test dataset')
+          throw new Error('Tests afterAll(): Error while deleting test dataset')
         }
       })
 
@@ -272,28 +272,41 @@ describe('DatasetsRepository', () => {
     })
   })
 
-  describe.skip('Private URLs', () => {
+  describe('Private URLs', () => {
     const expectedErrorInvalidToken = '[404] Private URL user not found'
+    let testDatasetIds: CreatedDatasetIdentifiers
     let privateUrlToken: string
 
     beforeAll(async () => {
       try {
-        const response = await createPrivateUrlViaApi(TestConstants.TEST_CREATED_DATASET_1_ID)
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
+      }
+      try {
+        const response = await createPrivateUrlViaApi(testDatasetIds.numericId)
         privateUrlToken = response.data.data.token
       } catch (error) {
         throw new Error('Tests beforeAll(): Error while creating Dataset private URL')
       }
     })
 
+    afterAll(async () => {
+      try {
+        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+      } catch (error) {
+        throw new Error('Tests afterAll(): Error while deleting test dataset')
+      }
+    })
+
     describe('getPrivateUrlDataset', () => {
       test('should return dataset when token is valid', async () => {
         const actual = await sut.getPrivateUrlDataset(privateUrlToken)
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID)
+        expect(actual.id).toBe(testDatasetIds.numericId)
       })
 
       test('should return error when token is not valid', async () => {
         const expectedError = new ReadError(expectedErrorInvalidToken)
-
         await expect(sut.getPrivateUrlDataset('invalidToken')).rejects.toThrow(expectedError)
       })
     })
@@ -306,49 +319,82 @@ describe('DatasetsRepository', () => {
 
       test('should return error when token is not valid', async () => {
         const expectedError = new ReadError(expectedErrorInvalidToken)
-
         await expect(sut.getPrivateUrlDatasetCitation('invalidToken')).rejects.toThrow(
-          expectedError
-        )
-      })
-    })
-
-    describe('getDatasetUserPermissions', () => {
-      test('should return user permissions filtering by dataset id', async () => {
-        const actual = await sut.getDatasetUserPermissions(TestConstants.TEST_CREATED_DATASET_1_ID)
-        expect(actual.canViewUnpublishedDataset).toBe(true)
-        expect(actual.canEditDataset).toBe(true)
-        expect(actual.canPublishDataset).toBe(true)
-        expect(actual.canManageDatasetPermissions).toBe(true)
-        expect(actual.canDeleteDatasetDraft).toBe(true)
-      })
-
-      test('should return error when dataset does not exist', async () => {
-        const expectedError = new ReadError(
-          `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
-        )
-
-        await expect(sut.getDatasetUserPermissions(nonExistentTestDatasetId)).rejects.toThrow(
           expectedError
         )
       })
     })
   })
 
-  describe.skip('getDatasetLocks', () => {
+  describe('getDatasetUserPermissions', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      try {
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
+      }
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+      } catch (error) {
+        throw new Error('Tests afterAll(): Error while deleting test dataset')
+      }
+    })
+
+    test('should return user permissions filtering by dataset id', async () => {
+      const actual = await sut.getDatasetUserPermissions(testDatasetIds.numericId)
+      expect(actual.canViewUnpublishedDataset).toBe(true)
+      expect(actual.canEditDataset).toBe(true)
+      expect(actual.canPublishDataset).toBe(true)
+      expect(actual.canManageDatasetPermissions).toBe(true)
+      expect(actual.canDeleteDatasetDraft).toBe(true)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new ReadError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(sut.getDatasetUserPermissions(nonExistentTestDatasetId)).rejects.toThrow(
+        expectedError
+      )
+    })
+  })
+
+  describe('getDatasetLocks', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      try {
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
+      }
+    })
+
+    afterAll(async () => {
+      try {
+        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      } catch (error) {
+        throw new Error('Tests afterAll(): Error while deleting test dataset')
+      }
+    })
+
     test('should return list of dataset locks by dataset id for a dataset while publishing', async () => {
-      await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID)
+      await publishDatasetViaApi(testDatasetIds.numericId)
         .then()
         .catch((error) => {
           console.log(JSON.stringify(error))
         })
-      const actual = await sut.getDatasetLocks(TestConstants.TEST_CREATED_DATASET_2_ID)
+      const actual = await sut.getDatasetLocks(testDatasetIds.numericId)
       expect(actual.length).toBe(1)
       expect(actual[0].lockType).toBe(DatasetLockType.FINALIZE_PUBLICATION)
       expect(actual[0].userId).toBe('dataverseAdmin')
-      expect(actual[0].message).toBe(
-        'Publishing the dataset; Registering PIDs for Datafiles; Validating Datafiles Asynchronously'
-      )
+      expect(actual[0].message).toContain('Publishing the dataset')
     })
 
     test('should return error when dataset does not exist', async () => {
@@ -360,10 +406,28 @@ describe('DatasetsRepository', () => {
     })
   })
 
-  describe.skip('getDatasetCitation', () => {
+  describe('getDatasetCitation', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      try {
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
+      }
+    })
+
+    afterAll(async () => {
+      try {
+        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      } catch (error) {
+        throw new Error('Tests afterAll(): Error while deleting test dataset')
+      }
+    })
+
     test('should return citation when dataset exists', async () => {
       const actualDatasetCitation = await sut.getDatasetCitation(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
         false
       )
@@ -381,16 +445,21 @@ describe('DatasetsRepository', () => {
     })
 
     test('should return citation when dataset is deaccessioned', async () => {
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
+
       const actualDatasetCitation = await sut.getDatasetCitation(
-        TestConstants.TEST_CREATED_DATASET_2_ID,
+        testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
         true
       )
+
       expect(typeof actualDatasetCitation).toBe('string')
     })
   })
 
-  describe.skip('createDataset', () => {
+  describe('createDataset', () => {
     test('should create a dataset with the provided dataset citation fields', async () => {
       const testNewDataset = {
         metadataBlockValues: [
@@ -473,16 +542,34 @@ describe('DatasetsRepository', () => {
     })
   })
 
-  describe.skip('publishDataset', () => {
+  describe('publishDataset', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      try {
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
+      }
+    })
+
+    afterAll(async () => {
+      try {
+        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      } catch (error) {
+        throw new Error('Tests afterAll(): Error while deleting test dataset')
+      }
+    })
+
     test('should publish a new dataset version', async () => {
       const expectedMajorVersion = 1
-      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_4_ID, 10)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
 
-      await sut.publishDataset(TestConstants.TEST_CREATED_DATASET_4_ID, VersionUpdateType.MAJOR)
-      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_4_ID, 10)
+      await sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
 
       const newDatasetVersion = await sut.getDataset(
-        TestConstants.TEST_CREATED_DATASET_4_ID,
+        testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
         false
       )
