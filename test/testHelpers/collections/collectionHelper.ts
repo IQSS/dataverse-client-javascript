@@ -1,12 +1,19 @@
 import { Collection } from '../../../src/collections'
 import { DvObjectType } from '../../../src'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
+import { TestConstants } from '../TestConstants'
+import axios from 'axios'
+import collectionJson from './test-collection-1.json'
 
 const COLLECTION_ID = 11111
 const COLLECTION_ALIAS_STR = 'secondCollection'
 const COLLECTION_NAME_STR = 'Laboratory Research'
 const COLLECTION_AFFILIATION_STR = 'Laboratory Research Corporation'
 const COLLECTION_DESCRIPTION_STR = 'This is an example collection used for testing.'
+
+const DATAVERSE_API_REQUEST_HEADERS = {
+  headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
+}
 
 export const createCollectionModel = (): Collection => {
   const collectionModel: Collection = {
@@ -30,4 +37,12 @@ export const createCollectionPayload = (): CollectionPayload => {
     isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
   }
   return collectionPayload
+}
+
+export async function createCollectionViaApi(): Promise<void> {
+  return await axios.post(
+    `${TestConstants.TEST_API_URL}/dataverses/root`,
+    collectionJson,
+    DATAVERSE_API_REQUEST_HEADERS
+  )
 }

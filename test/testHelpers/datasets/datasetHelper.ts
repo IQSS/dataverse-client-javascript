@@ -202,6 +202,22 @@ export const createDatasetVersionPayload = (
   return datasetPayload
 }
 
+export const deleteUnpublishedDatasetViaApi = async (datasetId: number): Promise<AxiosResponse> => {
+  return await axios.delete(
+    `${TestConstants.TEST_API_URL}/datasets/${datasetId}`,
+    DATAVERSE_API_REQUEST_HEADERS
+  )
+}
+
+export const deletePublishedDatasetViaApi = async (
+  datasetPersistentId: string
+): Promise<AxiosResponse> => {
+  return await axios.delete(
+    `${TestConstants.TEST_API_URL}/datasets/:persistentId/destroy?persistentId=${datasetPersistentId}`,
+    DATAVERSE_API_REQUEST_HEADERS
+  )
+}
+
 export const createDatasetLicenseModel = (withIconUri = true): DatasetLicense => {
   const datasetLicense: DatasetLicense = {
     name: 'CC0 1.0',
@@ -270,4 +286,35 @@ export const waitForNoLocks = async (
   if (hasLocks) {
     throw new Error('Max retries reached.')
   }
+}
+
+export async function waitForDatasetsIndexedInSolr(
+  expectedNumberOfIndexedDatasets: number
+): Promise<void> {
+  console.log('Waiting for datasets indexing in Solr...')
+  let datasetsIndexed = false
+  let retry = 0
+  while (!datasetsIndexed && retry < 10) {
+    await axios
+      .get(`${TestConstants.TEST_API_URL}/search?q=*&type=dataset`, DATAVERSE_API_REQUEST_HEADERS)
+      .then((response) => {
+        const nDatasets = response.data.data.items.length
+        if (nDatasets === expectedNumberOfIndexedDatasets) {
+          datasetsIndexed = true
+        }
+      })
+      .catch((error) => {
+        console.error(
+          `Tests setup: Error while waiting for datasets indexing in Solr: [${
+            error.response.status
+          }]${error.response.data ? ` ${error.response.data.message}` : ''}`
+        )
+      })
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    retry++
+  }
+  if (!datasetsIndexed) {
+    throw new Error('Tests setup: Timeout reached while waiting for datasets indexing in Solr')
+  }
+  console.log('Datasets indexed in Solr')
 }

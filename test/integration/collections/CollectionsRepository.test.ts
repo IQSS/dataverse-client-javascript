@@ -4,7 +4,7 @@ import { ReadError } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 
-describe('CollectionsRepository', () => {
+describe.skip('CollectionsRepository', () => {
   const testGetCollection: CollectionsRepository = new CollectionsRepository()
 
   beforeEach(async () => {

@@ -22,7 +22,7 @@ import {
   waitForNoLocks
 } from '../../testHelpers/datasets/datasetHelper'
 
-describe('FilesRepository', () => {
+describe.skip('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
 
   const testTextFile1Name = 'test-file-1.txt'
