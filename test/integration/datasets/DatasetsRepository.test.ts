@@ -80,9 +80,18 @@ describe('DatasetsRepository', () => {
 
     const createDatasets = async () => {
       try {
-        firstDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-        secondDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-        thirdDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+        firstDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS
+        )
+        secondDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS
+        )
+        thirdDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS
+        )
         fourthDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
           TestConstants.TEST_CREATED_COLLECTION_ALIAS
@@ -114,49 +123,58 @@ describe('DatasetsRepository', () => {
     }
 
     test('should return all dataset previews when no pagination params are defined', async () => {
-      const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews()
+      const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews(
+        undefined,
+        undefined,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+      )
       expect(actual.datasetPreviews.length).toEqual(expectedTotalDatasetCount)
       expect(actual.datasetPreviews[0].persistentId).toMatch(fourthDatasetIds.persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return first dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 0)
+      const actual = await sut.getAllDatasetPreviews(
+        testPageLimit,
+        0,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+      )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(fourthDatasetIds.persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return second dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 1)
+      const actual = await sut.getAllDatasetPreviews(
+        testPageLimit,
+        1,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+      )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(thirdDatasetIds.persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return third dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 2)
+      const actual = await sut.getAllDatasetPreviews(
+        testPageLimit,
+        2,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+      )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(secondDatasetIds.persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return fourth dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 3)
+      const actual = await sut.getAllDatasetPreviews(
+        testPageLimit,
+        3,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+      )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(firstDatasetIds.persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
-    })
-
-    test('should return datasets in the specified collection', async () => {
-      const actual = await sut.getAllDatasetPreviews(
-        testPageLimit,
-        0,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS
-      )
-      expect(actual.datasetPreviews[0].persistentId).toMatch(fourthDatasetIds.persistentId)
-      expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.totalDatasetCount).toEqual(1)
     })
   })
 
