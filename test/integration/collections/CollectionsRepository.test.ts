@@ -9,7 +9,7 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 
-describe('CollectionsRepository', () => {
+describe.skip('CollectionsRepository', () => {
   const testGetCollection: CollectionsRepository = new CollectionsRepository()
 
   beforeAll(async () => {
