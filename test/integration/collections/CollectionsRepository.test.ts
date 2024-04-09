@@ -9,7 +9,7 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 
-describe.skip('CollectionsRepository', () => {
+describe('CollectionsRepository', () => {
   const testGetCollection: CollectionsRepository = new CollectionsRepository()
 
   beforeAll(async () => {
@@ -19,7 +19,7 @@ describe.skip('CollectionsRepository', () => {
       process.env.TEST_API_KEY
     )
     try {
-      await createCollectionViaApi()
+      await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
     } catch (error) {
       throw new Error('Tests beforeAll(): Error while creating test collection')
     }
@@ -32,7 +32,7 @@ describe.skip('CollectionsRepository', () => {
       process.env.TEST_API_KEY
     )
     try {
-      await deleteCollectionViaApi()
+      await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
     } catch (error) {
       throw new Error('Tests afterAll(): Error while deleting test collection')
     }
@@ -49,9 +49,9 @@ describe.skip('CollectionsRepository', () => {
     describe('by string alias', () => {
       test('should return collection when it exists filtering by id AS (alias)', async () => {
         const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_2
         )
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_ALIAS)
+        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
       })
 
       test('should return error when collection does not exist', async () => {

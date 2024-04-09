@@ -289,14 +289,17 @@ export const waitForNoLocks = async (
 }
 
 export async function waitForDatasetsIndexedInSolr(
-  expectedNumberOfIndexedDatasets: number
+  expectedNumberOfIndexedDatasets: number,
+  collectionAlias: string
 ): Promise<void> {
-  console.log('Waiting for datasets indexing in Solr...')
   let datasetsIndexed = false
   let retry = 0
   while (!datasetsIndexed && retry < 10) {
     await axios
-      .get(`${TestConstants.TEST_API_URL}/search?q=*&type=dataset`, DATAVERSE_API_REQUEST_HEADERS)
+      .get(
+        `${TestConstants.TEST_API_URL}/search?q=*&type=dataset&subtree=${collectionAlias}`,
+        DATAVERSE_API_REQUEST_HEADERS
+      )
       .then((response) => {
         const nDatasets = response.data.data.items.length
         if (nDatasets === expectedNumberOfIndexedDatasets) {
@@ -316,5 +319,4 @@ export async function waitForDatasetsIndexedInSolr(
   if (!datasetsIndexed) {
     throw new Error('Tests setup: Timeout reached while waiting for datasets indexing in Solr')
   }
-  console.log('Datasets indexed in Solr')
 }

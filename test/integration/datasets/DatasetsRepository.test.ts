@@ -72,7 +72,7 @@ describe('DatasetsRepository', () => {
 
     const createCollection = async () => {
       try {
-        await createCollectionViaApi()
+        await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
       } catch (error) {
         throw new Error('Tests beforeAll(): Error while creating test collection')
       }
@@ -82,22 +82,25 @@ describe('DatasetsRepository', () => {
       try {
         firstDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
         )
         secondDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
         )
         thirdDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
         )
         fourthDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
         )
 
-        await waitForDatasetsIndexedInSolr(expectedTotalDatasetCount)
+        await waitForDatasetsIndexedInSolr(
+          expectedTotalDatasetCount,
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+        )
       } catch (error) {
         throw new Error('Tests beforeAll(): Error while creating test datasets')
       }
@@ -116,7 +119,7 @@ describe('DatasetsRepository', () => {
 
     const deleteCollection = async () => {
       try {
-        await deleteCollectionViaApi()
+        await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
       } catch (error) {
         throw new Error('Tests afterAll(): Error while deleting test collection')
       }
@@ -126,7 +129,7 @@ describe('DatasetsRepository', () => {
       const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews(
         undefined,
         undefined,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(expectedTotalDatasetCount)
       expect(actual.datasetPreviews[0].persistentId).toMatch(fourthDatasetIds.persistentId)
@@ -137,7 +140,7 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getAllDatasetPreviews(
         testPageLimit,
         0,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(fourthDatasetIds.persistentId)
@@ -148,7 +151,7 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getAllDatasetPreviews(
         testPageLimit,
         1,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(thirdDatasetIds.persistentId)
@@ -159,7 +162,7 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getAllDatasetPreviews(
         testPageLimit,
         2,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(secondDatasetIds.persistentId)
@@ -170,7 +173,7 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getAllDatasetPreviews(
         testPageLimit,
         3,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(firstDatasetIds.persistentId)

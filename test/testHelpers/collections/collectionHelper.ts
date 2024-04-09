@@ -3,7 +3,8 @@ import { DvObjectType } from '../../../src'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { TestConstants } from '../TestConstants'
 import axios from 'axios'
-import collectionJson from './test-collection-1.json'
+import collectionJson1 from './test-collection-1.json'
+import collectionJson2 from './test-collection-2.json'
 
 const COLLECTION_ID = 11111
 const COLLECTION_ALIAS_STR = 'secondCollection'
@@ -39,17 +40,19 @@ export const createCollectionPayload = (): CollectionPayload => {
   return collectionPayload
 }
 
-export async function createCollectionViaApi(): Promise<void> {
+export async function createCollectionViaApi(collectionAlias: string): Promise<void> {
   return await axios.post(
     `${TestConstants.TEST_API_URL}/dataverses/root`,
-    collectionJson,
+    collectionAlias == TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      ? collectionJson1
+      : collectionJson2,
     DATAVERSE_API_REQUEST_HEADERS
   )
 }
 
-export async function deleteCollectionViaApi(): Promise<void> {
+export async function deleteCollectionViaApi(collectionAlias: string): Promise<void> {
   return await axios.delete(
-    `${TestConstants.TEST_API_URL}/dataverses/${TestConstants.TEST_CREATED_COLLECTION_ALIAS}`,
+    `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}`,
     DATAVERSE_API_REQUEST_HEADERS
   )
 }
