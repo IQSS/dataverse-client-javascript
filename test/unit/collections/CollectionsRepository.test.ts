@@ -10,6 +10,7 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError } from '../../../src'
+import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -85,7 +86,7 @@ describe('CollectionsRepository', () => {
     describe('by default root id', () => {
       test('should return a Collection when no collection id, using ROOT instead is successful', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testCollectionSuccessfulResponse)
-        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${TestConstants.TEST_CREATED_COLLECTION_1_ROOT}`
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${ROOT_COLLECTION_ALIAS}`
 
         // API Key auth
         const actual = await sut.getCollection()
@@ -96,7 +97,7 @@ describe('CollectionsRepository', () => {
 
       test('should return error on repository read error', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
-        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${TestConstants.TEST_CREATED_COLLECTION_1_ROOT}`
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${ROOT_COLLECTION_ALIAS}`
 
         let error = undefined as unknown as ReadError
 
