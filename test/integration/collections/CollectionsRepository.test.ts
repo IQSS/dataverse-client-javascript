@@ -11,6 +11,7 @@ import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Co
 
 describe('CollectionsRepository', () => {
   const testGetCollection: CollectionsRepository = new CollectionsRepository()
+  let testCollectionId: number
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -19,7 +20,10 @@ describe('CollectionsRepository', () => {
       process.env.TEST_API_KEY
     )
     try {
-      await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
+      await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2).then(
+        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+        (response: any) => (testCollectionId = response.data.data.id)
+      )
     } catch (error) {
       throw new Error('Tests beforeAll(): Error while creating test collection')
     }
@@ -65,10 +69,9 @@ describe('CollectionsRepository', () => {
       })
     })
     describe('by numeric id', () => {
-      // FIXME
-      test.skip('should return collection when it exists filtering by id AS (id)', async () => {
-        const actual = await testGetCollection.getCollection(1)
-        expect(actual.id).toBe(1)
+      test('should return collection when it exists filtering by id AS (id)', async () => {
+        const actual = await testGetCollection.getCollection(testCollectionId)
+        expect(actual.id).toBe(testCollectionId)
       })
 
       test('should return error when collection does not exist', async () => {
