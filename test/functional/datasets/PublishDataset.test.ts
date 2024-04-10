@@ -7,7 +7,10 @@ import {
 } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
-import { waitForNoLocks } from '../../testHelpers/datasets/datasetHelper'
+import {
+  waitForNoLocks,
+  deletePublishedDatasetViaApi
+} from '../../testHelpers/datasets/datasetHelper'
 
 const testNewDataset = {
   license: {
@@ -57,12 +60,16 @@ describe('execute', () => {
   })
 
   test('should successfully publish a dataset', async () => {
-    const dataset = await createDataset.execute(testNewDataset)
+    const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
 
-    const response = await publishDataset.execute(dataset.persistentId, VersionUpdateType.MAJOR)
-    await waitForNoLocks(dataset.numericId, 10)
+    const response = await publishDataset.execute(
+      createdDatasetIdentifiers.persistentId,
+      VersionUpdateType.MAJOR
+    )
+    await waitForNoLocks(createdDatasetIdentifiers.numericId, 10)
 
     expect(response).toBeUndefined()
+    await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
   })
 
   test('should throw an error when trying to publish a dataset that does not exist', async () => {
