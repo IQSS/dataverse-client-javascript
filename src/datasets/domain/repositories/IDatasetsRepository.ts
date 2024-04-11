@@ -1,4 +1,4 @@
-import { Dataset } from '../models/Dataset'
+import { Dataset, VersionUpdateType } from '../models/Dataset'
 import { DatasetLock } from '../models/DatasetLock'
 import { DatasetPreviewSubset } from '../models/DatasetPreviewSubset'
 import { DatasetUserPermissions } from '../models/DatasetUserPermissions'
@@ -32,4 +32,5 @@ export interface IDatasetsRepository {
     datasetMetadataBlocks: MetadataBlock[],
     collectionId: string
   ): Promise<CreatedDatasetIdentifiers>
+  publishDataset(datasetId: number | string, versionUpdateType: VersionUpdateType): Promise<void>
 }

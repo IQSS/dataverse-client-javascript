@@ -27,6 +27,7 @@ import {
   createNewDatasetRequestPayload
 } from '../../testHelpers/datasets/newDatasetHelper'
 import { WriteError } from '../../../src'
+import { VersionUpdateType } from '../../../src/datasets/domain/models/Dataset'
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository()
@@ -55,6 +56,8 @@ describe('DatasetsRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       TestConstants.TEST_DUMMY_API_KEY
     )
+
+    jest.clearAllMocks()
   })
 
   describe('getDatasetSummaryFieldNames', () => {
@@ -771,6 +774,59 @@ describe('DatasetsRepository', () => {
         expectedApiEndpoint,
         expectedNewDatasetRequestPayloadJson,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('publishDataset', () => {
+    const testVersionUpdateType = VersionUpdateType.MAJOR
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/actions/:publish`
+    const expectedApiKeyRequestConfig = {
+      ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      params: { type: VersionUpdateType.MAJOR }
+    }
+    const expectedCookieRequestConfig = {
+      ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+      params: { type: VersionUpdateType.MAJOR }
+    }
+
+    test('should return nothing when providing id, version update type and response is successful', async () => {
+      jest.spyOn(axios, 'post').mockResolvedValue(undefined)
+
+      // API Key auth
+      let actual = await sut.publishDataset(testDatasetModel.id, testVersionUpdateType)
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        '{}',
+        expectedApiKeyRequestConfig
+      )
+      expect(actual).toBeUndefined()
+
+      // API Key auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.publishDataset(testDatasetModel.id, testVersionUpdateType)
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        '{}',
+        expectedCookieRequestConfig
+      )
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: WriteError = undefined
+      await sut.publishDataset(testDatasetModel.id, testVersionUpdateType).catch((e) => (error = e))
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        '{}',
+        expectedApiKeyRequestConfig
       )
       expect(error).toBeInstanceOf(Error)
     })

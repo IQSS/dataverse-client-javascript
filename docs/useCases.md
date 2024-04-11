@@ -23,6 +23,7 @@ The different use cases currently available in the package are classified below,
     - [List All Datasets](#list-all-datasets)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
+    - [Publish a Dataset](#publish-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -356,6 +357,40 @@ _See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation
 The above example creates the new dataset in the `root` collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call.
 
 The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
+
+#### Publish a Dataset
+
+Publishes a Dataset, given its identifier and the type of version update to perform.
+
+##### Example call:
+
+```typescript
+import { publishDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+const versionUpdateType = VersionUpdateType.MINOR
+
+publishDataset.execute(datasetId, versionUpdateType).then((publishedDataset: Dataset) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/PublishDataset.ts) implementation_.
+
+The above example publishes the dataset with the specified identifier and performs a minor version update. If the response
+is successful, the use case does not return the dataset object, but the HTTP status code `200`. Otherwise, it throws an error.
+If you want to perform a major version update, you must set the `versionUpdateType` parameter to `VersionUpdateType.MAJOR`.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/domain/models/VersionUpdateType.ts) enum value, which can be one of the following:
+
+- `VersionUpdateType.MINOR`
+- `VersionUpdateType.MAJOR`
 
 ## Files
 
