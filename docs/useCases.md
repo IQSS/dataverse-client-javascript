@@ -38,6 +38,7 @@ The different use cases currently available in the package are classified below,
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get Metadata Block By Name](#get-metadata-block-by-name)
+    - [Get Collection Metadata Blocks](#get-collection-metadata-blocks)
 - [Users](#Users)
   - [Users read use cases](#users-read-use-cases)
     - [Get Current Authenticated User](#get-current-authenticated-user)
@@ -764,6 +765,32 @@ getMetadataBlockByName.execute(name).then((metadataBlock: MetadataBlock) => {
 ```
 
 _See [use case](../src/metadataBlocks/domain/useCases/GetMetadataBlockByName.ts) implementation_.
+
+#### Get Collection Metadata Blocks
+
+Returns a [MetadataBlock](../src/metadataBlocks/domain/models/MetadataBlock.ts) array containing the metadata blocks from the requested collection.
+
+##### Example call:
+
+```typescript
+import { getCollectionMetadataBlocks } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'citation'
+
+getCollectionMetadataBlocks.execute(collectionAlias).then((metadataBlocks: MetadataBlock[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/metadataBlocks/domain/useCases/GetCollectionMetadataBlocks.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+There is a second optional parameter called `onlyDisplayedOnCreate` which indicates whether or not to return only the metadata blocks that are displayed on dataset creation. The default value is false.
 
 ## Users
 

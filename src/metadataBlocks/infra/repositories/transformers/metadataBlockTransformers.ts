@@ -1,10 +1,34 @@
 import { AxiosResponse } from 'axios'
-import { MetadataBlock, MetadataFieldInfo } from '../../../domain/models/MetadataBlock'
+import {
+  MetadataBlock,
+  MetadataFieldInfo,
+  MetadataFieldTypeClass,
+  MetadataFieldType,
+  MetadataFieldWatermark
+} from '../../../domain/models/MetadataBlock'
+import { MetadataBlockPayload } from './MetadataBlockPayload'
+
+export const transformMetadataBlocksResponseToMetadataBlocks = (
+  response: AxiosResponse
+): MetadataBlock[] => {
+  const metadataBlocksPayload = response.data.data
+  const metadataBlocks: MetadataBlock[] = []
+  metadataBlocksPayload.forEach(function (metadataBlockPayload: MetadataBlockPayload) {
+    metadataBlocks.push(transformMetadataBlockPayloadToMetadataBlock(metadataBlockPayload))
+  })
+  return metadataBlocks
+}
 
 export const transformMetadataBlockResponseToMetadataBlock = (
   response: AxiosResponse
 ): MetadataBlock => {
   const metadataBlockPayload = response.data.data
+  return transformMetadataBlockPayloadToMetadataBlock(metadataBlockPayload)
+}
+
+const transformMetadataBlockPayloadToMetadataBlock = (
+  metadataBlockPayload: MetadataBlockPayload
+): MetadataBlock => {
   const metadataFields: Record<string, MetadataFieldInfo> = {}
   const metadataBlockFieldsPayload = metadataBlockPayload.fields
   const childFieldKeys = getChildFieldKeys(metadataBlockFieldsPayload)
@@ -19,6 +43,7 @@ export const transformMetadataBlockResponseToMetadataBlock = (
     id: metadataBlockPayload.id,
     name: metadataBlockPayload.name,
     displayName: metadataBlockPayload.displayName,
+    displayOnCreate: metadataBlockPayload.displayOnCreate,
     metadataFields: metadataFields
   }
 }
@@ -46,8 +71,8 @@ const transformPayloadMetadataFieldInfo = (
     name: metadataFieldInfoPayload.name,
     displayName: metadataFieldInfoPayload.displayName,
     title: metadataFieldInfoPayload.title,
-    type: metadataFieldInfoPayload.type,
-    watermark: metadataFieldInfoPayload.watermark,
+    type: metadataFieldInfoPayload.type as MetadataFieldType,
+    watermark: metadataFieldInfoPayload.watermark as MetadataFieldWatermark,
     description: metadataFieldInfoPayload.description,
     multiple: metadataFieldInfoPayload.multiple,
     isControlledVocabulary: metadataFieldInfoPayload.isControlledVocabulary,
@@ -57,7 +82,8 @@ const transformPayloadMetadataFieldInfo = (
     displayFormat: metadataFieldInfoPayload.displayFormat,
     isRequired: metadataFieldInfoPayload.isRequired,
     displayOrder: metadataFieldInfoPayload.displayOrder,
-    typeClass: metadataFieldInfoPayload.typeClass
+    typeClass: metadataFieldInfoPayload.typeClass as MetadataFieldTypeClass,
+    displayOnCreate: metadataFieldInfoPayload.displayOnCreate
   }
   if (!isChild && 'childFields' in metadataFieldInfoPayload) {
     const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields

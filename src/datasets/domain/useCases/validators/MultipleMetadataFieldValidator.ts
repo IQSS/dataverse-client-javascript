@@ -4,6 +4,7 @@ import {
 } from './BaseMetadataFieldValidator'
 import { NewDatasetMetadataFieldValueDTO } from '../../dtos/NewDatasetDTO'
 import { SingleMetadataFieldValidator } from './SingleMetadataFieldValidator'
+import { MetadataFieldType } from '../../../../metadataBlocks/domain/models/MetadataBlock'
 
 export class MultipleMetadataFieldValidator extends BaseMetadataFieldValidator {
   constructor(private singleMetadataFieldValidator: SingleMetadataFieldValidator) {
@@ -19,14 +20,17 @@ export class MultipleMetadataFieldValidator extends BaseMetadataFieldValidator {
         'Expecting an array of values.'
       )
     }
-    if (this.isValidArrayType(metadataFieldValue, 'string') && metadataFieldInfo.type === 'NONE') {
+    if (
+      this.isValidArrayType(metadataFieldValue, 'string') &&
+      metadataFieldInfo.type === MetadataFieldType.None
+    ) {
       throw this.createGeneralValidationError(
         newDatasetMetadataFieldAndValueInfo,
         'Expecting an array of child fields, not strings.'
       )
     } else if (
       this.isValidArrayType(metadataFieldValue, 'object') &&
-      metadataFieldInfo.type !== 'NONE'
+      metadataFieldInfo.type !== MetadataFieldType.None
     ) {
       throw this.createGeneralValidationError(
         newDatasetMetadataFieldAndValueInfo,
