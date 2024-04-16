@@ -2,6 +2,7 @@ import { Collection } from '../../../domain/models/Collection'
 import { AxiosResponse } from 'axios'
 import { CollectionPayload } from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
+import { transformHtmlToMarkdown } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -14,7 +15,7 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     alias: collectionPayload.alias,
     name: collectionPayload.name,
     affiliation: collectionPayload.affiliation,
-    description: collectionPayload.description,
+    description: transformHtmlToMarkdown(collectionPayload.description),
     ...(collectionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
     })

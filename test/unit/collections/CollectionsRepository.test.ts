@@ -6,7 +6,8 @@ import {
 } from '../../../src/core/infra/repositories/ApiConfig'
 import {
   createCollectionModel,
-  createCollectionPayload
+  createCollectionPayload,
+  transformedCollectionModel
 } from '../../testHelpers/collections/collectionHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError } from '../../../src'
@@ -45,7 +46,7 @@ describe('CollectionsRepository', () => {
         const actual = await sut.getCollection(testCollectionModel.id)
 
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testCollectionModel)
+        expect(actual).toStrictEqual(transformedCollectionModel)
       })
 
       test('should return error on repository read error', async () => {
@@ -68,7 +69,7 @@ describe('CollectionsRepository', () => {
         const actual = await sut.getCollection(testCollectionModel.alias)
 
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testCollectionModel)
+        expect(actual).toStrictEqual(transformedCollectionModel)
       })
 
       test('should return error on repository read error', async () => {
@@ -91,7 +92,7 @@ describe('CollectionsRepository', () => {
         const actual = await sut.getCollection()
 
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testCollectionModel)
+        expect(actual).toStrictEqual(transformedCollectionModel)
       })
 
       test('should return error on repository read error', async () => {
