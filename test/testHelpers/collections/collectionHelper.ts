@@ -14,7 +14,7 @@ export const createCollectionModel = (): Collection => {
     alias: COLLECTION_ALIAS_STR,
     name: COLLECTION_NAME_STR,
     affiliation: COLLECTION_AFFILIATION_STR,
-    description: COLLECTION_DESCRIPTION_HTML,
+    description: COLLECTION_DESCRIPTION_MARKDOWN,
     isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
   }
   return collectionModel
@@ -30,12 +30,4 @@ export const createCollectionPayload = (): CollectionPayload => {
     isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
   }
   return collectionPayload
-}
-export const transformedCollectionModel: CollectionPayload = {
-  id: COLLECTION_ID,
-  alias: COLLECTION_ALIAS_STR,
-  name: COLLECTION_NAME_STR,
-  affiliation: COLLECTION_AFFILIATION_STR,
-  description: COLLECTION_DESCRIPTION_MARKDOWN,
-  isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
 }
