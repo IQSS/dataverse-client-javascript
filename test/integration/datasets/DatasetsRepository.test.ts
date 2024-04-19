@@ -55,7 +55,7 @@ describe('DatasetsRepository', () => {
   describe('getAllDatasetPreviews', () => {
     const testPageLimit = 1
     const expectedTotalDatasetCount = 4
-    let createdDatasetIds: CreatedDatasetIdentifiers[] = []
+    const createdDatasetIds: CreatedDatasetIdentifiers[] = []
 
     beforeAll(async () => {
       await createCollection()
