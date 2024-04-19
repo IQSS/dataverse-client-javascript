@@ -8,9 +8,10 @@ describe('execute', () => {
 
   test('should return metadata block on repository success', async () => {
     const testMetadataBlock = createMetadataBlockModel()
-    const metadataBlocksRepositoryStub: IMetadataBlocksRepository = {
-      getMetadataBlockByName: jest.fn().mockReturnValue(testMetadataBlock)
-    }
+    const metadataBlocksRepositoryStub: IMetadataBlocksRepository = {} as IMetadataBlocksRepository
+    metadataBlocksRepositoryStub.getMetadataBlockByName = jest
+      .fn()
+      .mockResolvedValue(testMetadataBlock)
     const sut = new GetMetadataBlockByName(metadataBlocksRepositoryStub)
 
     const actual = await sut.execute(testMetadataBlockName)
@@ -22,9 +23,10 @@ describe('execute', () => {
   })
 
   test('should return error result on repository error', async () => {
-    const metadataBlocksRepositoryStub: IMetadataBlocksRepository = {
-      getMetadataBlockByName: jest.fn().mockRejectedValue(new ReadError())
-    }
+    const metadataBlocksRepositoryStub: IMetadataBlocksRepository = {} as IMetadataBlocksRepository
+    metadataBlocksRepositoryStub.getMetadataBlockByName = jest
+      .fn()
+      .mockRejectedValue(new ReadError())
     const sut = new GetMetadataBlockByName(metadataBlocksRepositoryStub)
 
     let actualError: ReadError

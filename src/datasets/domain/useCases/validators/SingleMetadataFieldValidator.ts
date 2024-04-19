@@ -7,6 +7,7 @@ import { DateFormatFieldError } from './errors/DateFormatFieldError'
 import { MetadataFieldValidator } from './MetadataFieldValidator'
 import { NewDatasetMetadataChildFieldValueDTO } from '../../dtos/NewDatasetDTO'
 import { MultipleMetadataFieldValidator } from './MultipleMetadataFieldValidator'
+import { MetadataFieldType } from '../../../../metadataBlocks/domain/models/MetadataBlock'
 
 export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
   validate(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo): void {
@@ -18,13 +19,19 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
         'Expecting a single field, not an array.'
       )
     }
-    if (typeof metadataFieldValue === 'object' && metadataFieldInfo.type !== 'NONE') {
+    if (
+      typeof metadataFieldValue === 'object' &&
+      metadataFieldInfo.type !== MetadataFieldType.None
+    ) {
       throw this.createGeneralValidationError(
         newDatasetMetadataFieldAndValueInfo,
         'Expecting a string, not child fields.'
       )
     }
-    if (typeof metadataFieldValue === 'string' && metadataFieldInfo.type === 'NONE') {
+    if (
+      typeof metadataFieldValue === 'string' &&
+      metadataFieldInfo.type === MetadataFieldType.None
+    ) {
       throw this.createGeneralValidationError(
         newDatasetMetadataFieldAndValueInfo,
         'Expecting child fields, not a string.'
@@ -41,7 +48,7 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
       this.validateControlledVocabularyFieldValue(newDatasetMetadataFieldAndValueInfo)
     }
 
-    if (metadataFieldInfo.type == 'DATE') {
+    if (metadataFieldInfo.type == MetadataFieldType.Date) {
       this.validateDateFieldValue(newDatasetMetadataFieldAndValueInfo)
     }
 

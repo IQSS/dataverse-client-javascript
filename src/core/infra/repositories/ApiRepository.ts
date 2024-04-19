@@ -39,10 +39,6 @@ export abstract class ApiRepository {
     operation: string,
     resourceId: number | string = undefined
   ) {
-    if (resourceName === 'dataverses') {
-      return `/${resourceName}/${resourceId}`
-    }
-
     return typeof resourceId === 'number'
       ? `/${resourceName}/${resourceId}/${operation}`
       : typeof resourceId === 'string'

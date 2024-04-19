@@ -2,8 +2,12 @@ import {
   NewDatasetDTO,
   NewDatasetMetadataFieldValueDTO
 } from '../../../src/datasets/domain/dtos/NewDatasetDTO'
-import { DatasetLicense, MetadataBlock } from '../../../src'
+import { DatasetLicense, MetadataBlock, MetadataFieldType } from '../../../src'
 import { NewDatasetRequestPayload } from '../../../src/datasets/infra/repositories/transformers/newDatasetTransformers'
+import {
+  MetadataFieldWatermark,
+  MetadataFieldTypeClass
+} from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 
 export const createNewDatasetDTO = (
   titleFieldValue?: NewDatasetMetadataFieldValueDTO,
@@ -102,62 +106,67 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
     id: 1,
     name: 'citation',
     displayName: 'Citation Metadata',
+    displayOnCreate: true,
     metadataFields: {
       title: {
         name: 'title',
         displayName: 'title',
         title: 'title',
-        type: 'DatasetField',
-        watermark: 'watermark',
+        type: MetadataFieldType.Text,
+        watermark: MetadataFieldWatermark.Empty,
         description: 'description',
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
-        typeClass: 'primitive'
+        displayOnCreate: true,
+        typeClass: MetadataFieldTypeClass.Primitive
       },
       author: {
         name: 'author',
         displayName: 'author',
         title: 'author',
-        type: 'NONE',
-        watermark: 'watermark',
+        type: MetadataFieldType.None,
+        watermark: MetadataFieldWatermark.Empty,
         description: 'description',
         multiple: true,
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 1,
-        typeClass: 'compound',
+        typeClass: MetadataFieldTypeClass.Compound,
+        displayOnCreate: true,
         childMetadataFields: {
           authorName: {
             name: 'authorName',
             displayName: 'author name',
             title: 'author name',
-            type: 'TEXT',
-            watermark: 'watermark',
+            type: MetadataFieldType.Text,
+            watermark: MetadataFieldWatermark.Empty,
             description: 'description',
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 2,
-            typeClass: 'primitive'
+            displayOnCreate: true,
+            typeClass: MetadataFieldTypeClass.Primitive
           },
           authorAffiliation: {
             name: 'authorAffiliation',
             displayName: 'author affiliation',
             title: 'author affiliation',
-            type: 'TEXT',
-            watermark: 'watermark',
+            type: MetadataFieldType.Text,
+            watermark: MetadataFieldWatermark.Empty,
             description: 'descriprion',
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: false,
             displayOrder: 3,
-            typeClass: 'primitive'
+            displayOnCreate: true,
+            typeClass: MetadataFieldTypeClass.Primitive
           }
         }
       },
@@ -165,8 +174,8 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         name: 'alternativeRequiredTitle',
         displayName: 'Alternative Required Title',
         title: 'Alternative Title',
-        type: 'TEXT',
-        watermark: '',
+        type: MetadataFieldType.Text,
+        watermark: MetadataFieldWatermark.Empty,
         description:
           'Either 1) a title commonly used to refer to the Dataset or 2) an abbreviation of the main title',
         multiple: true,
@@ -174,28 +183,30 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: '',
         isRequired: true,
         displayOrder: 4,
-        typeClass: 'primitive'
+        displayOnCreate: true,
+        typeClass: MetadataFieldTypeClass.Primitive
       },
       timePeriodCoveredStart: {
         name: 'timePeriodCoveredStart',
         displayName: 'Time Period Start Date',
         title: 'Start Date',
-        type: 'DATE',
-        watermark: 'YYYY-MM-DD',
+        type: MetadataFieldType.Date,
+        watermark: MetadataFieldWatermark.Empty,
         description: 'The start date of the time period that the data refer to',
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#NAME: #VALUE ',
         isRequired: false,
         displayOrder: 5,
-        typeClass: 'primitive'
+        displayOnCreate: true,
+        typeClass: MetadataFieldTypeClass.Primitive
       },
       contributor: {
         name: 'contributor',
         displayName: 'Contributor',
         title: 'Contributor',
-        type: 'NONE',
-        watermark: '',
+        type: MetadataFieldType.None,
+        watermark: MetadataFieldWatermark.Empty,
         description:
           'The entity, such as a person or organization, responsible for collecting, managing, or otherwise contributing to the development of the Dataset',
         multiple: true,
@@ -203,20 +214,22 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
         displayFormat: ':',
         isRequired: false,
         displayOrder: 6,
-        typeClass: 'compound',
+        typeClass: MetadataFieldTypeClass.Compound,
+        displayOnCreate: true,
         childMetadataFields: {
           contributorType: {
             name: 'contributorType',
             displayName: 'Contributor Type',
             title: 'Type',
-            type: 'TEXT',
-            watermark: '',
+            type: MetadataFieldType.Text,
+            watermark: MetadataFieldWatermark.Empty,
             description: 'Indicates the type of contribution made to the dataset',
             multiple: false,
             isControlledVocabulary: true,
             displayFormat: '#VALUE ',
             isRequired: false,
             displayOrder: 7,
+            displayOnCreate: true,
             controlledVocabularyValues: [
               'Data Collector',
               'Data Curator',
@@ -236,14 +249,14 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
               'Work Package Leader',
               'Other'
             ],
-            typeClass: 'controlledVocabulary'
+            typeClass: MetadataFieldTypeClass.ControlledVocabulary
           },
           contributorName: {
             name: 'contributorName',
             displayName: 'Contributor Name',
             title: 'Name',
-            type: 'TEXT',
-            watermark: '1) FamilyName, GivenName or 2) Organization',
+            type: MetadataFieldType.Text,
+            watermark: MetadataFieldWatermark.Empty,
             description:
               "The name of the contributor, e.g. the person's name or the name of an organization",
             multiple: false,
@@ -251,7 +264,8 @@ export const createNewDatasetMetadataBlockModel = (): MetadataBlock => {
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 8,
-            typeClass: 'primitive'
+            typeClass: MetadataFieldTypeClass.Primitive,
+            displayOnCreate: true
           }
         }
       }

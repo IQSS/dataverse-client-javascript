@@ -1,66 +1,77 @@
-import { MetadataBlock } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
+import {
+  MetadataBlock,
+  MetadataFieldType,
+  MetadataFieldWatermark,
+  MetadataFieldTypeClass
+} from '../../../src/metadataBlocks/domain/models/MetadataBlock'
+import { MetadataBlockPayload } from '../../../src/metadataBlocks/infra/repositories/transformers/MetadataBlockPayload'
 
 export const createMetadataBlockModel = (): MetadataBlock => {
   return {
     id: 1,
     name: 'testName',
     displayName: 'testDisplayName',
+    displayOnCreate: true,
     metadataFields: {
       testField1: {
         name: 'testName1',
         displayName: 'testDisplayName1',
         title: 'testTitle1',
-        type: 'testType1',
-        watermark: 'testWatermark1',
+        type: MetadataFieldType.Text,
+        watermark: MetadataFieldWatermark.Empty,
         description: 'testDescription1',
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
-        typeClass: 'primitive'
+        typeClass: MetadataFieldTypeClass.Primitive,
+        displayOnCreate: true
       },
       testField2: {
         name: 'testName2',
         displayName: 'testDisplayName2',
         title: 'testTitle2',
-        type: 'testType2',
-        watermark: 'testWatermark2',
+        type: MetadataFieldType.Text,
+        watermark: MetadataFieldWatermark.Empty,
         description: 'testDescription2',
         multiple: true,
         isControlledVocabulary: false,
         displayFormat: '',
         isRequired: true,
         displayOrder: 0,
-        typeClass: 'compound',
+        typeClass: MetadataFieldTypeClass.Compound,
+        displayOnCreate: true,
         childMetadataFields: {
           testField3: {
             name: 'testName3',
             displayName: 'testDisplayName3',
             title: 'testTitle3',
-            type: 'testType3',
-            watermark: 'testWatermark3',
+            type: MetadataFieldType.Text,
+            watermark: MetadataFieldWatermark.Empty,
             description: 'testDescription3',
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
-            typeClass: 'primitive'
+            typeClass: MetadataFieldTypeClass.Primitive,
+            displayOnCreate: true
           },
           testField4: {
             name: 'testName4',
             displayName: 'testDisplayName4',
             title: 'testTitle4',
-            type: 'testType4',
-            watermark: 'testWatermark4',
+            type: MetadataFieldType.Text,
+            watermark: MetadataFieldWatermark.Empty,
             description: 'testDescription4',
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
-            typeClass: 'primitive'
+            typeClass: MetadataFieldTypeClass.Primitive,
+            displayOnCreate: true
           }
         }
       }
@@ -68,33 +79,34 @@ export const createMetadataBlockModel = (): MetadataBlock => {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createMetadataBlockPayload = (): any => {
+export const createMetadataBlockPayload = (): MetadataBlockPayload => {
   return {
     id: 1,
     name: 'testName',
     displayName: 'testDisplayName',
+    displayOnCreate: true,
     fields: {
       testField1: {
         name: 'testName1',
         displayName: 'testDisplayName1',
         title: 'testTitle1',
-        type: 'testType1',
-        watermark: 'testWatermark1',
+        type: 'TEXT',
+        watermark: '',
         description: 'testDescription1',
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
         isRequired: true,
         displayOrder: 0,
-        typeClass: 'primitive'
+        typeClass: 'primitive',
+        displayOnCreate: true
       },
       testField2: {
         name: 'testName2',
         displayName: 'testDisplayName2',
         title: 'testTitle2',
-        type: 'testType2',
-        watermark: 'testWatermark2',
+        type: 'TEXT',
+        watermark: '',
         description: 'testDescription2',
         multiple: true,
         isControlledVocabulary: false,
@@ -102,34 +114,37 @@ export const createMetadataBlockPayload = (): any => {
         isRequired: true,
         displayOrder: 0,
         typeClass: 'compound',
+        displayOnCreate: true,
         childFields: {
           testField3: {
             name: 'testName3',
             displayName: 'testDisplayName3',
             title: 'testTitle3',
-            type: 'testType3',
-            watermark: 'testWatermark3',
+            type: 'TEXT',
+            watermark: '',
             description: 'testDescription3',
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
-            typeClass: 'primitive'
+            typeClass: 'primitive',
+            displayOnCreate: true
           },
           testField4: {
             name: 'testName4',
             displayName: 'testDisplayName4',
             title: 'testTitle4',
-            type: 'testType4',
-            watermark: 'testWatermark4',
+            type: 'TEXT',
+            watermark: '',
             description: 'testDescription4',
             multiple: false,
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
             displayOrder: 0,
-            typeClass: 'primitive'
+            typeClass: 'primitive',
+            displayOnCreate: true
           }
         }
       }
