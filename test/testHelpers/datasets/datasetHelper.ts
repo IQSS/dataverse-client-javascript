@@ -203,19 +203,27 @@ export const createDatasetVersionPayload = (
 }
 
 export const deleteUnpublishedDatasetViaApi = async (datasetId: number): Promise<AxiosResponse> => {
-  return await axios.delete(
-    `${TestConstants.TEST_API_URL}/datasets/${datasetId}`,
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    return await axios.delete(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}`,
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while deleting unpublished test dataset ${datasetId}`)
+  }
 }
 
 export const deletePublishedDatasetViaApi = async (
   datasetPersistentId: string
 ): Promise<AxiosResponse> => {
-  return await axios.delete(
-    `${TestConstants.TEST_API_URL}/datasets/:persistentId/destroy?persistentId=${datasetPersistentId}`,
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    return await axios.delete(
+      `${TestConstants.TEST_API_URL}/datasets/:persistentId/destroy?persistentId=${datasetPersistentId}`,
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while deleting published test dataset ${datasetPersistentId}`)
+  }
 }
 
 export const createDatasetLicenseModel = (withIconUri = true): DatasetLicense => {
@@ -230,31 +238,43 @@ export const createDatasetLicenseModel = (withIconUri = true): DatasetLicense =>
 }
 
 export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResponse> => {
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/actions/:publish?type=major`,
-    {},
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    return await axios.post(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}/actions/:publish?type=major`,
+      {},
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while publishing test dataset ${datasetId}`)
+  }
 }
 
 export const deaccessionDatasetViaApi = async (
   datasetId: number,
   versionId: string
 ): Promise<AxiosResponse> => {
-  const data = { deaccessionReason: 'Test reason.' }
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
-    JSON.stringify(data),
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    const data = { deaccessionReason: 'Test reason.' }
+    return await axios.post(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
+      JSON.stringify(data),
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while deaccessioning test dataset ${datasetId}`)
+  }
 }
 
 export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosResponse> => {
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,
-    {},
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    return await axios.post(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,
+      {},
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while creating private URL for dataset ${datasetId}`)
+  }
 }
 
 export const waitForNoLocks = async (
@@ -308,15 +328,15 @@ export async function waitForDatasetsIndexedInSolr(
       })
       .catch((error) => {
         console.error(
-          `Tests setup: Error while waiting for datasets indexing in Solr: [${
-            error.response.status
-          }]${error.response.data ? ` ${error.response.data.message}` : ''}`
+          `Error while waiting for datasets indexing in Solr: [${error.response.status}]${
+            error.response.data ? ` ${error.response.data.message}` : ''
+          }`
         )
       })
     await new Promise((resolve) => setTimeout(resolve, 1000))
     retry++
   }
   if (!datasetsIndexed) {
-    throw new Error('Tests setup: Timeout reached while waiting for datasets indexing in Solr')
+    throw new Error('Timeout reached while waiting for datasets indexing in Solr')
   }
 }

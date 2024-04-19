@@ -8,6 +8,7 @@ import {
   deleteCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
+import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 
 describe('CollectionsRepository', () => {
   const testGetCollection: CollectionsRepository = new CollectionsRepository()
@@ -19,14 +20,9 @@ describe('CollectionsRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
-    try {
-      await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2).then(
-        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-        (response: any) => (testCollectionId = response.data.data.id)
-      )
-    } catch (error) {
-      throw new Error('Tests beforeAll(): Error while creating test collection')
-    }
+    await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2).then(
+      (collectionPayload: CollectionPayload) => (testCollectionId = collectionPayload.id)
+    )
   })
 
   afterAll(async () => {
@@ -35,11 +31,7 @@ describe('CollectionsRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
-    try {
-      await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
-    } catch (error) {
-      throw new Error('Tests afterAll(): Error while deleting test collection')
-    }
+    await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
   })
 
   describe('getCollection', () => {

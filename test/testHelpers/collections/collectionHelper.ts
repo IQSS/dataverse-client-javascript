@@ -40,19 +40,29 @@ export const createCollectionPayload = (): CollectionPayload => {
   return collectionPayload
 }
 
-export async function createCollectionViaApi(collectionAlias: string): Promise<void> {
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/dataverses/root`,
-    collectionAlias == TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      ? collectionJson1
-      : collectionJson2,
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+export async function createCollectionViaApi(collectionAlias: string): Promise<CollectionPayload> {
+  try {
+    return await axios
+      .post(
+        `${TestConstants.TEST_API_URL}/dataverses/root`,
+        collectionAlias == TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+          ? collectionJson1
+          : collectionJson2,
+        DATAVERSE_API_REQUEST_HEADERS
+      )
+      .then((response) => response.data.data)
+  } catch (error) {
+    throw new Error(`Error while creating test collection ${collectionAlias}`)
+  }
 }
 
 export async function deleteCollectionViaApi(collectionAlias: string): Promise<void> {
-  return await axios.delete(
-    `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}`,
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    return await axios.delete(
+      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}`,
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while deleting test collection ${collectionAlias}`)
+  }
 }

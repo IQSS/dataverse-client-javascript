@@ -71,58 +71,42 @@ describe('DatasetsRepository', () => {
     })
 
     const createCollection = async () => {
-      try {
-        await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test collection')
-      }
+      await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
     }
 
     const createDatasets = async () => {
-      try {
-        firstDatasetIds = await createDataset.execute(
-          TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-        )
-        secondDatasetIds = await createDataset.execute(
-          TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-        )
-        thirdDatasetIds = await createDataset.execute(
-          TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-        )
-        fourthDatasetIds = await createDataset.execute(
-          TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-        )
+      firstDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
+      secondDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
+      thirdDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
+      fourthDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
 
-        await waitForDatasetsIndexedInSolr(
-          expectedTotalDatasetCount,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-        )
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test datasets')
-      }
+      await waitForDatasetsIndexedInSolr(
+        expectedTotalDatasetCount,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
     }
 
     const deleteDatasets = async () => {
-      try {
-        await deleteUnpublishedDatasetViaApi(firstDatasetIds.numericId)
-        await deleteUnpublishedDatasetViaApi(secondDatasetIds.numericId)
-        await deleteUnpublishedDatasetViaApi(thirdDatasetIds.numericId)
-        await deleteUnpublishedDatasetViaApi(fourthDatasetIds.numericId)
-      } catch (error) {
-        throw new Error('Tests afterAll(): Error while deleting test datasets')
-      }
+      await deleteUnpublishedDatasetViaApi(firstDatasetIds.numericId)
+      await deleteUnpublishedDatasetViaApi(secondDatasetIds.numericId)
+      await deleteUnpublishedDatasetViaApi(thirdDatasetIds.numericId)
+      await deleteUnpublishedDatasetViaApi(fourthDatasetIds.numericId)
     }
 
     const deleteCollection = async () => {
-      try {
-        await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
-      } catch (error) {
-        throw new Error('Tests afterAll(): Error while deleting test collection')
-      }
+      await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
     }
 
     test('should return all dataset previews when no pagination params are defined', async () => {
@@ -193,19 +177,11 @@ describe('DatasetsRepository', () => {
       let testDatasetIds: CreatedDatasetIdentifiers
 
       beforeAll(async () => {
-        try {
-          testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-        } catch (error) {
-          throw new Error('Tests beforeAll(): Error while creating test dataset')
-        }
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
       })
 
       afterAll(async () => {
-        try {
-          await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-        } catch (error) {
-          throw new Error('Tests afterAll(): Error while deleting test dataset')
-        }
+        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
       })
 
       test('should return dataset when it exists filtering by id and version id', async () => {
@@ -270,19 +246,11 @@ describe('DatasetsRepository', () => {
       let testDatasetIds: CreatedDatasetIdentifiers
 
       beforeAll(async () => {
-        try {
-          testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-        } catch (error) {
-          throw new Error('Tests beforeAll(): Error while creating test dataset')
-        }
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
       })
 
       afterAll(async () => {
-        try {
-          await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
-        } catch (error) {
-          throw new Error('Tests afterAll(): Error while deleting test dataset')
-        }
+        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
       })
 
       test('should return dataset when it exists filtering by persistent id and version id', async () => {
@@ -317,25 +285,13 @@ describe('DatasetsRepository', () => {
     let privateUrlToken: string
 
     beforeAll(async () => {
-      try {
-        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test dataset')
-      }
-      try {
-        const response = await createPrivateUrlViaApi(testDatasetIds.numericId)
-        privateUrlToken = response.data.data.token
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating Dataset private URL')
-      }
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      const response = await createPrivateUrlViaApi(testDatasetIds.numericId)
+      privateUrlToken = response.data.data.token
     })
 
     afterAll(async () => {
-      try {
-        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
-      } catch (error) {
-        throw new Error('Tests afterAll(): Error while deleting test dataset')
-      }
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
 
     describe('getPrivateUrlDataset', () => {
@@ -369,19 +325,11 @@ describe('DatasetsRepository', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
     beforeAll(async () => {
-      try {
-        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test dataset')
-      }
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
     })
 
     afterAll(async () => {
-      try {
-        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
-      } catch (error) {
-        throw new Error('Tests afterAll(): Error while deleting test dataset')
-      }
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
 
     test('should return user permissions filtering by dataset id', async () => {
@@ -408,27 +356,15 @@ describe('DatasetsRepository', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
     beforeAll(async () => {
-      try {
-        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test dataset')
-      }
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
     })
 
     afterAll(async () => {
-      try {
-        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-      } catch (error) {
-        throw new Error('Tests afterAll(): Error while deleting test dataset')
-      }
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
 
     test('should return list of dataset locks by dataset id for a dataset while publishing', async () => {
       await publishDatasetViaApi(testDatasetIds.numericId)
-        .then()
-        .catch((error) => {
-          console.log(JSON.stringify(error))
-        })
       const actual = await sut.getDatasetLocks(testDatasetIds.numericId)
       expect(actual.length).toBe(1)
       expect(actual[0].lockType).toBe(DatasetLockType.FINALIZE_PUBLICATION)
@@ -449,19 +385,11 @@ describe('DatasetsRepository', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
     beforeAll(async () => {
-      try {
-        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test dataset')
-      }
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
     })
 
     afterAll(async () => {
-      try {
-        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-      } catch (error) {
-        throw new Error('Tests afterAll(): Error while deleting test dataset')
-      }
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
 
     test('should return citation when dataset exists', async () => {
@@ -585,19 +513,11 @@ describe('DatasetsRepository', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
     beforeAll(async () => {
-      try {
-        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test dataset')
-      }
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
     })
 
     afterAll(async () => {
-      try {
-        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-      } catch (error) {
-        throw new Error('Tests afterAll(): Error while deleting test dataset')
-      }
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
 
     test('should publish a new dataset version', async () => {
