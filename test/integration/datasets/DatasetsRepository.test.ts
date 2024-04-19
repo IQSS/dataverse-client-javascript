@@ -55,10 +55,7 @@ describe('DatasetsRepository', () => {
   describe('getAllDatasetPreviews', () => {
     const testPageLimit = 1
     const expectedTotalDatasetCount = 4
-    let firstDatasetIds: CreatedDatasetIdentifiers
-    let secondDatasetIds: CreatedDatasetIdentifiers
-    let thirdDatasetIds: CreatedDatasetIdentifiers
-    let fourthDatasetIds: CreatedDatasetIdentifiers
+    let createdDatasetIds: CreatedDatasetIdentifiers[] = []
 
     beforeAll(async () => {
       await createCollection()
@@ -75,22 +72,12 @@ describe('DatasetsRepository', () => {
     }
 
     const createDatasets = async () => {
-      firstDatasetIds = await createDataset.execute(
-        TestConstants.TEST_NEW_DATASET_DTO,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
-      secondDatasetIds = await createDataset.execute(
-        TestConstants.TEST_NEW_DATASET_DTO,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
-      thirdDatasetIds = await createDataset.execute(
-        TestConstants.TEST_NEW_DATASET_DTO,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
-      fourthDatasetIds = await createDataset.execute(
-        TestConstants.TEST_NEW_DATASET_DTO,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
+      for (let i = 0; i < expectedTotalDatasetCount; i++) {
+        createdDatasetIds[i] = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+        )
+      }
 
       await waitForDatasetsIndexedInSolr(
         expectedTotalDatasetCount,
@@ -99,10 +86,9 @@ describe('DatasetsRepository', () => {
     }
 
     const deleteDatasets = async () => {
-      await deleteUnpublishedDatasetViaApi(firstDatasetIds.numericId)
-      await deleteUnpublishedDatasetViaApi(secondDatasetIds.numericId)
-      await deleteUnpublishedDatasetViaApi(thirdDatasetIds.numericId)
-      await deleteUnpublishedDatasetViaApi(fourthDatasetIds.numericId)
+      for (let i = 0; i < expectedTotalDatasetCount; i++) {
+        await deleteUnpublishedDatasetViaApi(createdDatasetIds[i].numericId)
+      }
     }
 
     const deleteCollection = async () => {
@@ -116,7 +102,7 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(expectedTotalDatasetCount)
-      expect(actual.datasetPreviews[0].persistentId).toMatch(fourthDatasetIds.persistentId)
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[3].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
@@ -127,7 +113,7 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].persistentId).toMatch(fourthDatasetIds.persistentId)
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[3].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
@@ -138,7 +124,7 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].persistentId).toMatch(thirdDatasetIds.persistentId)
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[2].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
@@ -149,7 +135,7 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].persistentId).toMatch(secondDatasetIds.persistentId)
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[1].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
@@ -160,7 +146,7 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
       )
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].persistentId).toMatch(firstDatasetIds.persistentId)
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[0].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
   })
