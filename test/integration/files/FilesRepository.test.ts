@@ -134,7 +134,7 @@ describe('FilesRepository', () => {
         expect(actual.totalFilesCount).toBe(4)
       })
 
-      test.only('should return correct files filtering by dataset id, version id, and applying newest file criteria', async () => {
+      test('should return correct files filtering by dataset id, version id, and applying newest file criteria', async () => {
         const actual = await sut.getDatasetFiles(
           TestConstants.TEST_CREATED_DATASET_1_ID,
           latestDatasetVersionId,
