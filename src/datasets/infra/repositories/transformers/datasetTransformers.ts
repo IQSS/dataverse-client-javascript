@@ -141,6 +141,6 @@ const transformPayloadToDatasetMetadataSubfieldValue = (
   return result
 }
 
-const transformHtmlToMarkdown = (source: string): string => {
+export const transformHtmlToMarkdown = (source: string): string => {
   return turndownService.turndown(source)
 }

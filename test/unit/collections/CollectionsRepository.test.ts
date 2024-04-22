@@ -46,7 +46,7 @@ describe('CollectionsRepository', () => {
         const actual = await sut.getCollection(testCollectionModel.id)
 
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testCollectionModel)
+        expect(actual).toStrictEqual(createCollectionModel())
       })
 
       test('should return error on repository read error', async () => {
@@ -69,7 +69,7 @@ describe('CollectionsRepository', () => {
         const actual = await sut.getCollection(testCollectionModel.alias)
 
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testCollectionModel)
+        expect(actual).toStrictEqual(createCollectionModel())
       })
 
       test('should return error on repository read error', async () => {
@@ -92,7 +92,7 @@ describe('CollectionsRepository', () => {
         const actual = await sut.getCollection()
 
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testCollectionModel)
+        expect(actual).toStrictEqual(createCollectionModel())
       })
 
       test('should return error on repository read error', async () => {
