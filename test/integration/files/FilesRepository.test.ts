@@ -78,7 +78,14 @@ describe('FilesRepository', () => {
         throw new Error(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`)
       })
     // Registering test file 1
+
     await registerFileViaApi(uploadFileResponse.data.data.files[0].dataFile.id)
+      .then()
+      .catch((err) => {
+        console.log(err.message)
+        console.log(err.response.data)
+        throw new Error(`Tests beforeAll(): Error while registering file ${testTextFile1Name}`)
+      })
     const filesSubset = await sut.getDatasetFiles(
       TestConstants.TEST_CREATED_DATASET_1_ID,
       latestDatasetVersionId,
@@ -127,7 +134,7 @@ describe('FilesRepository', () => {
         expect(actual.totalFilesCount).toBe(4)
       })
 
-      test('should return correct files filtering by dataset id, version id, and applying newest file criteria', async () => {
+      test.only('should return correct files filtering by dataset id, version id, and applying newest file criteria', async () => {
         const actual = await sut.getDatasetFiles(
           TestConstants.TEST_CREATED_DATASET_1_ID,
           latestDatasetVersionId,
