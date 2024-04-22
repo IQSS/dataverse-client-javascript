@@ -3,6 +3,7 @@ import { ApiConfig } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError'
+import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
 
 describe('execute', () => {
   beforeEach(async () => {
@@ -56,6 +57,7 @@ describe('execute', () => {
       expect(createdDatasetIdentifiers).not.toBeNull()
       expect(createdDatasetIdentifiers.numericId).not.toBeNull()
       expect(createdDatasetIdentifiers.persistentId).not.toBeNull()
+      await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
     }
   })
 

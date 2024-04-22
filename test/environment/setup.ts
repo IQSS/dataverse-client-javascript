@@ -2,14 +2,7 @@ import * as fs from 'fs'
 import { DockerComposeEnvironment, Wait } from 'testcontainers'
 import axios from 'axios'
 import { TestConstants } from '../testHelpers/TestConstants'
-import datasetJson1 from '../testHelpers/datasets/test-dataset-1.json'
-import datasetJson2 from '../testHelpers/datasets/test-dataset-2.json'
-import datasetJson3 from '../testHelpers/datasets/test-dataset-3.json'
-import datasetJson4 from '../testHelpers/datasets/test-dataset-4.json'
-import collectionJson from '../testHelpers/collections/test-collection-1.json'
-import { ROOT_COLLECTION_ALIAS } from '../../src/collections/domain/models/Collection'
 
-const NUMBER_OF_DATASETS = 4
 const COMPOSE_FILE = 'docker-compose.yml'
 
 const CONTAINER_DATAVERSE_BOOTSTRAP_NAME = 'test_dataverse_bootstrap'
@@ -24,7 +17,6 @@ const API_KEY_USER_PASSWORD = 'admin1'
 export default async function setupTestEnvironment(): Promise<void> {
   await setupContainers()
   await setupApiKey()
-  await setupTestFixtures()
 }
 
 async function setupContainers(): Promise<void> {
@@ -53,89 +45,4 @@ async function setupApiKey(): Promise<void> {
       console.error('Tests setup: Error while obtaining API key')
     })
   console.log('API key obtained')
-}
-
-async function setupTestFixtures(): Promise<void> {
-  console.log('Creating test datasets...')
-  await createDatasetViaApi(datasetJson1)
-    .then()
-    .catch(() => {
-      console.error('Tests setup: Error while creating test Dataset 1')
-    })
-  await createDatasetViaApi(datasetJson2).catch(() => {
-    console.error('Tests setup: Error while creating test Dataset 2')
-  })
-  await createDatasetViaApi(datasetJson4).catch(() => {
-    console.error('Tests setup: Error while creating test Dataset 4')
-  })
-  await createCollectionViaApi(collectionJson)
-    .then()
-    .catch(() => {
-      console.error('Tests setup: Error while creating test Collection 1')
-    })
-  await createDatasetViaApi(datasetJson3, collectionJson.alias)
-    .then()
-    .catch(() => {
-      console.error('Tests setup: Error while creating test Dataset 3')
-    })
-  console.log('Test datasets created')
-  await waitForDatasetsIndexingInSolr()
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-async function createCollectionViaApi(collectionJson: any): Promise<any> {
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/dataverses/root`,
-    collectionJson,
-    buildRequestHeaders()
-  )
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-async function createDatasetViaApi(
-  datasetJson: any,
-  collectionId = ROOT_COLLECTION_ALIAS
-): Promise<any> {
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/dataverses/${collectionId}/datasets`,
-    datasetJson,
-    buildRequestHeaders()
-  )
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-async function waitForDatasetsIndexingInSolr(): Promise<void> {
-  console.log('Waiting for datasets indexing in Solr...')
-  let datasetsIndexed = false
-  let retry = 0
-  while (!datasetsIndexed && retry < 10) {
-    await axios
-      .get(`${TestConstants.TEST_API_URL}/search?q=*&type=dataset`, buildRequestHeaders())
-      .then((response) => {
-        const nDatasets = response.data.data.items.length
-        if (nDatasets === NUMBER_OF_DATASETS) {
-          datasetsIndexed = true
-        }
-      })
-      .catch((error) => {
-        console.error(
-          `Tests setup: Error while waiting for datasets indexing in Solr: [${
-            error.response.status
-          }]${error.response.data ? ` ${error.response.data.message}` : ''}`
-        )
-      })
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    retry++
-  }
-  if (!datasetsIndexed) {
-    throw new Error('Tests setup: Timeout reached while waiting for datasets indexing in Solr')
-  }
-  console.log('Datasets indexed in Solr')
-}
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function buildRequestHeaders(): any {
-  return {
-    headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
-  }
 }
