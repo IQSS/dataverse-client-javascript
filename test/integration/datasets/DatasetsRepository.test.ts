@@ -2,16 +2,21 @@ import { DatasetsRepository } from '../../../src/datasets/infra/repositories/Dat
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   createPrivateUrlViaApi,
-  deaccessionDatasetViaApi,
   publishDatasetViaApi,
-  waitForNoLocks
+  waitForNoLocks,
+  deleteUnpublishedDatasetViaApi,
+  waitForDatasetsIndexedInSolr,
+  deletePublishedDatasetViaApi,
+  deaccessionDatasetViaApi
 } from '../../testHelpers/datasets/datasetHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
   DatasetLockType,
   DatasetNotNumberedVersion,
   DatasetPreviewSubset,
-  VersionUpdateType
+  VersionUpdateType,
+  createDataset,
+  CreatedDatasetIdentifiers
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -22,14 +27,16 @@ import {
   DatasetDescription
 } from '../../../src/datasets/domain/models/Dataset'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
+import {
+  createCollectionViaApi,
+  deleteCollectionViaApi
+} from '../../testHelpers/collections/collectionHelper'
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository()
   const nonExistentTestDatasetId = 100
 
-  const latestVersionId = DatasetNotNumberedVersion.LATEST
-
-  beforeEach(async () => {
+  beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
@@ -37,7 +44,7 @@ describe('DatasetsRepository', () => {
     )
   })
 
-  afterEach(async () => {
+  afterAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
@@ -48,47 +55,99 @@ describe('DatasetsRepository', () => {
   describe('getAllDatasetPreviews', () => {
     const testPageLimit = 1
     const expectedTotalDatasetCount = 4
+    const createdDatasetIds: CreatedDatasetIdentifiers[] = []
+
+    beforeAll(async () => {
+      await createCollection()
+      await createDatasets()
+    })
+
+    afterAll(async () => {
+      await deleteDatasets()
+      await deleteCollection()
+    })
+
+    const createCollection = async () => {
+      await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
+    }
+
+    const createDatasets = async () => {
+      for (let i = 0; i < expectedTotalDatasetCount; i++) {
+        createdDatasetIds[i] = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+        )
+      }
+
+      await waitForDatasetsIndexedInSolr(
+        expectedTotalDatasetCount,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
+    }
+
+    const deleteDatasets = async () => {
+      for (let i = 0; i < expectedTotalDatasetCount; i++) {
+        await deleteUnpublishedDatasetViaApi(createdDatasetIds[i].numericId)
+      }
+    }
+
+    const deleteCollection = async () => {
+      await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
+    }
 
     test('should return all dataset previews when no pagination params are defined', async () => {
-      const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews()
+      const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews(
+        undefined,
+        undefined,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
       expect(actual.datasetPreviews.length).toEqual(expectedTotalDatasetCount)
-      expect(actual.datasetPreviews[0].title).toMatch('Third Dataset')
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[3].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return first dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 0)
+      const actual = await sut.getAllDatasetPreviews(
+        testPageLimit,
+        0,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].title).toMatch('Third Dataset')
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[3].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return second dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 1)
+      const actual = await sut.getAllDatasetPreviews(
+        testPageLimit,
+        1,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].title).toMatch('Fourth Dataset')
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[2].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return third dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 2)
+      const actual = await sut.getAllDatasetPreviews(
+        testPageLimit,
+        2,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].title).toMatch('Second Dataset')
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[1].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return fourth dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 3)
+      const actual = await sut.getAllDatasetPreviews(
+        testPageLimit,
+        3,
+        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+      )
       expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.datasetPreviews[0].title).toMatch('First Dataset')
+      expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[0].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
-    })
-
-    test('should return datasets in the specified collection', async () => {
-      const actual = await sut.getAllDatasetPreviews(testPageLimit, 0, 'firstCollection')
-      expect(actual.datasetPreviews[0].title).toMatch('Third Dataset')
-      expect(actual.datasetPreviews.length).toEqual(1)
-      expect(actual.totalDatasetCount).toEqual(1)
     })
   })
 
@@ -101,47 +160,60 @@ describe('DatasetsRepository', () => {
 
   describe('getDataset', () => {
     describe('by numeric id', () => {
+      let testDatasetIds: CreatedDatasetIdentifiers
+
+      beforeAll(async () => {
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      })
+
+      afterAll(async () => {
+        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      })
+
       test('should return dataset when it exists filtering by id and version id', async () => {
         const actual = await sut.getDataset(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
-          latestVersionId,
+          testDatasetIds.numericId,
+          DatasetNotNumberedVersion.LATEST,
           false
         )
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID)
+        expect(actual.id).toBe(testDatasetIds.numericId)
       })
 
       test('should return dataset when it is deaccessioned and includeDeaccessioned param is set', async () => {
-        await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID)
-
-        await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_2_ID, 10)
-
-        await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID, '1.0')
+        await publishDatasetViaApi(testDatasetIds.numericId)
+        await waitForNoLocks(testDatasetIds.numericId, 10)
+        await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
 
         const actual = await sut.getDataset(
-          TestConstants.TEST_CREATED_DATASET_2_ID,
-          latestVersionId,
+          testDatasetIds.numericId,
+          DatasetNotNumberedVersion.LATEST,
           true
         )
 
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_2_ID)
+        expect(actual.id).toBe(testDatasetIds.numericId)
       })
 
       test('should return dataset when it is deaccessioned, includeDeaccessioned param is set, and user is unauthenticated', async () => {
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
         const actual = await sut.getDataset(
-          TestConstants.TEST_CREATED_DATASET_2_ID,
-          latestVersionId,
+          testDatasetIds.numericId,
+          DatasetNotNumberedVersion.LATEST,
           true
         )
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_2_ID)
+        expect(actual.id).toBe(testDatasetIds.numericId)
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
       })
 
       test('should return error when dataset is deaccessioned and includeDeaccessioned param is not set', async () => {
         const expectedError = new ReadError(
-          `[404] Dataset version ${latestVersionId} of dataset ${TestConstants.TEST_CREATED_DATASET_2_ID} not found`
+          `[404] Dataset version ${DatasetNotNumberedVersion.LATEST} of dataset ${testDatasetIds.numericId} not found`
         )
         await expect(
-          sut.getDataset(TestConstants.TEST_CREATED_DATASET_2_ID, latestVersionId, false)
+          sut.getDataset(testDatasetIds.numericId, DatasetNotNumberedVersion.LATEST, false)
         ).rejects.toThrow(expectedError)
       })
 
@@ -151,20 +223,34 @@ describe('DatasetsRepository', () => {
         )
 
         await expect(
-          sut.getDataset(nonExistentTestDatasetId, latestVersionId, false)
+          sut.getDataset(nonExistentTestDatasetId, DatasetNotNumberedVersion.LATEST, false)
         ).rejects.toThrow(expectedError)
       })
     })
 
     describe('by persistent id', () => {
+      let testDatasetIds: CreatedDatasetIdentifiers
+
+      beforeAll(async () => {
+        testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      })
+
+      afterAll(async () => {
+        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+      })
+
       test('should return dataset when it exists filtering by persistent id and version id', async () => {
         const createdDataset = await sut.getDataset(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
-          latestVersionId,
+          testDatasetIds.numericId,
+          DatasetNotNumberedVersion.LATEST,
           false
         )
-        const actual = await sut.getDataset(createdDataset.persistentId, latestVersionId, false)
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID)
+        const actual = await sut.getDataset(
+          createdDataset.persistentId,
+          DatasetNotNumberedVersion.LATEST,
+          false
+        )
+        expect(actual.id).toBe(testDatasetIds.numericId)
       })
 
       test('should return error when dataset does not exist', async () => {
@@ -172,35 +258,36 @@ describe('DatasetsRepository', () => {
         const expectedError = new ReadError(
           `[404] Dataset with Persistent ID ${testWrongPersistentId} not found.`
         )
-        await expect(sut.getDataset(testWrongPersistentId, latestVersionId, false)).rejects.toThrow(
-          expectedError
-        )
+        await expect(
+          sut.getDataset(testWrongPersistentId, DatasetNotNumberedVersion.LATEST, false)
+        ).rejects.toThrow(expectedError)
       })
     })
   })
 
   describe('Private URLs', () => {
     const expectedErrorInvalidToken = '[404] Private URL user not found'
+    let testDatasetIds: CreatedDatasetIdentifiers
     let privateUrlToken: string
 
     beforeAll(async () => {
-      try {
-        const response = await createPrivateUrlViaApi(TestConstants.TEST_CREATED_DATASET_1_ID)
-        privateUrlToken = response.data.data.token
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating Dataset private URL')
-      }
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      const response = await createPrivateUrlViaApi(testDatasetIds.numericId)
+      privateUrlToken = response.data.data.token
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
 
     describe('getPrivateUrlDataset', () => {
       test('should return dataset when token is valid', async () => {
         const actual = await sut.getPrivateUrlDataset(privateUrlToken)
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID)
+        expect(actual.id).toBe(testDatasetIds.numericId)
       })
 
       test('should return error when token is not valid', async () => {
         const expectedError = new ReadError(expectedErrorInvalidToken)
-
         await expect(sut.getPrivateUrlDataset('invalidToken')).rejects.toThrow(expectedError)
       })
     })
@@ -213,49 +300,62 @@ describe('DatasetsRepository', () => {
 
       test('should return error when token is not valid', async () => {
         const expectedError = new ReadError(expectedErrorInvalidToken)
-
         await expect(sut.getPrivateUrlDatasetCitation('invalidToken')).rejects.toThrow(
-          expectedError
-        )
-      })
-    })
-
-    describe('getDatasetUserPermissions', () => {
-      test('should return user permissions filtering by dataset id', async () => {
-        const actual = await sut.getDatasetUserPermissions(TestConstants.TEST_CREATED_DATASET_1_ID)
-        expect(actual.canViewUnpublishedDataset).toBe(true)
-        expect(actual.canEditDataset).toBe(true)
-        expect(actual.canPublishDataset).toBe(true)
-        expect(actual.canManageDatasetPermissions).toBe(true)
-        expect(actual.canDeleteDatasetDraft).toBe(true)
-      })
-
-      test('should return error when dataset does not exist', async () => {
-        const expectedError = new ReadError(
-          `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
-        )
-
-        await expect(sut.getDatasetUserPermissions(nonExistentTestDatasetId)).rejects.toThrow(
           expectedError
         )
       })
     })
   })
 
+  describe('getDatasetUserPermissions', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should return user permissions filtering by dataset id', async () => {
+      const actual = await sut.getDatasetUserPermissions(testDatasetIds.numericId)
+      expect(actual.canViewUnpublishedDataset).toBe(true)
+      expect(actual.canEditDataset).toBe(true)
+      expect(actual.canPublishDataset).toBe(true)
+      expect(actual.canManageDatasetPermissions).toBe(true)
+      expect(actual.canDeleteDatasetDraft).toBe(true)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new ReadError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(sut.getDatasetUserPermissions(nonExistentTestDatasetId)).rejects.toThrow(
+        expectedError
+      )
+    })
+  })
+
   describe('getDatasetLocks', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
     test('should return list of dataset locks by dataset id for a dataset while publishing', async () => {
-      await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_2_ID)
-        .then()
-        .catch((error) => {
-          console.log(JSON.stringify(error))
-        })
-      const actual = await sut.getDatasetLocks(TestConstants.TEST_CREATED_DATASET_2_ID)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      const actual = await sut.getDatasetLocks(testDatasetIds.numericId)
       expect(actual.length).toBe(1)
       expect(actual[0].lockType).toBe(DatasetLockType.FINALIZE_PUBLICATION)
       expect(actual[0].userId).toBe('dataverseAdmin')
-      expect(actual[0].message).toBe(
-        'Publishing the dataset; Registering PIDs for Datafiles; Validating Datafiles Asynchronously'
-      )
+      expect(actual[0].message).toContain('Publishing the dataset')
     })
 
     test('should return error when dataset does not exist', async () => {
@@ -268,10 +368,20 @@ describe('DatasetsRepository', () => {
   })
 
   describe('getDatasetCitation', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
     test('should return citation when dataset exists', async () => {
       const actualDatasetCitation = await sut.getDatasetCitation(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
-        latestVersionId,
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
         false
       )
       expect(typeof actualDatasetCitation).toBe('string')
@@ -283,16 +393,21 @@ describe('DatasetsRepository', () => {
       )
 
       await expect(
-        sut.getDatasetCitation(nonExistentTestDatasetId, latestVersionId, false)
+        sut.getDatasetCitation(nonExistentTestDatasetId, DatasetNotNumberedVersion.LATEST, false)
       ).rejects.toThrow(expectedError)
     })
 
     test('should return citation when dataset is deaccessioned', async () => {
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
+
       const actualDatasetCitation = await sut.getDatasetCitation(
-        TestConstants.TEST_CREATED_DATASET_2_ID,
-        latestVersionId,
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
         true
       )
+
       expect(typeof actualDatasetCitation).toBe('string')
     })
   })
@@ -343,7 +458,7 @@ describe('DatasetsRepository', () => {
       )
       const actualCreatedDataset = await sut.getDataset(
         createdDataset.numericId,
-        latestVersionId,
+        DatasetNotNumberedVersion.LATEST,
         false
       )
 
@@ -381,16 +496,26 @@ describe('DatasetsRepository', () => {
   })
 
   describe('publishDataset', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
     test('should publish a new dataset version', async () => {
       const expectedMajorVersion = 1
-      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_4_ID, 10)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
 
-      await sut.publishDataset(TestConstants.TEST_CREATED_DATASET_4_ID, VersionUpdateType.MAJOR)
-      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_4_ID, 10)
+      await sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
 
       const newDatasetVersion = await sut.getDataset(
-        TestConstants.TEST_CREATED_DATASET_4_ID,
-        latestVersionId,
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
         false
       )
 

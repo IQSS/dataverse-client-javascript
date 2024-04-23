@@ -202,6 +202,30 @@ export const createDatasetVersionPayload = (
   return datasetPayload
 }
 
+export const deleteUnpublishedDatasetViaApi = async (datasetId: number): Promise<AxiosResponse> => {
+  try {
+    return await axios.delete(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}`,
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while deleting unpublished test dataset ${datasetId}`)
+  }
+}
+
+export const deletePublishedDatasetViaApi = async (
+  datasetPersistentId: string
+): Promise<AxiosResponse> => {
+  try {
+    return await axios.delete(
+      `${TestConstants.TEST_API_URL}/datasets/:persistentId/destroy?persistentId=${datasetPersistentId}`,
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while deleting published test dataset ${datasetPersistentId}`)
+  }
+}
+
 export const createDatasetLicenseModel = (withIconUri = true): DatasetLicense => {
   const datasetLicense: DatasetLicense = {
     name: 'CC0 1.0',
@@ -214,31 +238,43 @@ export const createDatasetLicenseModel = (withIconUri = true): DatasetLicense =>
 }
 
 export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResponse> => {
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/actions/:publish?type=major`,
-    {},
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    return await axios.post(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}/actions/:publish?type=major`,
+      {},
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while publishing test dataset ${datasetId}`)
+  }
 }
 
 export const deaccessionDatasetViaApi = async (
   datasetId: number,
   versionId: string
 ): Promise<AxiosResponse> => {
-  const data = { deaccessionReason: 'Test reason.' }
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
-    JSON.stringify(data),
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    const data = { deaccessionReason: 'Test reason.' }
+    return await axios.post(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}/versions/${versionId}/deaccession`,
+      JSON.stringify(data),
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while deaccessioning test dataset ${datasetId}`)
+  }
 }
 
 export const createPrivateUrlViaApi = async (datasetId: number): Promise<AxiosResponse> => {
-  return await axios.post(
-    `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,
-    {},
-    DATAVERSE_API_REQUEST_HEADERS
-  )
+  try {
+    return await axios.post(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}/privateUrl`,
+      {},
+      DATAVERSE_API_REQUEST_HEADERS
+    )
+  } catch (error) {
+    throw new Error(`Error while creating private URL for dataset ${datasetId}`)
+  }
 }
 
 export const waitForNoLocks = async (
@@ -269,5 +305,38 @@ export const waitForNoLocks = async (
   }
   if (hasLocks) {
     throw new Error('Max retries reached.')
+  }
+}
+
+export async function waitForDatasetsIndexedInSolr(
+  expectedNumberOfIndexedDatasets: number,
+  collectionAlias: string
+): Promise<void> {
+  let datasetsIndexed = false
+  let retry = 0
+  while (!datasetsIndexed && retry < 10) {
+    await axios
+      .get(
+        `${TestConstants.TEST_API_URL}/search?q=*&type=dataset&subtree=${collectionAlias}`,
+        DATAVERSE_API_REQUEST_HEADERS
+      )
+      .then((response) => {
+        const nDatasets = response.data.data.items.length
+        if (nDatasets === expectedNumberOfIndexedDatasets) {
+          datasetsIndexed = true
+        }
+      })
+      .catch((error) => {
+        console.error(
+          `Error while waiting for datasets indexing in Solr: [${error.response.status}]${
+            error.response.data ? ` ${error.response.data.message}` : ''
+          }`
+        )
+      })
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    retry++
+  }
+  if (!datasetsIndexed) {
+    throw new Error('Timeout reached while waiting for datasets indexing in Solr')
   }
 }

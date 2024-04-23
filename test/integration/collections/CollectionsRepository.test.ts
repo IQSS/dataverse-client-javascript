@@ -3,31 +3,42 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
+import {
+  createCollectionViaApi,
+  deleteCollectionViaApi
+} from '../../testHelpers/collections/collectionHelper'
+import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
+import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 
 describe('CollectionsRepository', () => {
   const testGetCollection: CollectionsRepository = new CollectionsRepository()
+  let testCollectionId: number
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
+    )
+    await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2).then(
+      (collectionPayload: CollectionPayload) => (testCollectionId = collectionPayload.id)
     )
   })
 
-  afterEach(async () => {
+  afterAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
+    await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
   })
 
   describe('getCollection', () => {
     describe('by default `root` Id', () => {
       test('should return the root collection of the Dataverse installation if no parameter is passed AS `root`', async () => {
         const actual = await testGetCollection.getCollection()
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ROOT)
+        expect(actual.alias).toBe(ROOT_COLLECTION_ALIAS)
       })
 
       test('should return isReleased is true for root collection', async () => {
@@ -39,9 +50,9 @@ describe('CollectionsRepository', () => {
     describe('by string alias', () => {
       test('should return collection when it exists filtering by id AS (alias)', async () => {
         const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_CREATED_COLLECTION_1_ALIAS
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_2
         )
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ALIAS)
+        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
       })
       test('should return isReleased is false for unpublished collection', async () => {
         const actual = await testGetCollection.getCollection(
@@ -62,10 +73,8 @@ describe('CollectionsRepository', () => {
     })
     describe('by numeric id', () => {
       test('should return collection when it exists filtering by id AS (id)', async () => {
-        const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_CREATED_COLLECTION_1_ID
-        )
-        expect(actual.id).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ID)
+        const actual = await testGetCollection.getCollection(testCollectionId)
+        expect(actual.id).toBe(testCollectionId)
       })
 
       test('should return error when collection does not exist', async () => {

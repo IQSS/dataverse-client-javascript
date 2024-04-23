@@ -5,25 +5,32 @@ import {
 } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { registerFileViaApi, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
-import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
   FileSearchCriteria,
   FileAccessStatus,
   FileOrderCriteria
 } from '../../../src/files/domain/models/FileCriteria'
-import { DatasetNotNumberedVersion, Dataset } from '../../../src/datasets'
+import {
+  DatasetNotNumberedVersion,
+  Dataset,
+  CreatedDatasetIdentifiers,
+  createDataset
+} from '../../../src/datasets'
 import { File } from '../../../src/files/domain/models/File'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
 import { FileDownloadSizeMode } from '../../../src'
 import {
   deaccessionDatasetViaApi,
   publishDatasetViaApi,
-  waitForNoLocks
+  waitForNoLocks,
+  deletePublishedDatasetViaApi
 } from '../../testHelpers/datasets/datasetHelper'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
+
+  let testDatasetIds: CreatedDatasetIdentifiers
 
   const testTextFile1Name = 'test-file-1.txt'
   const testTextFile2Name = 'test-file-2.txt'
@@ -35,43 +42,45 @@ describe('FilesRepository', () => {
 
   const latestDatasetVersionId = DatasetNotNumberedVersion.LATEST
 
-  const datasetRepository = new DatasetsRepository()
-
   let testFileId: number
   let testFilePersistentId: string
+
   beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
+    try {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    } catch (error) {
+      throw new Error('Tests beforeAll(): Error while creating test dataset')
+    }
     // Uploading test file 1 with some categories
-    const uploadFileResponse = await uploadFileViaApi(
-      TestConstants.TEST_CREATED_DATASET_1_ID,
-      testTextFile1Name,
-      { categories: [testCategoryName] }
-    )
+    const uploadFileResponse = await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name, {
+      categories: [testCategoryName]
+    })
       .then()
       .catch((e) => {
         console.log(e)
         throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
       })
     // Uploading test file 2
-    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTextFile2Name)
+    await uploadFileViaApi(testDatasetIds.numericId, testTextFile2Name)
       .then()
       .catch((e) => {
         console.log(e)
         throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile2Name}`)
       })
     // Uploading test file 3
-    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTextFile3Name)
+    await uploadFileViaApi(testDatasetIds.numericId, testTextFile3Name)
       .then()
       .catch((e) => {
         console.log(e)
         throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile3Name}`)
       })
     // Uploading test file 4
-    await uploadFileViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, testTabFile4Name)
+    await uploadFileViaApi(testDatasetIds.numericId, testTabFile4Name)
       .then()
       .catch((e) => {
         console.log(e)
@@ -87,13 +96,21 @@ describe('FilesRepository', () => {
         throw new Error(`Tests beforeAll(): Error while registering file ${testTextFile1Name}`)
       })
     const filesSubset = await sut.getDatasetFiles(
-      TestConstants.TEST_CREATED_DATASET_1_ID,
+      testDatasetIds.numericId,
       latestDatasetVersionId,
       false,
       FileOrderCriteria.NAME_AZ
     )
     testFileId = filesSubset.files[0].id
     testFilePersistentId = filesSubset.files[0].persistentId
+  })
+
+  afterAll(async () => {
+    try {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    } catch (error) {
+      throw new Error('Tests afterAll(): Error while deleting test dataset')
+    }
   })
 
   describe('getDatasetFiles', () => {
@@ -104,7 +121,7 @@ describe('FilesRepository', () => {
     describe('by numeric id', () => {
       test('should return all files filtering by dataset id and version id', async () => {
         const actual = await sut.getDatasetFiles(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
+          testDatasetIds.numericId,
           latestDatasetVersionId,
           false,
           FileOrderCriteria.NAME_AZ
@@ -120,7 +137,7 @@ describe('FilesRepository', () => {
 
       test('should return correct files filtering by dataset id, version id, and paginating', async () => {
         const actual = await sut.getDatasetFiles(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
+          testDatasetIds.numericId,
           latestDatasetVersionId,
           false,
           FileOrderCriteria.NAME_AZ,
@@ -136,7 +153,7 @@ describe('FilesRepository', () => {
 
       test('should return correct files filtering by dataset id, version id, and applying newest file criteria', async () => {
         const actual = await sut.getDatasetFiles(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
+          testDatasetIds.numericId,
           latestDatasetVersionId,
           false,
           FileOrderCriteria.NEWEST,
@@ -171,13 +188,8 @@ describe('FilesRepository', () => {
 
     describe('by persistent id', () => {
       test('should return all files filtering by persistent id and version id', async () => {
-        const testDataset = await datasetRepository.getDataset(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
-          latestDatasetVersionId,
-          false
-        )
         const actual = await sut.getDatasetFiles(
-          testDataset.persistentId,
+          testDatasetIds.persistentId,
           latestDatasetVersionId,
           false,
           FileOrderCriteria.NAME_AZ
@@ -192,13 +204,8 @@ describe('FilesRepository', () => {
       })
 
       test('should return correct files filtering by persistent id, version id, and paginating', async () => {
-        const testDataset = await datasetRepository.getDataset(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
-          latestDatasetVersionId,
-          false
-        )
         const actual = await sut.getDatasetFiles(
-          testDataset.persistentId,
+          testDatasetIds.persistentId,
           latestDatasetVersionId,
           false,
           FileOrderCriteria.NAME_AZ,
@@ -213,13 +220,8 @@ describe('FilesRepository', () => {
       })
 
       test('should return correct files filtering by persistent id, version id, and applying newest file criteria', async () => {
-        const testDataset = await datasetRepository.getDataset(
-          TestConstants.TEST_CREATED_DATASET_1_ID,
-          latestDatasetVersionId,
-          false
-        )
         const actual = await sut.getDatasetFiles(
-          testDataset.persistentId,
+          testDatasetIds.persistentId,
           latestDatasetVersionId,
           false,
           FileOrderCriteria.NEWEST,
@@ -282,7 +284,7 @@ describe('FilesRepository', () => {
 
     test('should return file count filtering by numeric id', async () => {
       const actual = await sut.getDatasetFileCounts(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         latestDatasetVersionId,
         false
       )
@@ -319,7 +321,7 @@ describe('FilesRepository', () => {
       }
       const testCriteria = new FileSearchCriteria().withCategoryName(testCategoryName)
       const actual = await sut.getDatasetFileCounts(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         latestDatasetVersionId,
         false,
         testCriteria
@@ -332,13 +334,8 @@ describe('FilesRepository', () => {
     })
 
     test('should return file count filtering by persistent id', async () => {
-      const testDataset = await datasetRepository.getDataset(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
-        latestDatasetVersionId,
-        false
-      )
       const actual = await sut.getDatasetFileCounts(
-        testDataset.persistentId,
+        testDatasetIds.persistentId,
         latestDatasetVersionId,
         false
       )
@@ -357,7 +354,7 @@ describe('FilesRepository', () => {
 
     test('should return total download size filtering by numeric id and ignoring original tabular size', async () => {
       const actual = await sut.getDatasetFilesTotalDownloadSize(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         latestDatasetVersionId,
         false,
         FileDownloadSizeMode.ORIGINAL
@@ -366,13 +363,8 @@ describe('FilesRepository', () => {
     })
 
     test('should return total download size filtering by persistent id and ignoring original tabular size', async () => {
-      const testDataset = await datasetRepository.getDataset(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
-        latestDatasetVersionId,
-        false
-      )
       const actual = await sut.getDatasetFilesTotalDownloadSize(
-        testDataset.persistentId,
+        testDatasetIds.persistentId,
         latestDatasetVersionId,
         false,
         FileDownloadSizeMode.ORIGINAL
@@ -384,7 +376,7 @@ describe('FilesRepository', () => {
       const expectedTotalDownloadSizeForCriteria = 12 // 12 bytes
       const testCriteria = new FileSearchCriteria().withCategoryName(testCategoryName)
       const actual = await sut.getDatasetFilesTotalDownloadSize(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         latestDatasetVersionId,
         false,
         FileDownloadSizeMode.ORIGINAL,
@@ -397,7 +389,7 @@ describe('FilesRepository', () => {
   describe('getFileDownloadCount', () => {
     test('should return count filtering by file id and version id', async () => {
       const currentTestFilesSubset = await sut.getDatasetFiles(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         latestDatasetVersionId,
         false,
         FileOrderCriteria.NAME_AZ
@@ -417,7 +409,7 @@ describe('FilesRepository', () => {
   describe('getFileUserPermissions', () => {
     test('should return user permissions filtering by file id and version id', async () => {
       const currentTestFilesSubset = await sut.getDatasetFiles(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         latestDatasetVersionId,
         false,
         FileOrderCriteria.NAME_AZ
@@ -440,7 +432,7 @@ describe('FilesRepository', () => {
   describe('getFileDataTables', () => {
     test('should return data tables filtering by tabular file id and version id', async () => {
       const currentTestFilesSubset = await sut.getDatasetFiles(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         latestDatasetVersionId,
         false,
         FileOrderCriteria.NAME_AZ
@@ -452,7 +444,7 @@ describe('FilesRepository', () => {
 
     test('should return error when file is not tabular and version id', async () => {
       const currentTestFilesSubset = await sut.getDatasetFiles(
-        TestConstants.TEST_CREATED_DATASET_1_ID,
+        testDatasetIds.numericId,
         latestDatasetVersionId,
         false,
         FileOrderCriteria.NAME_AZ
@@ -502,7 +494,7 @@ describe('FilesRepository', () => {
         ]
 
         expect(actual[0].name).toBe(testTextFile1Name)
-        expect(actual[1].id).toBe(TestConstants.TEST_CREATED_DATASET_1_ID)
+        expect(actual[1].id).toBe(testDatasetIds.numericId)
       })
 
       test('should return error when file does not exist', async () => {
@@ -559,19 +551,19 @@ describe('FilesRepository', () => {
     })
 
     test('should return citation when dataset is deaccessioned', async () => {
-      await publishDatasetViaApi(TestConstants.TEST_CREATED_DATASET_1_ID)
+      await publishDatasetViaApi(testDatasetIds.numericId)
         .then()
         .catch(() => {
           throw new Error('Error while publishing test Dataset')
         })
 
-      await waitForNoLocks(TestConstants.TEST_CREATED_DATASET_1_ID, 10)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
         .then()
         .catch(() => {
           throw new Error('Error while waiting for no locks')
         })
 
-      await deaccessionDatasetViaApi(TestConstants.TEST_CREATED_DATASET_1_ID, '1.0')
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
         .then()
         .catch(() => {
           throw new Error('Error while deaccessioning test Dataset')
