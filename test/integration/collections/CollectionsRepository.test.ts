@@ -29,8 +29,13 @@ describe('CollectionsRepository', () => {
         const actual = await testGetCollection.getCollection()
         expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ROOT)
       })
-    })
 
+      test('should return isReleased is true for root collection', async () => {
+        const actual = await testGetCollection.getCollection()
+        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ROOT)
+        expect(actual.isReleased).toBe(true)
+      })
+    })
     describe('by string alias', () => {
       test('should return collection when it exists filtering by id AS (alias)', async () => {
         const actual = await testGetCollection.getCollection(
@@ -38,7 +43,13 @@ describe('CollectionsRepository', () => {
         )
         expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ALIAS)
       })
-
+      test('should return isReleased is false for unpublished collection', async () => {
+        const actual = await testGetCollection.getCollection(
+          TestConstants.TEST_CREATED_COLLECTION_1_ALIAS
+        )
+        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ALIAS)
+        expect(actual.isReleased).toBe(false)
+      })
       test('should return error when collection does not exist', async () => {
         const expectedError = new ReadError(
           `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ALIAS}'`
