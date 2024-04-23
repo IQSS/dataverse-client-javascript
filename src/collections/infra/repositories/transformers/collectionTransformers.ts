@@ -13,6 +13,7 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     id: collectionPayload.id,
     alias: collectionPayload.alias,
     name: collectionPayload.name,
+    isReleased: collectionPayload.isReleased,
     affiliation: collectionPayload.affiliation,
     description: collectionPayload.description,
     ...(collectionPayload.isPartOf && {
