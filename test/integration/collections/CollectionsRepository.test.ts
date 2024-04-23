@@ -43,7 +43,7 @@ describe('CollectionsRepository', () => {
 
       test('should return isReleased is true for root collection', async () => {
         const actual = await testGetCollection.getCollection()
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ROOT)
+        expect(actual.alias).toBe(ROOT_COLLECTION_ALIAS)
         expect(actual.isReleased).toBe(true)
       })
     })
@@ -56,9 +56,9 @@ describe('CollectionsRepository', () => {
       })
       test('should return isReleased is false for unpublished collection', async () => {
         const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_CREATED_COLLECTION_1_ALIAS
+          TestConstants.TEST_CREATED_COLLECTION_ALIAS_2
         )
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_1_ALIAS)
+        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
         expect(actual.isReleased).toBe(false)
       })
       test('should return error when collection does not exist', async () => {
