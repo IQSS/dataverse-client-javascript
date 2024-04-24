@@ -6,46 +6,45 @@ import { IMetadataBlocksRepository } from '../../../metadataBlocks/domain/reposi
 import { MetadataBlock } from '../../../metadataBlocks'
 
 export abstract class DatasetWriteUseCase<T> implements UseCase<T> {
-    private datasetsRepository: IDatasetsRepository
-    private metadataBlocksRepository: IMetadataBlocksRepository
-    private newDatasetValidator: NewResourceValidator
-  
-    constructor(
-      datasetsRepository: IDatasetsRepository,
-      metadataBlocksRepository: IMetadataBlocksRepository,
-      newDatasetValidator: NewResourceValidator
-    ) {
-      this.datasetsRepository = datasetsRepository
-      this.metadataBlocksRepository = metadataBlocksRepository
-      this.newDatasetValidator = newDatasetValidator
-    }
-  
-    abstract execute(...args: unknown[]): Promise<T>
-  
-    getDatasetsRepository(): IDatasetsRepository {
-      return this.datasetsRepository
-    }
-  
-    getMetadataBlocksRepository(): IMetadataBlocksRepository {
-      return this.metadataBlocksRepository
-    }
-  
-    getNewDatasetValidator(): NewResourceValidator {
-      return this.newDatasetValidator
-    }
-  
-    async getNewDatasetMetadataBlocks(newDataset: NewDatasetDTO): Promise<MetadataBlock[]> {
-      const metadataBlocks: MetadataBlock[] = []
-      await Promise.all(
-        newDataset.metadataBlockValues.map(
-          async (metadataBlockValue: NewDatasetMetadataBlockValuesDTO) => {
-            metadataBlocks.push(
-              await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockValue.name)
-            )
-          }
-        )
-      )
-      return metadataBlocks
-    }
+  private datasetsRepository: IDatasetsRepository
+  private metadataBlocksRepository: IMetadataBlocksRepository
+  private newDatasetValidator: NewResourceValidator
+
+  constructor(
+    datasetsRepository: IDatasetsRepository,
+    metadataBlocksRepository: IMetadataBlocksRepository,
+    newDatasetValidator: NewResourceValidator
+  ) {
+    this.datasetsRepository = datasetsRepository
+    this.metadataBlocksRepository = metadataBlocksRepository
+    this.newDatasetValidator = newDatasetValidator
   }
-  
+
+  abstract execute(...args: unknown[]): Promise<T>
+
+  getDatasetsRepository(): IDatasetsRepository {
+    return this.datasetsRepository
+  }
+
+  getMetadataBlocksRepository(): IMetadataBlocksRepository {
+    return this.metadataBlocksRepository
+  }
+
+  getNewDatasetValidator(): NewResourceValidator {
+    return this.newDatasetValidator
+  }
+
+  async getNewDatasetMetadataBlocks(newDataset: NewDatasetDTO): Promise<MetadataBlock[]> {
+    const metadataBlocks: MetadataBlock[] = []
+    await Promise.all(
+      newDataset.metadataBlockValues.map(
+        async (metadataBlockValue: NewDatasetMetadataBlockValuesDTO) => {
+          metadataBlocks.push(
+            await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockValue.name)
+          )
+        }
+      )
+    )
+    return metadataBlocks
+  }
+}
