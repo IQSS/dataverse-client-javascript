@@ -22,10 +22,10 @@ import {
   createDatasetPreviewPayload
 } from '../../testHelpers/datasets/datasetPreviewHelper'
 import {
-  createNewDatasetDTO,
-  createNewDatasetMetadataBlockModel,
-  createNewDatasetRequestPayload
-} from '../../testHelpers/datasets/newDatasetHelper'
+  createDatasetDTO,
+  createDatasetMetadataBlockModel,
+  createDatasetRequestPayload
+} from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
 import { VersionUpdateType } from '../../../src/datasets/domain/models/Dataset'
 
@@ -714,10 +714,10 @@ describe('DatasetsRepository', () => {
   })
 
   describe('createDataset', () => {
-    const testNewDataset = createNewDatasetDTO()
-    const testMetadataBlocks = [createNewDatasetMetadataBlockModel()]
+    const testNewDataset = createDatasetDTO()
+    const testMetadataBlocks = [createDatasetMetadataBlockModel()]
     const testCollectionName = 'test'
-    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createNewDatasetRequestPayload())
+    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createDatasetRequestPayload())
 
     const testCreatedDatasetIdentifiers = {
       persistentId: 'test',

@@ -8,7 +8,7 @@ import { GetPrivateUrlDataset } from './domain/useCases/GetPrivateUrlDataset'
 import { GetAllDatasetPreviews } from './domain/useCases/GetAllDatasetPreviews'
 import { MetadataFieldValidator } from './domain/useCases/validators/MetadataFieldValidator'
 import { GetDatasetUserPermissions } from './domain/useCases/GetDatasetUserPermissions'
-import { NewDatasetResourceValidator } from './domain/useCases/validators/NewDatasetResourceValidator'
+import { DatasetResourceValidator } from './domain/useCases/validators/DatasetResourceValidator'
 import { GetDatasetSummaryFieldNames } from './domain/useCases/GetDatasetSummaryFieldNames'
 import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDatasetCitation'
 import { SingleMetadataFieldValidator } from './domain/useCases/validators/SingleMetadataFieldValidator'
@@ -33,7 +33,7 @@ const metadataFieldValidator = new MetadataFieldValidator(
 const createDataset = new CreateDataset(
   datasetsRepository,
   new MetadataBlocksRepository(),
-  new NewDatasetResourceValidator(metadataFieldValidator)
+  new DatasetResourceValidator(metadataFieldValidator)
 )
 const publishDataset = new PublishDataset(datasetsRepository)
 
@@ -66,11 +66,11 @@ export {
 export { DatasetPreview } from './domain/models/DatasetPreview'
 export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset'
 export {
-  NewDatasetDTO as NewDataset,
-  NewDatasetMetadataFieldsDTO as NewDatasetMetadataFields,
-  NewDatasetMetadataFieldValueDTO as NewDatasetMetadataFieldValue,
-  NewDatasetMetadataBlockValuesDTO as NewDatasetMetadataBlockValues,
-  NewDatasetMetadataChildFieldValueDTO as NewDatasetMetadataChildFieldValue
-} from './domain/dtos/NewDatasetDTO'
+  DatasetDTO,
+  DatasetMetadataFieldsDTO,
+  DatasetMetadataFieldValueDTO,
+  DatasetMetadataBlockValuesDTO,
+  DatasetMetadataChildFieldValueDTO
+} from './domain/dtos/DatasetDTO'
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers'
 export { VersionUpdateType } from './domain/models/Dataset'

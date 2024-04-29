@@ -7,9 +7,9 @@ import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from 
 import { DatasetLock } from '../../domain/models/DatasetLock'
 import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers'
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset'
-import { NewDatasetDTO } from '../../domain/dtos/NewDatasetDTO'
+import { DatasetDTO } from '../../domain/dtos/DatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
-import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers'
+import { transformDatasetModelToRequestPayload } from './transformers/datasetTransformers'
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
 
@@ -138,13 +138,13 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async createDataset(
-    newDataset: NewDatasetDTO,
+    newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
     collectionId: string
   ): Promise<CreatedDatasetIdentifiers> {
     return this.doPost(
       `/dataverses/${collectionId}/datasets`,
-      transformNewDatasetModelToRequestPayload(newDataset, datasetMetadataBlocks)
+      transformDatasetModelToRequestPayload(newDataset, datasetMetadataBlocks)
     )
       .then((response) => {
         const responseData = response.data.data
@@ -173,5 +173,15 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .catch((error) => {
         throw error
       })
+  }
+
+  // TODO
+  public async updateDataset(
+    datasetId: string | number,
+    newDataset: any,
+    datasetMetadataBlocks: MetadataBlock[]
+  ): Promise<void> {
+    console.log(datasetId + newDataset + datasetMetadataBlocks.length)
+    throw new Error('Method not implemented.')
   }
 }

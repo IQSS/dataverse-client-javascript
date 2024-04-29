@@ -1,11 +1,11 @@
 import {
   BaseMetadataFieldValidator,
-  NewDatasetMetadataFieldAndValueInfo
+  DatasetMetadataFieldAndValueInfo
 } from './BaseMetadataFieldValidator'
 import { MultipleMetadataFieldValidator } from './MultipleMetadataFieldValidator'
 import { SingleMetadataFieldValidator } from './SingleMetadataFieldValidator'
 import { EmptyFieldError } from './errors/EmptyFieldError'
-import { NewDatasetMetadataFieldValueDTO } from '../../dtos/NewDatasetDTO'
+import { DatasetMetadataFieldValueDTO } from '../../dtos/DatasetDTO'
 
 export class MetadataFieldValidator extends BaseMetadataFieldValidator {
   constructor(
@@ -15,9 +15,9 @@ export class MetadataFieldValidator extends BaseMetadataFieldValidator {
     super()
   }
 
-  validate(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo): void {
-    const metadataFieldValue = newDatasetMetadataFieldAndValueInfo.metadataFieldValue
-    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo
+  validate(datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo): void {
+    const metadataFieldValue = datasetMetadataFieldAndValueInfo.metadataFieldValue
+    const metadataFieldInfo = datasetMetadataFieldAndValueInfo.metadataFieldInfo
     if (
       metadataFieldValue == undefined ||
       this.isEmptyString(metadataFieldValue) ||
@@ -25,30 +25,30 @@ export class MetadataFieldValidator extends BaseMetadataFieldValidator {
     ) {
       if (metadataFieldInfo.isRequired) {
         throw new EmptyFieldError(
-          newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
-          newDatasetMetadataFieldAndValueInfo.metadataBlockName,
-          newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
-          newDatasetMetadataFieldAndValueInfo.metadataFieldPosition
+          datasetMetadataFieldAndValueInfo.metadataFieldKey,
+          datasetMetadataFieldAndValueInfo.metadataBlockName,
+          datasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+          datasetMetadataFieldAndValueInfo.metadataFieldPosition
         )
       } else {
         return
       }
     }
-    if (newDatasetMetadataFieldAndValueInfo.metadataFieldInfo.multiple) {
-      this.multipleMetadataFieldValidator.validate(newDatasetMetadataFieldAndValueInfo)
+    if (datasetMetadataFieldAndValueInfo.metadataFieldInfo.multiple) {
+      this.multipleMetadataFieldValidator.validate(datasetMetadataFieldAndValueInfo)
     } else {
-      this.singleMetadataFieldValidator.validate(newDatasetMetadataFieldAndValueInfo)
+      this.singleMetadataFieldValidator.validate(datasetMetadataFieldAndValueInfo)
     }
   }
 
-  private isEmptyString(metadataFieldValue: NewDatasetMetadataFieldValueDTO): boolean {
+  private isEmptyString(metadataFieldValue: DatasetMetadataFieldValueDTO): boolean {
     return typeof metadataFieldValue == 'string' && metadataFieldValue.trim() === ''
   }
 
-  private isEmptyArray(metadataFieldValue: NewDatasetMetadataFieldValueDTO): boolean {
+  private isEmptyArray(metadataFieldValue: DatasetMetadataFieldValueDTO): boolean {
     return (
       Array.isArray(metadataFieldValue) &&
-      (metadataFieldValue as Array<NewDatasetMetadataFieldValueDTO>).length == 0
+      (metadataFieldValue as Array<DatasetMetadataFieldValueDTO>).length == 0
     )
   }
 }

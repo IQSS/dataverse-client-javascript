@@ -3,7 +3,7 @@ import { DatasetLock } from '../models/DatasetLock'
 import { DatasetPreviewSubset } from '../models/DatasetPreviewSubset'
 import { DatasetUserPermissions } from '../models/DatasetUserPermissions'
 import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers'
-import { NewDatasetDTO } from '../dtos/NewDatasetDTO'
+import { NewDatasetDTO } from '../dtos/DatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 
 export interface IDatasetsRepository {
@@ -33,4 +33,9 @@ export interface IDatasetsRepository {
     collectionId: string
   ): Promise<CreatedDatasetIdentifiers>
   publishDataset(datasetId: number | string, versionUpdateType: VersionUpdateType): Promise<void>
+  updateDataset(
+    datasetId: number | string,
+    newDataset: NewDatasetDTO,
+    datasetMetadataBlocks: MetadataBlock[]
+  ): Promise<void>
 }

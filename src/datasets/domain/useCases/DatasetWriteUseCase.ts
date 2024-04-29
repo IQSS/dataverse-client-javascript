@@ -1,19 +1,19 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
-import { NewDatasetDTO, NewDatasetMetadataBlockValuesDTO } from '../dtos/NewDatasetDTO'
-import { NewResourceValidator } from '../../../core/domain/useCases/validators/NewResourceValidator'
+import { DatasetDTO, DatasetMetadataBlockValuesDTO } from '../dtos/DatasetDTO'
+import { ResourceValidator } from '../../../core/domain/useCases/validators/ResourceValidator'
 import { IMetadataBlocksRepository } from '../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository'
 import { MetadataBlock } from '../../../metadataBlocks'
 
 export abstract class DatasetWriteUseCase<T> implements UseCase<T> {
   private datasetsRepository: IDatasetsRepository
   private metadataBlocksRepository: IMetadataBlocksRepository
-  private newDatasetValidator: NewResourceValidator
+  private newDatasetValidator: ResourceValidator
 
   constructor(
     datasetsRepository: IDatasetsRepository,
     metadataBlocksRepository: IMetadataBlocksRepository,
-    newDatasetValidator: NewResourceValidator
+    newDatasetValidator: ResourceValidator
   ) {
     this.datasetsRepository = datasetsRepository
     this.metadataBlocksRepository = metadataBlocksRepository
@@ -30,20 +30,18 @@ export abstract class DatasetWriteUseCase<T> implements UseCase<T> {
     return this.metadataBlocksRepository
   }
 
-  getNewDatasetValidator(): NewResourceValidator {
+  getNewDatasetValidator(): ResourceValidator {
     return this.newDatasetValidator
   }
 
-  async getNewDatasetMetadataBlocks(newDataset: NewDatasetDTO): Promise<MetadataBlock[]> {
+  async getNewDatasetMetadataBlocks(dataset: DatasetDTO): Promise<MetadataBlock[]> {
     const metadataBlocks: MetadataBlock[] = []
     await Promise.all(
-      newDataset.metadataBlockValues.map(
-        async (metadataBlockValue: NewDatasetMetadataBlockValuesDTO) => {
-          metadataBlocks.push(
-            await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockValue.name)
-          )
-        }
-      )
+      dataset.metadataBlockValues.map(async (metadataBlockValue: DatasetMetadataBlockValuesDTO) => {
+        metadataBlocks.push(
+          await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockValue.name)
+        )
+      })
     )
     return metadataBlocks
   }

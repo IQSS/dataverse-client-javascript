@@ -1,28 +1,28 @@
-import { NewDatasetMetadataFieldValueDTO } from '../../dtos/NewDatasetDTO'
+import { DatasetMetadataFieldValueDTO } from '../../dtos/DatasetDTO'
 import { FieldValidationError } from './errors/FieldValidationError'
 import { MetadataFieldInfo } from '../../../../metadataBlocks'
 
-export interface NewDatasetMetadataFieldAndValueInfo {
+export interface DatasetMetadataFieldAndValueInfo {
   metadataFieldInfo: MetadataFieldInfo
   metadataFieldKey: string
-  metadataFieldValue: NewDatasetMetadataFieldValueDTO
+  metadataFieldValue: DatasetMetadataFieldValueDTO
   metadataBlockName: string
   metadataParentFieldKey?: string
   metadataFieldPosition?: number
 }
 
 export abstract class BaseMetadataFieldValidator {
-  abstract validate(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo): void
+  abstract validate(datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo): void
 
   protected createGeneralValidationError(
-    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo,
+    datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo,
     reason: string
   ): FieldValidationError {
     return new FieldValidationError(
-      newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
-      newDatasetMetadataFieldAndValueInfo.metadataBlockName,
-      newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
-      newDatasetMetadataFieldAndValueInfo.metadataFieldPosition,
+      datasetMetadataFieldAndValueInfo.metadataFieldKey,
+      datasetMetadataFieldAndValueInfo.metadataBlockName,
+      datasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+      datasetMetadataFieldAndValueInfo.metadataFieldPosition,
       reason
     )
   }

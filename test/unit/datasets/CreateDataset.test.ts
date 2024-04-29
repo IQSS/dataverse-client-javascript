@@ -1,19 +1,19 @@
 import { CreateDataset } from '../../../src/datasets/domain/useCases/CreateDataset'
 import { CreatedDatasetIdentifiers } from '../../../src/datasets/domain/models/CreatedDatasetIdentifiers'
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository'
-import { NewResourceValidator } from '../../../src/core/domain/useCases/validators/NewResourceValidator'
+import { ResourceValidator } from '../../../src/core/domain/useCases/validators/ResourceValidator'
 import {
-  createNewDatasetDTO,
-  createNewDatasetMetadataBlockModel
-} from '../../testHelpers/datasets/newDatasetHelper'
+  createDatasetDTO,
+  createDatasetMetadataBlockModel
+} from '../../testHelpers/datasets/datasetHelper'
 import { ResourceValidationError } from '../../../src/core/domain/useCases/validators/errors/ResourceValidationError'
 import { WriteError, ReadError } from '../../../src'
 import { IMetadataBlocksRepository } from '../../../src/metadataBlocks/domain/repositories/IMetadataBlocksRepository'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 
 describe('execute', () => {
-  const testDataset = createNewDatasetDTO()
-  const testMetadataBlocks = [createNewDatasetMetadataBlockModel()]
+  const testDataset = createDatasetDTO()
+  const testMetadataBlocks = [createDatasetMetadataBlockModel()]
 
   test('should return new dataset identifiers when validation is successful and repository call is successful', async () => {
     const testCreatedDatasetIdentifiers: CreatedDatasetIdentifiers = {
@@ -26,8 +26,8 @@ describe('execute', () => {
       .fn()
       .mockResolvedValue(testCreatedDatasetIdentifiers)
 
-    const newDatasetValidatorStub = <NewResourceValidator>{}
-    newDatasetValidatorStub.validate = jest.fn().mockResolvedValue(undefined)
+    const datasetValidatorStub = <ResourceValidator>{}
+    datasetValidatorStub.validate = jest.fn().mockResolvedValue(undefined)
 
     const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{}
     metadataBlocksRepositoryStub.getMetadataBlockByName = jest
@@ -37,7 +37,7 @@ describe('execute', () => {
     const sut = new CreateDataset(
       datasetsRepositoryStub,
       metadataBlocksRepositoryStub,
-      newDatasetValidatorStub
+      datasetValidatorStub
     )
 
     const actual = await sut.execute(testDataset)
@@ -47,7 +47,7 @@ describe('execute', () => {
     expect(metadataBlocksRepositoryStub.getMetadataBlockByName).toHaveBeenCalledWith(
       testMetadataBlocks[0].name
     )
-    expect(newDatasetValidatorStub.validate).toHaveBeenCalledWith(testDataset, testMetadataBlocks)
+    expect(datasetValidatorStub.validate).toHaveBeenCalledWith(testDataset, testMetadataBlocks)
     expect(datasetsRepositoryStub.createDataset).toHaveBeenCalledWith(
       testDataset,
       testMetadataBlocks,
@@ -59,8 +59,8 @@ describe('execute', () => {
     const datasetsRepositoryMock = <IDatasetsRepository>{}
     datasetsRepositoryMock.createDataset = jest.fn().mockResolvedValue(undefined)
 
-    const newDatasetValidatorStub = <NewResourceValidator>{}
-    newDatasetValidatorStub.validate = jest.fn().mockImplementation(() => {
+    const datasetValidatorStub = <ResourceValidator>{}
+    datasetValidatorStub.validate = jest.fn().mockImplementation(() => {
       throw new ResourceValidationError('Test error')
     })
 
@@ -72,7 +72,7 @@ describe('execute', () => {
     const sut = new CreateDataset(
       datasetsRepositoryMock,
       metadataBlocksRepositoryStub,
-      newDatasetValidatorStub
+      datasetValidatorStub
     )
 
     await expect(sut.execute(testDataset)).rejects.toThrow(ResourceValidationError)
@@ -80,7 +80,7 @@ describe('execute', () => {
     expect(metadataBlocksRepositoryStub.getMetadataBlockByName).toHaveBeenCalledWith(
       testMetadataBlocks[0].name
     )
-    expect(newDatasetValidatorStub.validate).toHaveBeenCalledWith(testDataset, testMetadataBlocks)
+    expect(datasetValidatorStub.validate).toHaveBeenCalledWith(testDataset, testMetadataBlocks)
     expect(datasetsRepositoryMock.createDataset).not.toHaveBeenCalled()
   })
 
@@ -89,8 +89,8 @@ describe('execute', () => {
     const testWriteError = new WriteError('Test error')
     datasetsRepositoryStub.createDataset = jest.fn().mockRejectedValue(testWriteError)
 
-    const newDatasetValidatorStub = <NewResourceValidator>{}
-    newDatasetValidatorStub.validate = jest.fn().mockResolvedValue(undefined)
+    const datasetValidatorStub = <ResourceValidator>{}
+    datasetValidatorStub.validate = jest.fn().mockResolvedValue(undefined)
 
     const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{}
     metadataBlocksRepositoryStub.getMetadataBlockByName = jest
@@ -100,14 +100,14 @@ describe('execute', () => {
     const sut = new CreateDataset(
       datasetsRepositoryStub,
       metadataBlocksRepositoryStub,
-      newDatasetValidatorStub
+      datasetValidatorStub
     )
     await expect(sut.execute(testDataset)).rejects.toThrow(testWriteError)
 
     expect(metadataBlocksRepositoryStub.getMetadataBlockByName).toHaveBeenCalledWith(
       testMetadataBlocks[0].name
     )
-    expect(newDatasetValidatorStub.validate).toHaveBeenCalledWith(testDataset, testMetadataBlocks)
+    expect(datasetValidatorStub.validate).toHaveBeenCalledWith(testDataset, testMetadataBlocks)
     expect(datasetsRepositoryStub.createDataset).toHaveBeenCalledWith(
       testDataset,
       testMetadataBlocks,
@@ -119,8 +119,8 @@ describe('execute', () => {
     const datasetsRepositoryMock = <IDatasetsRepository>{}
     datasetsRepositoryMock.createDataset = jest.fn().mockResolvedValue(undefined)
 
-    const newDatasetValidatorMock = <NewResourceValidator>{}
-    newDatasetValidatorMock.validate = jest.fn().mockResolvedValue(undefined)
+    const datasetValidatorMock = <ResourceValidator>{}
+    datasetValidatorMock.validate = jest.fn().mockResolvedValue(undefined)
 
     const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{}
     const testReadError = new ReadError('Test error')
@@ -129,11 +129,11 @@ describe('execute', () => {
     const sut = new CreateDataset(
       datasetsRepositoryMock,
       metadataBlocksRepositoryStub,
-      newDatasetValidatorMock
+      datasetValidatorMock
     )
     await expect(sut.execute(testDataset)).rejects.toThrow(testReadError)
 
-    expect(newDatasetValidatorMock.validate).not.toHaveBeenCalled()
+    expect(datasetValidatorMock.validate).not.toHaveBeenCalled()
     expect(datasetsRepositoryMock.createDataset).not.toHaveBeenCalled()
 
     expect(metadataBlocksRepositoryStub.getMetadataBlockByName).toHaveBeenCalledWith(
