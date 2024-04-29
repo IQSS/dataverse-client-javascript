@@ -299,7 +299,7 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 
 #### Create a Dataset
 
-Creates a new Dataset in a collection, given a [NewDatasetDTO](../src/datasets/domain/dtos/NewDatasetDTO.ts) object and an optional collection identifier, which defaults to `root`.
+Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object and an optional collection identifier, which defaults to `root`.
 
 This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
 
@@ -310,7 +310,7 @@ import { createDataset } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-const newDatasetDTO: NewDatasetDTO = {
+const datasetDTO: DatasetDTO = {
   metadataBlockValues: [
     {
       name: 'citation',
@@ -345,7 +345,7 @@ const newDatasetDTO: NewDatasetDTO = {
   ]
 }
 
-createDataset.execute(newDatasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers) => {
+createDataset.execute(datasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers) => {
   /* ... */
 })
 
