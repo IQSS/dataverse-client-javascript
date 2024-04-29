@@ -33,7 +33,7 @@ services:
 
   test_dataverse_bootstrap:
     container_name: 'test_dataverse_bootstrap'
-    image: gdcc/configbaker:unstable
+    image: gdcc/configbaker:${DATAVERSE_IMAGE_TAG}
     restart: 'no'
     environment:
       - TIMEOUT=${DATAVERSE_BOOTSTRAP_TIMEOUT}
