@@ -7,6 +7,7 @@ import collectionJson1 from './test-collection-1.json'
 import collectionJson2 from './test-collection-2.json'
 
 const COLLECTION_ID = 11111
+const COLLECTION_IS_RELEASED = 'true'
 const COLLECTION_ALIAS_STR = 'secondCollection'
 const COLLECTION_NAME_STR = 'Laboratory Research'
 const COLLECTION_AFFILIATION_STR = 'Laboratory Research Corporation'
@@ -23,6 +24,7 @@ export const createCollectionModel = (): Collection => {
     id: COLLECTION_ID,
     alias: COLLECTION_ALIAS_STR,
     name: COLLECTION_NAME_STR,
+    isReleased: COLLECTION_IS_RELEASED,
     affiliation: COLLECTION_AFFILIATION_STR,
     description: COLLECTION_DESCRIPTION_MARKDOWN,
     isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
@@ -35,6 +37,7 @@ export const createCollectionPayload = (): CollectionPayload => {
     id: COLLECTION_ID,
     alias: COLLECTION_ALIAS_STR,
     name: COLLECTION_NAME_STR,
+    isReleased: COLLECTION_IS_RELEASED,
     affiliation: COLLECTION_AFFILIATION_STR,
     description: COLLECTION_DESCRIPTION_HTML,
     isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
