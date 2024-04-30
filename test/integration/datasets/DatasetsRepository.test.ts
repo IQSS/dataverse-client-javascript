@@ -532,4 +532,82 @@ describe('DatasetsRepository', () => {
       ).rejects.toThrow(expectedError)
     })
   })
+
+  describe('updateDataset', () => {
+    test('should update an existing dataset with the provided dataset citation fields', async () => {
+      const testDataset = {
+        metadataBlockValues: [
+          {
+            name: 'citation',
+            fields: {
+              title: 'Dataset created using the createDataset use case',
+              author: [
+                {
+                  authorName: 'Admin, Dataverse',
+                  authorAffiliation: 'Dataverse.org'
+                },
+                {
+                  authorName: 'Owner, Dataverse',
+                  authorAffiliation: 'Dataversedemo.org'
+                }
+              ],
+              datasetContact: [
+                {
+                  datasetContactEmail: 'finch@mailinator.com',
+                  datasetContactName: 'Finch, Fiona'
+                }
+              ],
+              dsDescription: [
+                {
+                  dsDescriptionValue: 'This is the description of the dataset.'
+                }
+              ],
+              subject: ['Medicine, Health and Life Sciences']
+            }
+          }
+        ]
+      }
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+      const createdDataset = await sut.createDataset(
+        testDataset,
+        [citationMetadataBlock],
+        ROOT_COLLECTION_ALIAS
+      )
+
+      const actualCreatedDataset = await sut.getDataset(
+        createdDataset.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false
+      )
+
+      expect(
+        (actualCreatedDataset.metadataBlocks[0].fields.dsDescription[0] as DatasetDescription)
+          .dsDescriptionValue
+      ).toBe('This is the description of the dataset.')
+      
+      const updatedDsDescription = 'This is the updated description of the dataset.'
+      testDataset.metadataBlockValues[0].fields.dsDescription[0].dsDescriptionValue = updatedDsDescription
+
+      await sut.updateDataset(
+        createdDataset.numericId,
+        testDataset,
+        [citationMetadataBlock]
+      )
+
+      const actualUpdatedDataset = await sut.getDataset(
+        createdDataset.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false
+      )
+
+      expect(
+        (actualUpdatedDataset.metadataBlocks[0].fields.dsDescription[0] as DatasetDescription)
+          .dsDescriptionValue
+      ).toBe(updatedDsDescription)
+    })
+  })
 })
