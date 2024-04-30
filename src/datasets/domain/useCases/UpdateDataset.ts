@@ -26,6 +26,6 @@ export class UpdateDataset extends DatasetWriteUseCase<void> {
   async execute(datasetId: number | string, updatedDataset: DatasetDTO): Promise<void> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(updatedDataset)
     this.getNewDatasetValidator().validate(updatedDataset, metadataBlocks)
-    this.getDatasetsRepository().updateDataset(datasetId, updatedDataset, metadataBlocks)
+    return this.getDatasetsRepository().updateDataset(datasetId, updatedDataset, metadataBlocks)
   }
 }

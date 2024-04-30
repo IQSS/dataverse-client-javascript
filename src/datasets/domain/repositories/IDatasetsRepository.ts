@@ -3,7 +3,7 @@ import { DatasetLock } from '../models/DatasetLock'
 import { DatasetPreviewSubset } from '../models/DatasetPreviewSubset'
 import { DatasetUserPermissions } from '../models/DatasetUserPermissions'
 import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers'
-import { NewDatasetDTO } from '../dtos/DatasetDTO'
+import { DatasetDTO } from '../dtos/DatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 
 export interface IDatasetsRepository {
@@ -28,14 +28,14 @@ export interface IDatasetsRepository {
   getPrivateUrlDatasetCitation(token: string): Promise<string>
   getDatasetUserPermissions(datasetId: number | string): Promise<DatasetUserPermissions>
   createDataset(
-    newDataset: NewDatasetDTO,
+    newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
     collectionId: string
   ): Promise<CreatedDatasetIdentifiers>
   publishDataset(datasetId: number | string, versionUpdateType: VersionUpdateType): Promise<void>
   updateDataset(
     datasetId: number | string,
-    newDataset: NewDatasetDTO,
+    dataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[]
   ): Promise<void>
 }

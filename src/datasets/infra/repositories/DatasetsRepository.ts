@@ -175,13 +175,18 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  // TODO
   public async updateDataset(
     datasetId: string | number,
-    newDataset: any,
+    dataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[]
   ): Promise<void> {
-    console.log(datasetId + newDataset + datasetMetadataBlocks.length)
-    throw new Error('Method not implemented.')
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, `editMetadata`, datasetId),
+      transformDatasetModelToRequestPayload(dataset, datasetMetadataBlocks)
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
   }
 }
