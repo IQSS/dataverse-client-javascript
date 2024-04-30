@@ -831,4 +831,54 @@ describe('DatasetsRepository', () => {
       expect(error).toBeInstanceOf(Error)
     })
   })
+
+  describe('updateDataset', () => {
+    const testNewDataset = createDatasetDTO()
+    const testMetadataBlocks = [createDatasetMetadataBlockModel()]
+    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createDatasetRequestPayload())
+
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/editMetadata`
+
+    test('should call the API with a correct request payload', async () => {
+      jest.spyOn(axios, 'put').mockResolvedValue(undefined)
+
+      // API Key auth
+      let actual = await sut.updateDataset(testDatasetModel.id, testNewDataset, testMetadataBlocks)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toBeUndefined()
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.updateDataset(testDatasetModel.id, testNewDataset, testMetadataBlocks)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+      )
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'put').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: WriteError = undefined
+      await sut
+        .updateDataset(testDatasetModel.id, testNewDataset, testMetadataBlocks)
+        .catch((e) => (error = e))
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
 })
