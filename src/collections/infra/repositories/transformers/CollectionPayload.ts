@@ -4,6 +4,7 @@ export interface CollectionPayload {
   alias: string
   name: string
   affiliation?: string
+  isReleased: string
   description?: string
   isPartOf: OwnerNodePayload
 }

@@ -59,35 +59,26 @@ describe('FilesRepository', () => {
     // Uploading test file 1 with some categories
     const uploadFileResponse = await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name, {
       categories: [testCategoryName]
+    }).catch(() => {
+      throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
     })
-      .then()
-      .catch((e) => {
-        console.log(e)
-        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
-      })
     // Uploading test file 2
-    await uploadFileViaApi(testDatasetIds.numericId, testTextFile2Name)
-      .then()
-      .catch((e) => {
-        console.log(e)
-        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile2Name}`)
-      })
+    await uploadFileViaApi(testDatasetIds.numericId, testTextFile2Name).catch(() => {
+      throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile2Name}`)
+    })
     // Uploading test file 3
-    await uploadFileViaApi(testDatasetIds.numericId, testTextFile3Name)
-      .then()
-      .catch((e) => {
-        console.log(e)
-        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile3Name}`)
-      })
+    await uploadFileViaApi(testDatasetIds.numericId, testTextFile3Name).catch(() => {
+      throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile3Name}`)
+    })
     // Uploading test file 4
-    await uploadFileViaApi(testDatasetIds.numericId, testTabFile4Name)
-      .then()
-      .catch((e) => {
-        console.log(e)
-        throw new Error(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`)
-      })
+    await uploadFileViaApi(testDatasetIds.numericId, testTabFile4Name).catch(() => {
+      throw new Error(`Tests beforeAll(): Error while uploading file ${testTabFile4Name}`)
+    })
     // Registering test file 1
-    await registerFileViaApi(uploadFileResponse.data.data.files[0].dataFile.id)
+
+    await registerFileViaApi(uploadFileResponse.data.data.files[0].dataFile.id).catch(() => {
+      throw new Error(`Tests beforeAll(): Error while registering file ${testTextFile1Name}`)
+    })
     const filesSubset = await sut.getDatasetFiles(
       testDatasetIds.numericId,
       latestDatasetVersionId,
@@ -544,23 +535,17 @@ describe('FilesRepository', () => {
     })
 
     test('should return citation when dataset is deaccessioned', async () => {
-      await publishDatasetViaApi(testDatasetIds.numericId)
-        .then()
-        .catch(() => {
-          throw new Error('Error while publishing test Dataset')
-        })
+      await publishDatasetViaApi(testDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
 
-      await waitForNoLocks(testDatasetIds.numericId, 10)
-        .then()
-        .catch(() => {
-          throw new Error('Error while waiting for no locks')
-        })
+      await waitForNoLocks(testDatasetIds.numericId, 10).catch(() => {
+        throw new Error('Error while waiting for no locks')
+      })
 
-      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
-        .then()
-        .catch(() => {
-          throw new Error('Error while deaccessioning test Dataset')
-        })
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0').catch(() => {
+        throw new Error('Error while deaccessioning test Dataset')
+      })
 
       const actualFileCitation = await sut.getFileCitation(
         testFileId,
