@@ -415,7 +415,7 @@ updateDataset.execute(datasetId, datasetDTO)
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
+_See [use case](../src/datasets/domain/useCases/UpdateDataset.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 

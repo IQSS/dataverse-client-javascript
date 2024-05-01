@@ -16,7 +16,7 @@ export class CreateDataset extends DatasetWriteUseCase<CreatedDatasetIdentifiers
   }
 
   /**
-   * Creates a new Dataset in a collection, given a NewDatasetDTO object and an optional collection identifier, which defaults to root.
+   * Creates a new Dataset in a collection, given a DatasetDTO object and an optional collection identifier, which defaults to root.
    *
    * @param {DatasetDTO} [newDataset] - DatasetDTO object including the new dataset metadata field values for each metadata block.
    * @param {string} [collectionId] - Specifies the collection identifier where the new dataset should be created (optional, defaults to root).

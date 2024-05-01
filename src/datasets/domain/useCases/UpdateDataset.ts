@@ -14,7 +14,7 @@ export class UpdateDataset extends DatasetWriteUseCase<void> {
   }
 
   /**
-   * Updates a Dataset, given a NewDatasetDTO object including the updated dataset metadata field values for each metadata block
+   * Updates a Dataset, given a DatasetDTO object including the updated dataset metadata field values for each metadata block
    *
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {DatasetDTO} [updatedDataset] - DatasetDTO object including the updated dataset metadata field values for each metadata block.
