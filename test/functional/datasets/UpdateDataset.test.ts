@@ -18,7 +18,7 @@ describe('execute', () => {
     )
   })
 
-  test('should update create a dataset when required fields are sent', async () => {
+  test('should update a dataset when required fields are sent', async () => {
     const testDataset = {
       metadataBlockValues: [
         {

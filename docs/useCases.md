@@ -23,6 +23,7 @@ The different use cases currently available in the package are classified below,
     - [List All Datasets](#list-all-datasets)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
+    - [Update a Dataset](#update-a-dataset)
     - [Publish a Dataset](#publish-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
@@ -358,6 +359,66 @@ The above example creates the new dataset in the `root` collection since no coll
 
 The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 
+#### Update a Dataset
+
+Updates an existing Dataset, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) with the updated information.
+
+If a draft of the dataset already exists, the metadata of that draft is overwritten; otherwise, a new draft is created with the updated metadata.
+
+This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
+
+##### Example call:
+
+```typescript
+import { updateDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const datasetDTO: DatasetDTO = {
+  metadataBlockValues: [
+    {
+      name: 'citation',
+      fields: {
+        title: 'Updated Dataset',
+        author: [
+          {
+            authorName: 'John Doe',
+            authorAffiliation: 'Dataverse'
+          },
+          {
+            authorName: 'John Lee',
+            authorAffiliation: 'Dataverse'
+          }
+        ],
+        datasetContact: [
+          {
+            datasetContactEmail: 'johndoe@dataverse.com',
+            datasetContactName: 'John'
+          }
+        ],
+        dsDescription: [
+          {
+            dsDescriptionValue: 'This is the description of our new dataset'
+          }
+        ],
+        subject: 'Earth and Environmental Sciences'
+
+        /* Rest of field values... */
+      }
+    }
+  ]
+}
+
+updateDataset.execute(datasetId, datasetDTO)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
 #### Publish a Dataset
 
 Publishes a Dataset, given its identifier and the type of version update to perform.
@@ -372,9 +433,7 @@ import { publishDataset } from '@iqss/dataverse-client-javascript'
 const datasetId = 'doi:10.77777/FK2/AAAAAA'
 const versionUpdateType = VersionUpdateType.MINOR
 
-publishDataset.execute(datasetId, versionUpdateType).then((publishedDataset: Dataset) => {
-  /* ... */
-})
+publishDataset.execute(datasetId, versionUpdateType)
 
 /* ... */
 ```

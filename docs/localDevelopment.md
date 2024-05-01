@@ -72,6 +72,14 @@ These environment variables can be updated as needed for integration testing. Fo
 npm run test:coverage
 ```
 
+### Display container logs while running tests
+
+If you want to see the container logs while running integration or functional tests, run the following command before running the test commands:
+
+```bash
+export DEBUG=testcontainers:containers npm test
+```
+
 ## Format and lint
 
 ### Run formatter

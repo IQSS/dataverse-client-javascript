@@ -600,7 +600,7 @@ describe('DatasetsRepository', () => {
         DatasetNotNumberedVersion.LATEST,
         false
       )
-      
+
       expect(actualUpdatedDataset.metadataBlocks[0].fields.title).toBe(
         'Dataset created using the createDataset use case'
       )
@@ -631,6 +631,16 @@ describe('DatasetsRepository', () => {
         (actualUpdatedDataset.metadataBlocks[0].fields.dsDescription[0] as DatasetDescription)
           .dsDescriptionValue
       ).toBe(updatedDsDescription)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(
+        sut.publishDataset(nonExistentTestDatasetId, VersionUpdateType.MAJOR)
+      ).rejects.toThrow(expectedError)
     })
   })
 })
