@@ -14,6 +14,7 @@ import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDat
 import { SingleMetadataFieldValidator } from './domain/useCases/validators/SingleMetadataFieldValidator'
 import { MultipleMetadataFieldValidator } from './domain/useCases/validators/MultipleMetadataFieldValidator'
 import { PublishDataset } from './domain/useCases/PublishDataset'
+import { UpdateDataset } from './domain/useCases/UpdateDataset'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -30,12 +31,19 @@ const metadataFieldValidator = new MetadataFieldValidator(
   new SingleMetadataFieldValidator(),
   new MultipleMetadataFieldValidator(singleMetadataFieldValidator)
 )
+const publishDataset = new PublishDataset(datasetsRepository)
+const metadataBlocksRepository = new MetadataBlocksRepository()
+const datasetResourceValidator = new DatasetResourceValidator(metadataFieldValidator)
 const createDataset = new CreateDataset(
   datasetsRepository,
-  new MetadataBlocksRepository(),
-  new DatasetResourceValidator(metadataFieldValidator)
+  metadataBlocksRepository,
+  datasetResourceValidator
 )
-const publishDataset = new PublishDataset(datasetsRepository)
+const updateDataset = new UpdateDataset(
+  datasetsRepository,
+  metadataBlocksRepository,
+  datasetResourceValidator
+)
 
 export {
   getDataset,
@@ -46,8 +54,9 @@ export {
   getDatasetUserPermissions,
   getDatasetSummaryFieldNames,
   getPrivateUrlDatasetCitation,
+  publishDataset,
   createDataset,
-  publishDataset
+  updateDataset
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
