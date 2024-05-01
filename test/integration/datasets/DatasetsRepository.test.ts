@@ -600,7 +600,33 @@ describe('DatasetsRepository', () => {
         DatasetNotNumberedVersion.LATEST,
         false
       )
-
+      
+      expect(actualUpdatedDataset.metadataBlocks[0].fields.title).toBe(
+        'Dataset created using the createDataset use case'
+      )
+      expect((actualUpdatedDataset.metadataBlocks[0].fields.author[0] as Author).authorName).toBe(
+        'Admin, Dataverse'
+      )
+      expect(
+        (actualUpdatedDataset.metadataBlocks[0].fields.author[0] as Author).authorAffiliation
+      ).toBe('Dataverse.org')
+      expect((actualUpdatedDataset.metadataBlocks[0].fields.author[1] as Author).authorName).toBe(
+        'Owner, Dataverse'
+      )
+      expect(
+        (actualUpdatedDataset.metadataBlocks[0].fields.author[1] as Author).authorAffiliation
+      ).toBe('Dataversedemo.org')
+      expect(
+        (actualUpdatedDataset.metadataBlocks[0].fields.datasetContact[0] as DatasetContact)
+          .datasetContactEmail
+      ).toBe('finch@mailinator.com')
+      expect(
+        (actualUpdatedDataset.metadataBlocks[0].fields.datasetContact[0] as DatasetContact)
+          .datasetContactName
+      ).toBe('Finch, Fiona')
+      expect(actualUpdatedDataset.metadataBlocks[0].fields.subject).toContain(
+        'Medicine, Health and Life Sciences'
+      )
       expect(
         (actualUpdatedDataset.metadataBlocks[0].fields.dsDescription[0] as DatasetDescription)
           .dsDescriptionValue
