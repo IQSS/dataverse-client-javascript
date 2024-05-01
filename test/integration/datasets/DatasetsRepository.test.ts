@@ -588,15 +588,12 @@ describe('DatasetsRepository', () => {
         (actualCreatedDataset.metadataBlocks[0].fields.dsDescription[0] as DatasetDescription)
           .dsDescriptionValue
       ).toBe('This is the description of the dataset.')
-      
-      const updatedDsDescription = 'This is the updated description of the dataset.'
-      testDataset.metadataBlockValues[0].fields.dsDescription[0].dsDescriptionValue = updatedDsDescription
 
-      await sut.updateDataset(
-        createdDataset.numericId,
-        testDataset,
-        [citationMetadataBlock]
-      )
+      const updatedDsDescription = 'This is the updated description of the dataset.'
+      testDataset.metadataBlockValues[0].fields.dsDescription[0].dsDescriptionValue =
+        updatedDsDescription
+
+      await sut.updateDataset(createdDataset.numericId, testDataset, [citationMetadataBlock])
 
       const actualUpdatedDataset = await sut.getDataset(
         createdDataset.numericId,

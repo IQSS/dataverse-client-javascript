@@ -55,7 +55,46 @@ export type MetadataFieldValueRequestPayload =
   | Record<string, MetadataFieldRequestPayload>
   | Record<string, MetadataFieldRequestPayload>[]
 
-export const transformDatasetModelToRequestPayload = (
+export interface UpdateDatasetRequestPayload {
+  fields: MetadataFieldRequestPayload[]
+}
+
+export const transformDatasetModelToUpdateDatasetRequestPayload = (
+  dataset: DatasetDTO,
+  metadataBlocks: MetadataBlock[]
+): UpdateDatasetRequestPayload => {
+  const metadataFieldsRequestPayload: MetadataFieldRequestPayload[] = []
+  const datasetMetadataBlocksValues: DatasetMetadataBlockValuesDTO[] = dataset.metadataBlockValues
+  datasetMetadataBlocksValues.forEach(function (
+    newDatasetMetadataBlockValues: DatasetMetadataBlockValuesDTO
+  ) {
+    const metadataBlock: MetadataBlock = metadataBlocks.find(
+      (metadataBlock) => metadataBlock.name == newDatasetMetadataBlockValues.name
+    )
+    const metadataBlockFieldsPayload: MetadataFieldRequestPayload[] = []
+    const metadataBlockFields = metadataBlock.metadataFields
+    const datasetMetadataFields = newDatasetMetadataBlockValues.fields
+    for (const metadataFieldKey of Object.keys(datasetMetadataFields)) {
+      const datasetMetadataFieldValue: DatasetMetadataFieldValueDTO =
+        datasetMetadataFields[metadataFieldKey]
+      metadataBlockFieldsPayload.push({
+        value: transformMetadataFieldValueToRequestPayload(
+          datasetMetadataFieldValue,
+          metadataBlockFields[metadataFieldKey]
+        ),
+        typeClass: metadataBlockFields[metadataFieldKey].typeClass,
+        multiple: metadataBlockFields[metadataFieldKey].multiple,
+        typeName: metadataFieldKey
+      })
+    }
+    metadataFieldsRequestPayload.push(...metadataBlockFieldsPayload)
+  })
+  return {
+    fields: metadataFieldsRequestPayload
+  }
+}
+
+export const transformDatasetModelToNewDatasetRequestPayload = (
   dataset: DatasetDTO,
   metadataBlocks: MetadataBlock[]
 ): NewDatasetRequestPayload => {

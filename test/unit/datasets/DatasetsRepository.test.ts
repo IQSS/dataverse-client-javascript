@@ -8,7 +8,8 @@ import {
 import {
   createDatasetModel,
   createDatasetVersionPayload,
-  createDatasetLicenseModel
+  createDatasetLicenseModel,
+  createUpdateDatasetRequestPayload
 } from '../../testHelpers/datasets/datasetHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DatasetNotNumberedVersion, DatasetPreviewSubset } from '../../../src/datasets'
@@ -24,7 +25,7 @@ import {
 import {
   createDatasetDTO,
   createDatasetMetadataBlockModel,
-  createDatasetRequestPayload
+  createNewDatasetRequestPayload
 } from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
 import { VersionUpdateType } from '../../../src/datasets/domain/models/Dataset'
@@ -717,7 +718,7 @@ describe('DatasetsRepository', () => {
     const testNewDataset = createDatasetDTO()
     const testMetadataBlocks = [createDatasetMetadataBlockModel()]
     const testCollectionName = 'test'
-    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createDatasetRequestPayload())
+    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createNewDatasetRequestPayload())
 
     const testCreatedDatasetIdentifiers = {
       persistentId: 'test',
@@ -835,7 +836,16 @@ describe('DatasetsRepository', () => {
   describe('updateDataset', () => {
     const testNewDataset = createDatasetDTO()
     const testMetadataBlocks = [createDatasetMetadataBlockModel()]
-    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createDatasetRequestPayload())
+    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createUpdateDatasetRequestPayload())
+
+    const expectedApiKeyRequestConfig = {
+      ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      params: { replace: true }
+    }
+    const expectedCookieRequestConfig = {
+      ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+      params: { replace: true }
+    }
 
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/editMetadata`
 
@@ -848,7 +858,7 @@ describe('DatasetsRepository', () => {
       expect(axios.put).toHaveBeenCalledWith(
         expectedApiEndpoint,
         expectedNewDatasetRequestPayloadJson,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        expectedApiKeyRequestConfig
       )
       expect(actual).toBeUndefined()
 
@@ -860,7 +870,7 @@ describe('DatasetsRepository', () => {
       expect(axios.put).toHaveBeenCalledWith(
         expectedApiEndpoint,
         expectedNewDatasetRequestPayloadJson,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        expectedCookieRequestConfig
       )
       expect(actual).toBeUndefined()
     })
@@ -876,7 +886,7 @@ describe('DatasetsRepository', () => {
       expect(axios.put).toHaveBeenCalledWith(
         expectedApiEndpoint,
         expectedNewDatasetRequestPayloadJson,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        expectedApiKeyRequestConfig
       )
       expect(error).toBeInstanceOf(Error)
     })

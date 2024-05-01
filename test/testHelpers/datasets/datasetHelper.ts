@@ -13,7 +13,10 @@ import {
   DatasetMetadataFieldValueDTO
 } from '../../../src/datasets/domain/dtos/DatasetDTO'
 import { MetadataBlock, MetadataFieldType } from '../../../src'
-import { NewDatasetRequestPayload } from '../../../src/datasets/infra/repositories/transformers/datasetTransformers'
+import {
+  NewDatasetRequestPayload,
+  UpdateDatasetRequestPayload
+} from '../../../src/datasets/infra/repositories/transformers/datasetTransformers'
 import {
   MetadataFieldWatermark,
   MetadataFieldTypeClass
@@ -615,7 +618,9 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
   }
 }
 
-export const createDatasetRequestPayload = (license?: DatasetLicense): NewDatasetRequestPayload => {
+export const createNewDatasetRequestPayload = (
+  license?: DatasetLicense
+): NewDatasetRequestPayload => {
   return {
     datasetVersion: {
       ...(license && { license }),
@@ -674,5 +679,59 @@ export const createDatasetRequestPayload = (license?: DatasetLicense): NewDatase
         }
       }
     }
+  }
+}
+
+export const createUpdateDatasetRequestPayload = (): UpdateDatasetRequestPayload => {
+  return {
+    fields: [
+      {
+        value: 'test dataset',
+        typeClass: 'primitive',
+        multiple: false,
+        typeName: 'title'
+      },
+      {
+        value: [
+          {
+            authorName: {
+              value: 'Admin, Dataverse',
+              typeClass: 'primitive',
+              multiple: false,
+              typeName: 'authorName'
+            },
+            authorAffiliation: {
+              value: 'Dataverse.org',
+              typeClass: 'primitive',
+              multiple: false,
+              typeName: 'authorAffiliation'
+            }
+          },
+          {
+            authorName: {
+              value: 'Owner, Dataverse',
+              typeClass: 'primitive',
+              multiple: false,
+              typeName: 'authorName'
+            },
+            authorAffiliation: {
+              value: 'Dataverse.org',
+              typeClass: 'primitive',
+              multiple: false,
+              typeName: 'authorAffiliation'
+            }
+          }
+        ],
+        typeClass: 'compound',
+        multiple: true,
+        typeName: 'author'
+      },
+      {
+        value: ['alternative1', 'alternative2'],
+        typeClass: 'primitive',
+        multiple: true,
+        typeName: 'alternativeRequiredTitle'
+      }
+    ]
   }
 }

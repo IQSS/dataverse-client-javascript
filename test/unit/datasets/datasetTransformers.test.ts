@@ -1,17 +1,17 @@
 import {
   createDatasetMetadataBlockModel,
   createDatasetDTO,
-  createDatasetRequestPayload
+  createNewDatasetRequestPayload
 } from '../../testHelpers/datasets/datasetHelper'
-import { transformDatasetModelToRequestPayload } from '../../../src/datasets/infra/repositories/transformers/datasetTransformers'
 import { createDatasetLicenseModel } from '../../testHelpers/datasets/datasetHelper'
+import { transformDatasetModelToNewDatasetRequestPayload } from '../../../src/datasets/infra/repositories/transformers/datasetTransformers'
 
 describe('transformNewDatasetModelToRequestPayload', () => {
   test('should correctly transform a new dataset model to a new dataset request payload', async () => {
     const testDataset = createDatasetDTO()
     const testMetadataBlocks = [createDatasetMetadataBlockModel()]
-    const expectedNewDatasetRequestPayload = createDatasetRequestPayload()
-    const actual = transformDatasetModelToRequestPayload(testDataset, testMetadataBlocks)
+    const expectedNewDatasetRequestPayload = createNewDatasetRequestPayload()
+    const actual = transformDatasetModelToNewDatasetRequestPayload(testDataset, testMetadataBlocks)
 
     expect(actual).toEqual(expectedNewDatasetRequestPayload)
   })
@@ -26,10 +26,10 @@ describe('transformNewDatasetModelToRequestPayload', () => {
       createDatasetLicenseModel()
     )
     const testMetadataBlocks = [createDatasetMetadataBlockModel()]
-    const expectedNewDatasetRequestPayload = createDatasetRequestPayload(
+    const expectedNewDatasetRequestPayload = createNewDatasetRequestPayload(
       createDatasetLicenseModel()
     )
-    const actual = transformDatasetModelToRequestPayload(testDataset, testMetadataBlocks)
+    const actual = transformDatasetModelToNewDatasetRequestPayload(testDataset, testMetadataBlocks)
 
     expect(actual).toEqual(expectedNewDatasetRequestPayload)
   })

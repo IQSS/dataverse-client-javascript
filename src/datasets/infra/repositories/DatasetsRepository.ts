@@ -1,7 +1,10 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
-import { transformVersionResponseToDataset } from './transformers/datasetTransformers'
+import {
+  transformVersionResponseToDataset,
+  transformDatasetModelToUpdateDatasetRequestPayload
+} from './transformers/datasetTransformers'
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
 import { DatasetLock } from '../../domain/models/DatasetLock'
@@ -9,7 +12,7 @@ import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIde
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset'
 import { DatasetDTO } from '../../domain/dtos/DatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
-import { transformDatasetModelToRequestPayload } from './transformers/datasetTransformers'
+import { transformDatasetModelToNewDatasetRequestPayload } from './transformers/datasetTransformers'
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
 
@@ -144,7 +147,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   ): Promise<CreatedDatasetIdentifiers> {
     return this.doPost(
       `/dataverses/${collectionId}/datasets`,
-      transformDatasetModelToRequestPayload(newDataset, datasetMetadataBlocks)
+      transformDatasetModelToNewDatasetRequestPayload(newDataset, datasetMetadataBlocks)
     )
       .then((response) => {
         const responseData = response.data.data
@@ -182,7 +185,8 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   ): Promise<void> {
     return this.doPut(
       this.buildApiEndpoint(this.datasetsResourceName, `editMetadata`, datasetId),
-      transformDatasetModelToRequestPayload(dataset, datasetMetadataBlocks)
+      transformDatasetModelToUpdateDatasetRequestPayload(dataset, datasetMetadataBlocks),
+      { replace: true }
     )
       .then(() => undefined)
       .catch((error) => {
