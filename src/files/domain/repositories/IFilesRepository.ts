@@ -6,6 +6,7 @@ import { FileCounts } from '../models/FileCounts'
 import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode'
 import { File } from '../models/File'
 import { Dataset } from '../../../datasets'
+import { FileUploadDestination } from '../models/FileUploadDestination'
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -50,4 +51,9 @@ export interface IFilesRepository {
     datasetVersionId: string,
     includeDeaccessioned: boolean
   ): Promise<string>
+
+  getFileUploadDestinations(
+    datasetId: number | string,
+    fileSize: number
+  ): Promise<FileUploadDestination[]>
 }

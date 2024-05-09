@@ -564,4 +564,13 @@ describe('FilesRepository', () => {
       ).rejects.toThrow(errorExpected)
     })
   })
+
+  describe('getFileUploadDestination', () => {
+    test('should return upload destinations when dataset exists', async () => {
+      await sut.getFileUploadDestinations(
+        testDatasetIds.numericId,
+        1000
+      )
+    })
+  })
 })
