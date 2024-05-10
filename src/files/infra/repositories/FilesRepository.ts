@@ -16,7 +16,7 @@ import { transformFileCountsResponseToFileCounts } from './transformers/fileCoun
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode'
 import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
-import { transformUploadDestinationsResponseToUploadDestinations } from './transformers/fileUploadDestinationsTransformers'
+//import { transformUploadDestinationsResponseToUploadDestinations } from './transformers/fileUploadDestinationsTransformers'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -216,7 +216,8 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
         size: fileSize
       }
     )
-      .then((response) => transformUploadDestinationsResponseToUploadDestinations(response))
+      //.then((response) => transformUploadDestinationsResponseToUploadDestinations(response))
+      .then(() => [])
       .catch((error) => {
         console.log(error)
         throw error

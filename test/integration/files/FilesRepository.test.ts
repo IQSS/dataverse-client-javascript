@@ -24,8 +24,10 @@ import {
   deaccessionDatasetViaApi,
   publishDatasetViaApi,
   waitForNoLocks,
-  deletePublishedDatasetViaApi
+  deletePublishedDatasetViaApi,
+  deleteUnpublishedDatasetViaApi
 } from '../../testHelpers/datasets/datasetHelper'
+import { createCollectionViaApi, deleteCollectionViaApi, setStorageDriverViaApi } from '../../testHelpers/collections/collectionHelper'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -566,9 +568,25 @@ describe('FilesRepository', () => {
   })
 
   describe('getFileUploadDestination', () => {
+    let testDataset2Ids: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      await createCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_2)
+      await setStorageDriverViaApi(TestConstants.TEST_COLLECTION_ALIAS_2, 'LocalStack')
+      testDataset2Ids = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        TestConstants.TEST_COLLECTION_ALIAS_2
+      )
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(testDataset2Ids.numericId)
+      await deleteCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_2)
+    })
+
     test('should return upload destinations when dataset exists', async () => {
       await sut.getFileUploadDestinations(
-        testDatasetIds.numericId,
+        testDataset2Ids.numericId,
         1000
       )
     })

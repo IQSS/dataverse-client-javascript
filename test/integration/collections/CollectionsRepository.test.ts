@@ -20,7 +20,7 @@ describe('CollectionsRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
-    await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2).then(
+    await createCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_2).then(
       (collectionPayload: CollectionPayload) => (testCollectionId = collectionPayload.id)
     )
   })
@@ -31,7 +31,7 @@ describe('CollectionsRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
-    await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
+    await deleteCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_2)
   })
 
   describe('getCollection', () => {
@@ -50,15 +50,15 @@ describe('CollectionsRepository', () => {
     describe('by string alias', () => {
       test('should return collection when it exists filtering by id AS (alias)', async () => {
         const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS_2
+          TestConstants.TEST_COLLECTION_ALIAS_2
         )
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
+        expect(actual.alias).toBe(TestConstants.TEST_COLLECTION_ALIAS_2)
       })
       test('should return isReleased is false for unpublished collection', async () => {
         const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS_2
+          TestConstants.TEST_COLLECTION_ALIAS_2
         )
-        expect(actual.alias).toBe(TestConstants.TEST_CREATED_COLLECTION_ALIAS_2)
+        expect(actual.alias).toBe(TestConstants.TEST_COLLECTION_ALIAS_2)
         expect(actual.isReleased).toBe(false)
       })
       test('should return error when collection does not exist', async () => {

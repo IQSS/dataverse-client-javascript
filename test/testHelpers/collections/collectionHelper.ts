@@ -50,7 +50,7 @@ export async function createCollectionViaApi(collectionAlias: string): Promise<C
     return await axios
       .post(
         `${TestConstants.TEST_API_URL}/dataverses/root`,
-        collectionAlias == TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+        collectionAlias == TestConstants.TEST_COLLECTION_ALIAS_1
           ? collectionJson1
           : collectionJson2,
         DATAVERSE_API_REQUEST_HEADERS
@@ -68,6 +68,22 @@ export async function deleteCollectionViaApi(collectionAlias: string): Promise<v
       DATAVERSE_API_REQUEST_HEADERS
     )
   } catch (error) {
+    console.log(error)
     throw new Error(`Error while deleting test collection ${collectionAlias}`)
+  }
+}
+
+export async function setStorageDriverViaApi(collectionAlias: string, driverLabel: string): Promise<void> {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/admin/dataverse/${collectionAlias}/storageDriver`,
+      driverLabel,
+      {
+        headers: { 'Content-Type': 'text/plain', 'X-Dataverse-Key': process.env.TEST_API_KEY }
+      }
+    )
+  } catch (error) {
+    console.log(error)
+    throw new Error(`Error while setting storage driver for collection ${collectionAlias}`)
   }
 }
