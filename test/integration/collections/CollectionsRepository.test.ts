@@ -49,15 +49,11 @@ describe('CollectionsRepository', () => {
     })
     describe('by string alias', () => {
       test('should return collection when it exists filtering by id AS (alias)', async () => {
-        const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_COLLECTION_ALIAS_2
-        )
+        const actual = await testGetCollection.getCollection(TestConstants.TEST_COLLECTION_ALIAS_2)
         expect(actual.alias).toBe(TestConstants.TEST_COLLECTION_ALIAS_2)
       })
       test('should return isReleased is false for unpublished collection', async () => {
-        const actual = await testGetCollection.getCollection(
-          TestConstants.TEST_COLLECTION_ALIAS_2
-        )
+        const actual = await testGetCollection.getCollection(TestConstants.TEST_COLLECTION_ALIAS_2)
         expect(actual.alias).toBe(TestConstants.TEST_COLLECTION_ALIAS_2)
         expect(actual.isReleased).toBe(false)
       })

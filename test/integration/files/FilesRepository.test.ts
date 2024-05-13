@@ -27,7 +27,11 @@ import {
   deletePublishedDatasetViaApi,
   deleteUnpublishedDatasetViaApi
 } from '../../testHelpers/datasets/datasetHelper'
-import { createCollectionViaApi, deleteCollectionViaApi, setStorageDriverViaApi } from '../../testHelpers/collections/collectionHelper'
+import {
+  createCollectionViaApi,
+  deleteCollectionViaApi,
+  setStorageDriverViaApi
+} from '../../testHelpers/collections/collectionHelper'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -570,6 +574,9 @@ describe('FilesRepository', () => {
   describe('getFileUploadDestination', () => {
     let testDataset2Ids: CreatedDatasetIdentifiers
 
+    const expectedUrlFragment = '/mybucket/'
+    const expectedStorageIdFragment = 'localstack1://mybucket:'
+
     beforeAll(async () => {
       await createCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_2)
       await setStorageDriverViaApi(TestConstants.TEST_COLLECTION_ALIAS_2, 'LocalStack')
@@ -584,10 +591,50 @@ describe('FilesRepository', () => {
       await deleteCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_2)
     })
 
-    test('should return upload destinations when dataset exists', async () => {
-      await sut.getFileUploadDestinations(
+    test('should return upload destinations when dataset exists and the file does not require multipart download', async () => {
+      const actualFileDestinations = await sut.getFileUploadDestinations(
         testDataset2Ids.numericId,
         1000
+      )
+      expect(actualFileDestinations.length).toBe(1)
+      expect(actualFileDestinations[0].url).toContain(expectedUrlFragment)
+      expect(actualFileDestinations[0].partSize).not.toBeUndefined()
+      expect(actualFileDestinations[0].storageId).toContain(expectedStorageIdFragment)
+    })
+
+    test('should return upload destinations when dataset exists and the file requires multipart download', async () => {
+      const actualFileDestinations = await sut.getFileUploadDestinations(
+        testDataset2Ids.numericId,
+        10000000000
+      )
+      expect(actualFileDestinations.length).toBeGreaterThan(1)
+      expect(actualFileDestinations[0].url).toContain(expectedUrlFragment)
+      expect(actualFileDestinations[0].partSize).not.toBeUndefined()
+      expect(actualFileDestinations[0].storageId).toContain(expectedStorageIdFragment)
+      expect(actualFileDestinations[1].url).toContain(expectedUrlFragment)
+      expect(actualFileDestinations[1].partSize).not.toBeUndefined()
+      expect(actualFileDestinations[1].storageId).toContain(expectedStorageIdFragment)
+      expect(actualFileDestinations[0].url).not.toEqual(actualFileDestinations[1].url)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const nonExistentDatasetId = 400000
+      const errorExpected = new ReadError(
+        `[404] Dataset with ID ${nonExistentDatasetId} not found.`
+      )
+
+      await expect(sut.getFileUploadDestinations(nonExistentDatasetId, 1000)).rejects.toThrow(
+        errorExpected
+      )
+    })
+
+    test('should return error when direct upload is not configured in the dataset', async () => {
+      const errorExpected = new ReadError(
+        `[404] Direct upload not supported for files in this dataset: ${testDatasetIds.numericId}`
+      )
+
+      await expect(sut.getFileUploadDestinations(testDatasetIds.numericId, 1000)).rejects.toThrow(
+        errorExpected
       )
     })
   })

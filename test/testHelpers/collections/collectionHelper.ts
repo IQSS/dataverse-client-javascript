@@ -73,7 +73,10 @@ export async function deleteCollectionViaApi(collectionAlias: string): Promise<v
   }
 }
 
-export async function setStorageDriverViaApi(collectionAlias: string, driverLabel: string): Promise<void> {
+export async function setStorageDriverViaApi(
+  collectionAlias: string,
+  driverLabel: string
+): Promise<void> {
   try {
     return await axios.put(
       `${TestConstants.TEST_API_URL}/admin/dataverse/${collectionAlias}/storageDriver`,

@@ -13,10 +13,7 @@ export class UploadFiles implements UseCase<void> {
    * TODO
    * @returns {Promise<void>}
    */
-  async execute(
-    datasetId: number | string,
-    fileDTOs: FileDTO[],
-  ): Promise<void> {
+  async execute(datasetId: number | string, fileDTOs: FileDTO[]): Promise<void> {
     // TODO
     this.filesRepository.getFileUploadDestinations(datasetId, fileDTOs[0].filesize)
   }

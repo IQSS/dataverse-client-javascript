@@ -11,8 +11,7 @@ services:
       DATAVERSE_DB_HOST: postgres
       DATAVERSE_DB_PASSWORD: secret
       DATAVERSE_DB_USER: ${DATAVERSE_DB_USER}
-      JVM_ARGS: 
-        -Ddataverse.files.storage-driver-id=file1
+      JVM_ARGS: -Ddataverse.files.storage-driver-id=file1
         -Ddataverse.pid.providers=fake
         -Ddataverse.pid.default-provider=fake
         -Ddataverse.pid.fake.type=FAKE
@@ -57,12 +56,12 @@ services:
     privileged: false
 
   test_localstack:
-    container_name: "test_localstack"
-    hostname: "localstack"
+    container_name: 'test_localstack'
+    hostname: 'localstack'
     image: localstack/localstack:2.3.2
     restart: on-failure
     ports:
-      - "4566:4566"
+      - '4566:4566'
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - HOSTNAME_EXTERNAL=localstack
@@ -74,13 +73,13 @@ services:
       - /localstack:mode=770,size=128M,uid=1000,gid=1000
 
   test_minio:
-    container_name: "test_minio"
-    hostname: "minio"
+    container_name: 'test_minio'
+    hostname: 'minio'
     image: minio/minio
     restart: on-failure
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     networks:
       - dataverse
     volumes:
