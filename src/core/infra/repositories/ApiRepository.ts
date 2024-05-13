@@ -22,16 +22,15 @@ export abstract class ApiRepository {
     data: string | object,
     queryParams: object = {}
   ): Promise<AxiosResponse> {
-    return await axios
-      .post(
-        this.buildRequestUrl(apiEndpoint),
-        JSON.stringify(data),
-        this.buildRequestConfig(true, queryParams)
-      )
-      .then((response) => response)
-      .catch((error) => {
-        throw new WriteError(this.buildErrorMessage(error))
-      })
+    return await this.doRequest('post', apiEndpoint, data, queryParams)
+  }
+
+  public async doPut(
+    apiEndpoint: string,
+    data: string | object,
+    queryParams: object = {}
+  ): Promise<AxiosResponse> {
+    return await this.doRequest('put', apiEndpoint, data, queryParams)
   }
 
   protected buildApiEndpoint(
@@ -82,5 +81,23 @@ export abstract class ApiRepository {
       error.response && error.response.status ? error.response.status : 'unknown error status'
     const message = error.response && error.response.data ? ` ${error.response.data.message}` : ''
     return `[${status}]${message}`
+  }
+
+  private async doRequest(
+    method: 'post' | 'put',
+    apiEndpoint: string,
+    data: string | object,
+    queryParams: object = {}
+  ): Promise<AxiosResponse> {
+    const requestData = JSON.stringify(data)
+    const requestUrl = this.buildRequestUrl(apiEndpoint)
+    const requestConfig = this.buildRequestConfig(true, queryParams)
+
+    try {
+      const response = await axios[method](requestUrl, requestData, requestConfig)
+      return response
+    } catch (error) {
+      throw new WriteError(this.buildErrorMessage(error))
+    }
   }
 }

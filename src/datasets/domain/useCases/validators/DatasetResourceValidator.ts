@@ -1,19 +1,19 @@
-import { NewDatasetDTO, NewDatasetMetadataBlockValuesDTO } from '../../dtos/NewDatasetDTO'
-import { NewResourceValidator } from '../../../../core/domain/useCases/validators/NewResourceValidator'
+import { DatasetDTO, DatasetMetadataBlockValuesDTO } from '../../dtos/DatasetDTO'
+import { ResourceValidator } from '../../../../core/domain/useCases/validators/ResourceValidator'
 import { MetadataBlock } from '../../../../metadataBlocks'
 import { BaseMetadataFieldValidator } from './BaseMetadataFieldValidator'
 
-export class NewDatasetResourceValidator implements NewResourceValidator {
+export class DatasetResourceValidator implements ResourceValidator {
   constructor(private metadataFieldValidator: BaseMetadataFieldValidator) {}
 
-  public validate(resource: NewDatasetDTO, metadataBlocks: MetadataBlock[]) {
+  public validate(resource: DatasetDTO, metadataBlocks: MetadataBlock[]) {
     for (const metadataBlockValues of resource.metadataBlockValues) {
       this.validateMetadataBlock(metadataBlockValues, metadataBlocks)
     }
   }
 
   private validateMetadataBlock(
-    metadataBlockValues: NewDatasetMetadataBlockValuesDTO,
+    metadataBlockValues: DatasetMetadataBlockValuesDTO,
     metadataBlocks: MetadataBlock[]
   ) {
     const metadataBlockName = metadataBlockValues.name

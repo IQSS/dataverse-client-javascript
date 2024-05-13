@@ -1,31 +1,24 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
-import { NewDatasetDTO, NewDatasetMetadataBlockValuesDTO } from '../dtos/NewDatasetDTO'
-import { NewResourceValidator } from '../../../core/domain/useCases/validators/NewResourceValidator'
+import { DatasetDTO } from '../dtos/DatasetDTO'
+import { ResourceValidator } from '../../../core/domain/useCases/validators/ResourceValidator'
 import { IMetadataBlocksRepository } from '../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository'
-import { MetadataBlock } from '../../../metadataBlocks'
 import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers'
 import { ROOT_COLLECTION_ALIAS } from '../../../collections/domain/models/Collection'
+import { DatasetWriteUseCase } from './DatasetWriteUseCase'
 
-export class CreateDataset implements UseCase<CreatedDatasetIdentifiers> {
-  private datasetsRepository: IDatasetsRepository
-  private metadataBlocksRepository: IMetadataBlocksRepository
-  private newDatasetValidator: NewResourceValidator
-
+export class CreateDataset extends DatasetWriteUseCase<CreatedDatasetIdentifiers> {
   constructor(
     datasetsRepository: IDatasetsRepository,
     metadataBlocksRepository: IMetadataBlocksRepository,
-    newDatasetValidator: NewResourceValidator
+    newDatasetValidator: ResourceValidator
   ) {
-    this.datasetsRepository = datasetsRepository
-    this.metadataBlocksRepository = metadataBlocksRepository
-    this.newDatasetValidator = newDatasetValidator
+    super(datasetsRepository, metadataBlocksRepository, newDatasetValidator)
   }
 
   /**
-   * Creates a new Dataset in a collection, given a NewDatasetDTO object and an optional collection identifier, which defaults to root.
+   * Creates a new Dataset in a collection, given a DatasetDTO object and an optional collection identifier, which defaults to root.
    *
-   * @param {NewDatasetDTO} [newDataset] - NewDatasetDTO object including the new dataset metadata field values for each metadata block.
+   * @param {DatasetDTO} [newDataset] - DatasetDTO object including the new dataset metadata field values for each metadata block.
    * @param {string} [collectionId] - Specifies the collection identifier where the new dataset should be created (optional, defaults to root).
    * @returns {Promise<CreatedDatasetIdentifiers>}
    * @throws {ResourceValidationError} - If there are validation errors related to the provided information.
@@ -33,27 +26,11 @@ export class CreateDataset implements UseCase<CreatedDatasetIdentifiers> {
    * @throws {WriteError} - If there are errors while writing data.
    */
   async execute(
-    newDataset: NewDatasetDTO,
+    newDataset: DatasetDTO,
     collectionId = ROOT_COLLECTION_ALIAS
   ): Promise<CreatedDatasetIdentifiers> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(newDataset)
-
-    this.newDatasetValidator.validate(newDataset, metadataBlocks)
-
-    return this.datasetsRepository.createDataset(newDataset, metadataBlocks, collectionId)
-  }
-
-  async getNewDatasetMetadataBlocks(newDataset: NewDatasetDTO): Promise<MetadataBlock[]> {
-    const metadataBlocks: MetadataBlock[] = []
-    await Promise.all(
-      newDataset.metadataBlockValues.map(
-        async (metadataBlockValue: NewDatasetMetadataBlockValuesDTO) => {
-          metadataBlocks.push(
-            await this.metadataBlocksRepository.getMetadataBlockByName(metadataBlockValue.name)
-          )
-        }
-      )
-    )
-    return metadataBlocks
+    this.getNewDatasetValidator().validate(newDataset, metadataBlocks)
+    return this.getDatasetsRepository().createDataset(newDataset, metadataBlocks, collectionId)
   }
 }

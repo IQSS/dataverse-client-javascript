@@ -1,15 +1,18 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
-import { transformVersionResponseToDataset } from './transformers/datasetTransformers'
+import {
+  transformVersionResponseToDataset,
+  transformDatasetModelToUpdateDatasetRequestPayload
+} from './transformers/datasetTransformers'
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
 import { DatasetLock } from '../../domain/models/DatasetLock'
 import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers'
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset'
-import { NewDatasetDTO } from '../../domain/dtos/NewDatasetDTO'
+import { DatasetDTO } from '../../domain/dtos/DatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
-import { transformNewDatasetModelToRequestPayload } from './transformers/newDatasetTransformers'
+import { transformDatasetModelToNewDatasetRequestPayload } from './transformers/datasetTransformers'
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
 
@@ -138,13 +141,13 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async createDataset(
-    newDataset: NewDatasetDTO,
+    newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
     collectionId: string
   ): Promise<CreatedDatasetIdentifiers> {
     return this.doPost(
       `/dataverses/${collectionId}/datasets`,
-      transformNewDatasetModelToRequestPayload(newDataset, datasetMetadataBlocks)
+      transformDatasetModelToNewDatasetRequestPayload(newDataset, datasetMetadataBlocks)
     )
       .then((response) => {
         const responseData = response.data.data
@@ -168,6 +171,22 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       {
         type: versionUpdateType
       }
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateDataset(
+    datasetId: string | number,
+    dataset: DatasetDTO,
+    datasetMetadataBlocks: MetadataBlock[]
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, `editMetadata`, datasetId),
+      transformDatasetModelToUpdateDatasetRequestPayload(dataset, datasetMetadataBlocks),
+      { replace: true }
     )
       .then(() => undefined)
       .catch((error) => {

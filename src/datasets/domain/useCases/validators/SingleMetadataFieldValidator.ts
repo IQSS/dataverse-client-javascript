@@ -1,21 +1,21 @@
 import {
   BaseMetadataFieldValidator,
-  NewDatasetMetadataFieldAndValueInfo
+  DatasetMetadataFieldAndValueInfo
 } from './BaseMetadataFieldValidator'
 import { ControlledVocabularyFieldError } from './errors/ControlledVocabularyFieldError'
 import { DateFormatFieldError } from './errors/DateFormatFieldError'
 import { MetadataFieldValidator } from './MetadataFieldValidator'
-import { NewDatasetMetadataChildFieldValueDTO } from '../../dtos/NewDatasetDTO'
+import { DatasetMetadataChildFieldValueDTO } from '../../dtos/DatasetDTO'
 import { MultipleMetadataFieldValidator } from './MultipleMetadataFieldValidator'
 import { MetadataFieldType } from '../../../../metadataBlocks/domain/models/MetadataBlock'
 
 export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
-  validate(newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo): void {
-    const metadataFieldValue = newDatasetMetadataFieldAndValueInfo.metadataFieldValue
-    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo
+  validate(datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo): void {
+    const metadataFieldValue = datasetMetadataFieldAndValueInfo.metadataFieldValue
+    const metadataFieldInfo = datasetMetadataFieldAndValueInfo.metadataFieldInfo
     if (Array.isArray(metadataFieldValue)) {
       throw this.createGeneralValidationError(
-        newDatasetMetadataFieldAndValueInfo,
+        datasetMetadataFieldAndValueInfo,
         'Expecting a single field, not an array.'
       )
     }
@@ -24,7 +24,7 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
       metadataFieldInfo.type !== MetadataFieldType.None
     ) {
       throw this.createGeneralValidationError(
-        newDatasetMetadataFieldAndValueInfo,
+        datasetMetadataFieldAndValueInfo,
         'Expecting a string, not child fields.'
       )
     }
@@ -33,65 +33,63 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
       metadataFieldInfo.type === MetadataFieldType.None
     ) {
       throw this.createGeneralValidationError(
-        newDatasetMetadataFieldAndValueInfo,
+        datasetMetadataFieldAndValueInfo,
         'Expecting child fields, not a string.'
       )
     }
-    this.validateFieldValue(newDatasetMetadataFieldAndValueInfo)
+    this.validateFieldValue(datasetMetadataFieldAndValueInfo)
   }
 
-  private validateFieldValue(
-    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo
-  ) {
-    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo
+  private validateFieldValue(datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo) {
+    const metadataFieldInfo = datasetMetadataFieldAndValueInfo.metadataFieldInfo
     if (metadataFieldInfo.isControlledVocabulary) {
-      this.validateControlledVocabularyFieldValue(newDatasetMetadataFieldAndValueInfo)
+      this.validateControlledVocabularyFieldValue(datasetMetadataFieldAndValueInfo)
     }
 
     if (metadataFieldInfo.type == MetadataFieldType.Date) {
-      this.validateDateFieldValue(newDatasetMetadataFieldAndValueInfo)
+      this.validateDateFieldValue(datasetMetadataFieldAndValueInfo)
     }
 
     if (metadataFieldInfo.childMetadataFields != undefined) {
-      this.validateChildMetadataFieldValues(newDatasetMetadataFieldAndValueInfo)
+      this.validateChildMetadataFieldValues(datasetMetadataFieldAndValueInfo)
     }
   }
 
   private validateControlledVocabularyFieldValue(
-    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo
+    datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo
   ) {
     if (
-      !newDatasetMetadataFieldAndValueInfo.metadataFieldInfo.controlledVocabularyValues.includes(
-        newDatasetMetadataFieldAndValueInfo.metadataFieldValue as string
+      !datasetMetadataFieldAndValueInfo.metadataFieldInfo.controlledVocabularyValues.includes(
+        datasetMetadataFieldAndValueInfo.metadataFieldValue as string
       )
     ) {
       throw new ControlledVocabularyFieldError(
-        newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
-        newDatasetMetadataFieldAndValueInfo.metadataBlockName,
-        newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
-        newDatasetMetadataFieldAndValueInfo.metadataFieldPosition
+        datasetMetadataFieldAndValueInfo.metadataFieldKey,
+        datasetMetadataFieldAndValueInfo.metadataBlockName,
+        datasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+        datasetMetadataFieldAndValueInfo.metadataFieldPosition
       )
     }
   }
 
   private validateDateFieldValue(
-    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo
+    datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo
   ) {
     const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/
-    if (!dateFormatRegex.test(newDatasetMetadataFieldAndValueInfo.metadataFieldValue as string)) {
+    if (!dateFormatRegex.test(datasetMetadataFieldAndValueInfo.metadataFieldValue as string)) {
       throw new DateFormatFieldError(
-        newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
-        newDatasetMetadataFieldAndValueInfo.metadataBlockName,
-        newDatasetMetadataFieldAndValueInfo.metadataParentFieldKey,
-        newDatasetMetadataFieldAndValueInfo.metadataFieldPosition
+        datasetMetadataFieldAndValueInfo.metadataFieldKey,
+        datasetMetadataFieldAndValueInfo.metadataBlockName,
+        datasetMetadataFieldAndValueInfo.metadataParentFieldKey,
+        datasetMetadataFieldAndValueInfo.metadataFieldPosition
       )
     }
   }
 
   private validateChildMetadataFieldValues(
-    newDatasetMetadataFieldAndValueInfo: NewDatasetMetadataFieldAndValueInfo
+    datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo
   ) {
-    const metadataFieldInfo = newDatasetMetadataFieldAndValueInfo.metadataFieldInfo
+    const metadataFieldInfo = datasetMetadataFieldAndValueInfo.metadataFieldInfo
     const childMetadataFieldKeys = Object.keys(metadataFieldInfo.childMetadataFields)
     const metadataFieldValidator = new MetadataFieldValidator(
       this,
@@ -103,11 +101,11 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
         metadataFieldInfo: childMetadataFieldInfo,
         metadataFieldKey: childMetadataFieldKey,
         metadataFieldValue: (
-          newDatasetMetadataFieldAndValueInfo.metadataFieldValue as NewDatasetMetadataChildFieldValueDTO
+          datasetMetadataFieldAndValueInfo.metadataFieldValue as DatasetMetadataChildFieldValueDTO
         )[childMetadataFieldKey],
-        metadataBlockName: newDatasetMetadataFieldAndValueInfo.metadataBlockName,
-        metadataParentFieldKey: newDatasetMetadataFieldAndValueInfo.metadataFieldKey,
-        metadataFieldPosition: newDatasetMetadataFieldAndValueInfo.metadataFieldPosition
+        metadataBlockName: datasetMetadataFieldAndValueInfo.metadataBlockName,
+        metadataParentFieldKey: datasetMetadataFieldAndValueInfo.metadataFieldKey,
+        metadataFieldPosition: datasetMetadataFieldAndValueInfo.metadataFieldPosition
       })
     }
   }

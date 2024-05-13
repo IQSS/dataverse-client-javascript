@@ -1,23 +1,23 @@
 import {
-  createNewDatasetMetadataBlockModel,
-  createNewDatasetDTO,
+  createDatasetMetadataBlockModel,
+  createDatasetDTO,
   createNewDatasetRequestPayload
-} from '../../testHelpers/datasets/newDatasetHelper'
-import { transformNewDatasetModelToRequestPayload } from '../../../src/datasets/infra/repositories/transformers/newDatasetTransformers'
+} from '../../testHelpers/datasets/datasetHelper'
 import { createDatasetLicenseModel } from '../../testHelpers/datasets/datasetHelper'
+import { transformDatasetModelToNewDatasetRequestPayload } from '../../../src/datasets/infra/repositories/transformers/datasetTransformers'
 
 describe('transformNewDatasetModelToRequestPayload', () => {
   test('should correctly transform a new dataset model to a new dataset request payload', async () => {
-    const testNewDataset = createNewDatasetDTO()
-    const testMetadataBlocks = [createNewDatasetMetadataBlockModel()]
+    const testDataset = createDatasetDTO()
+    const testMetadataBlocks = [createDatasetMetadataBlockModel()]
     const expectedNewDatasetRequestPayload = createNewDatasetRequestPayload()
-    const actual = transformNewDatasetModelToRequestPayload(testNewDataset, testMetadataBlocks)
+    const actual = transformDatasetModelToNewDatasetRequestPayload(testDataset, testMetadataBlocks)
 
     expect(actual).toEqual(expectedNewDatasetRequestPayload)
   })
 
   it('should correctly transform a new dataset model to a new dataset request payload when it contains a license', () => {
-    const testNewDataset = createNewDatasetDTO(
+    const testDataset = createDatasetDTO(
       undefined,
       undefined,
       undefined,
@@ -25,11 +25,11 @@ describe('transformNewDatasetModelToRequestPayload', () => {
       undefined,
       createDatasetLicenseModel()
     )
-    const testMetadataBlocks = [createNewDatasetMetadataBlockModel()]
+    const testMetadataBlocks = [createDatasetMetadataBlockModel()]
     const expectedNewDatasetRequestPayload = createNewDatasetRequestPayload(
       createDatasetLicenseModel()
     )
-    const actual = transformNewDatasetModelToRequestPayload(testNewDataset, testMetadataBlocks)
+    const actual = transformDatasetModelToNewDatasetRequestPayload(testDataset, testMetadataBlocks)
 
     expect(actual).toEqual(expectedNewDatasetRequestPayload)
   })

@@ -8,7 +8,8 @@ import {
 import {
   createDatasetModel,
   createDatasetVersionPayload,
-  createDatasetLicenseModel
+  createDatasetLicenseModel,
+  createUpdateDatasetRequestPayload
 } from '../../testHelpers/datasets/datasetHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DatasetNotNumberedVersion, DatasetPreviewSubset } from '../../../src/datasets'
@@ -22,10 +23,10 @@ import {
   createDatasetPreviewPayload
 } from '../../testHelpers/datasets/datasetPreviewHelper'
 import {
-  createNewDatasetDTO,
-  createNewDatasetMetadataBlockModel,
+  createDatasetDTO,
+  createDatasetMetadataBlockModel,
   createNewDatasetRequestPayload
-} from '../../testHelpers/datasets/newDatasetHelper'
+} from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
 import { VersionUpdateType } from '../../../src/datasets/domain/models/Dataset'
 
@@ -714,8 +715,8 @@ describe('DatasetsRepository', () => {
   })
 
   describe('createDataset', () => {
-    const testNewDataset = createNewDatasetDTO()
-    const testMetadataBlocks = [createNewDatasetMetadataBlockModel()]
+    const testNewDataset = createDatasetDTO()
+    const testMetadataBlocks = [createDatasetMetadataBlockModel()]
     const testCollectionName = 'test'
     const expectedNewDatasetRequestPayloadJson = JSON.stringify(createNewDatasetRequestPayload())
 
@@ -826,6 +827,65 @@ describe('DatasetsRepository', () => {
       expect(axios.post).toHaveBeenCalledWith(
         expectedApiEndpoint,
         '{}',
+        expectedApiKeyRequestConfig
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('updateDataset', () => {
+    const testNewDataset = createDatasetDTO()
+    const testMetadataBlocks = [createDatasetMetadataBlockModel()]
+    const expectedNewDatasetRequestPayloadJson = JSON.stringify(createUpdateDatasetRequestPayload())
+
+    const expectedApiKeyRequestConfig = {
+      ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+      params: { replace: true }
+    }
+    const expectedCookieRequestConfig = {
+      ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+      params: { replace: true }
+    }
+
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/editMetadata`
+
+    test('should call the API with a correct request payload', async () => {
+      jest.spyOn(axios, 'put').mockResolvedValue(undefined)
+
+      // API Key auth
+      let actual = await sut.updateDataset(testDatasetModel.id, testNewDataset, testMetadataBlocks)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        expectedApiKeyRequestConfig
+      )
+      expect(actual).toBeUndefined()
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.updateDataset(testDatasetModel.id, testNewDataset, testMetadataBlocks)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
+        expectedCookieRequestConfig
+      )
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'put').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: WriteError = undefined
+      await sut
+        .updateDataset(testDatasetModel.id, testNewDataset, testMetadataBlocks)
+        .catch((e) => (error = e))
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewDatasetRequestPayloadJson,
         expectedApiKeyRequestConfig
       )
       expect(error).toBeInstanceOf(Error)

@@ -19,8 +19,195 @@ import {
 } from './DatasetPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import TurndownService from 'turndown'
+import {
+  DatasetDTO,
+  DatasetMetadataBlockValuesDTO,
+  DatasetMetadataFieldsDTO,
+  DatasetMetadataFieldValueDTO,
+  DatasetMetadataChildFieldValueDTO
+} from '../../../domain/dtos/DatasetDTO'
+import { MetadataBlock, MetadataFieldInfo } from '../../../../metadataBlocks'
 
 const turndownService = new TurndownService()
+
+export interface NewDatasetRequestPayload {
+  datasetVersion: {
+    license?: DatasetLicense
+    metadataBlocks: Record<string, MetadataBlockRequestPayload>
+  }
+}
+
+export interface MetadataBlockRequestPayload {
+  fields: MetadataFieldRequestPayload[]
+  displayName: string
+}
+
+export interface MetadataFieldRequestPayload {
+  value: MetadataFieldValueRequestPayload
+  typeClass: string
+  multiple: boolean
+  typeName: string
+}
+
+export type MetadataFieldValueRequestPayload =
+  | string
+  | string[]
+  | Record<string, MetadataFieldRequestPayload>
+  | Record<string, MetadataFieldRequestPayload>[]
+
+export interface UpdateDatasetRequestPayload {
+  fields: MetadataFieldRequestPayload[]
+}
+
+export const transformDatasetModelToUpdateDatasetRequestPayload = (
+  dataset: DatasetDTO,
+  metadataBlocks: MetadataBlock[]
+): UpdateDatasetRequestPayload => {
+  const metadataFieldsRequestPayload: MetadataFieldRequestPayload[] = []
+  const datasetMetadataBlocksValues: DatasetMetadataBlockValuesDTO[] = dataset.metadataBlockValues
+  datasetMetadataBlocksValues.forEach(function (
+    newDatasetMetadataBlockValues: DatasetMetadataBlockValuesDTO
+  ) {
+    const metadataBlock: MetadataBlock = metadataBlocks.find(
+      (metadataBlock) => metadataBlock.name == newDatasetMetadataBlockValues.name
+    )
+    const metadataBlockFieldsPayload: MetadataFieldRequestPayload[] = []
+    const metadataBlockFields = metadataBlock.metadataFields
+    const datasetMetadataFields = newDatasetMetadataBlockValues.fields
+    for (const metadataFieldKey of Object.keys(datasetMetadataFields)) {
+      const datasetMetadataFieldValue: DatasetMetadataFieldValueDTO =
+        datasetMetadataFields[metadataFieldKey]
+      metadataBlockFieldsPayload.push({
+        value: transformMetadataFieldValueToRequestPayload(
+          datasetMetadataFieldValue,
+          metadataBlockFields[metadataFieldKey]
+        ),
+        typeClass: metadataBlockFields[metadataFieldKey].typeClass,
+        multiple: metadataBlockFields[metadataFieldKey].multiple,
+        typeName: metadataFieldKey
+      })
+    }
+    metadataFieldsRequestPayload.push(...metadataBlockFieldsPayload)
+  })
+  return {
+    fields: metadataFieldsRequestPayload
+  }
+}
+
+export const transformDatasetModelToNewDatasetRequestPayload = (
+  dataset: DatasetDTO,
+  metadataBlocks: MetadataBlock[]
+): NewDatasetRequestPayload => {
+  return {
+    datasetVersion: {
+      ...(dataset.license && { license: dataset.license }),
+      metadataBlocks: transformMetadataBlockModelsToRequestPayload(
+        dataset.metadataBlockValues,
+        metadataBlocks
+      )
+    }
+  }
+}
+
+export const transformMetadataBlockModelsToRequestPayload = (
+  datasetMetadataBlocksValues: DatasetMetadataBlockValuesDTO[],
+  metadataBlocks: MetadataBlock[]
+): Record<string, MetadataBlockRequestPayload> => {
+  const metadataBlocksRequestPayload: Record<string, MetadataBlockRequestPayload> = {}
+  datasetMetadataBlocksValues.forEach(function (
+    newDatasetMetadataBlockValues: DatasetMetadataBlockValuesDTO
+  ) {
+    const metadataBlock: MetadataBlock = metadataBlocks.find(
+      (metadataBlock) => metadataBlock.name == newDatasetMetadataBlockValues.name
+    )
+    metadataBlocksRequestPayload[newDatasetMetadataBlockValues.name] = {
+      fields: transformMetadataFieldModelsToRequestPayload(
+        newDatasetMetadataBlockValues.fields,
+        metadataBlock.metadataFields
+      ),
+      displayName: metadataBlock.displayName
+    }
+  })
+  return metadataBlocksRequestPayload
+}
+
+export const transformMetadataFieldModelsToRequestPayload = (
+  datasetMetadataFields: DatasetMetadataFieldsDTO,
+  metadataBlockFields: Record<string, MetadataFieldInfo>
+): MetadataFieldRequestPayload[] => {
+  const metadataFieldsRequestPayload: MetadataFieldRequestPayload[] = []
+  for (const metadataFieldKey of Object.keys(datasetMetadataFields)) {
+    const newDatasetMetadataChildFieldValue: DatasetMetadataFieldValueDTO =
+      datasetMetadataFields[metadataFieldKey]
+    metadataFieldsRequestPayload.push({
+      value: transformMetadataFieldValueToRequestPayload(
+        newDatasetMetadataChildFieldValue,
+        metadataBlockFields[metadataFieldKey]
+      ),
+      typeClass: metadataBlockFields[metadataFieldKey].typeClass,
+      multiple: metadataBlockFields[metadataFieldKey].multiple,
+      typeName: metadataFieldKey
+    })
+  }
+  return metadataFieldsRequestPayload
+}
+
+export const transformMetadataFieldValueToRequestPayload = (
+  datasetMetadataFieldValue: DatasetMetadataFieldValueDTO,
+  metadataBlockFieldInfo: MetadataFieldInfo
+): MetadataFieldValueRequestPayload => {
+  let value: MetadataFieldValueRequestPayload
+  if (metadataBlockFieldInfo.multiple) {
+    const newDatasetMetadataChildFieldValues = datasetMetadataFieldValue as
+      | string[]
+      | DatasetMetadataChildFieldValueDTO[]
+    if (typeof newDatasetMetadataChildFieldValues[0] == 'string') {
+      value = datasetMetadataFieldValue as string[]
+    } else {
+      value = []
+      ;(newDatasetMetadataChildFieldValues as DatasetMetadataChildFieldValueDTO[]).forEach(
+        function (childMetadataFieldValue: DatasetMetadataChildFieldValueDTO) {
+          ;(value as Record<string, MetadataFieldRequestPayload>[]).push(
+            transformMetadataChildFieldValueToRequestPayload(
+              childMetadataFieldValue,
+              metadataBlockFieldInfo
+            )
+          )
+        }
+      )
+    }
+  } else {
+    if (typeof datasetMetadataFieldValue == 'string') {
+      value = datasetMetadataFieldValue
+    } else {
+      value = transformMetadataChildFieldValueToRequestPayload(
+        datasetMetadataFieldValue as DatasetMetadataChildFieldValueDTO,
+        metadataBlockFieldInfo
+      )
+    }
+  }
+  return value
+}
+
+export const transformMetadataChildFieldValueToRequestPayload = (
+  datasetMetadataChildFieldValue: DatasetMetadataChildFieldValueDTO,
+  metadataBlockFieldInfo: MetadataFieldInfo
+): Record<string, MetadataFieldRequestPayload> => {
+  const metadataChildFieldRequestPayload: Record<string, MetadataFieldRequestPayload> = {}
+  for (const metadataChildFieldKey of Object.keys(datasetMetadataChildFieldValue)) {
+    const childMetadataFieldInfo: MetadataFieldInfo =
+      metadataBlockFieldInfo.childMetadataFields[metadataChildFieldKey]
+    const value: string = datasetMetadataChildFieldValue[metadataChildFieldKey] as unknown as string
+    metadataChildFieldRequestPayload[metadataChildFieldKey] = {
+      value: value,
+      typeClass: childMetadataFieldInfo.typeClass,
+      multiple: childMetadataFieldInfo.multiple,
+      typeName: metadataChildFieldKey
+    }
+  }
+
+  return metadataChildFieldRequestPayload
+}
 
 export const transformVersionResponseToDataset = (response: AxiosResponse): Dataset => {
   const versionPayload = response.data.data

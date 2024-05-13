@@ -8,12 +8,13 @@ import { GetPrivateUrlDataset } from './domain/useCases/GetPrivateUrlDataset'
 import { GetAllDatasetPreviews } from './domain/useCases/GetAllDatasetPreviews'
 import { MetadataFieldValidator } from './domain/useCases/validators/MetadataFieldValidator'
 import { GetDatasetUserPermissions } from './domain/useCases/GetDatasetUserPermissions'
-import { NewDatasetResourceValidator } from './domain/useCases/validators/NewDatasetResourceValidator'
+import { DatasetResourceValidator } from './domain/useCases/validators/DatasetResourceValidator'
 import { GetDatasetSummaryFieldNames } from './domain/useCases/GetDatasetSummaryFieldNames'
 import { GetPrivateUrlDatasetCitation } from './domain/useCases/GetPrivateUrlDatasetCitation'
 import { SingleMetadataFieldValidator } from './domain/useCases/validators/SingleMetadataFieldValidator'
 import { MultipleMetadataFieldValidator } from './domain/useCases/validators/MultipleMetadataFieldValidator'
 import { PublishDataset } from './domain/useCases/PublishDataset'
+import { UpdateDataset } from './domain/useCases/UpdateDataset'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -30,12 +31,19 @@ const metadataFieldValidator = new MetadataFieldValidator(
   new SingleMetadataFieldValidator(),
   new MultipleMetadataFieldValidator(singleMetadataFieldValidator)
 )
+const publishDataset = new PublishDataset(datasetsRepository)
+const metadataBlocksRepository = new MetadataBlocksRepository()
+const datasetResourceValidator = new DatasetResourceValidator(metadataFieldValidator)
 const createDataset = new CreateDataset(
   datasetsRepository,
-  new MetadataBlocksRepository(),
-  new NewDatasetResourceValidator(metadataFieldValidator)
+  metadataBlocksRepository,
+  datasetResourceValidator
 )
-const publishDataset = new PublishDataset(datasetsRepository)
+const updateDataset = new UpdateDataset(
+  datasetsRepository,
+  metadataBlocksRepository,
+  datasetResourceValidator
+)
 
 export {
   getDataset,
@@ -46,8 +54,9 @@ export {
   getDatasetUserPermissions,
   getDatasetSummaryFieldNames,
   getPrivateUrlDatasetCitation,
+  publishDataset,
   createDataset,
-  publishDataset
+  updateDataset
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -66,11 +75,11 @@ export {
 export { DatasetPreview } from './domain/models/DatasetPreview'
 export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset'
 export {
-  NewDatasetDTO as NewDataset,
-  NewDatasetMetadataFieldsDTO as NewDatasetMetadataFields,
-  NewDatasetMetadataFieldValueDTO as NewDatasetMetadataFieldValue,
-  NewDatasetMetadataBlockValuesDTO as NewDatasetMetadataBlockValues,
-  NewDatasetMetadataChildFieldValueDTO as NewDatasetMetadataChildFieldValue
-} from './domain/dtos/NewDatasetDTO'
+  DatasetDTO,
+  DatasetMetadataFieldsDTO,
+  DatasetMetadataFieldValueDTO,
+  DatasetMetadataBlockValuesDTO,
+  DatasetMetadataChildFieldValueDTO
+} from './domain/dtos/DatasetDTO'
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers'
 export { VersionUpdateType } from './domain/models/Dataset'
