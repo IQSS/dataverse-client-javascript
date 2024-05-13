@@ -571,7 +571,7 @@ describe('FilesRepository', () => {
     })
   })
 
-  describe('getFileUploadDestination', () => {
+  describe('getFileUploadDestinations', () => {
     let testDataset2Ids: CreatedDatasetIdentifiers
 
     const expectedUrlFragment = '/mybucket/'

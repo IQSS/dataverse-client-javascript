@@ -1,8 +1,14 @@
 import { AxiosResponse } from 'axios'
 import { FileUploadDestination } from '../../../domain/models/FileUploadDestination'
 
-export interface FileUploadDestinationPayload {
+export interface FileSingleUploadDestinationPayload {
   url: string
+  partSize: number
+  storageIdentifier: string
+}
+
+export interface FileMultipartUploadDestinationPayload {
+  urls: Record<string, string>
   partSize: number
   storageIdentifier: string
 }
