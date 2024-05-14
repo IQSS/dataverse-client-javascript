@@ -33,6 +33,8 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 
 describe('DatasetsRepository', () => {
+  const testCollectionAlias = "datasetsRepositoryTestCollection"
+
   const sut: DatasetsRepository = new DatasetsRepository()
   const nonExistentTestDatasetId = 100
 
@@ -68,20 +70,20 @@ describe('DatasetsRepository', () => {
     })
 
     const createCollection = async () => {
-      await createCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_1)
+      await createCollectionViaApi(testCollectionAlias)
     }
 
     const createDatasets = async () => {
       for (let i = 0; i < expectedTotalDatasetCount; i++) {
         createdDatasetIds[i] = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_COLLECTION_ALIAS_1
+          testCollectionAlias
         )
       }
 
       await waitForDatasetsIndexedInSolr(
         expectedTotalDatasetCount,
-        TestConstants.TEST_COLLECTION_ALIAS_1
+        testCollectionAlias
       )
     }
 
@@ -92,14 +94,14 @@ describe('DatasetsRepository', () => {
     }
 
     const deleteCollection = async () => {
-      await deleteCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_1)
+      await deleteCollectionViaApi(testCollectionAlias)
     }
 
     test('should return all dataset previews when no pagination params are defined', async () => {
       const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews(
         undefined,
         undefined,
-        TestConstants.TEST_COLLECTION_ALIAS_1
+        testCollectionAlias
       )
       expect(actual.datasetPreviews.length).toEqual(expectedTotalDatasetCount)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[3].persistentId)
@@ -110,7 +112,7 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getAllDatasetPreviews(
         testPageLimit,
         0,
-        TestConstants.TEST_COLLECTION_ALIAS_1
+        testCollectionAlias
       )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[3].persistentId)
@@ -121,7 +123,7 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getAllDatasetPreviews(
         testPageLimit,
         1,
-        TestConstants.TEST_COLLECTION_ALIAS_1
+        testCollectionAlias
       )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[2].persistentId)
@@ -132,7 +134,7 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getAllDatasetPreviews(
         testPageLimit,
         2,
-        TestConstants.TEST_COLLECTION_ALIAS_1
+        testCollectionAlias
       )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[1].persistentId)
@@ -143,7 +145,7 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getAllDatasetPreviews(
         testPageLimit,
         3,
-        TestConstants.TEST_COLLECTION_ALIAS_1
+        testCollectionAlias
       )
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[0].persistentId)

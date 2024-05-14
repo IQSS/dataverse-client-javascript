@@ -572,23 +572,24 @@ describe('FilesRepository', () => {
   })
 
   describe('getFileUploadDestinations', () => {
+    const testCollectionAlias = "getFileUploadDestinationsTestCollection"
     let testDataset2Ids: CreatedDatasetIdentifiers
 
     const expectedUrlFragment = '/mybucket/'
     const expectedStorageIdFragment = 'localstack1://mybucket:'
 
     beforeAll(async () => {
-      await createCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_2)
-      await setStorageDriverViaApi(TestConstants.TEST_COLLECTION_ALIAS_2, 'LocalStack')
+      await createCollectionViaApi(testCollectionAlias)
+      await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
       testDataset2Ids = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,
-        TestConstants.TEST_COLLECTION_ALIAS_2
+        testCollectionAlias
       )
     })
 
     afterAll(async () => {
       await deleteUnpublishedDatasetViaApi(testDataset2Ids.numericId)
-      await deleteCollectionViaApi(TestConstants.TEST_COLLECTION_ALIAS_2)
+      await deleteCollectionViaApi(testCollectionAlias)
     })
 
     test('should return upload destinations when dataset exists and the file does not require multipart download', async () => {
