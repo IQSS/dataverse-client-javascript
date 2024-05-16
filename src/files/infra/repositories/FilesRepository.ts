@@ -17,7 +17,7 @@ import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode'
 import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
 import { transformUploadDestinationsResponseToUploadDestinations } from './transformers/fileUploadDestinationsTransformers'
-import fs from 'fs';
+import fs from 'fs'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean

@@ -35,7 +35,7 @@ import {
   createSingleFileUploadDestinationModel,
   createSingleFileUploadDestinationPayload
 } from '../../testHelpers/files/fileUploadDestinationHelper'
-import fs from 'fs';
+import fs from 'fs'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()

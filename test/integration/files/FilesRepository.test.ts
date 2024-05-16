@@ -33,7 +33,7 @@ import {
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import path from 'path'
-import fs from 'fs';
+import fs from 'fs'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -574,13 +574,13 @@ describe('FilesRepository', () => {
   })
 
   describe('getFileUploadDestinations', () => {
-    const testCollectionAlias = "getFileUploadDestinationsTestCollection"
+    const testCollectionAlias = 'getFileUploadDestinationsTestCollection'
     let testDataset2Ids: CreatedDatasetIdentifiers
 
     const expectedUrlFragment = '/mybucket/'
     const expectedStorageIdFragment = 'localstack1://mybucket:'
 
-    const testFilePath = path.join(__dirname, 'test-file');
+    const testFilePath = path.join(__dirname, 'test-file')
 
     beforeAll(async () => {
       await createCollectionViaApi(testCollectionAlias)
@@ -630,9 +630,9 @@ describe('FilesRepository', () => {
         `[404] Dataset with ID ${nonExistentDatasetId} not found.`
       )
 
-      await expect(sut.getFileUploadDestinations(nonExistentDatasetId, testFilePath)).rejects.toThrow(
-        errorExpected
-      )
+      await expect(
+        sut.getFileUploadDestinations(nonExistentDatasetId, testFilePath)
+      ).rejects.toThrow(errorExpected)
     })
 
     test('should return error when direct upload is not configured in the dataset', async () => {
@@ -640,9 +640,9 @@ describe('FilesRepository', () => {
         `[404] Direct upload not supported for files in this dataset: ${testDatasetIds.numericId}`
       )
 
-      await expect(sut.getFileUploadDestinations(testDatasetIds.numericId, testFilePath)).rejects.toThrow(
-        errorExpected
-      )
+      await expect(
+        sut.getFileUploadDestinations(testDatasetIds.numericId, testFilePath)
+      ).rejects.toThrow(errorExpected)
     })
   })
 })

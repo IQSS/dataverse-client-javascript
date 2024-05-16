@@ -50,18 +50,18 @@ export async function createCollectionViaApi(collectionAlias: string): Promise<C
         `${TestConstants.TEST_API_URL}/dataverses/root`,
         JSON.stringify({
           alias: collectionAlias,
-          name: "Scientific Research",
+          name: 'Scientific Research',
           dataverseContacts: [
             {
-              contactEmail: "pi@example.edu"
+              contactEmail: 'pi@example.edu'
             },
             {
-              contactEmail: "student@example.edu"
+              contactEmail: 'student@example.edu'
             }
           ],
-          affiliation: "Scientific Research University",
-          description: "We do all the science.",
-          dataverseType: "LABORATORY"
+          affiliation: 'Scientific Research University',
+          description: 'We do all the science.',
+          dataverseType: 'LABORATORY'
         }),
         DATAVERSE_API_REQUEST_HEADERS
       )

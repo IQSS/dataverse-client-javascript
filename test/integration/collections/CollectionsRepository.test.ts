@@ -11,7 +11,7 @@ import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Co
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 
 describe('CollectionsRepository', () => {
-  const testCollectionAlias = "collectionsRepositoryTestCollection"
+  const testCollectionAlias = 'collectionsRepositoryTestCollection'
   const sut: CollectionsRepository = new CollectionsRepository()
   let testCollectionId: number
 
@@ -63,9 +63,9 @@ describe('CollectionsRepository', () => {
           `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ALIAS}'`
         )
 
-        await expect(
-          sut.getCollection(TestConstants.TEST_DUMMY_COLLECTION_ALIAS)
-        ).rejects.toThrow(expectedError)
+        await expect(sut.getCollection(TestConstants.TEST_DUMMY_COLLECTION_ALIAS)).rejects.toThrow(
+          expectedError
+        )
       })
     })
     describe('by numeric id', () => {
@@ -79,9 +79,9 @@ describe('CollectionsRepository', () => {
           `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
         )
 
-        await expect(
-          sut.getCollection(TestConstants.TEST_DUMMY_COLLECTION_ID)
-        ).rejects.toThrow(expectedError)
+        await expect(sut.getCollection(TestConstants.TEST_DUMMY_COLLECTION_ID)).rejects.toThrow(
+          expectedError
+        )
       })
     })
   })
