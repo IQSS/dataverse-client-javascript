@@ -17,6 +17,7 @@ import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode'
 import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
 import { transformUploadDestinationsResponseToUploadDestinations } from './transformers/fileUploadDestinationsTransformers'
+import fs from 'fs';
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -206,13 +207,13 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
 
   public async getFileUploadDestinations(
     datasetId: number | string,
-    fileSize: number
+    filePath: string
   ): Promise<FileUploadDestination[]> {
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `uploadurls`, datasetId),
       true,
       {
-        size: fileSize
+        size: fs.statSync(filePath).size
       }
     )
       .then((response) => transformUploadDestinationsResponseToUploadDestinations(response))

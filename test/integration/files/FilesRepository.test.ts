@@ -32,6 +32,8 @@ import {
   deleteCollectionViaApi,
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
+import path from 'path'
+import fs from 'fs';
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -578,6 +580,8 @@ describe('FilesRepository', () => {
     const expectedUrlFragment = '/mybucket/'
     const expectedStorageIdFragment = 'localstack1://mybucket:'
 
+    const testFilePath = path.join(__dirname, 'test-file');
+
     beforeAll(async () => {
       await createCollectionViaApi(testCollectionAlias)
       await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
@@ -595,7 +599,7 @@ describe('FilesRepository', () => {
     test('should return upload destinations when dataset exists and the file does not require multipart download', async () => {
       const actualFileDestinations = await sut.getFileUploadDestinations(
         testDataset2Ids.numericId,
-        1000
+        testFilePath
       )
       expect(actualFileDestinations.length).toBe(1)
       expect(actualFileDestinations[0].url).toContain(expectedUrlFragment)
@@ -604,9 +608,11 @@ describe('FilesRepository', () => {
     })
 
     test('should return upload destinations when dataset exists and the file requires multipart download', async () => {
+      // Exceptionally, and although it is an integration test, we use a mock to avoid having to include a large test file in the integration test suite
+      jest.spyOn(fs, 'statSync').mockReturnValue({ size: 10000000000 } as fs.Stats)
       const actualFileDestinations = await sut.getFileUploadDestinations(
         testDataset2Ids.numericId,
-        10000000000
+        testFilePath
       )
       expect(actualFileDestinations.length).toBeGreaterThan(1)
       expect(actualFileDestinations[0].url).toContain(expectedUrlFragment)
@@ -624,7 +630,7 @@ describe('FilesRepository', () => {
         `[404] Dataset with ID ${nonExistentDatasetId} not found.`
       )
 
-      await expect(sut.getFileUploadDestinations(nonExistentDatasetId, 1000)).rejects.toThrow(
+      await expect(sut.getFileUploadDestinations(nonExistentDatasetId, testFilePath)).rejects.toThrow(
         errorExpected
       )
     })
@@ -634,7 +640,7 @@ describe('FilesRepository', () => {
         `[404] Direct upload not supported for files in this dataset: ${testDatasetIds.numericId}`
       )
 
-      await expect(sut.getFileUploadDestinations(testDatasetIds.numericId, 1000)).rejects.toThrow(
+      await expect(sut.getFileUploadDestinations(testDatasetIds.numericId, testFilePath)).rejects.toThrow(
         errorExpected
       )
     })

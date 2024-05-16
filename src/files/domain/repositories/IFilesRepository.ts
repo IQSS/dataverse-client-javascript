@@ -54,6 +54,6 @@ export interface IFilesRepository {
 
   getFileUploadDestinations(
     datasetId: number | string,
-    fileSize: number
+    filePath: string
   ): Promise<FileUploadDestination[]>
 }
