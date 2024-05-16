@@ -4,7 +4,12 @@ import {
   DataverseApiAuthMechanism
 } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { registerFileViaApi, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
+import {
+  createFileInFileSystem,
+  deleteFileInFileSystem,
+  registerFileViaApi,
+  uploadFileViaApi
+} from '../../testHelpers/files/filesHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
   FileSearchCriteria,
@@ -33,7 +38,6 @@ import {
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import path from 'path'
-import fs from 'fs'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -580,7 +584,8 @@ describe('FilesRepository', () => {
     const expectedUrlFragment = '/mybucket/'
     const expectedStorageIdFragment = 'localstack1://mybucket:'
 
-    const testFilePath = path.join(__dirname, 'test-file')
+    const singlepartFilePath = path.join(__dirname, 'test-file')
+    const multipartFilePath = path.join(__dirname, 'multipart-file')
 
     beforeAll(async () => {
       await createCollectionViaApi(testCollectionAlias)
@@ -589,17 +594,21 @@ describe('FilesRepository', () => {
         TestConstants.TEST_NEW_DATASET_DTO,
         testCollectionAlias
       )
+      createFileInFileSystem(singlepartFilePath, 1000)
+      createFileInFileSystem(multipartFilePath, 1273741824)
     })
 
     afterAll(async () => {
       await deleteUnpublishedDatasetViaApi(testDataset2Ids.numericId)
       await deleteCollectionViaApi(testCollectionAlias)
+      deleteFileInFileSystem(singlepartFilePath)
+      deleteFileInFileSystem(multipartFilePath)
     })
 
     test('should return upload destinations when dataset exists and the file does not require multipart download', async () => {
       const actualFileDestinations = await sut.getFileUploadDestinations(
         testDataset2Ids.numericId,
-        testFilePath
+        singlepartFilePath
       )
       expect(actualFileDestinations.length).toBe(1)
       expect(actualFileDestinations[0].url).toContain(expectedUrlFragment)
@@ -608,11 +617,9 @@ describe('FilesRepository', () => {
     })
 
     test('should return upload destinations when dataset exists and the file requires multipart download', async () => {
-      // Exceptionally, and although it is an integration test, we use a mock to avoid having to include a large test file in the integration test suite
-      jest.spyOn(fs, 'statSync').mockReturnValue({ size: 10000000000 } as fs.Stats)
       const actualFileDestinations = await sut.getFileUploadDestinations(
         testDataset2Ids.numericId,
-        testFilePath
+        multipartFilePath
       )
       expect(actualFileDestinations.length).toBeGreaterThan(1)
       expect(actualFileDestinations[0].url).toContain(expectedUrlFragment)
@@ -631,7 +638,7 @@ describe('FilesRepository', () => {
       )
 
       await expect(
-        sut.getFileUploadDestinations(nonExistentDatasetId, testFilePath)
+        sut.getFileUploadDestinations(nonExistentDatasetId, singlepartFilePath)
       ).rejects.toThrow(errorExpected)
     })
 
@@ -641,7 +648,7 @@ describe('FilesRepository', () => {
       )
 
       await expect(
-        sut.getFileUploadDestinations(testDatasetIds.numericId, testFilePath)
+        sut.getFileUploadDestinations(testDatasetIds.numericId, singlepartFilePath)
       ).rejects.toThrow(errorExpected)
     })
   })

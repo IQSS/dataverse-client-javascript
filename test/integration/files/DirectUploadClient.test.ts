@@ -10,12 +10,15 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
 import path from 'path'
+import { createFileInFileSystem, deleteFileInFileSystem } from '../../testHelpers/files/filesHelper'
 
 describe('uploadFile', () => {
   const testCollectionAlias = 'directUploadTestCollection'
   let testDatasetIds: CreatedDatasetIdentifiers
 
   const sut: DirectUploadClient = new DirectUploadClient()
+
+  const singlepartFilePath = path.join(__dirname, 'test-file')
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -33,16 +36,20 @@ describe('uploadFile', () => {
     } catch (error) {
       throw new Error('Tests beforeAll(): Error while creating test dataset')
     }
+    createFileInFileSystem(singlepartFilePath, 1000)
   })
 
   afterAll(async () => {
     await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     await deleteCollectionViaApi(testCollectionAlias)
+    deleteFileInFileSystem(singlepartFilePath)
   })
 
   test('should upload file to destination when there is only one destination', async () => {
-    const filePath = path.join(__dirname, 'test-file')
-    await sut.uploadFile(filePath, await createTestFileUploadDestinations(filePath))
+    await sut.uploadFile(
+      singlepartFilePath,
+      await createTestFileUploadDestinations(singlepartFilePath)
+    )
   })
 
   const createTestFileUploadDestinations = async (filePath: string) => {
