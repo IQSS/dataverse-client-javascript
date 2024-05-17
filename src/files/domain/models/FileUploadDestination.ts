@@ -1,5 +1,5 @@
 export interface FileUploadDestination {
-  url: string
+  urls: string[]
   storageId: string
   partSize: number
 }

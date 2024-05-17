@@ -5,24 +5,30 @@ import fs from 'fs'
 import FormData from 'form-data'
 
 export class DirectUploadClient implements IDirectUploadClient {
-  public async uploadFile(filePath: string, destinations: FileUploadDestination[]): Promise<void> {
-    if (destinations.length === 1) {
-      const formData = new FormData()
-      formData.append('file', fs.createReadStream(filePath))
-
-      return await axios
-        .put(destinations[0].url, formData, {
-          headers: {
-            ...formData.getHeaders(),
-            'x-amz-tagging': 'dv-state=temp'
-          }
-        })
-        .then((response) => console.log(response))
-        .catch((error) => {
-          console.log(error)
-        })
+  public async uploadFile(filePath: string, destination: FileUploadDestination): Promise<void> {
+    if (destination.urls.length === 1) {
+      return this.uploadSinglepartFile(filePath, destination)
     } else {
-      throw new Error('Method not implemented.')
+      return this.uploadMultipartFile(filePath, destination)
     }
+  }
+
+  private async uploadSinglepartFile(filePath: string, destination: FileUploadDestination): Promise<void> {
+    const formData = new FormData()
+    formData.append('file', fs.createReadStream(filePath))
+    return await axios
+      .put(destination.urls[0], formData, {
+        headers: {
+          ...formData.getHeaders(),
+          'x-amz-tagging': 'dv-state=temp'
+        }
+      })
+  }
+
+  private async uploadMultipartFile(filePath: string, destination: FileUploadDestination): Promise<void> {
+    console.log(filePath)
+    destination.urls.forEach(destinationUrl => {
+      console.log(destinationUrl)
+    });
   }
 }

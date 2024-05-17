@@ -52,8 +52,8 @@ export interface IFilesRepository {
     includeDeaccessioned: boolean
   ): Promise<string>
 
-  getFileUploadDestinations(
+  getFileUploadDestination(
     datasetId: number | string,
     filePath: string
-  ): Promise<FileUploadDestination[]>
+  ): Promise<FileUploadDestination>
 }

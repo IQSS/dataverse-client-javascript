@@ -15,7 +15,7 @@ export const createSingleFileUploadDestinationPayload = (): FileSingleUploadDest
 export const createSingleFileUploadDestinationModel = (): FileUploadDestination => {
   const singleFileUploadDestinationPayload = createSingleFileUploadDestinationPayload()
   return {
-    url: singleFileUploadDestinationPayload.url,
+    urls: [singleFileUploadDestinationPayload.url],
     partSize: singleFileUploadDestinationPayload.partSize,
     storageId: singleFileUploadDestinationPayload.storageIdentifier
   }
@@ -33,18 +33,11 @@ export const createMultipartFileUploadDestinationPayload =
     }
   }
 
-export const createMultipartFileUploadDestinationModels = (): FileUploadDestination[] => {
+export const createMultipartFileUploadDestinationModel = (): FileUploadDestination => {
   const multipartFileUploadDestinationPayload = createMultipartFileUploadDestinationPayload()
-  return [
-    {
-      url: multipartFileUploadDestinationPayload.urls['1'],
-      partSize: multipartFileUploadDestinationPayload.partSize,
-      storageId: multipartFileUploadDestinationPayload.storageIdentifier
-    },
-    {
-      url: multipartFileUploadDestinationPayload.urls['2'],
-      partSize: multipartFileUploadDestinationPayload.partSize,
-      storageId: multipartFileUploadDestinationPayload.storageIdentifier
-    }
-  ]
+  return {
+    urls: [multipartFileUploadDestinationPayload.urls['1'], multipartFileUploadDestinationPayload.urls['2']],
+    partSize: multipartFileUploadDestinationPayload.partSize,
+    storageId: multipartFileUploadDestinationPayload.storageIdentifier
+  }
 }

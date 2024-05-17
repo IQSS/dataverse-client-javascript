@@ -577,7 +577,7 @@ describe('FilesRepository', () => {
     })
   })
 
-  describe('getFileUploadDestinations', () => {
+  describe('getFileUploadDestination', () => {
     const testCollectionAlias = 'getFileUploadDestinationsTestCollection'
     let testDataset2Ids: CreatedDatasetIdentifiers
 
@@ -605,30 +605,27 @@ describe('FilesRepository', () => {
       deleteFileInFileSystem(multipartFilePath)
     })
 
-    test('should return upload destinations when dataset exists and the file does not require multipart download', async () => {
-      const actualFileDestinations = await sut.getFileUploadDestinations(
+    test('should return upload destination when dataset exists and the file does not require multipart download', async () => {
+      const actualFileDestination = await sut.getFileUploadDestination(
         testDataset2Ids.numericId,
         singlepartFilePath
       )
-      expect(actualFileDestinations.length).toBe(1)
-      expect(actualFileDestinations[0].url).toContain(expectedUrlFragment)
-      expect(actualFileDestinations[0].partSize).not.toBeUndefined()
-      expect(actualFileDestinations[0].storageId).toContain(expectedStorageIdFragment)
+      expect(actualFileDestination.urls.length).toBe(1)
+      expect(actualFileDestination.urls[0]).toContain(expectedUrlFragment)
+      expect(actualFileDestination.partSize).not.toBeUndefined()
+      expect(actualFileDestination.storageId).toContain(expectedStorageIdFragment)
     })
 
-    test('should return upload destinations when dataset exists and the file requires multipart download', async () => {
-      const actualFileDestinations = await sut.getFileUploadDestinations(
+    test('should return upload destination when dataset exists and the file requires multipart download', async () => {
+      const actualFileDestination = await sut.getFileUploadDestination(
         testDataset2Ids.numericId,
         multipartFilePath
       )
-      expect(actualFileDestinations.length).toBeGreaterThan(1)
-      expect(actualFileDestinations[0].url).toContain(expectedUrlFragment)
-      expect(actualFileDestinations[0].partSize).not.toBeUndefined()
-      expect(actualFileDestinations[0].storageId).toContain(expectedStorageIdFragment)
-      expect(actualFileDestinations[1].url).toContain(expectedUrlFragment)
-      expect(actualFileDestinations[1].partSize).not.toBeUndefined()
-      expect(actualFileDestinations[1].storageId).toContain(expectedStorageIdFragment)
-      expect(actualFileDestinations[0].url).not.toEqual(actualFileDestinations[1].url)
+      expect(actualFileDestination.urls.length).toBeGreaterThan(1)
+      expect(actualFileDestination.urls[0]).toContain(expectedUrlFragment)
+      expect(actualFileDestination.partSize).not.toBeUndefined()
+      expect(actualFileDestination.storageId).toContain(expectedStorageIdFragment)
+      expect(actualFileDestination.urls[0]).not.toEqual(actualFileDestination.urls[1])
     })
 
     test('should return error when dataset does not exist', async () => {
@@ -638,7 +635,7 @@ describe('FilesRepository', () => {
       )
 
       await expect(
-        sut.getFileUploadDestinations(nonExistentDatasetId, singlepartFilePath)
+        sut.getFileUploadDestination(nonExistentDatasetId, singlepartFilePath)
       ).rejects.toThrow(errorExpected)
     })
 
@@ -648,7 +645,7 @@ describe('FilesRepository', () => {
       )
 
       await expect(
-        sut.getFileUploadDestinations(testDatasetIds.numericId, singlepartFilePath)
+        sut.getFileUploadDestination(testDatasetIds.numericId, singlepartFilePath)
       ).rejects.toThrow(errorExpected)
     })
   })

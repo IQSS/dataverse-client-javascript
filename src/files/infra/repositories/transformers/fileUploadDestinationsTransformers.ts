@@ -13,27 +13,26 @@ export interface FileMultipartUploadDestinationPayload {
   storageIdentifier: string
 }
 
-export const transformUploadDestinationsResponseToUploadDestinations = (
+export const transformUploadDestinationsResponseToUploadDestination = (
   response: AxiosResponse
-): FileUploadDestination[] => {
+): FileUploadDestination => {
   const fileUploadDestinationsPayload = response.data.data
-  const fileUploadDestinations: FileUploadDestination[] = []
 
   if (fileUploadDestinationsPayload.url != undefined) {
-    fileUploadDestinations.push({
-      url: fileUploadDestinationsPayload.url,
+    return {
+      urls: [fileUploadDestinationsPayload.url],
       partSize: fileUploadDestinationsPayload.partSize,
       storageId: fileUploadDestinationsPayload.storageIdentifier
-    })
+    }
   } else {
+    const urls: string[] = []
     for (const urlKey of Object.keys(fileUploadDestinationsPayload.urls)) {
-      fileUploadDestinations.push({
-        url: fileUploadDestinationsPayload.urls[urlKey],
-        partSize: fileUploadDestinationsPayload.partSize,
-        storageId: fileUploadDestinationsPayload.storageIdentifier
-      })
+      urls.push(fileUploadDestinationsPayload.urls[urlKey])
+    }
+    return {
+      urls: urls,
+      partSize: fileUploadDestinationsPayload.partSize,
+      storageId: fileUploadDestinationsPayload.storageIdentifier
     }
   }
-
-  return fileUploadDestinations
 }

@@ -16,7 +16,7 @@ import { transformFileCountsResponseToFileCounts } from './transformers/fileCoun
 import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode'
 import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
-import { transformUploadDestinationsResponseToUploadDestinations } from './transformers/fileUploadDestinationsTransformers'
+import { transformUploadDestinationsResponseToUploadDestination } from './transformers/fileUploadDestinationsTransformers'
 import fs from 'fs'
 
 export interface GetFilesQueryParams {
@@ -205,10 +205,10 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       })
   }
 
-  public async getFileUploadDestinations(
+  public async getFileUploadDestination(
     datasetId: number | string,
     filePath: string
-  ): Promise<FileUploadDestination[]> {
+  ): Promise<FileUploadDestination> {
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `uploadurls`, datasetId),
       true,
@@ -216,7 +216,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
         size: fs.statSync(filePath).size
       }
     )
-      .then((response) => transformUploadDestinationsResponseToUploadDestinations(response))
+      .then((response) => transformUploadDestinationsResponseToUploadDestination(response))
       .catch((error) => {
         throw error
       })
