@@ -11,6 +11,7 @@ import {
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
 import path from 'path'
 import { createFileInFileSystem, deleteFileInFileSystem } from '../../testHelpers/files/filesHelper'
+import axios from 'axios'
 
 describe('uploadFile', () => {
   const testCollectionAlias = 'directUploadTestCollection'
@@ -18,7 +19,8 @@ describe('uploadFile', () => {
 
   const sut: DirectUploadClient = new DirectUploadClient()
 
-  const singlepartFilePath = path.join(__dirname, 'test-file')
+  const singlepartFileName = 'test-file'
+  const singlepartFilePath = path.join(__dirname, singlepartFileName)
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -46,10 +48,11 @@ describe('uploadFile', () => {
   })
 
   test('should upload file to destination when there is only one destination', async () => {
-    await sut.uploadFile(
-      singlepartFilePath,
-      await createTestFileUploadDestinations(singlepartFilePath)
-    )
+    const destinations = await createTestFileUploadDestinations(singlepartFilePath)
+    const singlepartFileUrl = destinations[0].url
+    expect(await fileExistsInBucket(singlepartFileUrl)).toBe(false)
+    await sut.uploadFile(singlepartFilePath, destinations)
+    expect(await fileExistsInBucket(singlepartFileUrl)).toBe(true)
   })
 
   const createTestFileUploadDestinations = async (filePath: string) => {
@@ -62,5 +65,16 @@ describe('uploadFile', () => {
       destination.url = destination.url.replace('localstack', 'localhost')
     })
     return destinations
+  }
+
+  const fileExistsInBucket = async (fileUrl: string): Promise<boolean> => {
+    return axios
+      .get(`${fileUrl}`)
+      .then(() => {
+        return true
+      })
+      .catch(() => {
+        return false
+      })
   }
 })
