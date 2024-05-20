@@ -30,7 +30,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     return new Promise<void>((resolve, reject) => {
       const fileBytes = fs.statSync(filePath).size
       const partMaxSize = destination.partSize
-      let eTags: Record<number, string> = {}
+      const eTags: Record<number, string> = {}
 
       const uploadPromises = destination.urls.map(async (destinationUrl, index) => {
         const formData = this.createFileSliceRequestFormData(
@@ -45,16 +45,9 @@ export class DirectUploadClient implements IDirectUploadClient {
               ...formData.getHeaders()
             }
           })
-          // TODO
-          console.log('multipart response')
-          console.log(response)
           const eTag = response.headers['etag']
           eTags[index + 1] = eTag
-          console.log('etag')
-          console.log(eTag)
-          if (Object.keys(eTags).length === destination.urls.length) {
-            resolve()
-          }
+          resolve()
         } catch (error) {
           reject(error)
         }
@@ -62,6 +55,7 @@ export class DirectUploadClient implements IDirectUploadClient {
 
       Promise.all(uploadPromises)
         .then(() => {
+          // TODO send etags
           resolve()
         })
         .catch((error) => {
@@ -77,7 +71,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     index: number
   ): FormData {
     const partSize = Math.min(partMaxSize, fileBytes - index * partMaxSize)
-    var offset = index * partMaxSize
+    const offset = index * partMaxSize
     const fileSlice = fs.createReadStream(filePath, {
       start: offset,
       end: offset + partSize
