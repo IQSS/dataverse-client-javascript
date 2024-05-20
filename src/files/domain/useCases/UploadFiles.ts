@@ -17,7 +17,7 @@ export class UploadFiles implements UseCase<void> {
    */
   async execute(datasetId: number | string, filePaths: string[]): Promise<void> {
     filePaths.map(async (filePath) => {
-      const fileUploadDestinations = await this.filesRepository.getFileUploadDestinations(
+      const fileUploadDestinations = await this.filesRepository.getFileUploadDestination(
         datasetId,
         filePath
       )

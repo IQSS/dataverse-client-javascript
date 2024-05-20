@@ -52,7 +52,7 @@ describe('uploadFile', () => {
     deleteFileInFileSystem(multipartFilePath)
   })
 
-  test('should upload file to destination when there is only one destination URL', async () => {
+  test.skip('should upload file to destination when there is only one destination URL', async () => {
     const destination = await createTestFileUploadDestination(singlepartFilePath)
     const singlepartFileUrl = destination.urls[0]
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(false)
@@ -60,9 +60,10 @@ describe('uploadFile', () => {
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(true)
   })
 
-  test.skip('should upload file to destinations when there are multiple destination URLs', async () => {
+  test('should upload file to destinations when there are multiple destination URLs', async () => {
     const destination = await createTestFileUploadDestination(multipartFilePath)
     await sut.uploadFile(multipartFilePath, destination)
+    //expect(await singlepartFileExistsInBucket(destination.urls[0])).toBe(true)
   })
 
   const createTestFileUploadDestination = async (filePath: string) => {

@@ -36,7 +36,10 @@ export const createMultipartFileUploadDestinationPayload =
 export const createMultipartFileUploadDestinationModel = (): FileUploadDestination => {
   const multipartFileUploadDestinationPayload = createMultipartFileUploadDestinationPayload()
   return {
-    urls: [multipartFileUploadDestinationPayload.urls['1'], multipartFileUploadDestinationPayload.urls['2']],
+    urls: [
+      multipartFileUploadDestinationPayload.urls['1'],
+      multipartFileUploadDestinationPayload.urls['2']
+    ],
     partSize: multipartFileUploadDestinationPayload.partSize,
     storageId: multipartFileUploadDestinationPayload.storageIdentifier
   }
