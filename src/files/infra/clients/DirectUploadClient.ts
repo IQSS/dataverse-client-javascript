@@ -1,8 +1,9 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { IDirectUploadClient } from '../../domain/clients/IDirectUploadClient'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
 import fs from 'fs'
 import FormData from 'form-data'
+import { buildRequestConfig, buildRequestUrl } from '../../../core/infra/repositories/apiConfigBuilders'
 
 export class DirectUploadClient implements IDirectUploadClient {
   public async uploadFile(filePath: string, destination: FileUploadDestination): Promise<void> {
@@ -26,42 +27,50 @@ export class DirectUploadClient implements IDirectUploadClient {
     })
   }
 
-  private uploadMultipartFile(filePath: string, destination: FileUploadDestination): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const fileBytes = fs.statSync(filePath).size
-      const partMaxSize = destination.partSize
-      const eTags: Record<number, string> = {}
+  private async uploadMultipartFile(
+    filePath: string,
+    destination: FileUploadDestination
+  ): Promise<void> {
+    const fileBytes = fs.statSync(filePath).size
+    const partMaxSize = destination.partSize
+    const eTags: Record<number, string> = {}
+    const maxRetries = 3
+    const timeout = 10000
 
-      const uploadPromises = destination.urls.map(async (destinationUrl, index) => {
-        const formData = this.createFileSliceRequestFormData(
-          filePath,
-          partMaxSize,
-          fileBytes,
-          index
-        )
-        try {
-          const response = await axios.put(destinationUrl, formData, {
-            headers: {
-              ...formData.getHeaders()
-            }
-          })
-          const eTag = response.headers['etag']
-          eTags[index + 1] = eTag
-          resolve()
-        } catch (error) {
-          reject(error)
+    const uploadPart = async (
+      destinationUrl: string,
+      index: number,
+      retries: number = 0
+    ): Promise<void> => {
+      const formData = this.createFileSliceRequestFormData(filePath, partMaxSize, fileBytes, index)
+      const config: AxiosRequestConfig = {
+        headers: {
+          ...formData.getHeaders()
+        },
+        timeout: timeout
+      }
+
+      try {
+        const response = await axios.put(destinationUrl, formData, config)
+        const eTag = response.headers['etag']
+        eTags[`${index + 1}`] = eTag
+      } catch (error) {
+        if (retries < maxRetries) {
+          console.warn(`Retrying part ${index + 1}, attempt ${retries + 1}`)
+          await uploadPart(destinationUrl, index, retries + 1)
+        } else {
+          throw new Error(`Error uploading part ${index + 1}: ${error.message}`)
         }
-      })
+      }
+    }
 
-      Promise.all(uploadPromises)
-        .then(() => {
-          // TODO send etags
-          resolve()
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+    const promises = destination.urls.map((destinationUrl, index) =>
+      uploadPart(destinationUrl, index)
+    )
+
+    await Promise.all(promises)
+
+    await this.completeMultipartUpload(destination.completeEndpoint, eTags)
   }
 
   private createFileSliceRequestFormData(
@@ -79,5 +88,13 @@ export class DirectUploadClient implements IDirectUploadClient {
     const formData = new FormData()
     formData.append('file', fileSlice)
     return formData
+  }
+
+  private async completeMultipartUpload(
+    completeEndpoint: string,
+    eTags: Record<string, string>
+  ): Promise<void> {
+    console.log(JSON.stringify(eTags))
+    return await axios.put(buildRequestUrl(completeEndpoint), JSON.stringify(eTags), buildRequestConfig(false, {}))
   }
 }
