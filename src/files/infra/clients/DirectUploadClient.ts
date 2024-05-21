@@ -3,7 +3,10 @@ import { IDirectUploadClient } from '../../domain/clients/IDirectUploadClient'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
 import fs from 'fs'
 import FormData from 'form-data'
-import { buildRequestConfig, buildRequestUrl } from '../../../core/infra/repositories/apiConfigBuilders'
+import {
+  buildRequestConfig,
+  buildRequestUrl
+} from '../../../core/infra/repositories/apiConfigBuilders'
 
 export class DirectUploadClient implements IDirectUploadClient {
   public async uploadFile(filePath: string, destination: FileUploadDestination): Promise<void> {
@@ -42,7 +45,12 @@ export class DirectUploadClient implements IDirectUploadClient {
       index: number,
       retries: number = 0
     ): Promise<void> => {
-      const formData = this.createFileSliceRequestFormData(filePath, partMaxSize, fileBytes, index)
+      const formData = await this.createFileSliceRequestFormData(
+        filePath,
+        partMaxSize,
+        fileBytes,
+        index
+      )
       const config: AxiosRequestConfig = {
         headers: {
           ...formData.getHeaders()
@@ -52,7 +60,7 @@ export class DirectUploadClient implements IDirectUploadClient {
 
       try {
         const response = await axios.put(destinationUrl, formData, config)
-        const eTag = response.headers['etag']
+        const eTag = response.headers['etag'].replace(/"/g, '')
         eTags[`${index + 1}`] = eTag
       } catch (error) {
         if (retries < maxRetries) {
@@ -70,31 +78,54 @@ export class DirectUploadClient implements IDirectUploadClient {
 
     await Promise.all(promises)
 
-    await this.completeMultipartUpload(destination.completeEndpoint, eTags)
+    return await this.completeMultipartUpload(destination.completeEndpoint, eTags)
   }
 
-  private createFileSliceRequestFormData(
+  private async createFileSliceRequestFormData(
     filePath: string,
     partMaxSize: number,
     fileBytes: number,
     index: number
-  ): FormData {
-    const partSize = Math.min(partMaxSize, fileBytes - index * partMaxSize)
-    const offset = index * partMaxSize
-    const fileSlice = fs.createReadStream(filePath, {
-      start: offset,
-      end: offset + partSize
-    })
+  ): Promise<FormData> {
+    const start = index * partMaxSize
+    const end = Math.min(start + partMaxSize - 1, fileBytes - 1)
+
+    const buffer = await this.readFileSlice(filePath, start, end)
+
     const formData = new FormData()
-    formData.append('file', fileSlice)
+    formData.append('file', buffer, { filename: 'slice' })
+
     return formData
+  }
+
+  private readFileSlice(filePath: string, start: number, end: number): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = []
+      const fileSlice = fs.createReadStream(filePath, { start, end, encoding: null })
+
+      fileSlice.on('data', (chunk: Buffer) => {
+        chunks.push(chunk)
+      })
+
+      fileSlice.on('end', () => {
+        resolve(Buffer.concat(chunks))
+      })
+
+      fileSlice.on('error', (err) => {
+        reject(err)
+      })
+    })
   }
 
   private async completeMultipartUpload(
     completeEndpoint: string,
     eTags: Record<string, string>
   ): Promise<void> {
-    console.log(JSON.stringify(eTags))
-    return await axios.put(buildRequestUrl(completeEndpoint), JSON.stringify(eTags), buildRequestConfig(false, {}))
+    return await axios
+      .put(buildRequestUrl(completeEndpoint), eTags, buildRequestConfig(true, {}))
+      .then(() => undefined)
+      .catch((error) => {
+        console.log(error)
+      })
   }
 }
