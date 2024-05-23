@@ -49,7 +49,7 @@ describe('uploadFile', () => {
     await deleteCollectionViaApi(testCollectionAlias)
   })
 
-  test.skip('should upload file to destination when there is only one destination URL', async () => {
+  test('should upload file to destination when there is only one destination URL', async () => {
     const destination = await createTestFileUploadDestination(singlepartFile)
     const singlepartFileUrl = destination.urls[0]
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(false)

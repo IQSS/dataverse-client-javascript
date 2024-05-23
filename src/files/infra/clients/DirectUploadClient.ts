@@ -18,8 +18,11 @@ export class DirectUploadClient implements IDirectUploadClient {
     file: File,
     destination: FileUploadDestination
   ): Promise<void> {
-    return await axios.put(destination.urls[0], file, {
+    const formData = new FormData();
+    formData.append('file', file);
+    await axios.put(destination.urls[0], formData, {
       headers: {
+        'Content-Type': 'multipart/form-data',
         'x-amz-tagging': 'dv-state=temp'
       }
     })
