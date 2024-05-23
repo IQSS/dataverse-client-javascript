@@ -1,17 +1,17 @@
-import { File } from '../../../src/files/domain/models/File'
+import { File as FileModel } from '../../../src/files/domain/models/File'
+import { File, Blob } from '@web-std/file'
 import axios, { AxiosResponse } from 'axios'
 import { TestConstants } from '../TestConstants'
 import { readFile } from 'fs/promises'
 import { FilesSubset } from '../../../src/files/domain/models/FilesSubset'
 import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode'
 import { FilePayload } from '../../../src/files/infra/repositories/transformers/FilePayload'
-import fs from 'fs'
 
 interface FileMetadata {
   categories?: string[]
 }
 
-export const createFileModel = (): File => {
+export const createFileModel = (): FileModel => {
   return {
     id: 1,
     persistentId: '',
@@ -58,7 +58,7 @@ export const createFileModel = (): File => {
   }
 }
 
-export const createManyFilesModel = (amount: number): File[] => {
+export const createManyFilesModel = (amount: number): FileModel[] => {
   return Array.from({ length: amount }, () => createFileModel())
 }
 
@@ -181,19 +181,28 @@ const enableFilePIDs = async (): Promise<AxiosResponse> => {
     )
 }
 
-export function createFileInFileSystem(filePath: string, fileSizeInBytes: number): void {
-  const buffer = Buffer.alloc(fileSizeInBytes)
+export async function createSinglepartFileBlob(): Promise<File> {
   try {
-    fs.writeFileSync(filePath, buffer)
+    return await createFileBlobWithSize(1000, 'singlepart-file')
   } catch (error) {
-    console.error(`Error creating file: ${filePath}`, error)
+    throw new Error(`Error while creating test singlepart file`)
   }
 }
 
-export function deleteFileInFileSystem(filePath: string): void {
+export async function createMultipartFileBlob(): Promise<File> {
   try {
-    fs.unlinkSync(filePath)
+    return await createFileBlobWithSize(1273741824, 'multipart-file')
   } catch (error) {
-    console.error(`Error deleting file: ${filePath}`, error)
+    throw new Error(`Error while creating test multipart file`)
   }
+}
+
+async function createFileBlobWithSize(fileSizeInBytes: number, fileName: string): Promise<File> {
+  const blob = await createBlobWithSize(fileSizeInBytes)
+  return new File([blob], fileName, { type: 'text/plain' })
+}
+
+async function createBlobWithSize(size: number): Promise<Blob> {
+  const arrayBuffer = new ArrayBuffer(size)
+  return new Blob([arrayBuffer])
 }

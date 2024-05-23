@@ -33,8 +33,8 @@ export const transformUploadDestinationsResponseToUploadDestination = (
       urls: urls,
       partSize: fileUploadDestinationsPayload.partSize,
       storageId: fileUploadDestinationsPayload.storageIdentifier,
-      abortEndpoint: fileUploadDestinationsPayload.abort.substring(4),
-      completeEndpoint: fileUploadDestinationsPayload.complete.substring(4)
+      abortEndpoint: fileUploadDestinationsPayload.abort?.substring(4),
+      completeEndpoint: fileUploadDestinationsPayload.complete?.substring(4)
     }
   }
 }

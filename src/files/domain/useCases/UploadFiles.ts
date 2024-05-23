@@ -15,13 +15,13 @@ export class UploadFiles implements UseCase<void> {
    * TODO
    * @returns {Promise<void>}
    */
-  async execute(datasetId: number | string, filePaths: string[]): Promise<void> {
-    filePaths.map(async (filePath) => {
+  async execute(datasetId: number | string, files: File[]): Promise<void> {
+    files.map(async (file) => {
       const fileUploadDestinations = await this.filesRepository.getFileUploadDestination(
         datasetId,
-        filePath
+        file
       )
-      await this.directUploadClient.uploadFile(filePath, fileUploadDestinations)
+      await this.directUploadClient.uploadFile(file, fileUploadDestinations)
     })
   }
 }

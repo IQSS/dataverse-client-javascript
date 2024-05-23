@@ -5,8 +5,8 @@ import {
 } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
-  createFileInFileSystem,
-  deleteFileInFileSystem,
+  createMultipartFileBlob,
+  createSinglepartFileBlob,
   registerFileViaApi,
   uploadFileViaApi
 } from '../../testHelpers/files/filesHelper'
@@ -22,7 +22,7 @@ import {
   CreatedDatasetIdentifiers,
   createDataset
 } from '../../../src/datasets'
-import { File } from '../../../src/files/domain/models/File'
+import { File as FileModel } from '../../../src/files/domain/models/File'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
 import { FileDownloadSizeMode } from '../../../src'
 import {
@@ -37,7 +37,6 @@ import {
   deleteCollectionViaApi,
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
-import path from 'path'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -464,28 +463,28 @@ describe('FilesRepository', () => {
   describe('getFile', () => {
     describe('by numeric id', () => {
       test('should return file when providing a valid id', async () => {
-        const actual: File = (await sut.getFile(
+        const actual: FileModel = (await sut.getFile(
           testFileId,
           DatasetNotNumberedVersion.LATEST,
           false
-        )) as File
+        )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return file draft when providing a valid id and version is draft', async () => {
-        const actual: File = (await sut.getFile(
+        const actual: FileModel = (await sut.getFile(
           testFileId,
           DatasetNotNumberedVersion.DRAFT,
           false
-        )) as File
+        )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return file and dataset when providing id, version, and returnDatasetVersion is true', async () => {
         const actual = (await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT, true)) as [
-          File,
+          FileModel,
           Dataset
         ]
 
@@ -507,7 +506,7 @@ describe('FilesRepository', () => {
           testFilePersistentId,
           DatasetNotNumberedVersion.LATEST,
           false
-        )) as File
+        )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
       })
@@ -517,7 +516,7 @@ describe('FilesRepository', () => {
           testFilePersistentId,
           DatasetNotNumberedVersion.DRAFT,
           false
-        )) as File
+        )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
       })
@@ -584,8 +583,8 @@ describe('FilesRepository', () => {
     const expectedUrlFragment = '/mybucket/'
     const expectedStorageIdFragment = 'localstack1://mybucket:'
 
-    const singlepartFilePath = path.join(__dirname, 'test-file')
-    const multipartFilePath = path.join(__dirname, 'multipart-file')
+    let singlepartFile: File
+    let multipartFile: File
 
     beforeAll(async () => {
       await createCollectionViaApi(testCollectionAlias)
@@ -594,21 +593,19 @@ describe('FilesRepository', () => {
         TestConstants.TEST_NEW_DATASET_DTO,
         testCollectionAlias
       )
-      createFileInFileSystem(singlepartFilePath, 1000)
-      createFileInFileSystem(multipartFilePath, 1273741824)
+      singlepartFile = await createSinglepartFileBlob()
+      multipartFile = await createMultipartFileBlob()
     })
 
     afterAll(async () => {
       await deleteUnpublishedDatasetViaApi(testDataset2Ids.numericId)
       await deleteCollectionViaApi(testCollectionAlias)
-      deleteFileInFileSystem(singlepartFilePath)
-      deleteFileInFileSystem(multipartFilePath)
     })
 
     test('should return upload destination when dataset exists and the file does not require multipart download', async () => {
       const actualFileDestination = await sut.getFileUploadDestination(
         testDataset2Ids.numericId,
-        singlepartFilePath
+        singlepartFile
       )
       expect(actualFileDestination.urls.length).toBe(1)
       expect(actualFileDestination.urls[0]).toContain(expectedUrlFragment)
@@ -619,7 +616,7 @@ describe('FilesRepository', () => {
     test('should return upload destination when dataset exists and the file requires multipart download', async () => {
       const actualFileDestination = await sut.getFileUploadDestination(
         testDataset2Ids.numericId,
-        multipartFilePath
+        multipartFile
       )
       expect(actualFileDestination.urls.length).toBeGreaterThan(1)
       expect(actualFileDestination.urls[0]).toContain(expectedUrlFragment)
@@ -635,7 +632,7 @@ describe('FilesRepository', () => {
       )
 
       await expect(
-        sut.getFileUploadDestination(nonExistentDatasetId, singlepartFilePath)
+        sut.getFileUploadDestination(nonExistentDatasetId, singlepartFile)
       ).rejects.toThrow(errorExpected)
     })
 
@@ -645,7 +642,7 @@ describe('FilesRepository', () => {
       )
 
       await expect(
-        sut.getFileUploadDestination(testDatasetIds.numericId, singlepartFilePath)
+        sut.getFileUploadDestination(testDatasetIds.numericId, singlepartFile)
       ).rejects.toThrow(errorExpected)
     })
   })

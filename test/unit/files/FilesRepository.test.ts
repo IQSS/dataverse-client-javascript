@@ -10,7 +10,9 @@ import {
   createFileModel,
   createManyFilesPayload,
   createFilesSubsetModel,
-  createFilePayload
+  createFilePayload,
+  createSinglepartFileBlob,
+  createMultipartFileBlob
 } from '../../testHelpers/files/filesHelper'
 import {
   createFileDataTablePayload,
@@ -62,7 +64,6 @@ describe('FilesRepository', () => {
   })
 
   describe('getFileUploadDestination', () => {
-    const testFilePath = 'testdir/test-file.txt'
     const testFileSize = 1000
 
     const expectedRequestConfigApiKey = {
@@ -96,6 +97,14 @@ describe('FilesRepository', () => {
     }
     const testMultipleFileUploadDestination = createMultipartFileUploadDestinationModel()
 
+    let singlepartFile: File
+    let multipartFile: File
+
+    beforeAll(async () => {
+      singlepartFile = await createSinglepartFileBlob()
+      multipartFile = await createMultipartFileBlob()
+    })
+
     describe('by numeric id', () => {
       test('should return destination when single response is successful', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testSingleSuccessfulResponse)
@@ -104,13 +113,13 @@ describe('FilesRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/uploadurls`
 
         // API Key auth
-        let actual = await sut.getFileUploadDestination(testDatasetId, testFilePath)
+        let actual = await sut.getFileUploadDestination(testDatasetId, singlepartFile)
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toEqual(testSingleFileUploadDestination)
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
-        actual = await sut.getFileUploadDestination(testDatasetId, testFilePath)
+        actual = await sut.getFileUploadDestination(testDatasetId, singlepartFile)
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,
           expectedRequestConfigSessionCookie
@@ -125,13 +134,13 @@ describe('FilesRepository', () => {
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/uploadurls`
 
         // API Key auth
-        let actual = await sut.getFileUploadDestination(testDatasetId, testFilePath)
+        let actual = await sut.getFileUploadDestination(testDatasetId, multipartFile)
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toEqual(testMultipleFileUploadDestination)
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
-        actual = await sut.getFileUploadDestination(testDatasetId, testFilePath)
+        actual = await sut.getFileUploadDestination(testDatasetId, multipartFile)
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,
           expectedRequestConfigSessionCookie
@@ -143,7 +152,7 @@ describe('FilesRepository', () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
         jest.spyOn(fs, 'statSync').mockReturnValue({ size: testFileSize } as fs.Stats)
 
-        await expect(sut.getFileUploadDestination(testDatasetId, testFilePath)).rejects.toThrow(
+        await expect(sut.getFileUploadDestination(testDatasetId, singlepartFile)).rejects.toThrow(
           ReadError
         )
       })
@@ -159,7 +168,7 @@ describe('FilesRepository', () => {
         // API Key auth
         let actual = await sut.getFileUploadDestination(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
-          testFilePath
+          singlepartFile
         )
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toEqual(testSingleFileUploadDestination)
@@ -168,7 +177,7 @@ describe('FilesRepository', () => {
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
         actual = await sut.getFileUploadDestination(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
-          testFilePath
+          singlepartFile
         )
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,
@@ -186,7 +195,7 @@ describe('FilesRepository', () => {
         // API Key auth
         let actual = await sut.getFileUploadDestination(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
-          testFilePath
+          multipartFile
         )
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toEqual(testMultipleFileUploadDestination)
@@ -195,7 +204,7 @@ describe('FilesRepository', () => {
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
         actual = await sut.getFileUploadDestination(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
-          testFilePath
+          multipartFile
         )
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,
@@ -209,7 +218,7 @@ describe('FilesRepository', () => {
         jest.spyOn(fs, 'statSync').mockReturnValue({ size: testFileSize } as fs.Stats)
 
         await expect(
-          sut.getFileUploadDestination(TestConstants.TEST_DUMMY_PERSISTENT_ID, testFilePath)
+          sut.getFileUploadDestination(TestConstants.TEST_DUMMY_PERSISTENT_ID, singlepartFile)
         ).rejects.toThrow(ReadError)
       })
     })

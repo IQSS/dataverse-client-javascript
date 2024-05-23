@@ -4,7 +4,7 @@ import { FileUserPermissions } from '../models/FileUserPermissions'
 import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria'
 import { FileCounts } from '../models/FileCounts'
 import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode'
-import { File } from '../models/File'
+import { File as FileModel } from '../models/File'
 import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../models/FileUploadDestination'
 
@@ -44,7 +44,7 @@ export interface IFilesRepository {
     fileId: number | string,
     datasetVersionId: string,
     returnDatasetVersion: boolean
-  ): Promise<File | [File, Dataset]>
+  ): Promise<FileModel | [FileModel, Dataset]>
 
   getFileCitation(
     fileId: number | string,
@@ -52,8 +52,5 @@ export interface IFilesRepository {
     includeDeaccessioned: boolean
   ): Promise<string>
 
-  getFileUploadDestination(
-    datasetId: number | string,
-    filePath: string
-  ): Promise<FileUploadDestination>
+  getFileUploadDestination(datasetId: number | string, file: File): Promise<FileUploadDestination>
 }

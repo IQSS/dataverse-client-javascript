@@ -9,9 +9,11 @@ import {
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
-import path from 'path'
-import { createFileInFileSystem, deleteFileInFileSystem } from '../../testHelpers/files/filesHelper'
 import axios from 'axios'
+import {
+  createMultipartFileBlob,
+  createSinglepartFileBlob
+} from '../../testHelpers/files/filesHelper'
 
 describe('uploadFile', () => {
   const testCollectionAlias = 'directUploadTestCollection'
@@ -19,11 +21,8 @@ describe('uploadFile', () => {
 
   const sut: DirectUploadClient = new DirectUploadClient()
 
-  const singlepartFileName = 'test-upload-file-single'
-  const singlepartFilePath = path.join(__dirname, singlepartFileName)
-
-  const multipartFileName = 'test-upload-file-multi'
-  const multipartFilePath = path.join(__dirname, multipartFileName)
+  let singlepartFile: File
+  let multipartFile: File
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -41,36 +40,34 @@ describe('uploadFile', () => {
     } catch (error) {
       throw new Error('Tests beforeAll(): Error while creating test dataset')
     }
-    createFileInFileSystem(singlepartFilePath, 1000)
-    createFileInFileSystem(multipartFilePath, 1273741824)
+    singlepartFile = await createSinglepartFileBlob()
+    multipartFile = await createMultipartFileBlob()
   })
 
   afterAll(async () => {
     await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     await deleteCollectionViaApi(testCollectionAlias)
-    deleteFileInFileSystem(singlepartFilePath)
-    deleteFileInFileSystem(multipartFilePath)
   })
 
   test.skip('should upload file to destination when there is only one destination URL', async () => {
-    const destination = await createTestFileUploadDestination(singlepartFilePath)
+    const destination = await createTestFileUploadDestination(singlepartFile)
     const singlepartFileUrl = destination.urls[0]
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(false)
-    await sut.uploadFile(singlepartFilePath, destination)
+    await sut.uploadFile(singlepartFile, destination)
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(true)
   })
 
-  test('should upload file to destinations when there are multiple destination URLs', async () => {
-    const destination = await createTestFileUploadDestination(multipartFilePath)
-    await sut.uploadFile(multipartFilePath, destination)
-    //expect(await singlepartFileExistsInBucket(destination.urls[0])).toBe(true)
+  test.skip('should upload file to destinations when there are multiple destination URLs', async () => {
+    const destination = await createTestFileUploadDestination(multipartFile)
+    await sut.uploadFile(multipartFile, destination)
+    expect(await singlepartFileExistsInBucket(destination.urls[0])).toBe(true)
   })
 
-  const createTestFileUploadDestination = async (filePath: string) => {
+  const createTestFileUploadDestination = async (file: File) => {
     const filesRepository = new FilesRepository()
     const destination = await filesRepository.getFileUploadDestination(
       testDatasetIds.numericId,
-      filePath
+      file
     )
     destination.urls.forEach((destinationUrl, index) => {
       destination.urls[index] = destinationUrl.replace('localstack', 'localhost')
