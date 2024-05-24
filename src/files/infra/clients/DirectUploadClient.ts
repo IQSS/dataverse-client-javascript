@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { IDirectUploadClient } from '../../domain/clients/IDirectUploadClient'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
+import pLimit from 'p-limit'
 import {
   buildRequestConfig,
   buildRequestUrl
@@ -36,6 +37,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     const partMaxSize = destination.partSize
     const eTags: Record<number, string> = {}
     const maxRetries = 3
+    const limitConcurrency = pLimit(1)
 
     const uploadPart = async (
       destinationUrl: string,
@@ -44,26 +46,25 @@ export class DirectUploadClient implements IDirectUploadClient {
     ): Promise<void> => {
       const offset = index * partMaxSize
       const partSize = Math.min(partMaxSize, file.size - offset)
-
       const fileSlice = file.slice(offset, offset + partSize)
 
-      const formData = new FormData()
-      formData.append('file', fileSlice, fileSlice.name)
-
       try {
-        const response = await axios.put(destinationUrl, formData, {
+        const response = await axios.put(destinationUrl, fileSlice, {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            maxBodyLength: Infinity,
-            maxContentLength: Infinity
-          }
+            'Content-Type': 'application/octet-stream',
+            'Content-Length': fileSlice.size
+          },
+          maxBodyLength: Infinity,
+          maxContentLength: Infinity,
+          timeout: 120000
         })
-        console.log(response)
         const eTag = response.headers['etag'].replace(/"/g, '')
         eTags[`${index + 1}`] = eTag
       } catch (error) {
         if (retries < maxRetries) {
-          console.warn(`Retrying part ${index + 1}, attempt ${retries + 1}`)
+          const backoffDelay = Math.pow(2, retries) * 1000
+          console.warn(`Retrying part ${index + 1}, attempt ${retries + 1} after ${backoffDelay}ms`)
+          await new Promise((resolve) => setTimeout(resolve, backoffDelay))
           await uploadPart(destinationUrl, index, retries + 1)
         } else {
           throw new Error(`Error uploading part ${index + 1}: ${error.message}`)
@@ -71,11 +72,11 @@ export class DirectUploadClient implements IDirectUploadClient {
       }
     }
 
-    const promises = destination.urls.map((destinationUrl, index) =>
-      uploadPart(destinationUrl, index)
+    const uploadPromises = destination.urls.map((destinationUrl, index) =>
+      limitConcurrency(() => uploadPart(destinationUrl, index))
     )
 
-    await Promise.all(promises)
+    await Promise.all(uploadPromises)
 
     return await this.completeMultipartUpload(destination.completeEndpoint, eTags)
   }
