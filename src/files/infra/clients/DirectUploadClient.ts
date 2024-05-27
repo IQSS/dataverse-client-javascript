@@ -19,24 +19,25 @@ export class DirectUploadClient implements IDirectUploadClient {
     file: File,
     destination: FileUploadDestination
   ): Promise<void> {
-    const formData = new FormData()
-    formData.append('file', file, file.name)
-    await axios
-      .put(destination.urls[0], formData, {
+    try {
+      const arrayBuffer = await file.arrayBuffer()
+      await axios.put(destination.urls[0], arrayBuffer, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/octet-stream',
+          'Content-Length': file.size.toString(),
           'x-amz-tagging': 'dv-state=temp'
-        }
+        },
+        timeout: 60000
       })
-      .then((response) => {
-        console.log(response)
-      })
+    } catch (error) {
+      throw new Error(`Error uploading file ${file.name}: ${error.message}`)
+    }
   }
 
   async uploadMultipartFile(file: File, destination: FileUploadDestination): Promise<void> {
     const partMaxSize = destination.partSize
     const eTags: Record<number, string> = {}
-    const maxRetries = 5
+    const maxRetries = 10
     const limitConcurrency = pLimit(1)
 
     const uploadPart = async (
@@ -56,7 +57,7 @@ export class DirectUploadClient implements IDirectUploadClient {
           },
           maxBodyLength: Infinity,
           maxContentLength: Infinity,
-          timeout: 120000
+          timeout: 60000
         })
         const eTag = response.headers['etag'].replace(/"/g, '')
         eTags[`${index + 1}`] = eTag

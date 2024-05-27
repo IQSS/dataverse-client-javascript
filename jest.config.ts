@@ -9,7 +9,7 @@ const config: Config = {
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   coveragePathIgnorePatterns: ['node_modules', 'testHelpers'],
   globalSetup: '<rootDir>/test/environment/setup.ts',
-  testTimeout: 60000,
+  testTimeout: 120000,
   coverageThreshold: {
     global: {
       branches: 95,

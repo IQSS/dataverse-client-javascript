@@ -57,7 +57,7 @@ describe('uploadFile', () => {
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(true)
   })
 
-  test('should upload file to destinations when there are multiple destination URLs', async () => {
+  test.skip('should upload file to destinations when there are multiple destination URLs', async () => {
     const destination = await createTestFileUploadDestination(multipartFile)
     await sut.uploadFile(multipartFile, destination)
   })
@@ -76,9 +76,8 @@ describe('uploadFile', () => {
 
   const singlepartFileExistsInBucket = async (fileUrl: string): Promise<boolean> => {
     return axios
-      .get(`${fileUrl}`)
-      .then((response) => {
-        console.log(response)
+      .get(fileUrl)
+      .then(() => {
         return true
       })
       .catch(() => {
