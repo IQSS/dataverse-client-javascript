@@ -36,7 +36,7 @@ export class DirectUploadClient implements IDirectUploadClient {
   async uploadMultipartFile(file: File, destination: FileUploadDestination): Promise<void> {
     const partMaxSize = destination.partSize
     const eTags: Record<number, string> = {}
-    const maxRetries = 3
+    const maxRetries = 5
     const limitConcurrency = pLimit(1)
 
     const uploadPart = async (
