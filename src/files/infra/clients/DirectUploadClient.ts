@@ -91,6 +91,7 @@ export class DirectUploadClient implements IDirectUploadClient {
       .then(() => undefined)
       .catch((error) => {
         console.log(error)
+        throw new Error(`Error completing multipart upload: ${error.message}`)
       })
   }
 }
