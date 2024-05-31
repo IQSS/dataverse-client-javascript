@@ -239,7 +239,7 @@ describe('DatasetsRepository', () => {
       test('should return error when dataset does not exist', async () => {
         const testWrongPersistentId = 'wrongPersistentId'
         const expectedError = new ReadError(
-          `[404] Dataset with Persistent ID ${testWrongPersistentId} not found.`
+          `[400] Bad dataset ID number: ${testWrongPersistentId}.`
         )
         await expect(
           sut.getDataset(testWrongPersistentId, DatasetNotNumberedVersion.LATEST, false)
