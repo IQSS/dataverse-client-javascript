@@ -43,7 +43,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     const uploadPart = async (
       destinationUrl: string,
       index: number,
-      retries: number = 0
+      retries = 0
     ): Promise<void> => {
       const offset = index * partMaxSize
       const partSize = Math.min(partMaxSize, file.size - offset)
@@ -90,7 +90,6 @@ export class DirectUploadClient implements IDirectUploadClient {
       .put(buildRequestUrl(completeEndpoint), eTags, buildRequestConfig(true, {}))
       .then(() => undefined)
       .catch((error) => {
-        console.log(error)
         throw new Error(`Error completing multipart upload: ${error.message}`)
       })
   }

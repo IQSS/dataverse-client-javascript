@@ -59,7 +59,8 @@ describe('uploadFile', () => {
 
   test('should upload file to destinations when there are multiple destination URLs', async () => {
     const destination = await createTestFileUploadDestination(multipartFile)
-    await sut.uploadFile(multipartFile, destination)
+    const result = await sut.uploadFile(multipartFile, destination)
+    expect(result).toBeUndefined()
   })
 
   const createTestFileUploadDestination = async (file: File) => {
