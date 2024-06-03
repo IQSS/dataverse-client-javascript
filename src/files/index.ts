@@ -8,8 +8,11 @@ import { GetDatasetFilesTotalDownloadSize } from './domain/useCases/GetDatasetFi
 import { GetFile } from './domain/useCases/GetFile'
 import { GetFileCitation } from './domain/useCases/GetFileCitation'
 import { GetFileAndDataset } from './domain/useCases/GetFileAndDataset'
+import { UploadFile } from './domain/useCases/UploadFile'
+import { DirectUploadClient } from './infra/clients/DirectUploadClient'
 
 const filesRepository = new FilesRepository()
+const directUploadClient = new DirectUploadClient(filesRepository)
 
 const getDatasetFiles = new GetDatasetFiles(filesRepository)
 const getDatasetFileCounts = new GetDatasetFileCounts(filesRepository)
@@ -20,6 +23,7 @@ const getDatasetFilesTotalDownloadSize = new GetDatasetFilesTotalDownloadSize(fi
 const getFile = new GetFile(filesRepository)
 const getFileAndDataset = new GetFileAndDataset(filesRepository)
 const getFileCitation = new GetFileCitation(filesRepository)
+const uploadFile = new UploadFile(filesRepository, directUploadClient)
 
 export {
   getDatasetFiles,
@@ -30,7 +34,8 @@ export {
   getDatasetFilesTotalDownloadSize,
   getFile,
   getFileAndDataset,
-  getFileCitation
+  getFileCitation,
+  uploadFile
 }
 
 export { File, FileEmbargo, FileChecksum } from './domain/models/File'
