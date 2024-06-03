@@ -8,6 +8,7 @@ import {
 } from '../../../core/infra/repositories/apiConfigBuilders'
 import * as crypto from 'crypto'
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository'
+import { DirectUploadClientError } from '../../domain/clients/DirectUploadClientError'
 
 export class DirectUploadClient implements IDirectUploadClient {
   private filesRepository: IFilesRepository
@@ -46,7 +47,7 @@ export class DirectUploadClient implements IDirectUploadClient {
         timeout: 60000
       })
     } catch (error) {
-      throw new Error(`Error uploading file ${file.name}: ${error.message}`)
+      throw new DirectUploadClientError(`Error uploading file ${file.name}: ${error.message}`)
     }
   }
 
@@ -84,7 +85,7 @@ export class DirectUploadClient implements IDirectUploadClient {
           await new Promise((resolve) => setTimeout(resolve, backoffDelay))
           await uploadPart(destinationUrl, index, retries + 1)
         } else {
-          throw new Error(`Error uploading part ${index + 1}: ${error.message}`)
+          throw new DirectUploadClientError(`Error uploading part ${index + 1}: ${error.message}`)
         }
       }
     }
@@ -106,7 +107,7 @@ export class DirectUploadClient implements IDirectUploadClient {
       .put(buildRequestUrl(completeEndpoint), eTags, buildRequestConfig(true, {}))
       .then(() => undefined)
       .catch((error) => {
-        throw new Error(`Error completing multipart upload: ${error.message}`)
+        throw new DirectUploadClientError(`Error completing multipart upload: ${error.message}`)
       })
   }
 
