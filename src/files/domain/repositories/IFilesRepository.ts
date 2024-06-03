@@ -7,6 +7,7 @@ import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode'
 import { File as FileModel } from '../models/File'
 import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../models/FileUploadDestination'
+import { UploadedFileDTO } from '../dtos/UploadedFileDTO'
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -53,4 +54,9 @@ export interface IFilesRepository {
   ): Promise<string>
 
   getFileUploadDestination(datasetId: number | string, file: File): Promise<FileUploadDestination>
+
+  addUploadedFileToDataset(
+    datasetId: number | string,
+    uploadedFileDTO: UploadedFileDTO
+  ): Promise<undefined>
 }

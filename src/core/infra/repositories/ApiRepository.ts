@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 import { ReadError } from '../../domain/repositories/ReadError'
 import { WriteError } from '../../domain/repositories/WriteError'
 import { buildRequestConfig, buildRequestUrl } from './apiConfigBuilders'
+import { ApiConstants } from './ApiConstants'
 
 export abstract class ApiRepository {
   public async doGet(
@@ -20,9 +21,10 @@ export abstract class ApiRepository {
   public async doPost(
     apiEndpoint: string,
     data: string | object,
-    queryParams: object = {}
+    queryParams: object = {},
+    contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
   ): Promise<AxiosResponse> {
-    return await this.doRequest('post', apiEndpoint, data, queryParams)
+    return await this.doRequest('post', apiEndpoint, data, queryParams, contentType)
   }
 
   public async doPut(
@@ -57,11 +59,13 @@ export abstract class ApiRepository {
     method: 'post' | 'put',
     apiEndpoint: string,
     data: string | object,
-    queryParams: object = {}
+    queryParams: object = {},
+    contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
   ): Promise<AxiosResponse> {
-    const requestData = JSON.stringify(data)
+    const requestData =
+      contentType == ApiConstants.CONTENT_TYPE_APPLICATION_JSON ? JSON.stringify(data) : data
     const requestUrl = buildRequestUrl(apiEndpoint)
-    const requestConfig = buildRequestConfig(true, queryParams)
+    const requestConfig = buildRequestConfig(true, queryParams, contentType)
 
     try {
       const response = await axios[method](requestUrl, requestData, requestConfig)

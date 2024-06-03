@@ -1,13 +1,15 @@
 import { AxiosRequestConfig } from 'axios'
 import { ApiConfig, DataverseApiAuthMechanism } from './ApiConfig'
+import { ApiConstants } from './ApiConstants'
 
 export const buildRequestConfig = (
   authRequired: boolean,
-  queryParams: object
+  queryParams: object,
+  contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
 ): AxiosRequestConfig => {
   const requestConfig: AxiosRequestConfig = {
     params: queryParams,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': contentType }
   }
   if (!authRequired) {
     return requestConfig

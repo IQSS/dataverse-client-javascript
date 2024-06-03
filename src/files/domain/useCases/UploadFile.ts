@@ -20,6 +20,6 @@ export class UploadFile implements UseCase<void> {
       datasetId,
       file
     )
-    await this.directUploadClient.uploadFile(file, fileUploadDestination)
+    await this.directUploadClient.uploadFile(datasetId, file, fileUploadDestination)
   }
 }

@@ -6,13 +6,29 @@ import {
   buildRequestConfig,
   buildRequestUrl
 } from '../../../core/infra/repositories/apiConfigBuilders'
+import * as crypto from 'crypto'
+import { IFilesRepository } from '../../domain/repositories/IFilesRepository'
 
 export class DirectUploadClient implements IDirectUploadClient {
-  public async uploadFile(file: File, destination: FileUploadDestination): Promise<void> {
+  private filesRepository: IFilesRepository
+
+  private readonly checksumAlgorithm: string = 'md5'
+
+  constructor(filesRepository: IFilesRepository) {
+    this.filesRepository = filesRepository
+  }
+
+  public async uploadFile(
+    datasetId: number | string,
+    file: File,
+    destination: FileUploadDestination
+  ): Promise<void> {
     if (destination.urls.length === 1) {
-      return this.uploadSinglepartFile(file, destination)
+      await this.uploadSinglepartFile(file, destination)
+    } else {
+      await this.uploadMultipartFile(file, destination)
     }
-    return this.uploadMultipartFile(file, destination)
+    return await this.addUploadedFileToDataset(datasetId, file, destination.storageId)
   }
 
   private async uploadSinglepartFile(
@@ -92,5 +108,27 @@ export class DirectUploadClient implements IDirectUploadClient {
       .catch((error) => {
         throw new Error(`Error completing multipart upload: ${error.message}`)
       })
+  }
+
+  private async addUploadedFileToDataset(
+    datasetId: number | string,
+    file: File,
+    storageId: string
+  ): Promise<void> {
+    const fileArrayBuffer = await file.arrayBuffer()
+    const fileBuffer = Buffer.from(fileArrayBuffer)
+    return await this.filesRepository.addUploadedFileToDataset(datasetId, {
+      fileName: file.name,
+      storageId: storageId,
+      checksumType: this.checksumAlgorithm,
+      checksumValue: this.calculateBlobChecksum(fileBuffer),
+      mimeType: file.type
+    })
+  }
+
+  private calculateBlobChecksum(blob: Buffer): string {
+    const hash = crypto.createHash(this.checksumAlgorithm)
+    hash.update(blob)
+    return hash.digest('hex')
   }
 }

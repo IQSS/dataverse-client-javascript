@@ -17,6 +17,8 @@ import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode'
 import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
 import { transformUploadDestinationsResponseToUploadDestination } from './transformers/fileUploadDestinationsTransformers'
+import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
+import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -209,13 +211,42 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     file: File
   ): Promise<FileUploadDestination> {
     return this.doGet(
-      this.buildApiEndpoint(this.datasetsResourceName, `uploadurls`, datasetId),
+      this.buildApiEndpoint(this.datasetsResourceName, 'uploadurls', datasetId),
       true,
       {
         size: file.size
       }
     )
       .then((response) => transformUploadDestinationsResponseToUploadDestination(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async addUploadedFileToDataset(
+    datasetId: number | string,
+    uploadedFileDTO: UploadedFileDTO
+  ): Promise<undefined> {
+    const fileArray = [
+      {
+        fileName: uploadedFileDTO.fileName,
+        checksum: {
+          '@value': uploadedFileDTO.checksumValue,
+          '@type': uploadedFileDTO.checksumType.toUpperCase()
+        },
+        mimeType: uploadedFileDTO.mimeType,
+        storageIdentifier: uploadedFileDTO.storageId
+      }
+    ]
+    const formData = new FormData()
+    formData.append('jsonData', JSON.stringify(fileArray))
+    return this.doPost(
+      this.buildApiEndpoint(this.datasetsResourceName, 'addFiles', datasetId),
+      formData,
+      {},
+      ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
+    )
+      .then(() => undefined)
       .catch((error) => {
         throw error
       })

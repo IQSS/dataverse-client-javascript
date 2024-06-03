@@ -19,7 +19,7 @@ describe('uploadFile', () => {
   const testCollectionAlias = 'directUploadTestCollection'
   let testDatasetIds: CreatedDatasetIdentifiers
 
-  const sut: DirectUploadClient = new DirectUploadClient()
+  const sut: DirectUploadClient = new DirectUploadClient(new FilesRepository())
 
   let singlepartFile: File
   let multipartFile: File
@@ -53,13 +53,13 @@ describe('uploadFile', () => {
     const destination = await createTestFileUploadDestination(singlepartFile)
     const singlepartFileUrl = destination.urls[0]
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(false)
-    await sut.uploadFile(singlepartFile, destination)
+    await sut.uploadFile(testDatasetIds.numericId, singlepartFile, destination)
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(true)
   })
 
   test('should upload file to destinations when there are multiple destination URLs', async () => {
     const destination = await createTestFileUploadDestination(multipartFile)
-    const result = await sut.uploadFile(multipartFile, destination)
+    const result = await sut.uploadFile(testDatasetIds.numericId, multipartFile, destination)
     expect(result).toBeUndefined()
   })
 
