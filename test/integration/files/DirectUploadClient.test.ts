@@ -1,4 +1,10 @@
-import { ApiConfig, CreatedDatasetIdentifiers, createDataset } from '../../../src'
+import {
+  ApiConfig,
+  CreatedDatasetIdentifiers,
+  DatasetNotNumberedVersion,
+  FileOrderCriteria,
+  createDataset
+} from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
@@ -17,9 +23,11 @@ import {
 
 describe('uploadFile', () => {
   const testCollectionAlias = 'directUploadTestCollection'
-  let testDatasetIds: CreatedDatasetIdentifiers
+  let testDataset1Ids: CreatedDatasetIdentifiers
+  let testDataset2Ids: CreatedDatasetIdentifiers
 
-  const sut: DirectUploadClient = new DirectUploadClient(new FilesRepository())
+  const filesRepository = new FilesRepository()
+  const sut: DirectUploadClient = new DirectUploadClient(filesRepository)
 
   let singlepartFile: File
   let multipartFile: File
@@ -33,7 +41,11 @@ describe('uploadFile', () => {
     await createCollectionViaApi(testCollectionAlias)
     await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
     try {
-      testDatasetIds = await createDataset.execute(
+      testDataset1Ids = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      testDataset2Ids = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,
         testCollectionAlias
       )
@@ -45,30 +57,66 @@ describe('uploadFile', () => {
   })
 
   afterAll(async () => {
-    await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    await deleteUnpublishedDatasetViaApi(testDataset1Ids.numericId)
+    await deleteUnpublishedDatasetViaApi(testDataset2Ids.numericId)
     await deleteCollectionViaApi(testCollectionAlias)
   })
 
   test('should upload file to destination when there is only one destination URL', async () => {
-    const destination = await createTestFileUploadDestination(singlepartFile)
+    let datasetFiles = await filesRepository.getDatasetFiles(
+      testDataset1Ids.numericId,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      FileOrderCriteria.NAME_AZ
+    )
+    expect(datasetFiles.totalFilesCount).toBe(0)
+    const destination = await createTestFileUploadDestination(
+      singlepartFile,
+      testDataset1Ids.numericId
+    )
     const singlepartFileUrl = destination.urls[0]
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(false)
-    await sut.uploadFile(testDatasetIds.numericId, singlepartFile, destination)
+    await sut.uploadFile(testDataset1Ids.numericId, singlepartFile, destination)
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(true)
+    datasetFiles = await filesRepository.getDatasetFiles(
+      testDataset1Ids.numericId,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      FileOrderCriteria.NAME_AZ
+    )
+    expect(datasetFiles.totalFilesCount).toBe(1)
+    expect(datasetFiles.files[0].name).toBe('singlepart-file')
+    expect(datasetFiles.files[0].storageIdentifier).toContain('localstack1://mybucket:')
   })
 
   test('should upload file to destinations when there are multiple destination URLs', async () => {
-    const destination = await createTestFileUploadDestination(multipartFile)
-    const result = await sut.uploadFile(testDatasetIds.numericId, multipartFile, destination)
+    let datasetFiles = await filesRepository.getDatasetFiles(
+      testDataset2Ids.numericId,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      FileOrderCriteria.NAME_AZ
+    )
+    expect(datasetFiles.totalFilesCount).toBe(0)
+    const destination = await createTestFileUploadDestination(
+      multipartFile,
+      testDataset2Ids.numericId
+    )
+    const result = await sut.uploadFile(testDataset2Ids.numericId, multipartFile, destination)
     expect(result).toBeUndefined()
+    datasetFiles = await filesRepository.getDatasetFiles(
+      testDataset2Ids.numericId,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      FileOrderCriteria.NAME_AZ
+    )
+    expect(datasetFiles.totalFilesCount).toBe(1)
+    expect(datasetFiles.files[0].name).toBe('multipart-file')
+    expect(datasetFiles.files[0].storageIdentifier).toContain('localstack1://mybucket:')
   })
 
-  const createTestFileUploadDestination = async (file: File) => {
+  const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {
     const filesRepository = new FilesRepository()
-    const destination = await filesRepository.getFileUploadDestination(
-      testDatasetIds.numericId,
-      file
-    )
+    const destination = await filesRepository.getFileUploadDestination(testDatasetId, file)
     destination.urls.forEach((destinationUrl, index) => {
       destination.urls[index] = destinationUrl.replace('localstack', 'localhost')
     })
