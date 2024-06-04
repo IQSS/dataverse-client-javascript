@@ -66,7 +66,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     }
   }
 
-  async uploadMultipartFile(
+  private async uploadMultipartFile(
     datasetId: number | string,
     file: File,
     destination: FileUploadDestination
