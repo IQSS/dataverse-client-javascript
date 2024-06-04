@@ -13,6 +13,7 @@ import { FilePartUploadError } from './errors/FilePartUploadError'
 import { MultipartCompletionError } from './errors/MultipartCompletionError'
 import { AddUploadedFileToDatasetError } from './errors/AddUploadedFileToDatasetError'
 import { UrlGenerationError } from './errors/UrlGenerationError'
+import { MultipartAbortError } from './errors/MultipartAbortError'
 
 export class DirectUploadClient implements IDirectUploadClient {
   private filesRepository: IFilesRepository
@@ -72,7 +73,7 @@ export class DirectUploadClient implements IDirectUploadClient {
   ): Promise<void> {
     const partMaxSize = destination.partSize
     const eTags: Record<number, string> = {}
-    const maxRetries = 10
+    const maxRetries = 5
     const limitConcurrency = pLimit(1)
 
     const uploadPart = async (
@@ -103,7 +104,7 @@ export class DirectUploadClient implements IDirectUploadClient {
           await new Promise((resolve) => setTimeout(resolve, backoffDelay))
           await uploadPart(destinationUrl, index, retries + 1)
         } else {
-          // TODO CALL ABORT ENDPOINT
+          await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint)
           throw new FilePartUploadError(file.name, datasetId, error.message, index + 1)
         }
       }
@@ -121,6 +122,19 @@ export class DirectUploadClient implements IDirectUploadClient {
       destination.completeEndpoint,
       eTags
     )
+  }
+
+  private async abortMultipartUpload(
+    fileName: string,
+    datasetId: number | string,
+    abortEndpoint: string
+  ): Promise<void> {
+    return await axios
+      .delete(buildRequestUrl(abortEndpoint), buildRequestConfig(true, {}))
+      .then(() => undefined)
+      .catch((error) => {
+        throw new MultipartAbortError(fileName, datasetId, error.message)
+      })
   }
 
   private async completeMultipartUpload(
