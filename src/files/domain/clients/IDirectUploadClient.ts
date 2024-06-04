@@ -4,6 +4,6 @@ export interface IDirectUploadClient {
   uploadFile(
     datasetId: number | string,
     file: File,
-    destination: FileUploadDestination
+    destination?: FileUploadDestination
   ): Promise<void>
 }

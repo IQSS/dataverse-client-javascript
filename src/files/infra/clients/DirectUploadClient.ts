@@ -8,7 +8,11 @@ import {
 } from '../../../core/infra/repositories/apiConfigBuilders'
 import * as crypto from 'crypto'
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository'
-import { DirectUploadClientError } from '../../domain/clients/DirectUploadClientError'
+import { FileUploadError } from './errors/FileUploadError'
+import { FilePartUploadError } from './errors/FilePartUploadError'
+import { MultipartCompletionError } from './errors/MultipartCompletionError'
+import { AddUploadedFileToDatasetError } from './errors/AddUploadedFileToDatasetError'
+import { UrlGenerationError } from './errors/UrlGenerationError'
 
 export class DirectUploadClient implements IDirectUploadClient {
   private filesRepository: IFilesRepository
@@ -22,17 +26,27 @@ export class DirectUploadClient implements IDirectUploadClient {
   public async uploadFile(
     datasetId: number | string,
     file: File,
-    destination: FileUploadDestination
+    destination?: FileUploadDestination
   ): Promise<void> {
-    if (destination.urls.length === 1) {
-      await this.uploadSinglepartFile(file, destination)
-    } else {
-      await this.uploadMultipartFile(file, destination)
+    if (destination == undefined) {
+      destination = await this.filesRepository
+        .getFileUploadDestination(datasetId, file)
+        .catch((error) => {
+          throw new UrlGenerationError(file.name, datasetId, error.message)
+        })
     }
+
+    if (destination.urls.length === 1) {
+      await this.uploadSinglepartFile(datasetId, file, destination)
+    } else {
+      await this.uploadMultipartFile(datasetId, file, destination)
+    }
+
     return await this.addUploadedFileToDataset(datasetId, file, destination.storageId)
   }
 
   private async uploadSinglepartFile(
+    datasetId: number | string,
     file: File,
     destination: FileUploadDestination
   ): Promise<void> {
@@ -47,11 +61,15 @@ export class DirectUploadClient implements IDirectUploadClient {
         timeout: 60000
       })
     } catch (error) {
-      throw new DirectUploadClientError(`Error uploading file ${file.name}: ${error.message}`)
+      throw new FileUploadError(file.name, datasetId, error.message)
     }
   }
 
-  async uploadMultipartFile(file: File, destination: FileUploadDestination): Promise<void> {
+  async uploadMultipartFile(
+    datasetId: number | string,
+    file: File,
+    destination: FileUploadDestination
+  ): Promise<void> {
     const partMaxSize = destination.partSize
     const eTags: Record<number, string> = {}
     const maxRetries = 10
@@ -85,7 +103,8 @@ export class DirectUploadClient implements IDirectUploadClient {
           await new Promise((resolve) => setTimeout(resolve, backoffDelay))
           await uploadPart(destinationUrl, index, retries + 1)
         } else {
-          throw new DirectUploadClientError(`Error uploading part ${index + 1}: ${error.message}`)
+          // TODO CALL ABORT ENDPOINT
+          throw new FilePartUploadError(file.name, datasetId, error.message, index + 1)
         }
       }
     }
@@ -96,10 +115,17 @@ export class DirectUploadClient implements IDirectUploadClient {
 
     await Promise.all(uploadPromises)
 
-    return await this.completeMultipartUpload(destination.completeEndpoint, eTags)
+    return await this.completeMultipartUpload(
+      file.name,
+      datasetId,
+      destination.completeEndpoint,
+      eTags
+    )
   }
 
   private async completeMultipartUpload(
+    fileName: string,
+    datasetId: number | string,
     completeEndpoint: string,
     eTags: Record<string, string>
   ): Promise<void> {
@@ -107,7 +133,7 @@ export class DirectUploadClient implements IDirectUploadClient {
       .put(buildRequestUrl(completeEndpoint), eTags, buildRequestConfig(true, {}))
       .then(() => undefined)
       .catch((error) => {
-        throw new DirectUploadClientError(`Error completing multipart upload: ${error.message}`)
+        throw new MultipartCompletionError(fileName, datasetId, error.message)
       })
   }
 
@@ -118,13 +144,18 @@ export class DirectUploadClient implements IDirectUploadClient {
   ): Promise<void> {
     const fileArrayBuffer = await file.arrayBuffer()
     const fileBuffer = Buffer.from(fileArrayBuffer)
-    return await this.filesRepository.addUploadedFileToDataset(datasetId, {
-      fileName: file.name,
-      storageId: storageId,
-      checksumType: this.checksumAlgorithm,
-      checksumValue: this.calculateBlobChecksum(fileBuffer),
-      mimeType: file.type
-    })
+    return await this.filesRepository
+      .addUploadedFileToDataset(datasetId, {
+        fileName: file.name,
+        storageId: storageId,
+        checksumType: this.checksumAlgorithm,
+        checksumValue: this.calculateBlobChecksum(fileBuffer),
+        mimeType: file.type
+      })
+      .then(() => undefined)
+      .catch((error) => {
+        throw new AddUploadedFileToDatasetError(file.name, datasetId, error.message)
+      })
   }
 
   private calculateBlobChecksum(blob: Buffer): string {

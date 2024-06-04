@@ -101,8 +101,7 @@ describe('uploadFile', () => {
       multipartFile,
       testDataset2Ids.numericId
     )
-    const result = await sut.uploadFile(testDataset2Ids.numericId, multipartFile, destination)
-    expect(result).toBeUndefined()
+    await sut.uploadFile(testDataset2Ids.numericId, multipartFile, destination)
     datasetFiles = await filesRepository.getDatasetFiles(
       testDataset2Ids.numericId,
       DatasetNotNumberedVersion.LATEST,

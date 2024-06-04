@@ -1,5 +1,10 @@
 export class DirectUploadClientError extends Error {
-  constructor(message: string) {
-    super(message)
+  fileName: string
+  datasetId: number | string
+
+  constructor(fileName: string, datasetId: number | string, reason: string) {
+    super(reason)
+    this.datasetId = datasetId
+    this.fileName = fileName
   }
 }

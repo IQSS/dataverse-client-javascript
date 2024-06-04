@@ -23,7 +23,7 @@ const getDatasetFilesTotalDownloadSize = new GetDatasetFilesTotalDownloadSize(fi
 const getFile = new GetFile(filesRepository)
 const getFileAndDataset = new GetFileAndDataset(filesRepository)
 const getFileCitation = new GetFileCitation(filesRepository)
-const uploadFile = new UploadFile(filesRepository, directUploadClient)
+const uploadFile = new UploadFile(directUploadClient)
 
 export {
   getDatasetFiles,
