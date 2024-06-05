@@ -1,7 +1,8 @@
 import { FileUploadDestination } from '../../../src/files/domain/models/FileUploadDestination'
 import {
   FileMultipartUploadDestinationPayload,
-  FileSingleUploadDestinationPayload
+  FileSingleUploadDestinationPayload,
+  transformMultipartUploadDestinationsPayloadToMultipartUploadDestinationModel
 } from '../../../src/files/infra/repositories/transformers/fileUploadDestinationsTransformers'
 
 export const createSingleFileUploadDestinationPayload = (): FileSingleUploadDestinationPayload => {
@@ -29,18 +30,15 @@ export const createMultipartFileUploadDestinationPayload =
         '2': 'http://localstack:4566/mybucket/10.5072/FK2/PXR7TG/18f715da0f8-745c7b545756?uploadId=E9KZMX7EKJ2DvR701XU3Z0r3erhx5fimu5FPbsb9BqMrpzvs7psj4A&partNumber=2&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20240513T095152Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=default%2F20240513%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=03df92ba4a70dcf1293bede19068536bf2ed95be3e1c0b67ff1731ff637ada11'
       },
       partSize: 1073741824,
-      storageIdentifier: 'localstack1://mybucket:18f715da0f8-745c7b545756'
+      storageIdentifier: 'localstack1://mybucket:18f715da0f8-745c7b545756',
+      complete: '/api/datasets/mpupload/testComplete',
+      abort: '/api/datasets/mpupload/testAbort'
     }
   }
 
 export const createMultipartFileUploadDestinationModel = (): FileUploadDestination => {
   const multipartFileUploadDestinationPayload = createMultipartFileUploadDestinationPayload()
-  return {
-    urls: [
-      multipartFileUploadDestinationPayload.urls['1'],
-      multipartFileUploadDestinationPayload.urls['2']
-    ],
-    partSize: multipartFileUploadDestinationPayload.partSize,
-    storageId: multipartFileUploadDestinationPayload.storageIdentifier
-  }
+  return transformMultipartUploadDestinationsPayloadToMultipartUploadDestinationModel(
+    multipartFileUploadDestinationPayload
+  )
 }

@@ -17,11 +17,13 @@ import { MultipartAbortError } from './errors/MultipartAbortError'
 
 export class DirectUploadClient implements IDirectUploadClient {
   private filesRepository: IFilesRepository
+  private maxMultipartRetries: number
 
   private readonly checksumAlgorithm: string = 'md5'
 
-  constructor(filesRepository: IFilesRepository) {
+  constructor(filesRepository: IFilesRepository, maxMultipartRetries = 5) {
     this.filesRepository = filesRepository
+    this.maxMultipartRetries = maxMultipartRetries
   }
 
   public async uploadFile(
@@ -73,7 +75,7 @@ export class DirectUploadClient implements IDirectUploadClient {
   ): Promise<void> {
     const partMaxSize = destination.partSize
     const eTags: Record<number, string> = {}
-    const maxRetries = 5
+    const maxRetries = this.maxMultipartRetries
     const limitConcurrency = pLimit(1)
 
     const uploadPart = async (
@@ -100,7 +102,6 @@ export class DirectUploadClient implements IDirectUploadClient {
       } catch (error) {
         if (retries < maxRetries) {
           const backoffDelay = Math.pow(2, retries) * 1000
-          console.warn(`Retrying part ${index + 1}, attempt ${retries + 1} after ${backoffDelay}ms`)
           await new Promise((resolve) => setTimeout(resolve, backoffDelay))
           await uploadPart(destinationUrl, index, retries + 1)
         } else {

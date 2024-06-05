@@ -11,6 +11,8 @@ export interface FileMultipartUploadDestinationPayload {
   urls: Record<string, string>
   partSize: number
   storageIdentifier: string
+  complete?: string
+  abort?: string
 }
 
 export const transformUploadDestinationsResponseToUploadDestination = (
@@ -25,16 +27,24 @@ export const transformUploadDestinationsResponseToUploadDestination = (
       storageId: fileUploadDestinationsPayload.storageIdentifier
     }
   } else {
-    const urls: string[] = []
-    for (const urlKey of Object.keys(fileUploadDestinationsPayload.urls)) {
-      urls.push(fileUploadDestinationsPayload.urls[urlKey])
-    }
-    return {
-      urls: urls,
-      partSize: fileUploadDestinationsPayload.partSize,
-      storageId: fileUploadDestinationsPayload.storageIdentifier,
-      abortEndpoint: fileUploadDestinationsPayload.abort?.substring(4),
-      completeEndpoint: fileUploadDestinationsPayload.complete?.substring(4)
-    }
+    return transformMultipartUploadDestinationsPayloadToMultipartUploadDestinationModel(
+      fileUploadDestinationsPayload
+    )
+  }
+}
+
+export const transformMultipartUploadDestinationsPayloadToMultipartUploadDestinationModel = (
+  fileUploadDestinationsPayload: FileMultipartUploadDestinationPayload
+): FileUploadDestination => {
+  const urls: string[] = []
+  for (const urlKey of Object.keys(fileUploadDestinationsPayload.urls)) {
+    urls.push(fileUploadDestinationsPayload.urls[urlKey])
+  }
+  return {
+    urls: urls,
+    partSize: fileUploadDestinationsPayload.partSize,
+    storageId: fileUploadDestinationsPayload.storageIdentifier,
+    abortEndpoint: fileUploadDestinationsPayload.abort?.substring(4),
+    completeEndpoint: fileUploadDestinationsPayload.complete?.substring(4)
   }
 }
