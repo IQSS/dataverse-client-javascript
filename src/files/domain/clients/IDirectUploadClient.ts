@@ -4,6 +4,8 @@ export interface IDirectUploadClient {
   uploadFile(
     datasetId: number | string,
     file: File,
-    destination?: FileUploadDestination
+    progress: (now: number) => void,
+    abortController: AbortController,
+    destination?: FileUploadDestination,
   ): Promise<void>
 }

@@ -5,11 +5,15 @@ import { ApiConstants } from './ApiConstants'
 export const buildRequestConfig = (
   authRequired: boolean,
   queryParams: object,
-  contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
+  contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON,
+  abortSignal?: AbortSignal
 ): AxiosRequestConfig => {
   const requestConfig: AxiosRequestConfig = {
     params: queryParams,
-    headers: { 'Content-Type': contentType }
+    headers: {
+      'Content-Type': contentType
+    },
+    ...(abortSignal && { signal: abortSignal }),
   }
   if (!authRequired) {
     return requestConfig
