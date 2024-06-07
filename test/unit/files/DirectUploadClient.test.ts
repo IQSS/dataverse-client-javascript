@@ -17,6 +17,7 @@ import { FilePartUploadError } from '../../../src/files/infra/clients/errors/Fil
 import { MultipartAbortError } from '../../../src/files/infra/clients/errors/MultipartAbortError'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
+import { FileUploadDestination } from '../../../src/files/domain/models/FileUploadDestination'
 
 describe('uploadFile', () => {
   beforeEach(() => {
@@ -74,11 +75,10 @@ describe('uploadFile', () => {
       expect(progressMock).toHaveBeenCalledTimes(1)
     })
 
-    test('should return undefined on operation success', async () => {
+    test('should storage identifier on operation success', async () => {
       const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
-      filesRepositoryStub.getFileUploadDestination = jest
-        .fn()
-        .mockResolvedValue(createSingleFileUploadDestinationModel())
+      const testDestination: FileUploadDestination = createSingleFileUploadDestinationModel()
+      filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
       filesRepositoryStub.addUploadedFileToDataset = jest.fn().mockResolvedValue(undefined)
 
       jest.spyOn(axios, 'put').mockResolvedValue(undefined)
@@ -94,7 +94,7 @@ describe('uploadFile', () => {
       expect(progressMock).toHaveBeenCalledWith(100)
       expect(progressMock).toHaveBeenCalledTimes(2)
 
-      expect(actual).toEqual(undefined)
+      expect(actual).toEqual(testDestination.storageId)
     })
   })
 
@@ -193,7 +193,7 @@ describe('uploadFile', () => {
       expect(progressMock).toHaveBeenCalledTimes(3)
     })
 
-    test('should return undefined on operation success', async () => {
+    test('should return storage identifier on operation success', async () => {
       const testMultipartDestination = createMultipartFileUploadDestinationModel()
       const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
       filesRepositoryStub.getFileUploadDestination = jest
@@ -214,7 +214,7 @@ describe('uploadFile', () => {
 
       const actual = await sut.uploadFile(1, testFile, progressMock, abortController)
 
-      expect(actual).toEqual(undefined)
+      expect(actual).toEqual(testMultipartDestination.storageId)
 
       expect(progressMock).toHaveBeenCalledWith(10)
       expect(progressMock).toHaveBeenCalledWith(50)

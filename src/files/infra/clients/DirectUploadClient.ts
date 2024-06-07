@@ -37,7 +37,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     progress: (now: number) => void,
     abortController: AbortController,
     destination?: FileUploadDestination
-  ): Promise<void> {
+  ): Promise<string> {
     if (destination == undefined) {
       destination = await this.filesRepository
         .getFileUploadDestination(datasetId, file)
@@ -49,10 +49,12 @@ export class DirectUploadClient implements IDirectUploadClient {
 
     if (destination.urls.length === 1) {
       await this.uploadSinglepartFile(datasetId, file, destination, abortController)
-      progress(this.progressAfterFileUpload)
     } else {
       await this.uploadMultipartFile(datasetId, file, destination, progress, abortController)
     }
+    progress(this.progressAfterFileUpload)
+
+    return destination.storageId
   }
 
   private async uploadSinglepartFile(
@@ -145,10 +147,7 @@ export class DirectUploadClient implements IDirectUploadClient {
       destination,
       eTags,
       abortController
-    ).then(() => {
-      progress(this.progressAfterFileUpload)
-      undefined
-    })
+    )
   }
 
   private async abortMultipartUpload(

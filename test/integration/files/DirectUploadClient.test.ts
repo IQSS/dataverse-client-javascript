@@ -1,4 +1,10 @@
-import { ApiConfig, CreatedDatasetIdentifiers, createDataset } from '../../../src'
+import {
+  ApiConfig,
+  CreatedDatasetIdentifiers,
+  DatasetNotNumberedVersion,
+  FileOrderCriteria,
+  createDataset
+} from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
@@ -16,7 +22,7 @@ import {
 } from '../../testHelpers/files/filesHelper'
 import { FileUploadCancelError } from '../../../src/files/infra/clients/errors/FileUploadCancelError'
 
-describe('uploadFile', () => {
+describe('DirectUploadClient', () => {
   const testCollectionAlias = 'directUploadTestCollection'
   let testDataset1Ids: CreatedDatasetIdentifiers
   let testDataset2Ids: CreatedDatasetIdentifiers
@@ -61,7 +67,7 @@ describe('uploadFile', () => {
     await deleteCollectionViaApi(testCollectionAlias)
   })
 
-  test('should upload file to destination when there is only one destination URL', async () => {
+  test('should upload file and add it to the dataset when there is only one destination URL', async () => {
     const destination = await createTestFileUploadDestination(
       singlepartFile,
       testDataset1Ids.numericId
@@ -73,22 +79,50 @@ describe('uploadFile', () => {
 
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(false)
 
-    await sut.uploadFile(
+    // Test uploadFile method
+
+    const actualStorageId = await sut.uploadFile(
       testDataset1Ids.numericId,
       singlepartFile,
       progressMock,
       abortController,
       destination
     )
+    expect(actualStorageId).toBe(destination.storageId)
 
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(true)
 
     expect(progressMock).toHaveBeenCalledWith(10)
     expect(progressMock).toHaveBeenCalledWith(100)
     expect(progressMock).toHaveBeenCalledTimes(2)
+
+    // Test addUploadedFileToDataset method
+
+    let datasetFiles = await filesRepository.getDatasetFiles(
+      testDataset1Ids.numericId,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      FileOrderCriteria.NAME_AZ
+    )
+
+    expect(datasetFiles.totalFilesCount).toBe(0)
+
+    await sut.addUploadedFileToDataset(testDataset1Ids.numericId, singlepartFile, actualStorageId)
+
+    datasetFiles = await filesRepository.getDatasetFiles(
+      testDataset1Ids.numericId,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      FileOrderCriteria.NAME_AZ
+    )
+
+    expect(datasetFiles.totalFilesCount).toBe(1)
+    expect(datasetFiles.files[0].name).toBe('singlepart-file')
+    expect(datasetFiles.files[0].sizeBytes).toBe(singlepartFile.size)
+    expect(datasetFiles.files[0].storageIdentifier).toContain('localstack1://mybucket:')
   })
 
-  test('should upload file to destinations when there are multiple destination URLs', async () => {
+  test('should upload file and add it to the dataset when there are multiple destination URLs', async () => {
     const destination = await createTestFileUploadDestination(
       multipartFile,
       testDataset2Ids.numericId
@@ -97,19 +131,47 @@ describe('uploadFile', () => {
     const progressMock = jest.fn()
     const abortController = new AbortController()
 
-    await sut.uploadFile(
+    // Test uploadFile method
+
+    const actualStorageId = await sut.uploadFile(
       testDataset2Ids.numericId,
       multipartFile,
       progressMock,
       abortController,
       destination
     )
+    expect(actualStorageId).toBe(destination.storageId)
 
     expect(progressMock).toHaveBeenCalledWith(10)
     expect(progressMock).toHaveBeenCalledWith(50)
     expect(progressMock).toHaveBeenCalledWith(90)
     expect(progressMock).toHaveBeenCalledWith(100)
     expect(progressMock).toHaveBeenCalledTimes(4)
+
+    // Test addUploadedFileToDataset method
+
+    let datasetFiles = await filesRepository.getDatasetFiles(
+      testDataset2Ids.numericId,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      FileOrderCriteria.NAME_AZ
+    )
+
+    expect(datasetFiles.totalFilesCount).toBe(0)
+
+    await sut.addUploadedFileToDataset(testDataset2Ids.numericId, multipartFile, actualStorageId)
+
+    datasetFiles = await filesRepository.getDatasetFiles(
+      testDataset2Ids.numericId,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      FileOrderCriteria.NAME_AZ
+    )
+
+    expect(datasetFiles.totalFilesCount).toBe(1)
+    expect(datasetFiles.files[0].name).toBe('multipart-file')
+    expect(datasetFiles.files[0].sizeBytes).toBe(multipartFile.size)
+    expect(datasetFiles.files[0].storageIdentifier).toContain('localstack1://mybucket:')
   })
 
   test('should not finish uploading file to destinations when user cancels immediately and there are multiple destination urls', async () => {

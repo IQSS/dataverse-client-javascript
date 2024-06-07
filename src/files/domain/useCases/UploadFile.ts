@@ -1,7 +1,7 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { IDirectUploadClient } from '../clients/IDirectUploadClient'
 
-export class UploadFile implements UseCase<void> {
+export class UploadFile implements UseCase<string> {
   private directUploadClient: IDirectUploadClient
 
   constructor(directUploadClient: IDirectUploadClient) {
@@ -10,14 +10,14 @@ export class UploadFile implements UseCase<void> {
 
   /**
    * TODO
-   * @returns {Promise<void>}
+   * @returns {Promise<string>}
    */
   async execute(
     datasetId: number | string,
     file: File,
     progress: (now: number) => void,
     abortController: AbortController
-  ): Promise<void> {
-    await this.directUploadClient.uploadFile(datasetId, file, progress, abortController)
+  ): Promise<string> {
+    return await this.directUploadClient.uploadFile(datasetId, file, progress, abortController)
   }
 }

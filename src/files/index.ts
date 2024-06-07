@@ -10,6 +10,7 @@ import { GetFileCitation } from './domain/useCases/GetFileCitation'
 import { GetFileAndDataset } from './domain/useCases/GetFileAndDataset'
 import { UploadFile } from './domain/useCases/UploadFile'
 import { DirectUploadClient } from './infra/clients/DirectUploadClient'
+import { AddUploadedFileToDataset } from './domain/useCases/AddUploadedFileToDataset'
 
 const filesRepository = new FilesRepository()
 const directUploadClient = new DirectUploadClient(filesRepository)
@@ -24,6 +25,7 @@ const getFile = new GetFile(filesRepository)
 const getFileAndDataset = new GetFileAndDataset(filesRepository)
 const getFileCitation = new GetFileCitation(filesRepository)
 const uploadFile = new UploadFile(directUploadClient)
+const addUploadedFileToDataset = new AddUploadedFileToDataset(directUploadClient)
 
 export {
   getDatasetFiles,
@@ -35,7 +37,8 @@ export {
   getFile,
   getFileAndDataset,
   getFileCitation,
-  uploadFile
+  uploadFile,
+  addUploadedFileToDataset
 }
 
 export { File, FileEmbargo, FileChecksum } from './domain/models/File'

@@ -5,14 +5,15 @@ import { DirectUploadClientError } from '../../../src/files/domain/clients/Direc
 
 describe('execute', () => {
   let testFile: File
+  const testStorageId = 'test'
 
   beforeAll(async () => {
     testFile = await createSinglepartFileBlob()
   })
 
-  test('should return undefined on client success', async () => {
+  test('should return storage identifier on client success', async () => {
     const directUploadClientStub: IDirectUploadClient = {} as IDirectUploadClient
-    directUploadClientStub.uploadFile = jest.fn().mockResolvedValue(undefined)
+    directUploadClientStub.uploadFile = jest.fn().mockResolvedValue(testStorageId)
 
     const sut = new UploadFile(directUploadClientStub)
 
@@ -21,7 +22,7 @@ describe('execute', () => {
 
     const actual = await sut.execute(1, testFile, progressMock, abortController)
 
-    expect(actual).toEqual(undefined)
+    expect(actual).toEqual(testStorageId)
   })
 
   test('should return error on client error', async () => {
