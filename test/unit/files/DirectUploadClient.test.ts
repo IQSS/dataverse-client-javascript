@@ -3,7 +3,7 @@ import {
   createSinglepartFileBlob
 } from '../../testHelpers/files/filesHelper'
 import { IFilesRepository } from '../../../src/files/domain/repositories/IFilesRepository'
-import { ApiConfig, ReadError, WriteError } from '../../../src'
+import { ApiConfig, ReadError } from '../../../src'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { UrlGenerationError } from '../../../src/files/infra/clients/errors/UrlGenerationError'
 import {
@@ -12,7 +12,6 @@ import {
 } from '../../testHelpers/files/fileUploadDestinationHelper'
 import axios from 'axios'
 import { FileUploadError } from '../../../src/files/infra/clients/errors/FileUploadError'
-import { AddUploadedFileToDatasetError } from '../../../src/files/infra/clients/errors/AddUploadedFileToDatasetError'
 import { MultipartCompletionError } from '../../../src/files/infra/clients/errors/MultipartCompletionError'
 import { FilePartUploadError } from '../../../src/files/infra/clients/errors/FilePartUploadError'
 import { MultipartAbortError } from '../../../src/files/infra/clients/errors/MultipartAbortError'
@@ -44,7 +43,14 @@ describe('uploadFile', () => {
 
       const sut = new DirectUploadClient(filesRepositoryStub)
 
-      await expect(sut.uploadFile(1, testFile)).rejects.toThrow(UrlGenerationError)
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
+        UrlGenerationError
+      )
+
+      expect(progressMock).not.toHaveBeenCalled()
     })
 
     test('should return FileUploadError when there is an error on single file upload', async () => {
@@ -57,23 +63,15 @@ describe('uploadFile', () => {
 
       const sut = new DirectUploadClient(filesRepositoryStub)
 
-      await expect(sut.uploadFile(1, testFile)).rejects.toThrow(FileUploadError)
-    })
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
 
-    test('should return AddUploadedFileToDatasetError when there is an error on adding the uploaded file to the dataset', async () => {
-      const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
-      filesRepositoryStub.getFileUploadDestination = jest
-        .fn()
-        .mockResolvedValue(createSingleFileUploadDestinationModel())
-      filesRepositoryStub.addUploadedFileToDataset = jest
-        .fn()
-        .mockRejectedValue(new WriteError('test'))
+      await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
+        FileUploadError
+      )
 
-      jest.spyOn(axios, 'put').mockResolvedValue(undefined)
-
-      const sut = new DirectUploadClient(filesRepositoryStub)
-
-      await expect(sut.uploadFile(1, testFile)).rejects.toThrow(AddUploadedFileToDatasetError)
+      expect(progressMock).toHaveBeenCalledWith(10)
+      expect(progressMock).toHaveBeenCalledTimes(1)
     })
 
     test('should return undefined on operation success', async () => {
@@ -87,7 +85,14 @@ describe('uploadFile', () => {
 
       const sut = new DirectUploadClient(filesRepositoryStub)
 
-      const actual = await sut.uploadFile(1, testFile)
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      const actual = await sut.uploadFile(1, testFile, progressMock, abortController)
+
+      expect(progressMock).toHaveBeenCalledWith(10)
+      expect(progressMock).toHaveBeenCalledWith(100)
+      expect(progressMock).toHaveBeenCalledTimes(2)
 
       expect(actual).toEqual(undefined)
     })
@@ -119,7 +124,13 @@ describe('uploadFile', () => {
 
       const sut = new DirectUploadClient(filesRepositoryStub, 1)
 
-      await expect(sut.uploadFile(1, testFile)).rejects.toThrow(FilePartUploadError)
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
+        FilePartUploadError
+      )
+
       expect(axios.delete).toHaveBeenCalledWith(
         `${ApiConfig.dataverseApiUrl}/datasets/mpupload/testAbort`,
         {
@@ -127,6 +138,9 @@ describe('uploadFile', () => {
           params: {}
         }
       )
+
+      expect(progressMock).toHaveBeenCalledWith(10)
+      expect(progressMock).toHaveBeenCalledTimes(1)
     })
 
     test('should return MultipartAbortError when there is an error on multipart file upload and abort endpoint call fails', async () => {
@@ -138,9 +152,17 @@ describe('uploadFile', () => {
       jest.spyOn(axios, 'delete').mockRejectedValue('error')
       jest.spyOn(axios, 'put').mockRejectedValue('error')
 
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
       const sut = new DirectUploadClient(filesRepositoryStub, 1)
 
-      await expect(sut.uploadFile(1, testFile)).rejects.toThrow(MultipartAbortError)
+      await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
+        MultipartAbortError
+      )
+
+      expect(progressMock).toHaveBeenCalledWith(10)
+      expect(progressMock).toHaveBeenCalledTimes(1)
     })
 
     test('should return MultipartCompletionError when there is an error on multipart file completion', async () => {
@@ -155,26 +177,20 @@ describe('uploadFile', () => {
         .mockResolvedValueOnce(successfulPartResponse)
         .mockRejectedValueOnce(new Error('Third call failed'))
 
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
       const sut = new DirectUploadClient(filesRepositoryStub, 1)
-      await expect(sut.uploadFile(1, testFile)).rejects.toThrow(MultipartCompletionError)
+      await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
+        MultipartCompletionError
+      )
 
       expect(axios.put).toHaveBeenCalledTimes(3)
-    })
 
-    test('should return AddUploadedFileToDatasetError when there is an error on adding the uploaded file to the dataset', async () => {
-      const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
-      filesRepositoryStub.getFileUploadDestination = jest
-        .fn()
-        .mockResolvedValue(createMultipartFileUploadDestinationModel())
-      filesRepositoryStub.addUploadedFileToDataset = jest
-        .fn()
-        .mockRejectedValue(new WriteError('test'))
-
-      jest.spyOn(axios, 'put').mockResolvedValue(successfulPartResponse)
-
-      const sut = new DirectUploadClient(filesRepositoryStub, 1)
-
-      await expect(sut.uploadFile(1, testFile)).rejects.toThrow(AddUploadedFileToDatasetError)
+      expect(progressMock).toHaveBeenCalledWith(10)
+      expect(progressMock).toHaveBeenCalledWith(50)
+      expect(progressMock).toHaveBeenCalledWith(90)
+      expect(progressMock).toHaveBeenCalledTimes(3)
     })
 
     test('should return undefined on operation success', async () => {
@@ -193,17 +209,18 @@ describe('uploadFile', () => {
 
       const sut = new DirectUploadClient(filesRepositoryStub, 1)
 
-      const actual = await sut.uploadFile(1, testFile)
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      const actual = await sut.uploadFile(1, testFile, progressMock, abortController)
 
       expect(actual).toEqual(undefined)
-      expect(axios.put).toHaveBeenCalledWith(
-        `${ApiConfig.dataverseApiUrl}/datasets/mpupload/testComplete`,
-        { '1': 'test', '2': 'test' },
-        {
-          headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': 'dummyApiKey' },
-          params: {}
-        }
-      )
+
+      expect(progressMock).toHaveBeenCalledWith(10)
+      expect(progressMock).toHaveBeenCalledWith(50)
+      expect(progressMock).toHaveBeenCalledWith(90)
+      expect(progressMock).toHaveBeenCalledWith(100)
+      expect(progressMock).toHaveBeenCalledTimes(4)
     })
   })
 })

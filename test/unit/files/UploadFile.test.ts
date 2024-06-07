@@ -16,7 +16,10 @@ describe('execute', () => {
 
     const sut = new UploadFile(directUploadClientStub)
 
-    const actual = await sut.execute(1, testFile)
+    const progressMock = jest.fn()
+    const abortController = new AbortController()
+
+    const actual = await sut.execute(1, testFile, progressMock, abortController)
 
     expect(actual).toEqual(undefined)
   })
@@ -29,6 +32,11 @@ describe('execute', () => {
 
     const sut = new UploadFile(directUploadClientStub)
 
-    await expect(sut.execute(1, testFile)).rejects.toThrow(DirectUploadClientError)
+    const progressMock = jest.fn()
+    const abortController = new AbortController()
+
+    await expect(sut.execute(1, testFile, progressMock, abortController)).rejects.toThrow(
+      DirectUploadClientError
+    )
   })
 })

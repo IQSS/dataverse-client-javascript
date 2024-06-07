@@ -13,7 +13,7 @@ export const buildRequestConfig = (
     headers: {
       'Content-Type': contentType
     },
-    ...(abortSignal && { signal: abortSignal }),
+    ...(abortSignal && { signal: abortSignal })
   }
   if (!authRequired) {
     return requestConfig

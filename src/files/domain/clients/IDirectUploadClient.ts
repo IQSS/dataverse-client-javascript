@@ -6,6 +6,6 @@ export interface IDirectUploadClient {
     file: File,
     progress: (now: number) => void,
     abortController: AbortController,
-    destination?: FileUploadDestination,
+    destination?: FileUploadDestination
   ): Promise<void>
 }

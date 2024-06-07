@@ -59,7 +59,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     datasetId: number | string,
     file: File,
     destination: FileUploadDestination,
-    abortController: AbortController,
+    abortController: AbortController
   ): Promise<void> {
     try {
       const arrayBuffer = await file.arrayBuffer()
@@ -74,7 +74,7 @@ export class DirectUploadClient implements IDirectUploadClient {
       })
     } catch (error) {
       if (axios.isCancel(error)) {
-        throw new FileUploadCancelError(file.name, datasetId);
+        throw new FileUploadCancelError(file.name, datasetId)
       }
       throw new FileUploadError(file.name, datasetId, error.message)
     }
@@ -85,14 +85,14 @@ export class DirectUploadClient implements IDirectUploadClient {
     file: File,
     destination: FileUploadDestination,
     progress: (now: number) => void,
-    abortController: AbortController,
+    abortController: AbortController
   ): Promise<void> {
     const partMaxSize = destination.partSize
     const eTags: Record<number, string> = {}
     const maxRetries = this.maxMultipartRetries
     const limitConcurrency = pLimit(1)
 
-    const progressPartSize = 90 / destination.urls.length
+    const progressPartSize = 80 / destination.urls.length
 
     const uploadPart = async (
       destinationUrl: string,
@@ -120,7 +120,7 @@ export class DirectUploadClient implements IDirectUploadClient {
       } catch (error) {
         if (axios.isCancel(error)) {
           await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint)
-          throw new FileUploadCancelError(file.name, datasetId);
+          throw new FileUploadCancelError(file.name, datasetId)
         }
         if (retries < maxRetries) {
           const backoffDelay = Math.pow(2, retries) * 1000
@@ -169,15 +169,24 @@ export class DirectUploadClient implements IDirectUploadClient {
     datasetId: number | string,
     destination: FileUploadDestination,
     eTags: Record<string, string>,
-    abortController: AbortController,
+    abortController: AbortController
   ): Promise<void> {
     return await axios
-      .put(buildRequestUrl(destination.completeEndpoint), eTags, buildRequestConfig(true, {}, ApiConstants.CONTENT_TYPE_APPLICATION_JSON, abortController.signal))
+      .put(
+        buildRequestUrl(destination.completeEndpoint),
+        eTags,
+        buildRequestConfig(
+          true,
+          {},
+          ApiConstants.CONTENT_TYPE_APPLICATION_JSON,
+          abortController.signal
+        )
+      )
       .then(() => undefined)
       .catch(async (error) => {
         if (axios.isCancel(error)) {
           await this.abortMultipartUpload(fileName, datasetId, destination.abortEndpoint)
-          throw new FileUploadCancelError(fileName, datasetId);
+          throw new FileUploadCancelError(fileName, datasetId)
         }
         throw new MultipartCompletionError(fileName, datasetId, error.message)
       })
