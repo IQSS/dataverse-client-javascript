@@ -801,7 +801,7 @@ getDatasetFiles
 /* ... */
 ```
 
-### File write use cases
+### Files write use cases
 
 #### File Uploading Use Cases
 
