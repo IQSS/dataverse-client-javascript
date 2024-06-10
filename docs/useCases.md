@@ -839,7 +839,7 @@ _See [use case](../src/files/domain/useCases/UploadFile.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `file` parameter is a subclass of Blob (Binary Large Object) that represents a file from the user's filesystem.
+The `file` parameter is a subclass of Blob (Binary Large Object) that represents a file.
 
 The `progress` parameter represents a callback function that allows the caller to monitor the progress of the file uploading operation.
 
@@ -871,7 +871,7 @@ _See [use case](../src/files/domain/useCases/AddUploadedFileToDataset.ts) implem
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `file` parameter is a subclass of Blob (Binary Large Object) that represents a file from the caller's filesystem.
+The `file` parameter is a subclass of Blob (Binary Large Object) that represents a file.
 
 The `storageId` parameter represents the storage identifier obtained after a successful call to the UploadFile use case.
 
