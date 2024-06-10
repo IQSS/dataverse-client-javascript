@@ -36,6 +36,8 @@ The different use cases currently available in the package are classified below,
     - [Get the size of Downloading all the files of a Dataset Version](#get-the-size-of-downloading-all-the-files-of-a-dataset-version)
     - [Get User Permissions on a File](#get-user-permissions-on-a-file)
     - [List Files in a Dataset](#list-files-in-a-dataset)
+  - [Files write use cases](#files-write-use-cases)
+    - [File Uploading Use Cases](#file-uploading-use-cases)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get Metadata Block By Name](#get-metadata-block-by-name)
@@ -798,6 +800,102 @@ getDatasetFiles
 
 /* ... */
 ```
+
+### File write use cases
+
+#### File Uploading Use Cases
+
+These use cases are designed to facilitate the uploading of files to a remote S3 storage and subsequently adding them to a dataset. This process involves two main steps / use cases:
+
+1. Uploading a file to remote S3 storage and obtaining a storage identifier.
+2. Adding the uploaded file to the dataset using the obtained storage identifier.
+
+This use case flow is entirely based on the Direct Upload API as described in the Dataverse documentation: https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html
+
+##### Upload File
+
+This use case uploads a file to a remote S3 storage and returns the storage identifier associated with the file.
+
+###### Example call:
+
+```typescript
+import { uploadFile } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId: number | string = 123
+const file = new File(['content'], 'example.txt', { type: 'text/plain' })
+const progressCallback = (progress) => console.log(`Upload progress: ${progress}%`)
+const abortController = new AbortController()
+
+uploadFile.execute(datasetId, file, progressCallback, abortController).then((storageId) => {
+  console.log(`File uploaded successfully with storage ID: ${storageId}`)
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/UploadFile.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `file` parameter is a subclass of Blob (Binary Large Object) that represents a file from the user's filesystem.
+
+The `progress` parameter represents a callback function that allows the caller to monitor the progress of the file uploading operation.
+
+The `abortController` is a built-in mechanism in modern web browsers that allows the cancellation of asynchronous operations. It works in conjunction with an associated AbortSignal, which will be passed to the file uploading API calls to monitor whether the operation should be aborted, if the caller decides to cancel the operation midway.
+
+##### Add Uploaded File to the Dataset
+
+This use case involves adding a file that has been previously uploaded to remote storage to the dataset.
+
+###### Example call:
+
+```typescript
+import { addUploadedFileToDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId: number | string = 123
+const file: File = new File(['content'], 'example.txt', { type: 'text/plain' })
+const storageId: string = 'some-storage-identifier'
+
+addUploadedFileToDataset.execute(datasetId, file, storageId).then(() => {
+  console.log('File added to the dataset successfully.')
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/AddUploadedFileToDataset.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `file` parameter is a subclass of Blob (Binary Large Object) that represents a file from the caller's filesystem.
+
+The `storageId` parameter represents the storage identifier obtained after a successful call to the UploadFile use case.
+
+##### Error handling:
+
+These use cases involve multiple steps, each associated with different API calls, which introduce various points of potential failure. Therefore, different error types have been implemented according to their nature, all of which extend [DirectUploadClientError](../src/files/domain/clients/DirectUploadClientError.ts).
+
+The following errors might arise from the `UploadFile` use case:
+
+- UrlGenerationError: This error indicates that the destination URLs for file upload could not be generated successfully.
+
+- FilePartUploadError: This error indicates that the retry limit has been exceeded for uploading one of the parts of a multipart file. If this error is received, it is because the abort endpoint has been successfully called.
+
+- MultipartAbortError: This error indicates that it was not possible to call the abort endpoint after an error occurred during the upload of one of the parts of a multipart file.
+
+- MultipartCompletionError: This error indicates that the multipart upload could not be completed due to an error encountered when calling the completion endpoint.
+
+- FileUploadError: This error indicates that there has been an error while uploading a single-part file.
+
+- FileUploadCancelError: This error is received when the caller cancels the operation through the abort controller.
+
+The following error might arise from the `AddUploadedFileToDataset` use case:
+
+- AddUploadedFileToDatasetError: This error indicates that there was an error while adding the uploaded file to the dataset.
 
 ## Metadata Blocks
 
