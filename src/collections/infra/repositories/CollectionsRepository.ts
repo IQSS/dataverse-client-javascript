@@ -19,8 +19,25 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
-  public async createCollection(collectionDTO: CollectionDTO): Promise<void> {
-    console.log(collectionDTO.alias)
-    // TODO
+  public async createCollection(
+    collectionDTO: CollectionDTO,
+    parentCollectionId = 'root'
+  ): Promise<void> {
+    const dataverseContacts = collectionDTO.contacts.map((contact) => ({
+      contactEmail: contact
+    }))
+
+    const requestBody = {
+      alias: collectionDTO.alias,
+      name: collectionDTO.name,
+      dataverseContacts: dataverseContacts,
+      dataverseType: collectionDTO.type.toString()
+    }
+
+    return this.doPost(`/${this.collectionsResourceName}/${parentCollectionId}`, requestBody)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
   }
 }

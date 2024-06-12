@@ -3,5 +3,5 @@ import { Collection } from '../models/Collection'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
-  createCollection(collectionDTO: CollectionDTO): Promise<void>
+  createCollection(collectionDTO: CollectionDTO, parentCollectionId: string): Promise<void>
 }

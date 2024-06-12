@@ -12,7 +12,7 @@ export class CreateCollection implements UseCase<void> {
   /**
    * TODO
    */
-  async execute(newCollection: CollectionDTO): Promise<void> {
-    await this.collectionsRepository.createCollection(newCollection)
+  async execute(newCollection: CollectionDTO, parentCollectionId = 'root'): Promise<void> {
+    await this.collectionsRepository.createCollection(newCollection, parentCollectionId)
   }
 }

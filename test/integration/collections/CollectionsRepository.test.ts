@@ -4,6 +4,7 @@ import { ReadError } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import {
+  createCollectionDTO,
   createCollectionViaApi,
   deleteCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
@@ -83,6 +84,13 @@ describe('CollectionsRepository', () => {
           expectedError
         )
       })
+    })
+  })
+
+  describe('createCollection', () => {
+    test('should create collection in root when no parent collection is set', async () => {
+      const newCollectionDTO = createCollectionDTO()
+      await sut.createCollection(newCollectionDTO)
     })
   })
 })
