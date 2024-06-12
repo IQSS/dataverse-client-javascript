@@ -90,7 +90,8 @@ describe('CollectionsRepository', () => {
   describe('createCollection', () => {
     test('should create collection in root when no parent collection is set', async () => {
       const newCollectionDTO = createCollectionDTO()
-      await sut.createCollection(newCollectionDTO)
+      const actual = await sut.createCollection(newCollectionDTO)
+      expect(typeof actual).toBe('number')
     })
   })
 })

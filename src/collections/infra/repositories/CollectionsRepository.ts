@@ -22,7 +22,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   public async createCollection(
     collectionDTO: CollectionDTO,
     parentCollectionId = 'root'
-  ): Promise<void> {
+  ): Promise<number> {
     const dataverseContacts = collectionDTO.contacts.map((contact) => ({
       contactEmail: contact
     }))
@@ -35,7 +35,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     }
 
     return this.doPost(`/${this.collectionsResourceName}/${parentCollectionId}`, requestBody)
-      .then(() => undefined)
+      .then((response) => response.data.data.id)
       .catch((error) => {
         throw error
       })
