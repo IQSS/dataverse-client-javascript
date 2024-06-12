@@ -5,11 +5,13 @@ import {
   DataverseApiAuthMechanism
 } from '../../../src/core/infra/repositories/ApiConfig'
 import {
+  createCollectionDTO,
   createCollectionModel,
-  createCollectionPayload
+  createCollectionPayload,
+  createNewCollectionRequestPayload
 } from '../../testHelpers/collections/collectionHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { ReadError } from '../../../src'
+import { ReadError, WriteError } from '../../../src'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 
 describe('CollectionsRepository', () => {
@@ -28,7 +30,10 @@ describe('CollectionsRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       TestConstants.TEST_DUMMY_API_KEY
     )
+    
+    jest.clearAllMocks()
   })
+
   describe('getCollection', () => {
     const expectedRequestConfigApiKey = {
       params: {
@@ -106,6 +111,65 @@ describe('CollectionsRepository', () => {
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(error).toBeInstanceOf(Error)
       })
+    })
+  })
+
+  describe('createCollection', () => {
+    const testNewCollection = createCollectionDTO()
+    
+    const testCreatedCollectionId = 1
+    const testCreateCollectionResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          id: testCreatedCollectionId,
+        }
+      }
+    }
+
+    const expectedNewCollectionRequestPayloadJson = JSON.stringify(createNewCollectionRequestPayload())
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/root`
+
+    test('should call the API with a correct request payload', async () => {
+      jest.spyOn(axios, 'post').mockResolvedValue(testCreateCollectionResponse)
+
+      // API Key auth
+      let actual = await sut.createCollection(testNewCollection)
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewCollectionRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toStrictEqual(testCreatedCollectionId)
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.createCollection(testNewCollection)
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewCollectionRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+      )
+      expect(actual).toStrictEqual(testCreatedCollectionId)
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error = undefined as unknown as WriteError
+      await sut
+        .createCollection(testNewCollection)
+        .catch((e) => (error = e))
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedNewCollectionRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(error).toBeInstanceOf(Error)
     })
   })
 })

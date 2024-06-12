@@ -4,6 +4,7 @@ import { CollectionPayload } from '../../../src/collections/infra/repositories/t
 import { TestConstants } from '../TestConstants'
 import axios from 'axios'
 import { CollectionDTO, CollectionType } from '../../../src/collections/domain/dtos/CollectionDTO'
+import { NewCollectionRequestPayload } from '../../../src/collections/infra/repositories/CollectionsRepository'
 
 const COLLECTION_ID = 11111
 const COLLECTION_IS_RELEASED = 'true'
@@ -108,5 +109,18 @@ export const createCollectionDTO = (alias: string = 'test-collection'): Collecti
     name: 'Test Collection',
     contacts: ['dataverse@test.com'],
     type: CollectionType.DEPARTMENT
+  }
+}
+
+export const createNewCollectionRequestPayload = (): NewCollectionRequestPayload => {
+  return {
+    alias: 'test-collection',
+    name: 'Test Collection',
+    dataverseContacts: [
+      {
+        contactEmail: 'dataverse@test.com'
+      }
+    ],
+    dataverseType: 'DEPARTMENT'
   }
 }
