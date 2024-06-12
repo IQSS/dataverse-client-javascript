@@ -1,6 +1,6 @@
 import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { ReadError } from '../../../src'
+import { ReadError, WriteError } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import {
@@ -88,10 +88,32 @@ describe('CollectionsRepository', () => {
   })
 
   describe('createCollection', () => {
+    const testCreateCollectionAlias1 = 'createCollection-test-1'
+    const testCreateCollectionAlias2 = 'createCollection-test-2'
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(testCreateCollectionAlias1)
+      await deleteCollectionViaApi(testCreateCollectionAlias2)
+    })
+
     test('should create collection in root when no parent collection is set', async () => {
-      const newCollectionDTO = createCollectionDTO()
-      const actual = await sut.createCollection(newCollectionDTO)
+      const actual = await sut.createCollection(createCollectionDTO(testCreateCollectionAlias1))
       expect(typeof actual).toBe('number')
+    })
+
+    test('should create collection in parent collection when parent collection is set', async () => {
+      const actual = await sut.createCollection(createCollectionDTO(testCreateCollectionAlias2), testCollectionId)
+      expect(typeof actual).toBe('number')
+    })
+
+    test('should return error when parent collection does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
+      )
+      const testCreateCollectionAlias3 = 'createCollection-test-3'
+      await expect(sut.createCollection(createCollectionDTO(testCreateCollectionAlias3), TestConstants.TEST_DUMMY_COLLECTION_ID)).rejects.toThrow(
+        expectedError
+      )
     })
   })
 })

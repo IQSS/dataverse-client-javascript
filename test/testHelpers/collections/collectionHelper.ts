@@ -102,9 +102,9 @@ export async function setStorageDriverViaApi(
   }
 }
 
-export const createCollectionDTO = (): CollectionDTO => {
+export const createCollectionDTO = (alias: string = 'test-collection'): CollectionDTO => {
   return {
-    alias: 'test-collection',
+    alias: alias,
     name: 'Test Collection',
     contacts: ['dataverse@test.com'],
     type: CollectionType.DEPARTMENT

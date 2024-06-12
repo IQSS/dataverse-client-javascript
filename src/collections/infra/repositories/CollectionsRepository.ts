@@ -21,7 +21,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async createCollection(
     collectionDTO: CollectionDTO,
-    parentCollectionId = 'root'
+    parentCollectionId: number | string = ROOT_COLLECTION_ALIAS
   ): Promise<number> {
     const dataverseContacts = collectionDTO.contacts.map((contact) => ({
       contactEmail: contact
