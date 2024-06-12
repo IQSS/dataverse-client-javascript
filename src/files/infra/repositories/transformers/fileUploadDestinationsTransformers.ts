@@ -20,7 +20,7 @@ export const transformUploadDestinationsResponseToUploadDestination = (
 ): FileUploadDestination => {
   const fileUploadDestinationsPayload = response.data.data
 
-  if (fileUploadDestinationsPayload.url != undefined) {
+  if (fileUploadDestinationsPayload.url !== undefined) {
     return {
       urls: [fileUploadDestinationsPayload.url],
       partSize: fileUploadDestinationsPayload.partSize,

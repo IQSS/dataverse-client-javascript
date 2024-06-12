@@ -26,6 +26,8 @@ export class DirectUploadClient implements IDirectUploadClient {
   private readonly progressAfterUrlGeneration: number = 10
   private readonly progressAfterFileUpload: number = 100
 
+  private readonly fileUploadTimeoutMs: number = 60_000
+
   constructor(filesRepository: IFilesRepository, maxMultipartRetries = 5) {
     this.filesRepository = filesRepository
     this.maxMultipartRetries = maxMultipartRetries
@@ -38,7 +40,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     abortController: AbortController,
     destination?: FileUploadDestination
   ): Promise<string> {
-    if (destination == undefined) {
+    if (destination === undefined) {
       destination = await this.filesRepository
         .getFileUploadDestination(datasetId, file)
         .catch((error) => {
@@ -71,7 +73,7 @@ export class DirectUploadClient implements IDirectUploadClient {
           'Content-Length': file.size.toString(),
           'x-amz-tagging': 'dv-state=temp'
         },
-        timeout: 60000,
+        timeout: this.fileUploadTimeoutMs,
         signal: abortController.signal
       })
     } catch (error) {
@@ -113,12 +115,12 @@ export class DirectUploadClient implements IDirectUploadClient {
           },
           maxBodyLength: Infinity,
           maxContentLength: Infinity,
-          timeout: 60000,
+          timeout: this.fileUploadTimeoutMs,
           signal: abortController.signal
         })
         const eTag = response.headers['etag'].replace(/"/g, '')
         eTags[`${index + 1}`] = eTag
-        progress(this.progressAfterUrlGeneration + progressPartSize * (index + 1))
+        progress(Math.round(this.progressAfterUrlGeneration + progressPartSize * (index + 1)))
       } catch (error) {
         if (axios.isCancel(error)) {
           await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint)
