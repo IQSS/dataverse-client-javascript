@@ -2,6 +2,7 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRepository'
 import { transformCollectionResponseToCollection } from './transformers/collectionTransformers'
 import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collection'
+import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
   private readonly collectionsResourceName: string = 'dataverses'
@@ -16,5 +17,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       .catch((error) => {
         throw error
       })
+  }
+
+  public async createCollection(collectionDTO: CollectionDTO): Promise<void> {
+    console.log(collectionDTO.alias)
+    // TODO
   }
 }

@@ -11,6 +11,8 @@ The different use cases currently available in the package are classified below,
 - [Collections](#Collections)
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
+  - [Collections write use cases](#collections-write-use-cases)
+    - [Create a Collection](#create-a-collection)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)

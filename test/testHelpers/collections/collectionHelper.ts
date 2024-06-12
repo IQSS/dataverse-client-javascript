@@ -3,6 +3,7 @@ import { DvObjectType } from '../../../src'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { TestConstants } from '../TestConstants'
 import axios from 'axios'
+import { CollectionDTO, CollectionType } from '../../../src/collections/domain/dtos/CollectionDTO'
 
 const COLLECTION_ID = 11111
 const COLLECTION_IS_RELEASED = 'true'
@@ -98,5 +99,14 @@ export async function setStorageDriverViaApi(
   } catch (error) {
     console.log(error)
     throw new Error(`Error while setting storage driver for collection ${collectionAlias}`)
+  }
+}
+
+export const createCollectionDTO = (): CollectionDTO => {
+  return {
+    alias: 'test-collection',
+    name: 'Test Collection',
+    contacts: ['dataverse@test.com'],
+    type: CollectionType.DEPARTMENT
   }
 }
