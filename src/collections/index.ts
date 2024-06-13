@@ -10,3 +10,4 @@ const createCollection = new CreateCollection(collectionsRepository)
 
 export { getCollection, createCollection }
 export { Collection } from './domain/models/Collection'
+export { CollectionDTO } from './domain/dtos/CollectionDTO'
