@@ -20,7 +20,7 @@ export class UploadFile implements UseCase<string> {
    * @param {function(number): void} [progress] - A callback function to monitor the upload progress, receiving the current progress as a number.
    * @param {AbortController} [abortController] - An AbortController to manage and abort the upload process if necessary.
    * @returns {Promise<string>} A promise that resolves to the storage identifier of the uploaded file.
-   *
+   * @throws {DirectUploadClientError} - If there are errors while performing the operation.
    */
   async execute(
     datasetId: number | string,
