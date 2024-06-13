@@ -103,7 +103,7 @@ export async function setStorageDriverViaApi(
   }
 }
 
-export const createCollectionDTO = (alias: string = 'test-collection'): CollectionDTO => {
+export const createCollectionDTO = (alias = 'test-collection'): CollectionDTO => {
   return {
     alias: alias,
     name: 'Test Collection',

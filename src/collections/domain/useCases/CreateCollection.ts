@@ -13,7 +13,10 @@ export class CreateCollection implements UseCase<number> {
   /**
    * TODO
    */
-  async execute(newCollection: CollectionDTO, parentCollectionId: number | string = ROOT_COLLECTION_ALIAS): Promise<number> {
+  async execute(
+    newCollection: CollectionDTO,
+    parentCollectionId: number | string = ROOT_COLLECTION_ALIAS
+  ): Promise<number> {
     return await this.collectionsRepository.createCollection(newCollection, parentCollectionId)
   }
 }

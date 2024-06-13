@@ -30,7 +30,7 @@ describe('CollectionsRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       TestConstants.TEST_DUMMY_API_KEY
     )
-    
+
     jest.clearAllMocks()
   })
 
@@ -116,18 +116,20 @@ describe('CollectionsRepository', () => {
 
   describe('createCollection', () => {
     const testNewCollection = createCollectionDTO()
-    
+
     const testCreatedCollectionId = 1
     const testCreateCollectionResponse = {
       data: {
         status: 'OK',
         data: {
-          id: testCreatedCollectionId,
+          id: testCreatedCollectionId
         }
       }
     }
 
-    const expectedNewCollectionRequestPayloadJson = JSON.stringify(createNewCollectionRequestPayload())
+    const expectedNewCollectionRequestPayloadJson = JSON.stringify(
+      createNewCollectionRequestPayload()
+    )
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/root`
 
     test('should call the API with a correct request payload', async () => {
@@ -160,9 +162,7 @@ describe('CollectionsRepository', () => {
       jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
       let error = undefined as unknown as WriteError
-      await sut
-        .createCollection(testNewCollection)
-        .catch((e) => (error = e))
+      await sut.createCollection(testNewCollection).catch((e) => (error = e))
 
       expect(axios.post).toHaveBeenCalledWith(
         expectedApiEndpoint,

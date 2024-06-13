@@ -22,7 +22,7 @@ import {
 } from '../../testHelpers/files/filesHelper'
 import { FileUploadCancelError } from '../../../src/files/infra/clients/errors/FileUploadCancelError'
 
-describe.skip('DirectUploadClient', () => {
+describe('DirectUploadClient', () => {
   const testCollectionAlias = 'directUploadTestCollection'
   let testDataset1Ids: CreatedDatasetIdentifiers
   let testDataset2Ids: CreatedDatasetIdentifiers

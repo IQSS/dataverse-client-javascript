@@ -102,7 +102,10 @@ describe('CollectionsRepository', () => {
     })
 
     test('should create collection in parent collection when parent collection is set', async () => {
-      const actual = await sut.createCollection(createCollectionDTO(testCreateCollectionAlias2), testCollectionId)
+      const actual = await sut.createCollection(
+        createCollectionDTO(testCreateCollectionAlias2),
+        testCollectionId
+      )
       expect(typeof actual).toBe('number')
     })
 
@@ -111,9 +114,12 @@ describe('CollectionsRepository', () => {
         `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
       )
       const testCreateCollectionAlias3 = 'createCollection-test-3'
-      await expect(sut.createCollection(createCollectionDTO(testCreateCollectionAlias3), TestConstants.TEST_DUMMY_COLLECTION_ID)).rejects.toThrow(
-        expectedError
-      )
+      await expect(
+        sut.createCollection(
+          createCollectionDTO(testCreateCollectionAlias3),
+          TestConstants.TEST_DUMMY_COLLECTION_ID
+        )
+      ).rejects.toThrow(expectedError)
     })
   })
 })

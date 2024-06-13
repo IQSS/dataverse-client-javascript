@@ -5,9 +5,9 @@ import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collectio
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
 
 export interface NewCollectionRequestPayload {
-  alias: string,
-  name: string,
-  dataverseContacts: NewCollectionContactRequestPayload[],
+  alias: string
+  name: string
+  dataverseContacts: NewCollectionContactRequestPayload[]
   dataverseType: string
 }
 
@@ -34,9 +34,11 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionDTO: CollectionDTO,
     parentCollectionId: number | string = ROOT_COLLECTION_ALIAS
   ): Promise<number> {
-    const dataverseContacts: NewCollectionContactRequestPayload[] = collectionDTO.contacts.map((contact) => ({
-      contactEmail: contact
-    }))
+    const dataverseContacts: NewCollectionContactRequestPayload[] = collectionDTO.contacts.map(
+      (contact) => ({
+        contactEmail: contact
+      })
+    )
 
     const requestBody: NewCollectionRequestPayload = {
       alias: collectionDTO.alias,
