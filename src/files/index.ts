@@ -41,7 +41,7 @@ export {
   addUploadedFileToDataset
 }
 
-export { File, FileEmbargo, FileChecksum } from './domain/models/File'
+export { FileModel as File, FileEmbargo, FileChecksum } from './domain/models/FileModel'
 export { FileUserPermissions } from './domain/models/FileUserPermissions'
 export {
   FileSearchCriteria,

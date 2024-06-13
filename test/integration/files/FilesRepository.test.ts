@@ -22,7 +22,7 @@ import {
   CreatedDatasetIdentifiers,
   createDataset
 } from '../../../src/datasets'
-import { File as FileModel } from '../../../src/files/domain/models/File'
+import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
 import { FileDownloadSizeMode } from '../../../src'
 import {

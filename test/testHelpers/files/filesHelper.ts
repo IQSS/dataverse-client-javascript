@@ -1,4 +1,4 @@
-import { File as FileModel } from '../../../src/files/domain/models/File'
+import { FileModel as FileModel } from '../../../src/files/domain/models/FileModel'
 import { File, Blob } from '@web-std/file'
 import axios, { AxiosResponse } from 'axios'
 import { TestConstants } from '../TestConstants'

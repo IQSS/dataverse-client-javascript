@@ -459,7 +459,7 @@ The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/d
 
 #### Get a File
 
-Returns a [File](../src/files/domain/models/File.ts) instance, given the search parameters to identify it.
+Returns a [FileModel](../src/files/domain/models/FileModel.ts) instance, given the search parameters to identify it.
 
 ##### Example call:
 
@@ -471,7 +471,7 @@ import { getFile } from '@iqss/dataverse-client-javascript'
 const fileId = 2
 const datasetVersionId = '1.0'
 
-getFile.execute(fileId, datasetVersionId).then((file: File) => {
+getFile.execute(fileId, datasetVersionId).then((file: FileModel) => {
   /* ... */
 })
 
@@ -486,7 +486,7 @@ The optional `datasetVersionId` parameter can correspond to a numeric version id
 
 #### Get a File and its Dataset
 
-Returns a tuple of [File](../src/files/domain/models/File.ts) and [Dataset](../src/datasets/domain/models/Dataset.ts) objects (`[File, Dataset]`), given the search parameters to identify the file.
+Returns a tuple of [FileModel](../src/files/domain/models/FileModel.ts) and [Dataset](../src/datasets/domain/models/Dataset.ts) objects (`[FileModel, Dataset]`), given the search parameters to identify the file.
 
 The returned dataset object corresponds to the dataset version associated with the requested file.
 
@@ -500,7 +500,7 @@ import { getFileAndDataset } from '@iqss/dataverse-client-javascript'
 const fileId = 2
 const datasetVersionId = '1.0'
 
-getFileAndDataset.execute(fileId, datasetVersionId).then((fileAndDataset: [File, Dataset]) => {
+getFileAndDataset.execute(fileId, datasetVersionId).then((fileAndDataset: [FileModel, Dataset]) => {
   /* ... */
 })
 
