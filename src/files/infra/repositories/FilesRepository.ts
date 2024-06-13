@@ -1,6 +1,6 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository'
-import { File as FileModel } from '../../domain/models/File'
+import { FileModel as FileModel } from '../../domain/models/FileModel'
 import {
   transformFileResponseToFile,
   transformFilesResponseToFilesSubset

@@ -1,6 +1,6 @@
 import { DvObjectOwnerNode } from '../../../core/domain/models/DvObjectOwnerNode'
 
-export interface File {
+export interface FileModel {
   id: number
   persistentId: string
   name: string

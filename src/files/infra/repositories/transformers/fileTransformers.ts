@@ -1,4 +1,4 @@
-import { File, FileEmbargo, FileChecksum } from '../../../domain/models/File'
+import { FileModel, FileEmbargo, FileChecksum } from '../../../domain/models/FileModel'
 import { AxiosResponse } from 'axios'
 import { FilesSubset } from '../../../domain/models/FilesSubset'
 import { Dataset } from '../../../../datasets'
@@ -8,7 +8,7 @@ import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories
 
 export const transformFilesResponseToFilesSubset = (response: AxiosResponse): FilesSubset => {
   const filesPayload = response.data.data
-  const files: File[] = []
+  const files: FileModel[] = []
   filesPayload.forEach(function (filePayload: FilePayload) {
     files.push(transformFilePayloadToFile(filePayload))
   })
@@ -22,7 +22,7 @@ export const transformFilesResponseToFilesSubset = (response: AxiosResponse): Fi
 export const transformFileResponseToFile = (
   response: AxiosResponse,
   returnDatasetVersion: boolean
-): File | [File, Dataset] => {
+): FileModel | [FileModel, Dataset] => {
   const filePayload = response.data.data
   if (returnDatasetVersion) {
     return [
@@ -33,7 +33,7 @@ export const transformFileResponseToFile = (
   return transformFilePayloadToFile(filePayload)
 }
 
-const transformFilePayloadToFile = (filePayload: FilePayload): File => {
+const transformFilePayloadToFile = (filePayload: FilePayload): FileModel => {
   return {
     id: filePayload.dataFile.id,
     persistentId: filePayload.dataFile.persistentId,
