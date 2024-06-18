@@ -3,6 +3,8 @@ export interface CollectionDTO {
   name: string
   contacts: string[]
   type: CollectionType
+  affiliation?: string
+  description?: string
 }
 
 export enum CollectionType {
