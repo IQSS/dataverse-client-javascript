@@ -3,8 +3,6 @@ import { DvObjectType } from '../../../src'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { TestConstants } from '../TestConstants'
 import axios from 'axios'
-import collectionJson1 from './test-collection-1.json'
-import collectionJson2 from './test-collection-2.json'
 
 const COLLECTION_ID = 11111
 const COLLECTION_IS_RELEASED = 'true'
@@ -50,9 +48,21 @@ export async function createCollectionViaApi(collectionAlias: string): Promise<C
     return await axios
       .post(
         `${TestConstants.TEST_API_URL}/dataverses/root`,
-        collectionAlias == TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-          ? collectionJson1
-          : collectionJson2,
+        JSON.stringify({
+          alias: collectionAlias,
+          name: 'Scientific Research',
+          dataverseContacts: [
+            {
+              contactEmail: 'pi@example.edu'
+            },
+            {
+              contactEmail: 'student@example.edu'
+            }
+          ],
+          affiliation: 'Scientific Research University',
+          description: 'We do all the science.',
+          dataverseType: 'LABORATORY'
+        }),
         DATAVERSE_API_REQUEST_HEADERS
       )
       .then((response) => response.data.data)
@@ -68,6 +78,25 @@ export async function deleteCollectionViaApi(collectionAlias: string): Promise<v
       DATAVERSE_API_REQUEST_HEADERS
     )
   } catch (error) {
+    console.log(error)
     throw new Error(`Error while deleting test collection ${collectionAlias}`)
+  }
+}
+
+export async function setStorageDriverViaApi(
+  collectionAlias: string,
+  driverLabel: string
+): Promise<void> {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/admin/dataverse/${collectionAlias}/storageDriver`,
+      driverLabel,
+      {
+        headers: { 'Content-Type': 'text/plain', 'X-Dataverse-Key': process.env.TEST_API_KEY }
+      }
+    )
+  } catch (error) {
+    console.log(error)
+    throw new Error(`Error while setting storage driver for collection ${collectionAlias}`)
   }
 }

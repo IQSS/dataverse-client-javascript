@@ -33,6 +33,8 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 
 describe('DatasetsRepository', () => {
+  const testCollectionAlias = 'datasetsRepositoryTestCollection'
+
   const sut: DatasetsRepository = new DatasetsRepository()
   const nonExistentTestDatasetId = 100
 
@@ -68,21 +70,18 @@ describe('DatasetsRepository', () => {
     })
 
     const createCollection = async () => {
-      await createCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
+      await createCollectionViaApi(testCollectionAlias)
     }
 
     const createDatasets = async () => {
       for (let i = 0; i < expectedTotalDatasetCount; i++) {
         createdDatasetIds[i] = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
-          TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+          testCollectionAlias
         )
       }
 
-      await waitForDatasetsIndexedInSolr(
-        expectedTotalDatasetCount,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
+      await waitForDatasetsIndexedInSolr(expectedTotalDatasetCount, testCollectionAlias)
     }
 
     const deleteDatasets = async () => {
@@ -92,14 +91,14 @@ describe('DatasetsRepository', () => {
     }
 
     const deleteCollection = async () => {
-      await deleteCollectionViaApi(TestConstants.TEST_CREATED_COLLECTION_ALIAS_1)
+      await deleteCollectionViaApi(testCollectionAlias)
     }
 
     test('should return all dataset previews when no pagination params are defined', async () => {
       const actual: DatasetPreviewSubset = await sut.getAllDatasetPreviews(
         undefined,
         undefined,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
+        testCollectionAlias
       )
       expect(actual.datasetPreviews.length).toEqual(expectedTotalDatasetCount)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[3].persistentId)
@@ -107,44 +106,28 @@ describe('DatasetsRepository', () => {
     })
 
     test('should return first dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(
-        testPageLimit,
-        0,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 0, testCollectionAlias)
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[3].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return second dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(
-        testPageLimit,
-        1,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 1, testCollectionAlias)
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[2].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return third dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(
-        testPageLimit,
-        2,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 2, testCollectionAlias)
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[1].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
     })
 
     test('should return fourth dataset preview page', async () => {
-      const actual = await sut.getAllDatasetPreviews(
-        testPageLimit,
-        3,
-        TestConstants.TEST_CREATED_COLLECTION_ALIAS_1
-      )
+      const actual = await sut.getAllDatasetPreviews(testPageLimit, 3, testCollectionAlias)
       expect(actual.datasetPreviews.length).toEqual(1)
       expect(actual.datasetPreviews[0].persistentId).toMatch(createdDatasetIds[0].persistentId)
       expect(actual.totalDatasetCount).toEqual(expectedTotalDatasetCount)
@@ -256,7 +239,7 @@ describe('DatasetsRepository', () => {
       test('should return error when dataset does not exist', async () => {
         const testWrongPersistentId = 'wrongPersistentId'
         const expectedError = new ReadError(
-          `[404] Dataset with Persistent ID ${testWrongPersistentId} not found.`
+          `[400] Bad dataset ID number: ${testWrongPersistentId}.`
         )
         await expect(
           sut.getDataset(testWrongPersistentId, DatasetNotNumberedVersion.LATEST, false)

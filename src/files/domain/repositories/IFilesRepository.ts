@@ -4,8 +4,10 @@ import { FileUserPermissions } from '../models/FileUserPermissions'
 import { FileSearchCriteria, FileOrderCriteria } from '../models/FileCriteria'
 import { FileCounts } from '../models/FileCounts'
 import { FileDownloadSizeMode } from '../models/FileDownloadSizeMode'
-import { File } from '../models/File'
+import { FileModel } from '../models/FileModel'
 import { Dataset } from '../../../datasets'
+import { FileUploadDestination } from '../models/FileUploadDestination'
+import { UploadedFileDTO } from '../dtos/UploadedFileDTO'
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -43,11 +45,18 @@ export interface IFilesRepository {
     fileId: number | string,
     datasetVersionId: string,
     returnDatasetVersion: boolean
-  ): Promise<File | [File, Dataset]>
+  ): Promise<FileModel | [FileModel, Dataset]>
 
   getFileCitation(
     fileId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean
   ): Promise<string>
+
+  getFileUploadDestination(datasetId: number | string, file: File): Promise<FileUploadDestination>
+
+  addUploadedFileToDataset(
+    datasetId: number | string,
+    uploadedFileDTO: UploadedFileDTO
+  ): Promise<undefined>
 }

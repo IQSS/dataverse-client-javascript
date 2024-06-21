@@ -75,7 +75,7 @@ describe('execute', () => {
   test('should throw an error when trying to publish a dataset that does not exist', async () => {
     const nonExistentTestDatasetId = 'non-existent-dataset'
     const expectedError = new WriteError(
-      `[404] Dataset with Persistent ID ${nonExistentTestDatasetId} not found.`
+      `[400] Bad dataset ID number: ${nonExistentTestDatasetId}.`
     )
 
     await expect(

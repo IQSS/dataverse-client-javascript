@@ -47,8 +47,6 @@ export class TestConstants {
   }
   static readonly TEST_DUMMY_COLLECTION_ID = 10001
   static readonly TEST_DUMMY_COLLECTION_ALIAS = 'dummyCollectionId'
-  static readonly TEST_CREATED_COLLECTION_ALIAS_1 = 'testCollection1'
-  static readonly TEST_CREATED_COLLECTION_ALIAS_2 = 'testCollection2'
   static readonly TEST_NEW_DATASET_DTO: DatasetDTO = {
     license: {
       name: 'CC0 1.0',

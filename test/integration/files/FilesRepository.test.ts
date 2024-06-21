@@ -4,7 +4,12 @@ import {
   DataverseApiAuthMechanism
 } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { registerFileViaApi, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
+import {
+  createMultipartFileBlob,
+  createSinglepartFileBlob,
+  registerFileViaApi,
+  uploadFileViaApi
+} from '../../testHelpers/files/filesHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
   FileSearchCriteria,
@@ -17,15 +22,21 @@ import {
   CreatedDatasetIdentifiers,
   createDataset
 } from '../../../src/datasets'
-import { File } from '../../../src/files/domain/models/File'
+import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
 import { FileDownloadSizeMode } from '../../../src'
 import {
   deaccessionDatasetViaApi,
   publishDatasetViaApi,
   waitForNoLocks,
-  deletePublishedDatasetViaApi
+  deletePublishedDatasetViaApi,
+  deleteUnpublishedDatasetViaApi
 } from '../../testHelpers/datasets/datasetHelper'
+import {
+  createCollectionViaApi,
+  deleteCollectionViaApi,
+  setStorageDriverViaApi
+} from '../../testHelpers/collections/collectionHelper'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -224,7 +235,7 @@ describe('FilesRepository', () => {
       test('should return error when dataset does not exist', async () => {
         const testWrongPersistentId = 'wrongPersistentId'
         const errorExpected = new ReadError(
-          `[404] Dataset with Persistent ID ${testWrongPersistentId} not found.`
+          `[400] Bad dataset ID number: ${testWrongPersistentId}.`
         )
 
         await expect(
@@ -452,28 +463,28 @@ describe('FilesRepository', () => {
   describe('getFile', () => {
     describe('by numeric id', () => {
       test('should return file when providing a valid id', async () => {
-        const actual: File = (await sut.getFile(
+        const actual: FileModel = (await sut.getFile(
           testFileId,
           DatasetNotNumberedVersion.LATEST,
           false
-        )) as File
+        )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return file draft when providing a valid id and version is draft', async () => {
-        const actual: File = (await sut.getFile(
+        const actual: FileModel = (await sut.getFile(
           testFileId,
           DatasetNotNumberedVersion.DRAFT,
           false
-        )) as File
+        )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
       })
 
       test('should return file and dataset when providing id, version, and returnDatasetVersion is true', async () => {
         const actual = (await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT, true)) as [
-          File,
+          FileModel,
           Dataset
         ]
 
@@ -495,7 +506,7 @@ describe('FilesRepository', () => {
           testFilePersistentId,
           DatasetNotNumberedVersion.LATEST,
           false
-        )) as File
+        )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
       })
@@ -505,7 +516,7 @@ describe('FilesRepository', () => {
           testFilePersistentId,
           DatasetNotNumberedVersion.DRAFT,
           false
-        )) as File
+        )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
       })
@@ -561,6 +572,77 @@ describe('FilesRepository', () => {
 
       await expect(
         sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
+      ).rejects.toThrow(errorExpected)
+    })
+  })
+
+  describe('getFileUploadDestination', () => {
+    const testCollectionAlias = 'getFileUploadDestinationsTestCollection'
+    let testDataset2Ids: CreatedDatasetIdentifiers
+
+    const expectedUrlFragment = '/mybucket/'
+    const expectedStorageIdFragment = 'localstack1://mybucket:'
+
+    let singlepartFile: File
+    let multipartFile: File
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testCollectionAlias)
+      await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
+      testDataset2Ids = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      singlepartFile = await createSinglepartFileBlob()
+      multipartFile = await createMultipartFileBlob()
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(testDataset2Ids.numericId)
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should return upload destination when dataset exists and the file does not require multipart download', async () => {
+      const actualFileDestination = await sut.getFileUploadDestination(
+        testDataset2Ids.numericId,
+        singlepartFile
+      )
+      expect(actualFileDestination.urls.length).toBe(1)
+      expect(actualFileDestination.urls[0]).toContain(expectedUrlFragment)
+      expect(actualFileDestination.partSize).not.toBeUndefined()
+      expect(actualFileDestination.storageId).toContain(expectedStorageIdFragment)
+    })
+
+    test('should return upload destination when dataset exists and the file requires multipart download', async () => {
+      const actualFileDestination = await sut.getFileUploadDestination(
+        testDataset2Ids.numericId,
+        multipartFile
+      )
+      expect(actualFileDestination.urls.length).toBeGreaterThan(1)
+      expect(actualFileDestination.urls[0]).toContain(expectedUrlFragment)
+      expect(actualFileDestination.partSize).not.toBeUndefined()
+      expect(actualFileDestination.storageId).toContain(expectedStorageIdFragment)
+      expect(actualFileDestination.urls[0]).not.toEqual(actualFileDestination.urls[1])
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const nonExistentDatasetId = 400000
+      const errorExpected = new ReadError(
+        `[404] Dataset with ID ${nonExistentDatasetId} not found.`
+      )
+
+      await expect(
+        sut.getFileUploadDestination(nonExistentDatasetId, singlepartFile)
+      ).rejects.toThrow(errorExpected)
+    })
+
+    test('should return error when direct upload is not configured in the dataset', async () => {
+      const errorExpected = new ReadError(
+        `[404] Direct upload not supported for files in this dataset: ${testDatasetIds.numericId}`
+      )
+
+      await expect(
+        sut.getFileUploadDestination(testDatasetIds.numericId, singlepartFile)
       ).rejects.toThrow(errorExpected)
     })
   })

@@ -1,14 +1,14 @@
 import { GetDatasetFiles } from '../../../src/files/domain/useCases/GetDatasetFiles'
 import { IFilesRepository } from '../../../src/files/domain/repositories/IFilesRepository'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
-import { File } from '../../../src/files/domain/models/File'
+import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { createFileModel } from '../../testHelpers/files/filesHelper'
 import { DatasetNotNumberedVersion } from '../../../src/datasets'
 import { FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria'
 
 describe('execute', () => {
   test('should return files on repository success', async () => {
-    const testFiles: File[] = [createFileModel()]
+    const testFiles: FileModel[] = [createFileModel()]
     const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
     filesRepositoryStub.getDatasetFiles = jest.fn().mockResolvedValue(testFiles)
 

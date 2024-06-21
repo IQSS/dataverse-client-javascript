@@ -11,12 +11,26 @@ services:
       DATAVERSE_DB_HOST: postgres
       DATAVERSE_DB_PASSWORD: secret
       DATAVERSE_DB_USER: ${DATAVERSE_DB_USER}
-      JVM_ARGS: -Ddataverse.pid.providers=fake
+      JVM_ARGS: -Ddataverse.files.storage-driver-id=file1
+        -Ddataverse.pid.providers=fake
         -Ddataverse.pid.default-provider=fake
         -Ddataverse.pid.fake.type=FAKE
         -Ddataverse.pid.fake.label=FakeDOIProvider
         -Ddataverse.pid.fake.authority=10.5072
         -Ddataverse.pid.fake.shoulder=FK2/
+        -Ddataverse.files.file1.type=file
+        -Ddataverse.files.file1.label=Filesystem
+        -Ddataverse.files.file1.directory=${STORAGE_DIR}/store
+        -Ddataverse.files.localstack1.type=s3
+        -Ddataverse.files.localstack1.label=LocalStack
+        -Ddataverse.files.localstack1.custom-endpoint-url=http://localstack:4566
+        -Ddataverse.files.localstack1.custom-endpoint-region=us-east-2
+        -Ddataverse.files.localstack1.bucket-name=mybucket
+        -Ddataverse.files.localstack1.path-style-access=true
+        -Ddataverse.files.localstack1.upload-redirect=true
+        -Ddataverse.files.localstack1.download-redirect=true
+        -Ddataverse.files.localstack1.access-key=default
+        -Ddataverse.files.localstack1.secret-key=default
     ports:
       - '8080:8080'
     networks:
@@ -24,12 +38,30 @@ services:
     depends_on:
       - test_postgres
       - test_solr
+      - test_localstack
     tmpfs:
       - /dumps:mode=770,size=2052M,uid=1000,gid=1000
       - /tmp:mode=770,size=2052M,uid=1000,gid=1000
     mem_limit: 2147483648 # 2 GiB
     mem_reservation: 1024m
     privileged: false
+
+  test_localstack:
+    container_name: 'test_localstack'
+    hostname: 'localstack'
+    image: localstack/localstack:2.3.2
+    restart: on-failure
+    ports:
+      - '4566:4566'
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOSTNAME_EXTERNAL=localstack
+    networks:
+      - dataverse
+    volumes:
+      - ./conf/localstack:/etc/localstack/init/ready.d
+    tmpfs:
+      - /localstack:mode=770,size=128M,uid=1000,gid=1000
 
   test_dataverse_bootstrap:
     container_name: 'test_dataverse_bootstrap'
