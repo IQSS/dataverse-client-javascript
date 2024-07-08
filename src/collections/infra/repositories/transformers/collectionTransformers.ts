@@ -16,7 +16,9 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     name: collectionPayload.name,
     isReleased: collectionPayload.isReleased,
     affiliation: collectionPayload.affiliation,
-    description: transformHtmlToMarkdown(collectionPayload.description),
+    ...(collectionPayload.description && {
+      description: transformHtmlToMarkdown(collectionPayload.description)
+    }),
     ...(collectionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
     })

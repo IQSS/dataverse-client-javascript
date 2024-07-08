@@ -20,7 +20,7 @@ export class AddUploadedFileToDataset implements UseCase<void> {
    * @param {File} [file] - The file object that has been uploaded.
    * @param {string} [storageId] - The storage identifier associated with the uploaded file.
    * @returns {Promise<void>} A promise that resolves when the file has been successfully added to the dataset.
-   *
+   * @throws {DirectUploadClientError} - If there are errors while performing the operation.
    */
   async execute(datasetId: number | string, file: File, storageId: string): Promise<void> {
     await this.directUploadClient.addUploadedFileToDataset(datasetId, file, storageId)

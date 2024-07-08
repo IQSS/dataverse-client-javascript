@@ -11,6 +11,8 @@ The different use cases currently available in the package are classified below,
 - [Collections](#Collections)
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
+  - [Collections write use cases](#collections-write-use-cases)
+    - [Create a Collection](#create-a-collection)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -97,6 +99,39 @@ _See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+### Collections Write Use Cases
+
+#### Create a Collection
+
+Creates a new Collection, given a [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) object and an optional parent collection identifier, which defaults to `root`.
+
+##### Example call:
+
+```typescript
+import { createCollection } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionDTO: CollectionDTO = {
+  alias: alias,
+  name: 'Test Collection',
+  contacts: ['dataverse@test.com'],
+  type: CollectionType.DEPARTMENT
+}
+
+createCollection.execute(collectionDTO).then((createdCollectionId: number) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/CreateCollection.ts) implementation_.
+
+The above example creates the new collection in the `root` collection since no collection identifier is specified. If you want to create the collection in a different collection, you must add the collection identifier as a second parameter in the use case call.
+
+The use case returns a number, which is the identifier of the created collection.
 
 ## Datasets
 
