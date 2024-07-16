@@ -5,7 +5,10 @@ import {
   createDatasetDTOWithoutFirstLevelRequiredField
 } from '../../testHelpers/datasets/datasetHelper'
 import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError'
-import { DatasetDTO } from '../../../src/datasets/domain/dtos/DatasetDTO'
+import {
+  DatasetDTO,
+  DatasetMetadataChildFieldValueDTO
+} from '../../../src/datasets/domain/dtos/DatasetDTO'
 import { SingleMetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/SingleMetadataFieldValidator'
 import { MetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/MetadataFieldValidator'
 import { MultipleMetadataFieldValidator } from '../../../src/datasets/domain/useCases/validators/MultipleMetadataFieldValidator'
@@ -31,6 +34,7 @@ describe('validate', () => {
       sut.validate(dataset, testMetadataBlocks)
       throw new Error('Validation should fail')
     } catch (error) {
+      console.log({ expectedMetadataFieldName })
       expect(error).toBeInstanceOf(FieldValidationError)
       expect(error.citationBlockName).toEqual('citation')
       expect(error.metadataFieldName).toEqual(expectedMetadataFieldName)
@@ -124,7 +128,7 @@ describe('validate', () => {
   })
 
   test('should raise an empty field error when a required child field is missing', () => {
-    const invalidAuthorFieldValue = [
+    const invalidAuthorFieldValue: DatasetMetadataChildFieldValueDTO[] = [
       { authorName: 'Admin, Dataverse', authorAffiliation: 'Dataverse.org' },
       { authorAffiliation: 'Dataverse.org' }
     ]
@@ -141,7 +145,7 @@ describe('validate', () => {
   })
 
   test('should not raise an empty field error when a not required child field is missing', () => {
-    const authorFieldValue = [
+    const authorFieldValue: DatasetMetadataChildFieldValueDTO[] = [
       { authorName: 'Admin, Dataverse', authorAffiliation: 'Dataverse.org' },
       { authorName: 'John, Doe' }
     ]
@@ -156,12 +160,54 @@ describe('validate', () => {
     runValidateExpectingFieldValidationError(
       testDataset,
       'timePeriodCoveredStart',
-      'There was an error when validating the field timePeriodCoveredStart from metadata block citation. Reason was: The field requires a valid date format (YYYY-MM-DD).'
+      'There was an error when validating the field timePeriodCoveredStart from metadata block citation. Reason was: The field requires a valid date format (YYYY or YYYY-MM or YYYY-MM-DD).'
     )
   })
 
-  test('should not raise a date format validation error when a date field has a valid format', () => {
+  test('should not raise a date format validation error when a date field has a valid YYYY-MM-DD format', () => {
     const testDataset = createDatasetDTO(undefined, undefined, undefined, '2020-01-01')
+    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
+  })
+
+  test('should not raise a date format validation error when a date field has a valid YYYY-MM format', () => {
+    const testDataset = createDatasetDTO(undefined, undefined, undefined, '2020-01')
+    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
+  })
+
+  test('should not raise a date format validation error when a date field has a valid YYYY format', () => {
+    const testDataset = createDatasetDTO(undefined, undefined, undefined, '2020')
+    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
+  })
+
+  test('should raise a date format validation error when a date field has a wrong date format according to the field watermark', () => {
+    const testDataset = createDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      '01-03'
+    )
+
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
+      testDataset,
+      'dateOfCreation',
+      'There was an error when validating the field dateOfCreation from metadata block citation. Reason was: The field requires a valid date format (YYYY-MM-DD).'
+    )
+  })
+
+  test('should not raise a date format validation error when a date field has a valid format according to the field watermark', () => {
+    const testDataset = createDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      '2024-01-03'
+    )
     expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
   })
 

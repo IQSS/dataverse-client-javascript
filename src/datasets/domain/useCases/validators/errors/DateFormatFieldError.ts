@@ -4,6 +4,7 @@ export class DateFormatFieldError extends FieldValidationError {
   constructor(
     metadataFieldName: string,
     citationBlockName: string,
+    validDateFormat: string,
     parentMetadataFieldName?: string,
     fieldPosition?: number
   ) {
@@ -12,7 +13,7 @@ export class DateFormatFieldError extends FieldValidationError {
       citationBlockName,
       parentMetadataFieldName,
       fieldPosition,
-      'The field requires a valid date format (YYYY-MM-DD).'
+      `The field requires a valid date format (${validDateFormat}).`
     )
   }
 }

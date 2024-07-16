@@ -360,7 +360,8 @@ export const createDatasetDTO = (
   alternativeRequiredTitleValue?: DatasetMetadataFieldValueDTO,
   timePeriodCoveredStartValue?: DatasetMetadataFieldValueDTO,
   contributorTypeValue?: DatasetMetadataFieldValueDTO,
-  license?: DatasetLicense
+  license?: DatasetLicense,
+  dateOfCreationValue?: DatasetMetadataFieldValueDTO
 ): DatasetDTO => {
   const validTitle = 'test dataset'
   const validAuthorFieldValue = [
@@ -388,6 +389,9 @@ export const createDatasetDTO = (
               : validAlternativeRequiredTitleValue,
           ...(timePeriodCoveredStartValue && {
             timePeriodCoveredStart: timePeriodCoveredStartValue
+          }),
+          ...(dateOfCreationValue && {
+            dateOfCreation: dateOfCreationValue
           }),
           ...(contributorTypeValue && {
             contributor: [
@@ -536,8 +540,23 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
         displayName: 'Time Period Start Date',
         title: 'Start Date',
         type: MetadataFieldType.Date,
-        watermark: MetadataFieldWatermark.Empty,
+        watermark: MetadataFieldWatermark.YYYYOrYYYYMMOrYYYYMMDD,
         description: 'The start date of the time period that the data refer to',
+        multiple: false,
+        isControlledVocabulary: false,
+        displayFormat: '#NAME: #VALUE ',
+        isRequired: false,
+        displayOrder: 5,
+        displayOnCreate: true,
+        typeClass: MetadataFieldTypeClass.Primitive
+      },
+      dateOfCreation: {
+        name: 'dateOfCreation',
+        displayName: 'Date of Creation',
+        title: 'Creation Date',
+        type: MetadataFieldType.Date,
+        watermark: MetadataFieldWatermark.YyyyMmDD,
+        description: 'The creation date of dataset',
         multiple: false,
         isControlledVocabulary: false,
         displayFormat: '#NAME: #VALUE ',
