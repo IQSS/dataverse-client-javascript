@@ -34,7 +34,6 @@ describe('validate', () => {
       sut.validate(dataset, testMetadataBlocks)
       throw new Error('Validation should fail')
     } catch (error) {
-      console.log({ expectedMetadataFieldName })
       expect(error).toBeInstanceOf(FieldValidationError)
       expect(error.citationBlockName).toEqual('citation')
       expect(error.metadataFieldName).toEqual(expectedMetadataFieldName)
