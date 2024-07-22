@@ -122,4 +122,24 @@ describe('CollectionsRepository', () => {
       ).rejects.toThrow(expectedError)
     })
   })
+
+  describe('getCollectionFacets', () => {
+    test('should return collection facets given a valid collection alias', async () => {
+      const actual = await sut.getCollectionFacets(testCollectionAlias)
+      expect(actual).toContain('authorName')
+      expect(actual).toContain('subject')
+      expect(actual).toContain('keywordValue')
+      expect(actual).toContain('dateOfDeposit')
+    })
+
+    test('should return error when collection does not exist', async () => {
+      const expectedError = new ReadError(
+        `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ALIAS}'`
+      )
+
+      await expect(
+        sut.getCollectionFacets(TestConstants.TEST_DUMMY_COLLECTION_ALIAS)
+      ).rejects.toThrow(expectedError)
+    })
+  })
 })

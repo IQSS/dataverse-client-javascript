@@ -80,4 +80,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
+
+  public async getCollectionFacets(collectionIdOrAlias: string | number): Promise<string[]> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/facets`, true)
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
 }
