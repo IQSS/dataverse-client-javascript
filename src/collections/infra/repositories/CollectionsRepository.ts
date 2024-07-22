@@ -9,10 +9,23 @@ export interface NewCollectionRequestPayload {
   name: string
   dataverseContacts: NewCollectionContactRequestPayload[]
   dataverseType: string
+  metadataBlocks: NewCollectionMetadataBlocksRequestPayload
 }
 
 export interface NewCollectionContactRequestPayload {
   contactEmail: string
+}
+
+export interface NewCollectionMetadataBlocksRequestPayload {
+  metadataBlockNames: string[]
+  facetIds: string[]
+  inputLevels: NewCollectionInputLevelRequestPayload[]
+}
+
+export interface NewCollectionInputLevelRequestPayload {
+  datasetFieldTypeName: string
+  include: boolean
+  required: boolean
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -40,11 +53,25 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
     )
 
+    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] = []
+    collectionDTO.inputLevels.forEach((element) => {
+      inputLevelsRequestBody.push({
+        datasetFieldTypeName: element.datasetFieldName,
+        include: element.include,
+        required: element.required
+      })
+    })
+
     const requestBody: NewCollectionRequestPayload = {
       alias: collectionDTO.alias,
       name: collectionDTO.name,
       dataverseContacts: dataverseContacts,
-      dataverseType: collectionDTO.type.toString()
+      dataverseType: collectionDTO.type.toString(),
+      metadataBlocks: {
+        metadataBlockNames: collectionDTO.metadataBlockNames,
+        facetIds: collectionDTO.facetIds,
+        inputLevels: inputLevelsRequestBody
+      }
     }
 
     return this.doPost(`/${this.collectionsResourceName}/${parentCollectionId}`, requestBody)

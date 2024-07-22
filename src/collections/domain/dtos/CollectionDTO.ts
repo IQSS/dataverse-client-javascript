@@ -5,6 +5,15 @@ export interface CollectionDTO {
   type: CollectionType
   affiliation?: string
   description?: string
+  metadataBlockNames: string[]
+  facetIds?: string[]
+  inputLevels?: DatasetFieldTypeInputLevelDTO[]
+}
+
+export interface DatasetFieldTypeInputLevelDTO {
+  datasetFieldName: string
+  include: boolean
+  required: boolean
 }
 
 export enum CollectionType {
