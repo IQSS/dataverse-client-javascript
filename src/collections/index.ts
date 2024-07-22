@@ -11,5 +11,5 @@ const createCollection = new CreateCollection(collectionsRepository)
 const getCollectionFacets = new GetCollectionFacets(collectionsRepository)
 
 export { getCollection, createCollection, getCollectionFacets }
-export { Collection } from './domain/models/Collection'
-export { CollectionDTO, DatasetFieldTypeInputLevelDTO } from './domain/dtos/CollectionDTO'
+export { Collection, CollectionInputLevel } from './domain/models/Collection'
+export { CollectionDTO, CollectionInputLevelDTO } from './domain/dtos/CollectionDTO'

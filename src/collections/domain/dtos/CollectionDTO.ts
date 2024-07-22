@@ -7,10 +7,10 @@ export interface CollectionDTO {
   description?: string
   metadataBlockNames: string[]
   facetIds?: string[]
-  inputLevels?: DatasetFieldTypeInputLevelDTO[]
+  inputLevels?: CollectionInputLevelDTO[]
 }
 
-export interface DatasetFieldTypeInputLevelDTO {
+export interface CollectionInputLevelDTO {
   datasetFieldName: string
   include: boolean
   required: boolean

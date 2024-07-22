@@ -27,7 +27,14 @@ export const createCollectionModel = (): Collection => {
     isReleased: COLLECTION_IS_RELEASED,
     affiliation: COLLECTION_AFFILIATION_STR,
     description: COLLECTION_DESCRIPTION_MARKDOWN,
-    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
+    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
+    inputLevels: [
+      {
+        datasetFieldName: 'test',
+        required: true,
+        include: true
+      }
+    ]
   }
   return collectionModel
 }
@@ -40,7 +47,14 @@ export const createCollectionPayload = (): CollectionPayload => {
     isReleased: COLLECTION_IS_RELEASED,
     affiliation: COLLECTION_AFFILIATION_STR,
     description: COLLECTION_DESCRIPTION_HTML,
-    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
+    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
+    inputLevels: [
+      {
+        datasetFieldTypeName: 'test',
+        required: true,
+        include: true
+      }
+    ]
   }
   return collectionPayload
 }
