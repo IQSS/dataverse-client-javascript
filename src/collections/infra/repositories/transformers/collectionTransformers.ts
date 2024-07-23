@@ -32,7 +32,7 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
 const transformInputLevelsPayloadToInputLevels = (
   inputLevelsPayload: CollectionInputLevelPayload[]
 ): CollectionInputLevel[] => {
-  let collectionInputLevels: CollectionInputLevel[] = []
+  const collectionInputLevels: CollectionInputLevel[] = []
   inputLevelsPayload.forEach((element) => {
     collectionInputLevels.push({
       datasetFieldName: element.datasetFieldTypeName,
