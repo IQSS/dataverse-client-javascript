@@ -5,7 +5,7 @@ export interface CollectionDTO {
   type: CollectionType
   affiliation?: string
   description?: string
-  metadataBlockNames: string[]
+  metadataBlockNames?: string[]
   facetIds?: string[]
   inputLevels?: CollectionInputLevelDTO[]
 }

@@ -14,7 +14,7 @@ export class GetCollectionFacets implements UseCase<string[]> {
    *
    * @param {number | string} [collectionIdOrAlias = 'root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
    * If this parameter is not set, the default value is: 'root'
-   * @returns {Promise<Collection>}
+   * @returns {Promise<string[]>}
    */
   async execute(collectionIdOrAlias: number | string = ROOT_COLLECTION_ALIAS): Promise<string[]> {
     return await this.collectionsRepository.getCollectionFacets(collectionIdOrAlias)
