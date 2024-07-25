@@ -478,15 +478,16 @@ publishDataset.execute(datasetId, versionUpdateType)
 _See [use case](../src/datasets/domain/useCases/PublishDataset.ts) implementation_.
 
 The above example publishes the dataset with the specified identifier and performs a minor version update. If the response
-is successful, the use case does not return the dataset object, but the HTTP status code `200`. Otherwise, it throws an error.
-If you want to perform a major version update, you must set the `versionUpdateType` parameter to `VersionUpdateType.MAJOR`.
-
+is successful, the use case does not return the dataset object, but the HTTP status code `200`. Otherwise, it throws an error.\
+If you want to perform a major version update, you must set the `versionUpdateType` parameter to `VersionUpdateType.MAJOR`.\
+Superusers can pass `VersionUpdateType.UPDATE_CURRENT` to update metadata without changing the version number. This will overwrite the latest published version and therefore will only work for a dataset that has been published at least once.\
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/domain/models/VersionUpdateType.ts) enum value, which can be one of the following:
 
 - `VersionUpdateType.MINOR`
 - `VersionUpdateType.MAJOR`
+- `VersionUpdateType.UPDATE_CURRENT`
 
 ## Files
 

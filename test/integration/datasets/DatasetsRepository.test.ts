@@ -516,6 +516,64 @@ describe('DatasetsRepository', () => {
     })
   })
 
+  describe('publish dataset with current version', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeEach(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterEach(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should update current dataset version keeping same version number', async () => {
+      const expectedMajorVersion = 1
+
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      // Dataset is in draft, so we need to publish it first
+      await sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const datasetAfterFirstPublish = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false
+      )
+
+      // Update dataset
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+      await sut.updateDataset(testDatasetIds.numericId, TestConstants.TEST_NEW_DATASET_DTO, [
+        citationMetadataBlock
+      ])
+
+      // Update current version
+      await sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.UPDATE_CURRENT)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const datasetAfterUpdatingCurrentVersion = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false
+      )
+
+      expect(datasetAfterFirstPublish.versionInfo.majorNumber).toBe(expectedMajorVersion)
+      expect(datasetAfterUpdatingCurrentVersion.versionInfo.majorNumber).toBe(expectedMajorVersion)
+    })
+
+    test('should return error when trying to publish with the current version a dataset that has never been published before', async () => {
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      await expect(
+        sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.UPDATE_CURRENT)
+      ).rejects.toBeInstanceOf(WriteError)
+    })
+  })
+
   describe('updateDataset', () => {
     test('should update an existing dataset with the provided dataset citation fields', async () => {
       const testDataset = {

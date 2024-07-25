@@ -13,7 +13,7 @@ export class PublishDataset implements UseCase<void> {
    * Publishes a dataset, given its identifier and the type of version update type.
    *
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
-   * @param {VersionUpdateType} versionUpdateType - Specifies the type of version update, 'major' or 'minor'.
+   * @param {VersionUpdateType} versionUpdateType - Specifies the type of version update, 'major', 'minor' or 'updatecurrent'
    * @returns {Promise<void>} - This method does not return anything upon successful completion.
    */
   async execute(datasetId: number | string, versionUpdateType: VersionUpdateType): Promise<void> {
