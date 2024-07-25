@@ -53,20 +53,18 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
     )
 
-    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] = []
-    collectionDTO.inputLevels.forEach((element) => {
-      inputLevelsRequestBody.push({
-        datasetFieldTypeName: element.datasetFieldName,
-        include: element.include,
-        required: element.required
-      })
-    })
+    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
+      collectionDTO.inputLevels.map((inputLevel) => ({
+        datasetFieldTypeName: inputLevel.datasetFieldName,
+        include: inputLevel.include,
+        required: inputLevel.required
+      }))
 
     const requestBody: NewCollectionRequestPayload = {
       alias: collectionDTO.alias,
       name: collectionDTO.name,
       dataverseContacts: dataverseContacts,
-      dataverseType: collectionDTO.type.toString(),
+      dataverseType: collectionDTO.type,
       metadataBlocks: {
         metadataBlockNames: collectionDTO.metadataBlockNames,
         facetIds: collectionDTO.facetIds,

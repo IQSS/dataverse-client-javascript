@@ -32,13 +32,9 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
 const transformInputLevelsPayloadToInputLevels = (
   inputLevelsPayload: CollectionInputLevelPayload[]
 ): CollectionInputLevel[] => {
-  const collectionInputLevels: CollectionInputLevel[] = []
-  inputLevelsPayload.forEach((element) => {
-    collectionInputLevels.push({
-      datasetFieldName: element.datasetFieldTypeName,
-      include: element.include,
-      required: element.required
-    })
-  })
-  return collectionInputLevels
+  return inputLevelsPayload.map((inputLevel) => ({
+    datasetFieldName: inputLevel.datasetFieldTypeName,
+    include: inputLevel.include,
+    required: inputLevel.required
+  }))
 }
