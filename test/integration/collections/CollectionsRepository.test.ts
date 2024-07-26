@@ -109,7 +109,6 @@ describe('CollectionsRepository', () => {
       expect(typeof actualId).toBe('number')
 
       const createdCollection = await sut.getCollection(actualId)
-      console.log('returned collection')
       expect(createdCollection.id).toBe(actualId)
       expect(createdCollection.alias).toBe(newCollectionDTO.alias)
       expect(createdCollection.name).toBe(newCollectionDTO.name)
