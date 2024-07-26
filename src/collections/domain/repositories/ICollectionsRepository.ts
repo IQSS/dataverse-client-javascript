@@ -7,4 +7,5 @@ export interface ICollectionsRepository {
     collectionDTO: CollectionDTO,
     parentCollectionId: number | string
   ): Promise<number>
+  getCollectionFacets(collectionIdOrAlias: number | string): Promise<string[]>
 }

@@ -9,10 +9,23 @@ export interface NewCollectionRequestPayload {
   name: string
   dataverseContacts: NewCollectionContactRequestPayload[]
   dataverseType: string
+  metadataBlocks: NewCollectionMetadataBlocksRequestPayload
 }
 
 export interface NewCollectionContactRequestPayload {
   contactEmail: string
+}
+
+export interface NewCollectionMetadataBlocksRequestPayload {
+  metadataBlockNames: string[]
+  facetIds: string[]
+  inputLevels: NewCollectionInputLevelRequestPayload[]
+}
+
+export interface NewCollectionInputLevelRequestPayload {
+  datasetFieldTypeName: string
+  include: boolean
+  required: boolean
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -40,15 +53,35 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
     )
 
+    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
+      collectionDTO.inputLevels.map((inputLevel) => ({
+        datasetFieldTypeName: inputLevel.datasetFieldName,
+        include: inputLevel.include,
+        required: inputLevel.required
+      }))
+
     const requestBody: NewCollectionRequestPayload = {
       alias: collectionDTO.alias,
       name: collectionDTO.name,
       dataverseContacts: dataverseContacts,
-      dataverseType: collectionDTO.type.toString()
+      dataverseType: collectionDTO.type,
+      metadataBlocks: {
+        metadataBlockNames: collectionDTO.metadataBlockNames,
+        facetIds: collectionDTO.facetIds,
+        inputLevels: inputLevelsRequestBody
+      }
     }
 
     return this.doPost(`/${this.collectionsResourceName}/${parentCollectionId}`, requestBody)
       .then((response) => response.data.data.id)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getCollectionFacets(collectionIdOrAlias: string | number): Promise<string[]> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/facets`, true)
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })

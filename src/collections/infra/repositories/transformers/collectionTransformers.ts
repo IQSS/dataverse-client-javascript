@@ -1,6 +1,6 @@
-import { Collection } from '../../../domain/models/Collection'
+import { Collection, CollectionInputLevel } from '../../../domain/models/Collection'
 import { AxiosResponse } from 'axios'
-import { CollectionPayload } from './CollectionPayload'
+import { CollectionInputLevelPayload, CollectionPayload } from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import { transformHtmlToMarkdown } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
 
@@ -21,7 +21,20 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     }),
     ...(collectionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
+    }),
+    ...(collectionPayload.inputLevels && {
+      inputLevels: transformInputLevelsPayloadToInputLevels(collectionPayload.inputLevels)
     })
   }
   return collectionModel
+}
+
+const transformInputLevelsPayloadToInputLevels = (
+  inputLevelsPayload: CollectionInputLevelPayload[]
+): CollectionInputLevel[] => {
+  return inputLevelsPayload.map((inputLevel) => ({
+    datasetFieldName: inputLevel.datasetFieldTypeName,
+    include: inputLevel.include,
+    required: inputLevel.required
+  }))
 }

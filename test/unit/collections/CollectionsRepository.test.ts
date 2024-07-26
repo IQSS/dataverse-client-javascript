@@ -172,4 +172,60 @@ describe('CollectionsRepository', () => {
       expect(error).toBeInstanceOf(Error)
     })
   })
+
+  describe('getCollectionFacets', () => {
+    const testFacetsSuccessfulResponse = {
+      data: {
+        status: 'OK',
+        data: ['authorName', 'subject', 'keywordValue', 'dateOfDeposit']
+      }
+    }
+
+    describe('by numeric id', () => {
+      test('should return facets when providing a valid id', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testFacetsSuccessfulResponse)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.id}/facets`
+
+        // API Key auth
+        let actual = await sut.getCollectionFacets(testCollectionModel.id)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toContain('authorName')
+        expect(actual).toContain('subject')
+        expect(actual).toContain('keywordValue')
+        expect(actual).toContain('dateOfDeposit')
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        actual = await sut.getCollectionFacets(testCollectionModel.id)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+        expect(actual).toContain('authorName')
+        expect(actual).toContain('subject')
+        expect(actual).toContain('keywordValue')
+        expect(actual).toContain('dateOfDeposit')
+      })
+
+      test('should return error on repository read error', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.id}/facets`
+        let error = undefined as unknown as ReadError
+
+        await sut.getCollectionFacets(testCollectionModel.id).catch((e) => (error = e))
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(error).toBeInstanceOf(Error)
+      })
+    })
+  })
 })

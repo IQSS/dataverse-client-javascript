@@ -27,7 +27,14 @@ export const createCollectionModel = (): Collection => {
     isReleased: COLLECTION_IS_RELEASED,
     affiliation: COLLECTION_AFFILIATION_STR,
     description: COLLECTION_DESCRIPTION_MARKDOWN,
-    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
+    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
+    inputLevels: [
+      {
+        datasetFieldName: 'test',
+        required: true,
+        include: true
+      }
+    ]
   }
   return collectionModel
 }
@@ -40,7 +47,14 @@ export const createCollectionPayload = (): CollectionPayload => {
     isReleased: COLLECTION_IS_RELEASED,
     affiliation: COLLECTION_AFFILIATION_STR,
     description: COLLECTION_DESCRIPTION_HTML,
-    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
+    isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
+    inputLevels: [
+      {
+        datasetFieldTypeName: 'test',
+        required: true,
+        include: true
+      }
+    ]
   }
   return collectionPayload
 }
@@ -108,7 +122,16 @@ export const createCollectionDTO = (alias = 'test-collection'): CollectionDTO =>
     alias: alias,
     name: 'Test Collection',
     contacts: ['dataverse@test.com'],
-    type: CollectionType.DEPARTMENT
+    type: CollectionType.DEPARTMENT,
+    metadataBlockNames: ['citation', 'geospatial'],
+    facetIds: ['authorName', 'authorAffiliation'],
+    inputLevels: [
+      {
+        datasetFieldName: 'geographicCoverage',
+        required: true,
+        include: true
+      }
+    ]
   }
 }
 
@@ -121,6 +144,17 @@ export const createNewCollectionRequestPayload = (): NewCollectionRequestPayload
         contactEmail: 'dataverse@test.com'
       }
     ],
-    dataverseType: 'DEPARTMENT'
+    dataverseType: 'DEPARTMENT',
+    metadataBlocks: {
+      metadataBlockNames: ['citation', 'geospatial'],
+      facetIds: ['authorName', 'authorAffiliation'],
+      inputLevels: [
+        {
+          datasetFieldTypeName: 'geographicCoverage',
+          include: true,
+          required: true
+        }
+      ]
+    }
   }
 }

@@ -11,6 +11,7 @@ The different use cases currently available in the package are classified below,
 - [Collections](#Collections)
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
+    - [Get Collection Facets](#get-collection-facets)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
 - [Datasets](#Datasets)
@@ -95,6 +96,33 @@ getCollection
 ```
 
 _See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+#### Get Collection Facets
+
+Returns the names of the configured collection facets, given a collection identifier or alias.
+
+##### Example call:
+
+```typescript
+import { getCollectionFacets } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 12345
+
+getCollectionFacets
+  .execute(collectionId)
+  .then((facets: string[]) => {
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionFacets.ts)_ definition.
 
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
