@@ -7,6 +7,7 @@ import {
   MetadataFieldWatermark
 } from '../../../domain/models/MetadataBlock'
 import { MetadataBlockPayload } from './MetadataBlockPayload'
+import { MetadataFieldInfoPayload } from './MetadataFieldInfoPayload'
 
 export const transformMetadataBlocksResponseToMetadataBlocks = (
   response: AxiosResponse
@@ -26,6 +27,17 @@ export const transformMetadataBlockResponseToMetadataBlock = (
   return transformMetadataBlockPayloadToMetadataBlock(metadataBlockPayload)
 }
 
+export const transformMetadataFieldInfosResponseToMetadataFieldInfos = (
+  response: AxiosResponse
+): MetadataFieldInfo[] => {
+  const metadataFieldInfosPayload = response.data.data
+  const metadataFieldInfos: MetadataFieldInfo[] = []
+  metadataFieldInfosPayload.forEach(function (metadataBlockPayload: MetadataFieldInfoPayload) {
+    metadataFieldInfos.push(transformPayloadMetadataFieldInfo(metadataBlockPayload))
+  })
+  return metadataFieldInfos
+}
+
 const transformMetadataBlockPayloadToMetadataBlock = (
   metadataBlockPayload: MetadataBlockPayload
 ): MetadataBlock => {
@@ -35,7 +47,9 @@ const transformMetadataBlockPayloadToMetadataBlock = (
   Object.keys(metadataBlockFieldsPayload).forEach((metadataFieldKey) => {
     const metadataFieldIsAlreadyPresentAsChildField = childFieldKeys.has(metadataFieldKey)
     if (!metadataFieldIsAlreadyPresentAsChildField) {
-      const metadataFieldInfoPayload = metadataBlockFieldsPayload[metadataFieldKey]
+      const metadataFieldInfoPayload = metadataBlockFieldsPayload[
+        metadataFieldKey
+      ] as MetadataFieldInfoPayload
       metadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(metadataFieldInfoPayload)
     }
   })
@@ -63,8 +77,7 @@ const getChildFieldKeys = (metadataBlockFieldsPayload: Record<string, unknown>):
 }
 
 const transformPayloadMetadataFieldInfo = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  metadataFieldInfoPayload: any,
+  metadataFieldInfoPayload: MetadataFieldInfoPayload,
   isChild = false
 ): MetadataFieldInfo => {
   const metadataFieldInfo: MetadataFieldInfo = {
@@ -86,7 +99,10 @@ const transformPayloadMetadataFieldInfo = (
     displayOnCreate: metadataFieldInfoPayload.displayOnCreate
   }
   if (!isChild && 'childFields' in metadataFieldInfoPayload) {
-    const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields
+    const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields as Record<
+      string,
+      MetadataFieldInfoPayload
+    >
     const childMetadataFields: Record<string, MetadataFieldInfo> = {}
     Object.keys(childMetadataFieldsPayload).map((metadataFieldKey) => {
       childMetadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(

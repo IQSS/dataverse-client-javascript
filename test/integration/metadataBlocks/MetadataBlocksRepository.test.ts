@@ -10,11 +10,13 @@ describe('getMetadataBlockByName', () => {
   const sut: MetadataBlocksRepository = new MetadataBlocksRepository()
   const citationMetadataBlockName = 'citation'
 
-  ApiConfig.init(
-    TestConstants.TEST_API_URL,
-    DataverseApiAuthMechanism.API_KEY,
-    process.env.TEST_API_KEY
-  )
+  beforeAll(async () => {
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.API_KEY,
+      process.env.TEST_API_KEY
+    )
+  })
 
   test('should return error when metadata block does not exist', async () => {
     const nonExistentMetadataBlockName = 'nonExistentMetadataBlock'
