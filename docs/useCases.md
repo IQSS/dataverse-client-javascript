@@ -43,6 +43,7 @@ The different use cases currently available in the package are classified below,
     - [File Uploading Use Cases](#file-uploading-use-cases)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
+    - [Get All Facetable Dataset Fields](#get-all-facetable-dataset-fields)
     - [Get Metadata Block By Name](#get-metadata-block-by-name)
     - [Get Collection Metadata Blocks](#get-collection-metadata-blocks)
 - [Users](#Users)
@@ -963,6 +964,26 @@ The following error might arise from the `AddUploadedFileToDataset` use case:
 ## Metadata Blocks
 
 ### Metadata Blocks read use cases
+
+#### Get All Facetable Dataset Fields
+
+Returns a [MetadataFieldInfo](../src/metadataBlocks/domain/models/MetadataBlock.ts) array containing all facetable dataset fields defined in the installation.
+
+##### Example call:
+
+```typescript
+import { getAllFacetableMetadataFields } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAllFacetableMetadataFields.execute().then((metadataFieldInfos: MetadataFieldInfo[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/metadataBlocks/domain/useCases/GetAllFacetableDatasetFields.ts) implementation_.
 
 #### Get Metadata Block By Name
 
