@@ -125,6 +125,8 @@ export const createCollectionDTO = (alias = 'test-collection'): CollectionDTO =>
     type: CollectionType.DEPARTMENT,
     metadataBlockNames: ['citation', 'geospatial'],
     facetIds: ['authorName', 'authorAffiliation'],
+    description: 'test description',
+    affiliation: 'test affiliation',
     inputLevels: [
       {
         datasetFieldName: 'geographicCoverage',
@@ -145,6 +147,8 @@ export const createNewCollectionRequestPayload = (): NewCollectionRequestPayload
       }
     ],
     dataverseType: 'DEPARTMENT',
+    description: 'test description',
+    affiliation: 'test affiliation',
     metadataBlocks: {
       metadataBlockNames: ['citation', 'geospatial'],
       facetIds: ['authorName', 'authorAffiliation'],

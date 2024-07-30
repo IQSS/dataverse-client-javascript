@@ -9,6 +9,8 @@ export interface NewCollectionRequestPayload {
   name: string
   dataverseContacts: NewCollectionContactRequestPayload[]
   dataverseType: string
+  description?: string
+  affiliation?: string
   metadataBlocks: NewCollectionMetadataBlocksRequestPayload
 }
 
@@ -65,6 +67,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       name: collectionDTO.name,
       dataverseContacts: dataverseContacts,
       dataverseType: collectionDTO.type,
+      ...(collectionDTO.description && {
+        description: collectionDTO.description
+      }),
+      ...(collectionDTO.affiliation && {
+        affiliation: collectionDTO.affiliation
+      }),
       metadataBlocks: {
         metadataBlockNames: collectionDTO.metadataBlockNames,
         facetIds: collectionDTO.facetIds,
