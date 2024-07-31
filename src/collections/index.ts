@@ -12,4 +12,5 @@ const getCollectionFacets = new GetCollectionFacets(collectionsRepository)
 
 export { getCollection, createCollection, getCollectionFacets }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
+export { CollectionFacet } from './domain/models/CollectionFacet'
 export { CollectionDTO, CollectionInputLevelDTO } from './domain/dtos/CollectionDTO'

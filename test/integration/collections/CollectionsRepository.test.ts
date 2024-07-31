@@ -149,10 +149,10 @@ describe('CollectionsRepository', () => {
   describe('getCollectionFacets', () => {
     test('should return collection facets given a valid collection alias', async () => {
       const actual = await sut.getCollectionFacets(testCollectionAlias)
-      expect(actual).toContain('authorName')
-      expect(actual).toContain('subject')
-      expect(actual).toContain('keywordValue')
-      expect(actual).toContain('dateOfDeposit')
+      expect(actual.length).toBe(4)
+      expect(actual[0].name).toBe('authorName')
+      expect(actual[0].displayName).toBe('Author Name')
+      expect(actual[0].id).not.toBe(undefined)
     })
 
     test('should return error when collection does not exist', async () => {

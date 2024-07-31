@@ -1,8 +1,12 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRepository'
-import { transformCollectionResponseToCollection } from './transformers/collectionTransformers'
+import {
+  transformCollectionFacetsResponseToCollectionFacets,
+  transformCollectionResponseToCollection
+} from './transformers/collectionTransformers'
 import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collection'
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
+import { CollectionFacet } from '../../domain/models/CollectionFacet'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -87,9 +91,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
-  public async getCollectionFacets(collectionIdOrAlias: string | number): Promise<string[]> {
-    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/facets`, true)
-      .then((response) => response.data.data)
+  public async getCollectionFacets(
+    collectionIdOrAlias: string | number
+  ): Promise<CollectionFacet[]> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/facets`, true, {
+      returnDetails: true
+    })
+      .then((response) => transformCollectionFacetsResponseToCollectionFacets(response))
       .catch((error) => {
         throw error
       })

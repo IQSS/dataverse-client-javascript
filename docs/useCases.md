@@ -104,7 +104,7 @@ If no collection identifier is specified, the default collection identifier; `ro
 
 #### Get Collection Facets
 
-Returns the names of the configured collection facets, given a collection identifier or alias.
+Returns a [CollectionFacet](../src/collections/domain/models/CollectionFacet.ts) array containing the facets of the requested collection, given the collection identifier or alias.
 
 ##### Example call:
 
@@ -115,7 +115,7 @@ const collectionIdOrAlias = 12345
 
 getCollectionFacets
   .execute(collectionId)
-  .then((facets: string[]) => {
+  .then((facets: CollectionFacet[]) => {
     /* ... */
   })
   .catch((error: Error) => {

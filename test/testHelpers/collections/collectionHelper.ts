@@ -1,10 +1,11 @@
-import { Collection } from '../../../src/collections'
+import { Collection, CollectionFacet } from '../../../src/collections'
 import { DvObjectType } from '../../../src'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { TestConstants } from '../TestConstants'
 import axios from 'axios'
 import { CollectionDTO, CollectionType } from '../../../src/collections/domain/dtos/CollectionDTO'
 import { NewCollectionRequestPayload } from '../../../src/collections/infra/repositories/CollectionsRepository'
+import { CollectionFacetPayload } from '../../../src/collections/infra/repositories/transformers/CollectionFacetPayload'
 
 const COLLECTION_ID = 11111
 const COLLECTION_IS_RELEASED = 'true'
@@ -160,5 +161,21 @@ export const createNewCollectionRequestPayload = (): NewCollectionRequestPayload
         }
       ]
     }
+  }
+}
+
+export const createCollectionFacetModel = (): CollectionFacet => {
+  return {
+    id: 1,
+    name: 'testName',
+    displayName: 'testDisplayName'
+  }
+}
+
+export const createCollectionFacetRequestPayload = (): CollectionFacetPayload => {
+  return {
+    id: '1',
+    name: 'testName',
+    displayName: 'testDisplayName'
   }
 }

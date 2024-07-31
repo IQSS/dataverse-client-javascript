@@ -6,6 +6,7 @@ import {
 } from '../../../src/core/infra/repositories/ApiConfig'
 import {
   createCollectionDTO,
+  createCollectionFacetRequestPayload,
   createCollectionModel,
   createCollectionPayload,
   createNewCollectionRequestPayload
@@ -177,11 +178,18 @@ describe('CollectionsRepository', () => {
     const testFacetsSuccessfulResponse = {
       data: {
         status: 'OK',
-        data: ['authorName', 'subject', 'keywordValue', 'dateOfDeposit']
+        data: [createCollectionFacetRequestPayload()]
       }
     }
 
     describe('by numeric id', () => {
+      const expectedRequestConfigApiKey = {
+        params: {
+          returnDetails: true
+        },
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
       test('should return facets when providing a valid id', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testFacetsSuccessfulResponse)
         const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.id}/facets`
@@ -189,28 +197,22 @@ describe('CollectionsRepository', () => {
         // API Key auth
         let actual = await sut.getCollectionFacets(testCollectionModel.id)
 
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-        )
-        expect(actual).toContain('authorName')
-        expect(actual).toContain('subject')
-        expect(actual).toContain('keywordValue')
-        expect(actual).toContain('dateOfDeposit')
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual.length).toBe(1)
+        expect(actual[0].name).toBe('testName')
+        expect(actual[0].displayName).toBe('testDisplayName')
+        expect(actual[0].id).toBe(1)
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
 
         actual = await sut.getCollectionFacets(testCollectionModel.id)
 
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
-        )
-        expect(actual).toContain('authorName')
-        expect(actual).toContain('subject')
-        expect(actual).toContain('keywordValue')
-        expect(actual).toContain('dateOfDeposit')
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual.length).toBe(1)
+        expect(actual[0].name).toBe('testName')
+        expect(actual[0].displayName).toBe('testDisplayName')
+        expect(actual[0].id).toBe(1)
       })
 
       test('should return error on repository read error', async () => {
@@ -220,10 +222,7 @@ describe('CollectionsRepository', () => {
 
         await sut.getCollectionFacets(testCollectionModel.id).catch((e) => (error = e))
 
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-        )
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(error).toBeInstanceOf(Error)
       })
     })

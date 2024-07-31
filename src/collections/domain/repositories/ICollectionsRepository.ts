@@ -1,5 +1,6 @@
 import { CollectionDTO } from '../dtos/CollectionDTO'
 import { Collection } from '../models/Collection'
+import { CollectionFacet } from '../models/CollectionFacet'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -7,5 +8,5 @@ export interface ICollectionsRepository {
     collectionDTO: CollectionDTO,
     parentCollectionId: number | string
   ): Promise<number>
-  getCollectionFacets(collectionIdOrAlias: number | string): Promise<string[]>
+  getCollectionFacets(collectionIdOrAlias: number | string): Promise<CollectionFacet[]>
 }
