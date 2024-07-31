@@ -11,7 +11,7 @@ describe('execute', () => {
     )
   })
 
-  test('should return all facetable dataset fields', async () => {
+  test('should return all facetable metadata fields', async () => {
     let metadataFieldInfos: MetadataFieldInfo[] = null
     try {
       metadataFieldInfos = await getAllFacetableDatasetFields.execute()

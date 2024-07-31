@@ -4,7 +4,7 @@ import { IMetadataFieldInfosRepository } from '../../../src/metadataBlocks/domai
 import { GetAllFacetableMetadataFields } from '../../../src/metadataBlocks/domain/useCases/GetAllFacetableMetadataFields'
 
 describe('execute', () => {
-  test('should return all facetable dataset fields on repository success', async () => {
+  test('should return all facetable metadata fields on repository success', async () => {
     const testMetadataFieldInfos = [createMetadataFieldInfoModel()]
     const metadataFieldInfosRepositoryStub: IMetadataFieldInfosRepository =
       {} as IMetadataFieldInfosRepository

@@ -16,7 +16,7 @@ describe('getAllFacetableMetadataFields', () => {
     )
   })
 
-  test('should return all facetable dataset fields', async () => {
+  test('should return all facetable metadata fields', async () => {
     const actual = await sut.getAllFacetableMetadataFields()
 
     expect(actual.length).toBe(59)
