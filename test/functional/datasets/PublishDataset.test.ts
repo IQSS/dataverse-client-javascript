@@ -2,6 +2,7 @@ import {
   ApiConfig,
   createDataset,
   publishDataset,
+  updateDataset,
   VersionUpdateType,
   WriteError
 } from '../../../src'
@@ -72,6 +73,28 @@ describe('execute', () => {
     await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
   })
 
+  test('should successfully publish a dataset with update current version', async () => {
+    const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
+
+    const firstPublishResponse = await publishDataset.execute(
+      createdDatasetIdentifiers.persistentId,
+      VersionUpdateType.MAJOR
+    )
+    await waitForNoLocks(createdDatasetIdentifiers.numericId, 10)
+
+    await updateDataset.execute(createdDatasetIdentifiers.numericId, testNewDataset)
+
+    const secondPublishResponse = await publishDataset.execute(
+      createdDatasetIdentifiers.persistentId,
+      VersionUpdateType.UPDATE_CURRENT
+    )
+    await waitForNoLocks(createdDatasetIdentifiers.numericId, 10)
+
+    expect(firstPublishResponse).toBeUndefined()
+    expect(secondPublishResponse).toBeUndefined()
+    await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
+  })
+
   test('should throw an error when trying to publish a dataset that does not exist', async () => {
     const nonExistentTestDatasetId = 'non-existent-dataset'
     const expectedError = new WriteError(
@@ -81,5 +104,17 @@ describe('execute', () => {
     await expect(
       publishDataset.execute(nonExistentTestDatasetId, VersionUpdateType.MAJOR)
     ).rejects.toThrow(expectedError)
+  })
+
+  test('should throw an error when trying to publish with the current version a dataset that has never been published before', async () => {
+    const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
+
+    await waitForNoLocks(createdDatasetIdentifiers.numericId, 10)
+
+    await expect(
+      publishDataset.execute(createdDatasetIdentifiers.numericId, VersionUpdateType.UPDATE_CURRENT)
+    ).rejects.toBeInstanceOf(WriteError)
+
+    await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
   })
 })
