@@ -43,7 +43,7 @@ The different use cases currently available in the package are classified below,
     - [File Uploading Use Cases](#file-uploading-use-cases)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
-    - [Get All Facetable Dataset Fields](#get-all-facetable-dataset-fields)
+    - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
     - [Get Metadata Block By Name](#get-metadata-block-by-name)
     - [Get Collection Metadata Blocks](#get-collection-metadata-blocks)
 - [Users](#Users)
@@ -965,9 +965,9 @@ The following error might arise from the `AddUploadedFileToDataset` use case:
 
 ### Metadata Blocks read use cases
 
-#### Get All Facetable Dataset Fields
+#### Get All Facetable Metadata Fields
 
-Returns a [MetadataFieldInfo](../src/metadataBlocks/domain/models/MetadataBlock.ts) array containing all facetable dataset fields defined in the installation.
+Returns a [MetadataFieldInfo](../src/metadataBlocks/domain/models/MetadataBlock.ts) array containing all facetable metadata fields defined in the installation.
 
 ##### Example call:
 
@@ -983,7 +983,7 @@ getAllFacetableMetadataFields.execute().then((metadataFieldInfos: MetadataFieldI
 /* ... */
 ```
 
-_See [use case](../src/metadataBlocks/domain/useCases/GetAllFacetableDatasetFields.ts) implementation_.
+_See [use case](../src/metadataBlocks/domain/useCases/GetAllFacetableMetadataFields.ts) implementation_.
 
 #### Get Metadata Block By Name
 

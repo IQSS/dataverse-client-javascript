@@ -2,7 +2,7 @@ import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { MetadataFieldInfo } from '../..'
 import { IMetadataFieldInfosRepository } from '../repositories/IMetadataFieldInfosRepository'
 
-export class GetAllFacetableDatasetFields implements UseCase<MetadataFieldInfo[]> {
+export class GetAllFacetableMetadataFields implements UseCase<MetadataFieldInfo[]> {
   private metadataFieldInfosRepository: IMetadataFieldInfosRepository
 
   constructor(metadataFieldInfosRepository: IMetadataFieldInfosRepository) {
@@ -10,7 +10,7 @@ export class GetAllFacetableDatasetFields implements UseCase<MetadataFieldInfo[]
   }
 
   /**
-   * Returns a MetadataFieldInfo array containing all facetable dataset fields defined in the installation.
+   * Returns a MetadataFieldInfo array containing all facetable metadata fields defined in the installation.
    *
    * @returns {Promise<MetadataFieldInfo[]>}
    */
