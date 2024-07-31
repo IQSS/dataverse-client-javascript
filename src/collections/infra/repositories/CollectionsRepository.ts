@@ -60,7 +60,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     )
 
     const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
-      collectionDTO.inputLevels.map((inputLevel) => ({
+      collectionDTO.inputLevels?.map((inputLevel) => ({
         datasetFieldTypeName: inputLevel.datasetFieldName,
         include: inputLevel.include,
         required: inputLevel.required

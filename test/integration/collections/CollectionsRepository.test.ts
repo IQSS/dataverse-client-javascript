@@ -97,10 +97,12 @@ describe('CollectionsRepository', () => {
   describe('createCollection', () => {
     const testCreateCollectionAlias1 = 'createCollection-test-1'
     const testCreateCollectionAlias2 = 'createCollection-test-2'
+    const testCreateCollectionAlias3 = 'createCollection-test-3'
 
     afterAll(async () => {
       await deleteCollectionViaApi(testCreateCollectionAlias1)
       await deleteCollectionViaApi(testCreateCollectionAlias2)
+      await deleteCollectionViaApi(testCreateCollectionAlias3)
     })
 
     test('should create collection in root when no parent collection is set', async () => {
@@ -129,6 +131,13 @@ describe('CollectionsRepository', () => {
         createCollectionDTO(testCreateCollectionAlias2),
         testCollectionId
       )
+      expect(typeof actualId).toBe('number')
+    })
+
+    test('should create collection without input levels', async () => {
+      const newCollectionDTO = createCollectionDTO(testCreateCollectionAlias3)
+      newCollectionDTO.inputLevels = undefined
+      const actualId = await sut.createCollection(newCollectionDTO, testCollectionId)
       expect(typeof actualId).toBe('number')
     })
 
