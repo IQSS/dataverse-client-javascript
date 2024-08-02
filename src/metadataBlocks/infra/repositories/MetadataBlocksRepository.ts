@@ -28,4 +28,14 @@ export class MetadataBlocksRepository extends ApiRepository implements IMetadata
         throw error
       })
   }
+
+  public async getAllMetadataBlocks(): Promise<MetadataBlock[]> {
+    return this.doGet('/metadatablocks', false, {
+      returnDatasetFieldTypes: true
+    })
+      .then((response) => transformMetadataBlocksResponseToMetadataBlocks(response))
+      .catch((error) => {
+        throw error
+      })
+  }
 }

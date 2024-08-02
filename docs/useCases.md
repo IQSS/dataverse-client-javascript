@@ -43,6 +43,7 @@ The different use cases currently available in the package are classified below,
     - [File Uploading Use Cases](#file-uploading-use-cases)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
+    - [Get All Metadata Blocks](#get-all-metadata-blocks)
     - [Get Metadata Block By Name](#get-metadata-block-by-name)
     - [Get Collection Metadata Blocks](#get-collection-metadata-blocks)
 - [Users](#Users)
@@ -964,6 +965,26 @@ The following error might arise from the `AddUploadedFileToDataset` use case:
 ## Metadata Blocks
 
 ### Metadata Blocks read use cases
+
+#### Get All Metadata Blocks
+
+Returns a [MetadataBlock](../src/metadataBlocks/domain/models/MetadataBlock.ts) array containing the metadata blocks defined in the installation.
+
+##### Example call:
+
+```typescript
+import { getAllMetadataBlocks } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAllMetadataBlocks.execute().then((metadataBlocks: MetadataBlock[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/metadataBlocks/domain/useCases/GetAllMetadataBlocks.ts) implementation_.
 
 #### Get Metadata Block By Name
 
