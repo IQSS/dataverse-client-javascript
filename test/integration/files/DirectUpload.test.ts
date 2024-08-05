@@ -136,7 +136,7 @@ describe('Direct Upload', () => {
     expect(datasetFiles.files[0].storageIdentifier).toContain('localstack1://mybucket:')
   })
 
-  test('should upload file when there are multiple destination URLs', async () => {
+  test('should upload file and add it to the dataset when there are multiple destination URLs', async () => {
     const destination = await createTestFileUploadDestination(
       multipartFile,
       testDataset2Ids.numericId
