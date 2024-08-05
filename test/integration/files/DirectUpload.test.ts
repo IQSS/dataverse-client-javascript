@@ -121,7 +121,7 @@ describe('Direct Upload', () => {
       mimeType: singlepartFile.type
     }
 
-    await filesRepositorySut.addUploadedFileToDataset(testDataset1Ids.numericId, uploadedFileDTO)
+    await filesRepositorySut.addUploadedFilesToDataset(testDataset1Ids.numericId, [uploadedFileDTO])
 
     datasetFiles = await filesRepositorySut.getDatasetFiles(
       testDataset1Ids.numericId,
@@ -184,7 +184,7 @@ describe('Direct Upload', () => {
       mimeType: multipartFile.type
     }
 
-    await filesRepositorySut.addUploadedFileToDataset(testDataset2Ids.numericId, uploadedFileDTO)
+    await filesRepositorySut.addUploadedFilesToDataset(testDataset2Ids.numericId, [uploadedFileDTO])
 
     datasetFiles = await filesRepositorySut.getDatasetFiles(
       testDataset2Ids.numericId,

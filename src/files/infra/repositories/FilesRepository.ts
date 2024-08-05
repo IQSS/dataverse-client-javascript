@@ -42,6 +42,22 @@ export interface GetFilesTotalDownloadSizeQueryParams {
   searchText?: string
 }
 
+export interface UploadedFileRequestBody {
+  fileName: string
+  description: string
+  directoryLabel: string
+  categories: string[]
+  restrict: boolean
+  checksum: ChecksumRequestBody
+  mimeType: string
+  storageIdentifier: string
+}
+
+export interface ChecksumRequestBody {
+  '@value': string
+  '@type': string
+}
+
 export class FilesRepository extends ApiRepository implements IFilesRepository {
   private readonly datasetsResourceName: string = 'datasets'
   private readonly filesResourceName: string = 'files'
@@ -223,21 +239,26 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       })
   }
 
-  public async addUploadedFileToDataset(
+  public async addUploadedFilesToDataset(
     datasetId: number | string,
-    uploadedFileDTO: UploadedFileDTO
+    uploadedFileDTOs: UploadedFileDTO[]
   ): Promise<undefined> {
-    const fileArray = [
-      {
+    const fileArray: UploadedFileRequestBody[] = []
+    uploadedFileDTOs.forEach((uploadedFileDTO) => {
+      fileArray.push({
         fileName: uploadedFileDTO.fileName,
         checksum: {
           '@value': uploadedFileDTO.checksumValue,
           '@type': uploadedFileDTO.checksumType.toUpperCase()
         },
         mimeType: uploadedFileDTO.mimeType,
-        storageIdentifier: uploadedFileDTO.storageId
-      }
-    ]
+        storageIdentifier: uploadedFileDTO.storageId,
+        ...(uploadedFileDTO.description && { description: uploadedFileDTO.description }),
+        ...(uploadedFileDTO.categories && { categories: uploadedFileDTO.categories }),
+        ...(uploadedFileDTO.restrict && { restrict: uploadedFileDTO.restrict }),
+        ...(uploadedFileDTO.directoryLabel && { directoryLabel: uploadedFileDTO.directoryLabel })
+      })
+    })
     const formData = new FormData()
     formData.append('jsonData', JSON.stringify(fileArray))
     return this.doPost(

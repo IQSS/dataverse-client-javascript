@@ -909,41 +909,41 @@ The `progress` parameter represents a callback function that allows the caller t
 
 The `abortController` is a built-in mechanism in modern web browsers that allows the cancellation of asynchronous operations. It works in conjunction with an associated AbortSignal, which will be passed to the file uploading API calls to monitor whether the operation should be aborted, if the caller decides to cancel the operation midway.
 
-##### Add Uploaded File to the Dataset
+##### Add Uploaded Files to the Dataset
 
-This use case involves adding a file that has been previously uploaded to remote storage to the dataset.
+This use case involves adding files that have been previously uploaded to remote storage to the dataset.
 
 ###### Example call:
 
 ```typescript
-import { addUploadedFileToDataset } from '@iqss/dataverse-client-javascript'
+import { addUploadedFilesToDataset } from '@iqss/dataverse-client-javascript'
 import { UploadedFileDTO } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const datasetId: number | string = 123
-const uploadedFileDTO: UploadedFileDTO = {
-  fileName: 'the-file-name',
-  storageId: 'localstack1://mybucket:19121faf7e7-2c40322ff54e',
-  checksumType: 'md5',
-  checksumValue: 'ede3d3b685b4e137ba4cb2521329a75e',
-  mimeType: 'text/plain'
-}
+const uploadedFileDTOs: UploadedFileDTO[] = [
+  {
+    fileName: 'the-file-name',
+    storageId: 'localstack1://mybucket:19121faf7e7-2c40322ff54e',
+    checksumType: 'md5',
+    checksumValue: 'ede3d3b685b4e137ba4cb2521329a75e',
+    mimeType: 'text/plain'
+  }
+]
 
-addUploadedFileToDataset.execute(datasetId, uploadedFileDTO).then(() => {
-  console.log('File added to the dataset successfully.')
+addUploadedFilesToDataset.execute(datasetId, uploadedFileDTOs).then(() => {
+  console.log('Files added to the dataset successfully.')
 })
 
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/AddUploadedFileToDataset.ts) implementation_.
+_See [use case](../src/files/domain/useCases/AddUploadedFilesToDataset.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `uploadedFileDTO` parameter is an instance of [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded file. These properties should be calculated from the File Blob object previously sent through the upload file use case.
-
-The `storageId` parameter represents the storage identifier obtained after a successful call to the UploadFile use case.
+The `uploadedFileDTOs` parameter is an array of [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded files. These properties should be calculated from the uploaded File Blob objects and the resulting storage identifiers from the Upload File use case.
 
 ##### Error handling:
 
