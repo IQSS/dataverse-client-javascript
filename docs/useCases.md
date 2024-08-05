@@ -917,14 +917,20 @@ This use case involves adding a file that has been previously uploaded to remote
 
 ```typescript
 import { addUploadedFileToDataset } from '@iqss/dataverse-client-javascript'
+import { UploadedFileDTO } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const datasetId: number | string = 123
-const file: File = new File(['content'], 'example.txt', { type: 'text/plain' })
-const storageId: string = 'some-storage-identifier'
+const uploadedFileDTO: UploadedFileDTO = {
+  fileName: 'the-file-name',
+  storageId: 'localstack1://mybucket:19121faf7e7-2c40322ff54e',
+  checksumType: 'md5',
+  checksumValue: 'ede3d3b685b4e137ba4cb2521329a75e',
+  mimeType: 'text/plain'
+}
 
-addUploadedFileToDataset.execute(datasetId, file, storageId).then(() => {
+addUploadedFileToDataset.execute(datasetId, uploadedFileDTO).then(() => {
   console.log('File added to the dataset successfully.')
 })
 
@@ -935,7 +941,7 @@ _See [use case](../src/files/domain/useCases/AddUploadedFileToDataset.ts) implem
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `file` parameter is a subclass of Blob (Binary Large Object) that represents a file.
+The `uploadedFileDTO` parameter is an instance of [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded file. These properties should be calculated from the File Blob object previously sent through the upload file use case.
 
 The `storageId` parameter represents the storage identifier obtained after a successful call to the UploadFile use case.
 

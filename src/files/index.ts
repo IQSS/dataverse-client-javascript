@@ -25,7 +25,7 @@ const getFile = new GetFile(filesRepository)
 const getFileAndDataset = new GetFileAndDataset(filesRepository)
 const getFileCitation = new GetFileCitation(filesRepository)
 const uploadFile = new UploadFile(directUploadClient)
-const addUploadedFileToDataset = new AddUploadedFileToDataset(directUploadClient)
+const addUploadedFileToDataset = new AddUploadedFileToDataset(filesRepository)
 
 export {
   getDatasetFiles,
@@ -66,3 +66,4 @@ export {
 } from './domain/models/FileDataTable'
 export { FileDownloadSizeMode } from './domain/models/FileDownloadSizeMode'
 export { FilesSubset } from './domain/models/FilesSubset'
+export { UploadedFileDTO } from './domain/dtos/UploadedFileDTO'

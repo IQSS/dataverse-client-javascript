@@ -21,17 +21,20 @@ import {
   createSinglepartFileBlob
 } from '../../testHelpers/files/filesHelper'
 import { FileUploadCancelError } from '../../../src/files/infra/clients/errors/FileUploadCancelError'
+import * as crypto from 'crypto'
 
-describe('DirectUploadClient', () => {
+describe('Direct Upload', () => {
   const testCollectionAlias = 'directUploadTestCollection'
   let testDataset1Ids: CreatedDatasetIdentifiers
   let testDataset2Ids: CreatedDatasetIdentifiers
 
-  const filesRepository = new FilesRepository()
-  const sut: DirectUploadClient = new DirectUploadClient(filesRepository)
+  const filesRepositorySut = new FilesRepository()
+  const directUploadSut: DirectUploadClient = new DirectUploadClient(filesRepositorySut)
 
   let singlepartFile: File
   let multipartFile: File
+
+  const checksumAlgorithm: string = 'md5'
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -79,9 +82,9 @@ describe('DirectUploadClient', () => {
 
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(false)
 
-    // Test uploadFile method
+    // Test DirectUpload.uploadFile method
 
-    const actualStorageId = await sut.uploadFile(
+    const actualStorageId = await directUploadSut.uploadFile(
       testDataset1Ids.numericId,
       singlepartFile,
       progressMock,
@@ -96,9 +99,9 @@ describe('DirectUploadClient', () => {
     expect(progressMock).toHaveBeenCalledWith(100)
     expect(progressMock).toHaveBeenCalledTimes(2)
 
-    // Test addUploadedFileToDataset method
+    // Test FilesRepository.addUploadedFileToDataset method
 
-    let datasetFiles = await filesRepository.getDatasetFiles(
+    let datasetFiles = await filesRepositorySut.getDatasetFiles(
       testDataset1Ids.numericId,
       DatasetNotNumberedVersion.LATEST,
       true,
@@ -107,9 +110,20 @@ describe('DirectUploadClient', () => {
 
     expect(datasetFiles.totalFilesCount).toBe(0)
 
-    await sut.addUploadedFileToDataset(testDataset1Ids.numericId, singlepartFile, actualStorageId)
+    const fileArrayBuffer = await singlepartFile.arrayBuffer()
+    const fileBuffer = Buffer.from(fileArrayBuffer)
 
-    datasetFiles = await filesRepository.getDatasetFiles(
+    const uploadedFileDTO = {
+      fileName: singlepartFile.name,
+      storageId: actualStorageId,
+      checksumType: checksumAlgorithm,
+      checksumValue: calculateBlobChecksum(fileBuffer),
+      mimeType: singlepartFile.type
+    }
+
+    await filesRepositorySut.addUploadedFileToDataset(testDataset1Ids.numericId, uploadedFileDTO)
+
+    datasetFiles = await filesRepositorySut.getDatasetFiles(
       testDataset1Ids.numericId,
       DatasetNotNumberedVersion.LATEST,
       true,
@@ -122,7 +136,7 @@ describe('DirectUploadClient', () => {
     expect(datasetFiles.files[0].storageIdentifier).toContain('localstack1://mybucket:')
   })
 
-  test('should upload file and add it to the dataset when there are multiple destination URLs', async () => {
+  test('should upload file when there are multiple destination URLs', async () => {
     const destination = await createTestFileUploadDestination(
       multipartFile,
       testDataset2Ids.numericId
@@ -131,9 +145,9 @@ describe('DirectUploadClient', () => {
     const progressMock = jest.fn()
     const abortController = new AbortController()
 
-    // Test uploadFile method
+    // Test DirectUpload.uploadFile method
 
-    const actualStorageId = await sut.uploadFile(
+    const actualStorageId = await directUploadSut.uploadFile(
       testDataset2Ids.numericId,
       multipartFile,
       progressMock,
@@ -148,9 +162,9 @@ describe('DirectUploadClient', () => {
     expect(progressMock).toHaveBeenCalledWith(100)
     expect(progressMock).toHaveBeenCalledTimes(4)
 
-    // Test addUploadedFileToDataset method
+    // Test FilesRepository.addUploadedFileToDataset method
 
-    let datasetFiles = await filesRepository.getDatasetFiles(
+    let datasetFiles = await filesRepositorySut.getDatasetFiles(
       testDataset2Ids.numericId,
       DatasetNotNumberedVersion.LATEST,
       true,
@@ -159,9 +173,20 @@ describe('DirectUploadClient', () => {
 
     expect(datasetFiles.totalFilesCount).toBe(0)
 
-    await sut.addUploadedFileToDataset(testDataset2Ids.numericId, multipartFile, actualStorageId)
+    const fileArrayBuffer = await multipartFile.arrayBuffer()
+    const fileBuffer = Buffer.from(fileArrayBuffer)
 
-    datasetFiles = await filesRepository.getDatasetFiles(
+    const uploadedFileDTO = {
+      fileName: multipartFile.name,
+      storageId: actualStorageId,
+      checksumType: checksumAlgorithm,
+      checksumValue: calculateBlobChecksum(fileBuffer),
+      mimeType: multipartFile.type
+    }
+
+    await filesRepositorySut.addUploadedFileToDataset(testDataset2Ids.numericId, uploadedFileDTO)
+
+    datasetFiles = await filesRepositorySut.getDatasetFiles(
       testDataset2Ids.numericId,
       DatasetNotNumberedVersion.LATEST,
       true,
@@ -188,7 +213,7 @@ describe('DirectUploadClient', () => {
     }, 50)
 
     await expect(
-      sut.uploadFile(
+      directUploadSut.uploadFile(
         testDataset2Ids.numericId,
         multipartFile,
         progressMock,
@@ -220,5 +245,11 @@ describe('DirectUploadClient', () => {
       .catch(() => {
         return false
       })
+  }
+
+  const calculateBlobChecksum = (blob: Buffer): string => {
+    const hash = crypto.createHash(checksumAlgorithm)
+    hash.update(blob)
+    return hash.digest('hex')
   }
 })
