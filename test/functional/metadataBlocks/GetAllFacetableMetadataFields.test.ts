@@ -1,4 +1,4 @@
-import { ApiConfig, MetadataFieldInfo, getAllFacetableDatasetFields } from '../../../src'
+import { ApiConfig, MetadataFieldInfo, getAllFacetableMetadataFields } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 
@@ -14,7 +14,7 @@ describe('execute', () => {
   test('should return all facetable metadata fields', async () => {
     let metadataFieldInfos: MetadataFieldInfo[] = null
     try {
-      metadataFieldInfos = await getAllFacetableDatasetFields.execute()
+      metadataFieldInfos = await getAllFacetableMetadataFields.execute()
     } catch (error) {
       throw new Error('Should not raise an error')
     } finally {

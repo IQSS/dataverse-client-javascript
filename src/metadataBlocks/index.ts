@@ -16,7 +16,7 @@ const getAllFacetableMetadataFields = new GetAllFacetableMetadataFields(
 export {
   getMetadataBlockByName,
   getCollectionMetadataBlocks,
-  getAllFacetableMetadataFields as getAllFacetableDatasetFields
+  getAllFacetableMetadataFields
 }
 export {
   MetadataBlock,
