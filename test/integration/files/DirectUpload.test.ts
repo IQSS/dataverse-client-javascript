@@ -34,7 +34,7 @@ describe('Direct Upload', () => {
   let singlepartFile: File
   let multipartFile: File
 
-  const checksumAlgorithm: string = 'md5'
+  const checksumAlgorithm = 'md5'
 
   beforeEach(() => {
     jest.clearAllMocks()
