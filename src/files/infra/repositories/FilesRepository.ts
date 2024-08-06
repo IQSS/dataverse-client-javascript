@@ -44,13 +44,13 @@ export interface GetFilesTotalDownloadSizeQueryParams {
 
 export interface UploadedFileRequestBody {
   fileName: string
-  description: string
-  directoryLabel: string
-  categories: string[]
-  restrict: boolean
   checksum: ChecksumRequestBody
   mimeType: string
   storageIdentifier: string
+  description?: string
+  directoryLabel?: string
+  categories?: string[]
+  restrict?: boolean
 }
 
 export interface ChecksumRequestBody {
