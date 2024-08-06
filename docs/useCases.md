@@ -872,7 +872,7 @@ getDatasetFiles
 These use cases are designed to facilitate the uploading of files to a remote S3 storage and subsequently adding them to a dataset. This process involves two main steps / use cases:
 
 1. Uploading a file to remote S3 storage and obtaining a storage identifier.
-2. Adding the uploaded file to the dataset using the obtained storage identifier.
+2. Adding one or more uploaded files to the dataset using the obtained storage identifiers.
 
 This use case flow is entirely based on the Direct Upload API as described in the Dataverse documentation: https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html
 
