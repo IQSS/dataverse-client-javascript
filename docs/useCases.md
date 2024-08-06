@@ -943,7 +943,7 @@ _See [use case](../src/files/domain/useCases/AddUploadedFilesToDataset.ts) imple
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `uploadedFileDTOs` parameter is an array of [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded files. These properties should be calculated from the uploaded File Blob objects and the resulting storage identifiers from the Upload File use case.
+The `uploadedFileDTOs` parameter is an array of [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded files. Some of these properties should be calculated from the uploaded File Blob objects and the resulting storage identifiers from the Upload File use case.
 
 ##### Error handling:
 
