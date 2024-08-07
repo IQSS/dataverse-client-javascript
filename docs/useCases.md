@@ -12,6 +12,7 @@ The different use cases currently available in the package are classified below,
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
     - [Get Collection Facets](#get-collection-facets)
+    - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
 - [Datasets](#Datasets)
@@ -123,6 +124,34 @@ getCollectionFacets
 ```
 
 _See [use case](../src/collections/domain/useCases/GetCollectionFacets.ts)_ definition.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+#### Get User Permissions on a Collection
+
+Returns an instance of [CollectionUserPermissions](../src/collections/domain/models/CollectionUserPermissions.ts) that includes the permissions that the calling user has on a particular Collection.
+
+##### Example call:
+
+```typescript
+import { getCollectionUserPermissions } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+
+getCollectionUserPermissions
+  .execute(collectionIdOrAlias)
+  .then((permissions: CollectionUserPermissions) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionUserPermissions.ts) implementation_.
 
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
