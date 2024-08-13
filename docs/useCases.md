@@ -44,6 +44,7 @@ The different use cases currently available in the package are classified below,
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
+    - [Get All Metadata Blocks](#get-all-metadata-blocks)
     - [Get Metadata Block By Name](#get-metadata-block-by-name)
     - [Get Collection Metadata Blocks](#get-collection-metadata-blocks)
 - [Users](#Users)
@@ -507,15 +508,16 @@ publishDataset.execute(datasetId, versionUpdateType)
 _See [use case](../src/datasets/domain/useCases/PublishDataset.ts) implementation_.
 
 The above example publishes the dataset with the specified identifier and performs a minor version update. If the response
-is successful, the use case does not return the dataset object, but the HTTP status code `200`. Otherwise, it throws an error.
-If you want to perform a major version update, you must set the `versionUpdateType` parameter to `VersionUpdateType.MAJOR`.
-
+is successful, the use case does not return the dataset object, but the HTTP status code `200`. Otherwise, it throws an error.\
+If you want to perform a major version update, you must set the `versionUpdateType` parameter to `VersionUpdateType.MAJOR`.\
+Superusers can pass `VersionUpdateType.UPDATE_CURRENT` to update metadata without changing the version number. This will overwrite the latest published version and therefore will only work for a dataset that has been published at least once. \*Note that this will only work also if there were no file changes in the update.\
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/domain/models/VersionUpdateType.ts) enum value, which can be one of the following:
 
 - `VersionUpdateType.MINOR`
 - `VersionUpdateType.MAJOR`
+- `VersionUpdateType.UPDATE_CURRENT`
 
 ## Files
 
@@ -984,6 +986,26 @@ getAllFacetableMetadataFields.execute().then((metadataFieldInfos: MetadataFieldI
 ```
 
 _See [use case](../src/metadataBlocks/domain/useCases/GetAllFacetableMetadataFields.ts) implementation_.
+
+#### Get All Metadata Blocks
+
+Returns a [MetadataBlock](../src/metadataBlocks/domain/models/MetadataBlock.ts) array containing the metadata blocks defined in the installation.
+
+##### Example call:
+
+```typescript
+import { getAllMetadataBlocks } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAllMetadataBlocks.execute().then((metadataBlocks: MetadataBlock[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/metadataBlocks/domain/useCases/GetAllMetadataBlocks.ts) implementation_.
 
 #### Get Metadata Block By Name
 

@@ -6,9 +6,9 @@ import {
 } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
 
-describe('getMetadataBlockByName', () => {
-  const sut: MetadataBlocksRepository = new MetadataBlocksRepository()
+describe('MetadataBlocksRepository', () => {
   const citationMetadataBlockName = 'citation'
+  const sut: MetadataBlocksRepository = new MetadataBlocksRepository()
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -29,17 +29,39 @@ describe('getMetadataBlockByName', () => {
     )
   })
 
-  test('should return metadata block when it exists', async () => {
-    const actual = await sut.getMetadataBlockByName(citationMetadataBlockName)
+  describe('getMetadataBlockByName', () => {
+    test('should return error when metadata block does not exist', async () => {
+      const nonExistentMetadataBlockName = 'nonExistentMetadataBlock'
+      const errorExpected: ReadError = new ReadError(
+        `[404] Can't find metadata block '${nonExistentMetadataBlockName}'`
+      )
 
-    expect(actual.name).toBe(citationMetadataBlockName)
+      await expect(sut.getMetadataBlockByName(nonExistentMetadataBlockName)).rejects.toThrow(
+        errorExpected
+      )
+    })
+
+    test('should return metadata block when it exists', async () => {
+      const actual = await sut.getMetadataBlockByName(citationMetadataBlockName)
+
+      expect(actual.name).toBe(citationMetadataBlockName)
+    })
+
+    test('should return collection metadata blocks', async () => {
+      const actual = await sut.getCollectionMetadataBlocks('root', true)
+
+      expect(actual.length).toBe(1)
+      expect(actual[0].name).toBe(citationMetadataBlockName)
+      expect(actual[0].metadataFields.title.name).toBe('title')
+    })
   })
 
-  test('should return collection metadata blocks', async () => {
-    const actual = await sut.getCollectionMetadataBlocks('root', true)
-
-    expect(actual.length).toBe(1)
-    expect(actual[0].name).toBe(citationMetadataBlockName)
-    expect(actual[0].metadataFields.title.name).toBe('title')
+  describe('getAllMetadataBlocks', () => {
+    test('should return all metadata blocks', async () => {
+      const actual = await sut.getAllMetadataBlocks()
+      expect(actual.length).toBe(6)
+      expect(actual[0].name).toBe(citationMetadataBlockName)
+      expect(actual[0].metadataFields.title.name).toBe('title')
+    })
   })
 })

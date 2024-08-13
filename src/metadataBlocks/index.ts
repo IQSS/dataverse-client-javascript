@@ -3,6 +3,7 @@ import { MetadataBlocksRepository } from './infra/repositories/MetadataBlocksRep
 import { GetCollectionMetadataBlocks } from './domain/useCases/GetCollectionMetadataBlocks'
 import { GetAllFacetableMetadataFields } from './domain/useCases/GetAllFacetableMetadataFields'
 import { MetadataFieldInfosRepository } from './infra/repositories/MetadataFieldInfosRepository'
+import { GetAllMetadataBlocks } from './domain/useCases/GetAllMetadataBlocks'
 
 const metadataBlocksRepository = new MetadataBlocksRepository()
 const metadataFieldInfosRepository = new MetadataFieldInfosRepository()
@@ -12,12 +13,15 @@ const getCollectionMetadataBlocks = new GetCollectionMetadataBlocks(metadataBloc
 const getAllFacetableMetadataFields = new GetAllFacetableMetadataFields(
   metadataFieldInfosRepository
 )
+const getAllMetadataBlocks = new GetAllMetadataBlocks(metadataBlocksRepository)
 
 export {
   getMetadataBlockByName,
   getCollectionMetadataBlocks,
-  getAllFacetableMetadataFields
+  getAllFacetableMetadataFields,
+  getAllMetadataBlocks
 }
+
 export {
   MetadataBlock,
   MetadataFieldInfo,
