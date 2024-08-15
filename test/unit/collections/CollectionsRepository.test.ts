@@ -13,6 +13,10 @@ import {
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError, WriteError } from '../../../src'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
+import {
+  createCollectionUserPermissionsModel,
+  createCollectionUserPermissionsPayload
+} from '../../testHelpers/collections/collectionUserPermissionsHelper'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -219,6 +223,57 @@ describe('CollectionsRepository', () => {
         let error = undefined as unknown as ReadError
 
         await sut.getCollectionFacets(testCollectionModel.id).catch((e) => (error = e))
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(error).toBeInstanceOf(Error)
+      })
+    })
+  })
+
+  describe('getCollectionUserPermissions', () => {
+    const testCollectionUserPermissions = createCollectionUserPermissionsModel()
+    const testCollectionUserPermissionsResponse = {
+      data: {
+        status: 'OK',
+        data: createCollectionUserPermissionsPayload()
+      }
+    }
+
+    describe('by numeric id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.id}/userPermissions`
+
+      test('should return dataset user permissions when providing id and response is successful', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testCollectionUserPermissionsResponse)
+
+        // API Key auth
+        let actual = await sut.getCollectionUserPermissions(testCollectionModel.id)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toStrictEqual(testCollectionUserPermissions)
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        actual = await sut.getCollectionUserPermissions(testCollectionModel.id)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+        expect(actual).toStrictEqual(testCollectionUserPermissions)
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        let error = undefined as unknown as ReadError
+        await sut.getCollectionUserPermissions(testCollectionModel.id).catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,

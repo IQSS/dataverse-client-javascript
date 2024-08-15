@@ -3,6 +3,8 @@ import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRe
 import { transformCollectionResponseToCollection } from './transformers/collectionTransformers'
 import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collection'
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
+import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
+import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -82,6 +84,21 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   public async getCollectionFacets(collectionIdOrAlias: string | number): Promise<string[]> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/facets`, true)
       .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getCollectionUserPermissions(
+    collectionIdOrAlias: number | string
+  ): Promise<CollectionUserPermissions> {
+    return this.doGet(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/userPermissions`,
+      true
+    )
+      .then((response) =>
+        transformCollectionUserPermissionsResponseToCollectionUserPermissions(response)
+      )
       .catch((error) => {
         throw error
       })
