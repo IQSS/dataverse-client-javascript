@@ -6,12 +6,10 @@ import {
   buildRequestConfig,
   buildRequestUrl
 } from '../../../core/infra/repositories/apiConfigBuilders'
-import * as crypto from 'crypto'
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository'
 import { FileUploadError } from './errors/FileUploadError'
 import { FilePartUploadError } from './errors/FilePartUploadError'
 import { MultipartCompletionError } from './errors/MultipartCompletionError'
-import { AddUploadedFileToDatasetError } from './errors/AddUploadedFileToDatasetError'
 import { UrlGenerationError } from './errors/UrlGenerationError'
 import { MultipartAbortError } from './errors/MultipartAbortError'
 import { FileUploadCancelError } from './errors/FileUploadCancelError'
@@ -20,8 +18,6 @@ import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 export class DirectUploadClient implements IDirectUploadClient {
   private filesRepository: IFilesRepository
   private maxMultipartRetries: number
-
-  private readonly checksumAlgorithm: string = 'md5'
 
   private readonly progressAfterUrlGeneration: number = 10
   private readonly progressAfterFileUpload: number = 100
@@ -191,32 +187,5 @@ export class DirectUploadClient implements IDirectUploadClient {
         }
         throw new MultipartCompletionError(fileName, datasetId, error.message)
       })
-  }
-
-  public async addUploadedFileToDataset(
-    datasetId: number | string,
-    file: File,
-    storageId: string
-  ): Promise<void> {
-    const fileArrayBuffer = await file.arrayBuffer()
-    const fileBuffer = Buffer.from(fileArrayBuffer)
-    return await this.filesRepository
-      .addUploadedFileToDataset(datasetId, {
-        fileName: file.name,
-        storageId: storageId,
-        checksumType: this.checksumAlgorithm,
-        checksumValue: this.calculateBlobChecksum(fileBuffer),
-        mimeType: file.type
-      })
-      .then(() => undefined)
-      .catch((error) => {
-        throw new AddUploadedFileToDatasetError(file.name, datasetId, error.message)
-      })
-  }
-
-  private calculateBlobChecksum(blob: Buffer): string {
-    const hash = crypto.createHash(this.checksumAlgorithm)
-    hash.update(blob)
-    return hash.digest('hex')
   }
 }
