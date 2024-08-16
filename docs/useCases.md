@@ -12,6 +12,7 @@ The different use cases currently available in the package are classified below,
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
     - [Get Collection Facets](#get-collection-facets)
+    - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
 - [Datasets](#Datasets)
@@ -125,6 +126,34 @@ getCollectionFacets
 ```
 
 _See [use case](../src/collections/domain/useCases/GetCollectionFacets.ts)_ definition.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+#### Get User Permissions on a Collection
+
+Returns an instance of [CollectionUserPermissions](../src/collections/domain/models/CollectionUserPermissions.ts) that includes the permissions that the calling user has on a particular Collection.
+
+##### Example call:
+
+```typescript
+import { getCollectionUserPermissions } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+
+getCollectionUserPermissions
+  .execute(collectionIdOrAlias)
+  .then((permissions: CollectionUserPermissions) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionUserPermissions.ts) implementation_.
 
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
@@ -874,7 +903,7 @@ getDatasetFiles
 These use cases are designed to facilitate the uploading of files to a remote S3 storage and subsequently adding them to a dataset. This process involves two main steps / use cases:
 
 1. Uploading a file to remote S3 storage and obtaining a storage identifier.
-2. Adding the uploaded file to the dataset using the obtained storage identifier.
+2. Adding one or more uploaded files to the dataset using the obtained storage identifiers.
 
 This use case flow is entirely based on the Direct Upload API as described in the Dataverse documentation: https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html
 
@@ -911,35 +940,41 @@ The `progress` parameter represents a callback function that allows the caller t
 
 The `abortController` is a built-in mechanism in modern web browsers that allows the cancellation of asynchronous operations. It works in conjunction with an associated AbortSignal, which will be passed to the file uploading API calls to monitor whether the operation should be aborted, if the caller decides to cancel the operation midway.
 
-##### Add Uploaded File to the Dataset
+##### Add Uploaded Files to the Dataset
 
-This use case involves adding a file that has been previously uploaded to remote storage to the dataset.
+This use case involves adding files that have been previously uploaded to remote storage to the dataset.
 
 ###### Example call:
 
 ```typescript
-import { addUploadedFileToDataset } from '@iqss/dataverse-client-javascript'
+import { addUploadedFilesToDataset } from '@iqss/dataverse-client-javascript'
+import { UploadedFileDTO } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const datasetId: number | string = 123
-const file: File = new File(['content'], 'example.txt', { type: 'text/plain' })
-const storageId: string = 'some-storage-identifier'
+const uploadedFileDTOs: UploadedFileDTO[] = [
+  {
+    fileName: 'the-file-name',
+    storageId: 'localstack1://mybucket:19121faf7e7-2c40322ff54e',
+    checksumType: 'md5',
+    checksumValue: 'ede3d3b685b4e137ba4cb2521329a75e',
+    mimeType: 'text/plain'
+  }
+]
 
-addUploadedFileToDataset.execute(datasetId, file, storageId).then(() => {
-  console.log('File added to the dataset successfully.')
+addUploadedFilesToDataset.execute(datasetId, uploadedFileDTOs).then(() => {
+  console.log('Files added to the dataset successfully.')
 })
 
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/AddUploadedFileToDataset.ts) implementation_.
+_See [use case](../src/files/domain/useCases/AddUploadedFilesToDataset.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `file` parameter is a subclass of Blob (Binary Large Object) that represents a file.
-
-The `storageId` parameter represents the storage identifier obtained after a successful call to the UploadFile use case.
+The `uploadedFileDTOs` parameter is an array of [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded files. Some of these properties should be calculated from the uploaded File Blob objects and the resulting storage identifiers from the Upload File use case.
 
 ##### Error handling:
 

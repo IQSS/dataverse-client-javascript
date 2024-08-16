@@ -174,4 +174,29 @@ describe('CollectionsRepository', () => {
       ).rejects.toThrow(expectedError)
     })
   })
+
+  describe('getCollectionUserPermissions', () => {
+    test('should return user permissions', async () => {
+      const actual = await sut.getCollectionUserPermissions('root')
+      expect(actual.canAddDataset).toBe(true)
+      expect(actual.canAddCollection).toBe(true)
+      expect(actual.canDeleteCollection).toBe(true)
+      expect(actual.canEditCollection).toBe(true)
+      expect(actual.canManageCollectionPermissions).toBe(true)
+      expect(actual.canPublishCollection).toBe(true)
+      expect(actual.canViewUnpublishedCollection).toBe(true)
+    })
+
+    test('should return error when collection does not exist', async () => {
+      const nonExistentCollectionAlias = 'nonExistentCollection'
+
+      const expectedError = new ReadError(
+        `[404] Can't find dataverse with identifier='${nonExistentCollectionAlias}'`
+      )
+
+      await expect(sut.getCollectionUserPermissions(nonExistentCollectionAlias)).rejects.toThrow(
+        expectedError
+      )
+    })
+  })
 })

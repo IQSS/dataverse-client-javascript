@@ -1,6 +1,7 @@
 import { CollectionDTO } from '../dtos/CollectionDTO'
 import { Collection } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
+import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -9,4 +10,7 @@ export interface ICollectionsRepository {
     parentCollectionId: number | string
   ): Promise<number>
   getCollectionFacets(collectionIdOrAlias: number | string): Promise<CollectionFacet[]>
+  getCollectionUserPermissions(
+    collectionIdOrAlias: number | string
+  ): Promise<CollectionUserPermissions>
 }

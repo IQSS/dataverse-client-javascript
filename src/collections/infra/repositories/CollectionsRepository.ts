@@ -7,6 +7,8 @@ import {
 import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collection'
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
 import { CollectionFacet } from '../../domain/models/CollectionFacet'
+import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
+import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -98,6 +100,21 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       returnDetails: true
     })
       .then((response) => transformCollectionFacetsResponseToCollectionFacets(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getCollectionUserPermissions(
+    collectionIdOrAlias: number | string
+  ): Promise<CollectionUserPermissions> {
+    return this.doGet(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/userPermissions`,
+      true
+    )
+      .then((response) =>
+        transformCollectionUserPermissionsResponseToCollectionUserPermissions(response)
+      )
       .catch((error) => {
         throw error
       })

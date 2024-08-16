@@ -10,7 +10,7 @@ import { GetFileCitation } from './domain/useCases/GetFileCitation'
 import { GetFileAndDataset } from './domain/useCases/GetFileAndDataset'
 import { UploadFile } from './domain/useCases/UploadFile'
 import { DirectUploadClient } from './infra/clients/DirectUploadClient'
-import { AddUploadedFileToDataset } from './domain/useCases/AddUploadedFileToDataset'
+import { AddUploadedFilesToDataset } from './domain/useCases/AddUploadedFilesToDataset'
 
 const filesRepository = new FilesRepository()
 const directUploadClient = new DirectUploadClient(filesRepository)
@@ -25,7 +25,7 @@ const getFile = new GetFile(filesRepository)
 const getFileAndDataset = new GetFileAndDataset(filesRepository)
 const getFileCitation = new GetFileCitation(filesRepository)
 const uploadFile = new UploadFile(directUploadClient)
-const addUploadedFileToDataset = new AddUploadedFileToDataset(directUploadClient)
+const addUploadedFilesToDataset = new AddUploadedFilesToDataset(filesRepository)
 
 export {
   getDatasetFiles,
@@ -38,7 +38,7 @@ export {
   getFileAndDataset,
   getFileCitation,
   uploadFile,
-  addUploadedFileToDataset
+  addUploadedFilesToDataset
 }
 
 export { FileModel as File, FileEmbargo, FileChecksum } from './domain/models/FileModel'
@@ -66,3 +66,4 @@ export {
 } from './domain/models/FileDataTable'
 export { FileDownloadSizeMode } from './domain/models/FileDownloadSizeMode'
 export { FilesSubset } from './domain/models/FilesSubset'
+export { UploadedFileDTO } from './domain/dtos/UploadedFileDTO'

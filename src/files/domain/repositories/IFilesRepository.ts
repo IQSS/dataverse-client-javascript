@@ -55,8 +55,8 @@ export interface IFilesRepository {
 
   getFileUploadDestination(datasetId: number | string, file: File): Promise<FileUploadDestination>
 
-  addUploadedFileToDataset(
+  addUploadedFilesToDataset(
     datasetId: number | string,
-    uploadedFileDTO: UploadedFileDTO
+    uploadedFileDTOs: UploadedFileDTO[]
   ): Promise<undefined>
 }

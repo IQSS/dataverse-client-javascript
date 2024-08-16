@@ -79,7 +79,7 @@ describe('uploadFile', () => {
       const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
       const testDestination: FileUploadDestination = createSingleFileUploadDestinationModel()
       filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
-      filesRepositoryStub.addUploadedFileToDataset = jest.fn().mockResolvedValue(undefined)
+      filesRepositoryStub.addUploadedFilesToDataset = jest.fn().mockResolvedValue(undefined)
 
       jest.spyOn(axios, 'put').mockResolvedValue(undefined)
 
@@ -199,7 +199,7 @@ describe('uploadFile', () => {
       filesRepositoryStub.getFileUploadDestination = jest
         .fn()
         .mockResolvedValue(testMultipartDestination)
-      filesRepositoryStub.addUploadedFileToDataset = jest.fn().mockResolvedValue(undefined)
+      filesRepositoryStub.addUploadedFilesToDataset = jest.fn().mockResolvedValue(undefined)
 
       jest
         .spyOn(axios, 'put')
