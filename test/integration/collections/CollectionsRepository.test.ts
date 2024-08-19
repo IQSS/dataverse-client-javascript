@@ -97,10 +97,12 @@ describe('CollectionsRepository', () => {
   describe('createCollection', () => {
     const testCreateCollectionAlias1 = 'createCollection-test-1'
     const testCreateCollectionAlias2 = 'createCollection-test-2'
+    const testCreateCollectionAlias3 = 'createCollection-test-3'
 
     afterAll(async () => {
       await deleteCollectionViaApi(testCreateCollectionAlias1)
       await deleteCollectionViaApi(testCreateCollectionAlias2)
+      await deleteCollectionViaApi(testCreateCollectionAlias3)
     })
 
     test('should create collection in root when no parent collection is set', async () => {
@@ -132,6 +134,13 @@ describe('CollectionsRepository', () => {
       expect(typeof actualId).toBe('number')
     })
 
+    test('should create collection without input levels', async () => {
+      const newCollectionDTO = createCollectionDTO(testCreateCollectionAlias3)
+      newCollectionDTO.inputLevels = undefined
+      const actualId = await sut.createCollection(newCollectionDTO, testCollectionId)
+      expect(typeof actualId).toBe('number')
+    })
+
     test('should return error when parent collection does not exist', async () => {
       const expectedError = new WriteError(
         `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
@@ -149,10 +158,10 @@ describe('CollectionsRepository', () => {
   describe('getCollectionFacets', () => {
     test('should return collection facets given a valid collection alias', async () => {
       const actual = await sut.getCollectionFacets(testCollectionAlias)
-      expect(actual).toContain('authorName')
-      expect(actual).toContain('subject')
-      expect(actual).toContain('keywordValue')
-      expect(actual).toContain('dateOfDeposit')
+      expect(actual.length).toBe(4)
+      expect(actual[0].name).toBe('authorName')
+      expect(actual[0].displayName).toBe('Author Name')
+      expect(actual[0].id).not.toBe(undefined)
     })
 
     test('should return error when collection does not exist', async () => {

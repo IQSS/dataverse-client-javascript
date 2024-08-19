@@ -3,7 +3,7 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 
 describe('execute', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,

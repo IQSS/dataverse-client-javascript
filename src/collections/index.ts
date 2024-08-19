@@ -14,5 +14,6 @@ const getCollectionUserPermissions = new GetCollectionUserPermissions(collection
 
 export { getCollection, createCollection, getCollectionFacets, getCollectionUserPermissions }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
+export { CollectionFacet } from './domain/models/CollectionFacet'
 export { CollectionUserPermissions } from './domain/models/CollectionUserPermissions'
 export { CollectionDTO, CollectionInputLevelDTO } from './domain/dtos/CollectionDTO'

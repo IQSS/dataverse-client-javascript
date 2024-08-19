@@ -44,6 +44,7 @@ The different use cases currently available in the package are classified below,
     - [File Uploading Use Cases](#file-uploading-use-cases)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
+    - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
     - [Get All Metadata Blocks](#get-all-metadata-blocks)
     - [Get Metadata Block By Name](#get-metadata-block-by-name)
     - [Get Collection Metadata Blocks](#get-collection-metadata-blocks)
@@ -105,7 +106,7 @@ If no collection identifier is specified, the default collection identifier; `ro
 
 #### Get Collection Facets
 
-Returns the names of the configured collection facets, given a collection identifier or alias.
+Returns a [CollectionFacet](../src/collections/domain/models/CollectionFacet.ts) array containing the facets of the requested collection, given the collection identifier or alias.
 
 ##### Example call:
 
@@ -116,7 +117,7 @@ const collectionIdOrAlias = 12345
 
 getCollectionFacets
   .execute(collectionId)
-  .then((facets: string[]) => {
+  .then((facets: CollectionFacet[]) => {
     /* ... */
   })
   .catch((error: Error) => {
@@ -1000,6 +1001,26 @@ The following error might arise from the `AddUploadedFileToDataset` use case:
 ## Metadata Blocks
 
 ### Metadata Blocks read use cases
+
+#### Get All Facetable Metadata Fields
+
+Returns a [MetadataFieldInfo](../src/metadataBlocks/domain/models/MetadataBlock.ts) array containing all facetable metadata fields defined in the installation.
+
+##### Example call:
+
+```typescript
+import { getAllFacetableMetadataFields } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAllFacetableMetadataFields.execute().then((metadataFieldInfos: MetadataFieldInfo[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/metadataBlocks/domain/useCases/GetAllFacetableMetadataFields.ts) implementation_.
 
 #### Get All Metadata Blocks
 

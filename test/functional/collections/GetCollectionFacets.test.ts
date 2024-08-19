@@ -1,4 +1,4 @@
-import { ApiConfig, ReadError, getCollectionFacets } from '../../../src'
+import { ApiConfig, CollectionFacet, ReadError, getCollectionFacets } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
@@ -13,16 +13,14 @@ describe('execute', () => {
   })
 
   test('should return facets when a valid collection alias is provided', async () => {
-    let actual: string[] = []
+    let actual: CollectionFacet[] = []
     try {
       actual = await getCollectionFacets.execute(ROOT_COLLECTION_ALIAS)
     } catch (error) {
       throw new Error('Facets should be retrieved')
     } finally {
-      expect(actual).toContain('authorName')
-      expect(actual).toContain('subject')
-      expect(actual).toContain('keywordValue')
-      expect(actual).toContain('dateOfDeposit')
+      expect(actual[0].name).toBe('authorName')
+      expect(actual.length).toBe(4)
     }
   })
 
