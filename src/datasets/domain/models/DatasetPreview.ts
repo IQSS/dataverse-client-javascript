@@ -1,3 +1,4 @@
+import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { DatasetVersionInfo } from './Dataset'
 
 export interface DatasetPreview {
@@ -7,4 +8,5 @@ export interface DatasetPreview {
   versionInfo: DatasetVersionInfo
   citation: string
   description: string
+  publicationStatuses: PublicationStatus[]
 }

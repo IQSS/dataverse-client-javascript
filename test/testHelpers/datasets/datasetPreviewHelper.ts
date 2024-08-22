@@ -1,6 +1,7 @@
 import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview'
 import { DatasetVersionState } from '../../../src/datasets/domain/models/Dataset'
-import { DatasetPreviewPayload } from '../../../src/datasets/infra/repositories/transformers/datasetPreviewsTransformers'
+import { DatasetPreviewPayload } from '../../../src/datasets/infra/repositories/transformers/DatasetPreviewPayload'
+import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 
 const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z'
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z'
@@ -23,7 +24,8 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
       releaseTime: new Date(DATASET_RELEASE_TIME_STR)
     },
     citation: DATASET_CITATION,
-    description: 'test'
+    description: 'test',
+    publicationStatuses: [PublicationStatus.Draft, PublicationStatus.Unpublished]
   }
   return datasetPreviewModel
 }
@@ -40,6 +42,7 @@ export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
     updatedAt: DATASET_UPDATE_TIME_STR,
     published_at: DATASET_RELEASE_TIME_STR,
     citation: DATASET_CITATION,
-    description: 'test'
+    description: 'test',
+    publicationStatuses: ['Draft', 'Unpublished']
   }
 }

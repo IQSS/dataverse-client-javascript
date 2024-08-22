@@ -1,8 +1,12 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRepository'
-import { transformCollectionResponseToCollection } from './transformers/collectionTransformers'
+import {
+  transformCollectionItemsResponseToCollectionItemSubset,
+  transformCollectionResponseToCollection
+} from './transformers/collectionTransformers'
 import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collection'
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
+import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -26,6 +30,12 @@ export interface NewCollectionInputLevelRequestPayload {
   datasetFieldTypeName: string
   include: boolean
   required: boolean
+}
+
+export interface GetCollectionItemsQueryParams {
+  subtree: string
+  per_page?: number
+  start?: number
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -82,6 +92,27 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   public async getCollectionFacets(collectionIdOrAlias: string | number): Promise<string[]> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/facets`, true)
       .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getCollectionItems(
+    collectionId: string,
+    limit?: number,
+    offset?: number
+  ): Promise<CollectionItemSubset> {
+    const queryParams: GetCollectionItemsQueryParams = {
+      subtree: collectionId
+    }
+    if (limit !== undefined) {
+      queryParams.per_page = limit
+    }
+    if (offset !== undefined) {
+      queryParams.start = offset
+    }
+    return this.doGet('/search?q=*&type=dataset&type=file&sort=date&order=desc', true, queryParams)
+      .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error
       })
