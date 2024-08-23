@@ -66,4 +66,4 @@ export {
 } from './domain/models/FileDataTable'
 export { FileDownloadSizeMode } from './domain/models/FileDownloadSizeMode'
 export { FilesSubset } from './domain/models/FilesSubset'
-export { FilePreview } from './domain/models/FilePreview'
+export { FilePreview, FilePreviewChecksum } from './domain/models/FilePreview'

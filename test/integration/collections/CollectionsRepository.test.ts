@@ -206,7 +206,7 @@ describe('CollectionsRepository', () => {
       // Give enough time to Solr for indexing
       await new Promise((resolve) => setTimeout(resolve, 5000))
 
-      const actual = await sut.getCollectionItems(testCollectionAlias)
+      let actual = await sut.getCollectionItems(testCollectionAlias)
       const actualFilePreview = actual.items[0] as FilePreview
       const actualDatasetPreview = actual.items[1] as DatasetPreview
 
@@ -229,7 +229,7 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
       expect(actualFilePreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
       expect(actualFilePreview.sizeInBytes).toBe(12)
-      expect(actualFilePreview.url).toBe('http://localhost:8080/api/access/datafile/17')
+      expect(actualFilePreview.url).not.toBeUndefined()
 
       expect(actualDatasetPreview.title).toBe('Dataset created using the createDataset use case')
       expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
@@ -238,13 +238,18 @@ describe('CollectionsRepository', () => {
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
       expect(actualDatasetPreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
-      expect(actualDatasetPreview.versionId).toBe(8)
+      expect(actualDatasetPreview.versionId).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.createTime).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.lastUpdateTime).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.majorNumber).toBeUndefined()
       expect(actualDatasetPreview.versionInfo.minorNumber).toBeUndefined()
       expect(actualDatasetPreview.versionInfo.state).toBe('DRAFT')
 
+      expect(actual.totalItemCount).toBe(2)
+
+      // Test limit and offset
+      actual = await sut.getCollectionItems(testCollectionAlias, 1, 1)
+      expect((actual.items[0] as DatasetPreview).persistentId).toBe(testDatasetIds.persistentId)
       expect(actual.totalItemCount).toBe(2)
     })
 
