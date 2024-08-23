@@ -11,7 +11,7 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
 
   /**
    * Returns an instance of CollectionItemSubset that contains reduced information for each item that the calling user can access in the installation.
-   * If no collection identifier is provided, all items from all collections will be retrieved.
+   * If the collectionId parameter is not set, the use case will return items starting from the root collection.
    *
    * @param {string} [collectionId] - Collection id (optional).
    * @param {number} [limit] - Limit for pagination (optional).

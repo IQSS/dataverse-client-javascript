@@ -12,6 +12,7 @@ The different use cases currently available in the package are classified below,
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
     - [Get Collection Facets](#get-collection-facets)
+    - [List All Collection Items](#list-all-collection-items)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
 - [Datasets](#Datasets)
@@ -128,6 +129,36 @@ _See [use case](../src/collections/domain/useCases/GetCollectionFacets.ts)_ defi
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+#### List All Collection Items
+
+Returns an instance of [CollectionItemSubset](../src/collections/domain/models/CollectionItemSubset.ts) that contains reduced information for each collection item that the calling user can access in the installation.
+
+##### Example call:
+
+```typescript
+import { getCollectionItems } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionId = 'subcollection1'
+const limit = 10
+const offset = 20
+
+getCollectionItems.execute(collectionId, limit, offset).then((subset: CollectionItemSubset) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionItems.ts) implementation_.
+
+Note that `collectionId` is an optional parameter to filter the items by a specific collection. If not set, the use case will return items starting from the root collection.
+
+Note that `limit` and `offset` are optional parameters for pagination.
+
+The `CollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
 
 ### Collections Write Use Cases
 
