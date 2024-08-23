@@ -19,7 +19,7 @@ export const transformFilePreviewPayloadToFilePreview = (
       filePersistentId: filePreviewPayload.file_persistent_id
     }),
     description: filePreviewPayload.description,
-    fileType: filePreviewPayload.type,
+    fileType: filePreviewPayload.file_type,
     fileContentType: filePreviewPayload.file_content_type,
     sizeInBytes: filePreviewPayload.size_in_bytes,
     ...(filePreviewPayload.md5 && { md5: filePreviewPayload.md5 }),

@@ -10,15 +10,16 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
   }
 
   /**
-   * Returns an instance of CollectionItemSubset that contains reduced information for each collection item that the calling user can access in the installation.
+   * Returns an instance of CollectionItemSubset that contains reduced information for each item that the calling user can access in the installation.
+   * If no collection identifier is provided, all items from all collections will be retrieved.
    *
-   * @param {string} [collectionId] - Collection id.
+   * @param {string} [collectionId] - Collection id (optional).
    * @param {number} [limit] - Limit for pagination (optional).
    * @param {number} [offset] - Offset for pagination (optional).
    * @returns {Promise<CollectionItemSubset>}
    */
   async execute(
-    collectionId: string,
+    collectionId?: string,
     limit?: number,
     offset?: number
   ): Promise<CollectionItemSubset> {

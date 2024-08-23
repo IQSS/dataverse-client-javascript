@@ -10,7 +10,7 @@ export interface ICollectionsRepository {
   ): Promise<number>
   getCollectionFacets(collectionIdOrAlias: number | string): Promise<string[]>
   getCollectionItems(
-    collectionId: string,
+    collectionId?: string,
     limit?: number,
     offset?: number
   ): Promise<CollectionItemSubset>

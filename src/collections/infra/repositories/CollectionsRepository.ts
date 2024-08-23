@@ -33,7 +33,7 @@ export interface NewCollectionInputLevelRequestPayload {
 }
 
 export interface GetCollectionItemsQueryParams {
-  subtree: string
+  subtree?: string
   per_page?: number
   start?: number
 }
@@ -98,12 +98,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   }
 
   public async getCollectionItems(
-    collectionId: string,
+    collectionId?: string,
     limit?: number,
     offset?: number
   ): Promise<CollectionItemSubset> {
-    const queryParams: GetCollectionItemsQueryParams = {
-      subtree: collectionId
+    const queryParams: GetCollectionItemsQueryParams = {}
+    if (collectionId !== undefined) {
+      queryParams.subtree = collectionId
     }
     if (limit !== undefined) {
       queryParams.per_page = limit

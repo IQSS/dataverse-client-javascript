@@ -43,6 +43,7 @@ export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
     published_at: DATASET_RELEASE_TIME_STR,
     citation: DATASET_CITATION,
     description: 'test',
+    type: 'dataset',
     publicationStatuses: ['Draft', 'Unpublished']
   }
 }
