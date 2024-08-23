@@ -13,8 +13,14 @@ import {
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError, WriteError } from '../../../src'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
-import { createDatasetPreviewModel, createDatasetPreviewPayload } from '../../testHelpers/datasets/datasetPreviewHelper'
-import { createFilePreviewModel, createFilePreviewPayload } from '../../testHelpers/files/filePreviewHelper'
+import {
+  createDatasetPreviewModel,
+  createDatasetPreviewPayload
+} from '../../testHelpers/datasets/datasetPreviewHelper'
+import {
+  createFilePreviewModel,
+  createFilePreviewPayload
+} from '../../testHelpers/files/filePreviewHelper'
 import { CollectionItemSubset } from '../../../src/collections/domain/models/CollectionItemSubset'
 
 describe('CollectionsRepository', () => {

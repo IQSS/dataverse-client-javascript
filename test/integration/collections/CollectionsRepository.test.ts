@@ -223,7 +223,7 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.description).toBe('')
       expect(actualFilePreview.fileContentType).toBe('text/plain')
       expect(actualFilePreview.fileId).not.toBeUndefined()
-      expect(actualFilePreview.fileType).toBe('file')
+      expect(actualFilePreview.fileType).toBe('Plain Text')
       expect(actualFilePreview.md5).toBe(expectedFileMd5)
       expect(actualFilePreview.name).toBe('test-file-1.txt')
       expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)

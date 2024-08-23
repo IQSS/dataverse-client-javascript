@@ -23,7 +23,7 @@ export const transformDatasetPreviewsResponseToDatasetPreviewSubset = (
 export const transformDatasetPreviewPayloadToDatasetPreview = (
   datasetPreviewPayload: DatasetPreviewPayload
 ): DatasetPreview => {
-  let publicationStatuses: PublicationStatus[] = []
+  const publicationStatuses: PublicationStatus[] = []
   datasetPreviewPayload.publicationStatuses.forEach((element) => {
     publicationStatuses.push(element as unknown as PublicationStatus)
   })

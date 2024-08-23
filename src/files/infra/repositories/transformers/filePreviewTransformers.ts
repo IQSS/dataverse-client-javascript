@@ -5,7 +5,7 @@ import { FilePreviewPayload } from './FilePreviewPayload'
 export const transformFilePreviewPayloadToFilePreview = (
   filePreviewPayload: FilePreviewPayload
 ): FilePreview => {
-  let publicationStatuses: PublicationStatus[] = []
+  const publicationStatuses: PublicationStatus[] = []
   filePreviewPayload.publicationStatuses.forEach((element) => {
     publicationStatuses.push(element as unknown as PublicationStatus)
   })
