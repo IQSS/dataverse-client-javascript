@@ -1,4 +1,9 @@
-import { ApiConfig, CollectionFacet, ReadError, getCollectionFacets } from '../../../src'
+import {
+  ApiConfig,
+  CollectionUserPermissions,
+  ReadError,
+  getCollectionUserPermissions
+} from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
@@ -12,15 +17,20 @@ describe('execute', () => {
     )
   })
 
-  test('should return facets when a valid collection alias is provided', async () => {
-    let actual: CollectionFacet[] = []
+  test('should return user permissions when a valid collection alias is provided', async () => {
+    let actual: CollectionUserPermissions
     try {
-      actual = await getCollectionFacets.execute(ROOT_COLLECTION_ALIAS)
+      actual = await getCollectionUserPermissions.execute(ROOT_COLLECTION_ALIAS)
     } catch (error) {
-      throw new Error('Facets should be retrieved')
+      throw new Error('Permissions should be retrieved')
     } finally {
-      expect(actual[0].name).toBe('authorName')
-      expect(actual.length).toBe(4)
+      expect(actual.canAddDataset).toBe(true)
+      expect(actual.canAddCollection).toBe(true)
+      expect(actual.canDeleteCollection).toBe(true)
+      expect(actual.canEditCollection).toBe(true)
+      expect(actual.canManageCollectionPermissions).toBe(true)
+      expect(actual.canPublishCollection).toBe(true)
+      expect(actual.canViewUnpublishedCollection).toBe(true)
     }
   })
 
@@ -28,7 +38,7 @@ describe('execute', () => {
     expect.assertions(2)
     let readError: ReadError
     try {
-      await getCollectionFacets.execute(TestConstants.TEST_DUMMY_COLLECTION_ID)
+      await getCollectionUserPermissions.execute(TestConstants.TEST_DUMMY_COLLECTION_ID)
       throw new Error('Use case should throw an error')
     } catch (error) {
       readError = error

@@ -2,9 +2,11 @@ import {
   MetadataBlock,
   MetadataFieldType,
   MetadataFieldWatermark,
-  MetadataFieldTypeClass
+  MetadataFieldTypeClass,
+  MetadataFieldInfo
 } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 import { MetadataBlockPayload } from '../../../src/metadataBlocks/infra/repositories/transformers/MetadataBlockPayload'
+import { MetadataFieldInfoPayload } from '../../../src/metadataBlocks/infra/repositories/transformers/MetadataFieldInfoPayload'
 
 export const createMetadataBlockModel = (): MetadataBlock => {
   return {
@@ -149,5 +151,41 @@ export const createMetadataBlockPayload = (): MetadataBlockPayload => {
         }
       }
     }
+  }
+}
+
+export const createMetadataFieldInfoModel = (): MetadataFieldInfo => {
+  return {
+    name: 'testName1',
+    displayName: 'testDisplayName1',
+    title: 'testTitle1',
+    type: MetadataFieldType.Text,
+    watermark: MetadataFieldWatermark.Empty,
+    description: 'testDescription1',
+    multiple: false,
+    isControlledVocabulary: false,
+    displayFormat: '#VALUE',
+    isRequired: true,
+    displayOrder: 0,
+    typeClass: MetadataFieldTypeClass.Primitive,
+    displayOnCreate: true
+  }
+}
+
+export const createMetadataFieldInfoPayload = (): MetadataFieldInfoPayload => {
+  return {
+    name: 'testName1',
+    displayName: 'testDisplayName1',
+    title: 'testTitle1',
+    type: 'TEXT',
+    watermark: '',
+    description: 'testDescription1',
+    multiple: false,
+    isControlledVocabulary: false,
+    displayFormat: '#VALUE',
+    isRequired: true,
+    displayOrder: 0,
+    typeClass: 'primitive',
+    displayOnCreate: true
   }
 }

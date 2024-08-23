@@ -1,11 +1,15 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRepository'
 import {
+  transformCollectionFacetsResponseToCollectionFacets,
   transformCollectionItemsResponseToCollectionItemSubset,
   transformCollectionResponseToCollection
 } from './transformers/collectionTransformers'
 import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collection'
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
+import { CollectionFacet } from '../../domain/models/CollectionFacet'
+import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
+import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
 
 export interface NewCollectionRequestPayload {
@@ -13,6 +17,8 @@ export interface NewCollectionRequestPayload {
   name: string
   dataverseContacts: NewCollectionContactRequestPayload[]
   dataverseType: string
+  description?: string
+  affiliation?: string
   metadataBlocks: NewCollectionMetadataBlocksRequestPayload
 }
 
@@ -64,7 +70,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     )
 
     const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
-      collectionDTO.inputLevels.map((inputLevel) => ({
+      collectionDTO.inputLevels?.map((inputLevel) => ({
         datasetFieldTypeName: inputLevel.datasetFieldName,
         include: inputLevel.include,
         required: inputLevel.required
@@ -75,6 +81,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       name: collectionDTO.name,
       dataverseContacts: dataverseContacts,
       dataverseType: collectionDTO.type,
+      ...(collectionDTO.description && {
+        description: collectionDTO.description
+      }),
+      ...(collectionDTO.affiliation && {
+        affiliation: collectionDTO.affiliation
+      }),
       metadataBlocks: {
         metadataBlockNames: collectionDTO.metadataBlockNames,
         facetIds: collectionDTO.facetIds,
@@ -89,9 +101,28 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
-  public async getCollectionFacets(collectionIdOrAlias: string | number): Promise<string[]> {
-    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/facets`, true)
-      .then((response) => response.data.data)
+  public async getCollectionFacets(
+    collectionIdOrAlias: string | number
+  ): Promise<CollectionFacet[]> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/facets`, true, {
+      returnDetails: true
+    })
+      .then((response) => transformCollectionFacetsResponseToCollectionFacets(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getCollectionUserPermissions(
+    collectionIdOrAlias: number | string
+  ): Promise<CollectionUserPermissions> {
+    return this.doGet(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/userPermissions`,
+      true
+    )
+      .then((response) =>
+        transformCollectionUserPermissionsResponseToCollectionUserPermissions(response)
+      )
       .catch((error) => {
         throw error
       })

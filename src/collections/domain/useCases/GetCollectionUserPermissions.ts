@@ -1,9 +1,8 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
-import { ROOT_COLLECTION_ALIAS } from '../models/Collection'
-import { CollectionFacet } from '../models/CollectionFacet'
 
-export class GetCollectionFacets implements UseCase<CollectionFacet[]> {
+export class GetCollectionUserPermissions implements UseCase<CollectionUserPermissions> {
   private collectionsRepository: ICollectionsRepository
 
   constructor(collectionsRepository: ICollectionsRepository) {
@@ -11,15 +10,13 @@ export class GetCollectionFacets implements UseCase<CollectionFacet[]> {
   }
 
   /**
-   * Returns a CollectionFacet array containing the facets of the requested collection, given the collection identifier or alias.
+   * Returns an instance of CollectionUserPermissions that includes the permissions that the calling user has on a particular Collection.
    *
    * @param {number | string} [collectionIdOrAlias = 'root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
    * If this parameter is not set, the default value is: 'root'
-   * @returns {Promise<string[]>}
+   * @returns {Promise<CollectionUserPermissions>}
    */
-  async execute(
-    collectionIdOrAlias: number | string = ROOT_COLLECTION_ALIAS
-  ): Promise<CollectionFacet[]> {
-    return await this.collectionsRepository.getCollectionFacets(collectionIdOrAlias)
+  async execute(collectionIdOrAlias: number | string): Promise<CollectionUserPermissions> {
+    return await this.collectionsRepository.getCollectionUserPermissions(collectionIdOrAlias)
   }
 }

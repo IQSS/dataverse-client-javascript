@@ -1,35 +1,37 @@
-import { createSinglepartFileBlob } from '../../testHelpers/files/filesHelper'
-import { IDirectUploadClient } from '../../../src/files/domain/clients/IDirectUploadClient'
 import { DirectUploadClientError } from '../../../src/files/domain/clients/DirectUploadClientError'
-import { AddUploadedFileToDataset } from '../../../src/files/domain/useCases/AddUploadedFileToDataset'
+import { AddUploadedFilesToDataset } from '../../../src/files/domain/useCases/AddUploadedFilesToDataset'
+import { IFilesRepository } from '../../../src/files/domain/repositories/IFilesRepository'
 
 describe('execute', () => {
-  let testFile: File
-  const testStorageId = 'test'
-
-  beforeAll(async () => {
-    testFile = await createSinglepartFileBlob()
-  })
+  const testUploadedFileDTOs = [
+    {
+      fileName: 'testfile',
+      storageId: 'testStorageId',
+      checksumValue: 'testChecksumValue',
+      checksumType: 'md5',
+      mimeType: 'test/type'
+    }
+  ]
 
   test('should return undefined on client success', async () => {
-    const directUploadClientStub: IDirectUploadClient = {} as IDirectUploadClient
-    directUploadClientStub.addUploadedFileToDataset = jest.fn().mockResolvedValue(undefined)
+    const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+    filesRepositoryStub.addUploadedFilesToDataset = jest.fn().mockResolvedValue(undefined)
 
-    const sut = new AddUploadedFileToDataset(directUploadClientStub)
+    const sut = new AddUploadedFilesToDataset(filesRepositoryStub)
 
-    const actual = await sut.execute(1, testFile, testStorageId)
+    const actual = await sut.execute(1, testUploadedFileDTOs)
 
     expect(actual).toEqual(undefined)
   })
 
   test('should return error on client error', async () => {
-    const directUploadClientStub: IDirectUploadClient = {} as IDirectUploadClient
-    directUploadClientStub.addUploadedFileToDataset = jest
+    const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+    filesRepositoryStub.addUploadedFilesToDataset = jest
       .fn()
       .mockRejectedValue(new DirectUploadClientError('test', 'test', 'test'))
 
-    const sut = new AddUploadedFileToDataset(directUploadClientStub)
+    const sut = new AddUploadedFilesToDataset(filesRepositoryStub)
 
-    await expect(sut.execute(1, testFile, testStorageId)).rejects.toThrow(DirectUploadClientError)
+    await expect(sut.execute(1, testUploadedFileDTOs)).rejects.toThrow(DirectUploadClientError)
   })
 })
