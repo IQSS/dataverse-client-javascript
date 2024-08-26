@@ -17,10 +17,18 @@ describe('execute', () => {
     )
   })
 
-  test('should successfully publish a collection', async () => {
+  test('should successfully publish a collection with id', async () => {
     const createdCollectiontIdentifier = await createCollection.execute(testNewCollection)
 
     const response = await publishCollection.execute(createdCollectiontIdentifier)
+
+    expect(response).toBeUndefined()
+    await deleteCollectionViaApi(testNewCollection.alias)
+  })
+  test('should successfully publish a collection with alias', async () => {
+    await createCollection.execute(testNewCollection)
+
+    const response = await publishCollection.execute(testNewCollection.alias)
 
     expect(response).toBeUndefined()
     await deleteCollectionViaApi(testNewCollection.alias)

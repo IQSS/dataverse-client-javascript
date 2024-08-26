@@ -88,9 +88,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
-  public async publishCollection(collectionId: string | number): Promise<void> {
+  public async publishCollection(collectionIdOrAlias: string | number): Promise<void> {
     return this.doPost(
-      this.buildApiEndpoint(this.collectionsResourceName, `actions/:publish`, collectionId),
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/actions/:publish`,
       {}
     )
       .then(() => undefined)
