@@ -14,7 +14,7 @@ export class PublishCollection implements UseCase<void> {
    * @param {number | string} [collectionId] - The collection identifier, which can be a string (for collection alias), or a number (for numeric identifiers).
    * @returns {Promise<void>} - This method does not return anything upon successful completion.
    */
-  async execute(collectionId: number | string): Promise<void> {
-    return await this.collectionsRepository.publishCollection(collectionId)
+  async execute(collectionIdOrAlias: number | string): Promise<void> {
+    return await this.collectionsRepository.publishCollection(collectionIdOrAlias)
   }
 }

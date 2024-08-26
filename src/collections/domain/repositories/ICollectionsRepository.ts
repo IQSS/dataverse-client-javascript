@@ -9,7 +9,7 @@ export interface ICollectionsRepository {
     parentCollectionId: number | string
   ): Promise<number>
   getCollectionFacets(collectionIdOrAlias: number | string): Promise<string[]>
-  publishCollection(collectionId: number | string): Promise<void>
+  publishCollection(collectionIdOrAlias: number | string): Promise<void>
   getCollectionUserPermissions(
     collectionIdOrAlias: number | string
   ): Promise<CollectionUserPermissions>
