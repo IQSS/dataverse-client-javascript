@@ -3,10 +3,23 @@ import { AxiosResponse } from 'axios'
 import { CollectionInputLevelPayload, CollectionPayload } from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import { transformHtmlToMarkdown } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
+import { CollectionFacet } from '../../../domain/models/CollectionFacet'
+import { CollectionFacetPayload } from './CollectionFacetPayload'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
   return transformPayloadToCollection(collectionPayload)
+}
+
+export const transformCollectionFacetsResponseToCollectionFacets = (
+  response: AxiosResponse
+): CollectionFacet[] => {
+  const facetsPayloads = response.data.data
+  return facetsPayloads.map((facetsPayload: CollectionFacetPayload) => ({
+    id: Number(facetsPayload.id),
+    name: facetsPayload.name,
+    displayName: facetsPayload.displayName
+  }))
 }
 
 const transformPayloadToCollection = (collectionPayload: CollectionPayload): Collection => {

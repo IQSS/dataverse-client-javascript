@@ -18,6 +18,17 @@ describe('MetadataBlocksRepository', () => {
     )
   })
 
+  test('should return error when metadata block does not exist', async () => {
+    const nonExistentMetadataBlockName = 'nonExistentMetadataBlock'
+    const errorExpected: ReadError = new ReadError(
+      `[404] Can't find metadata block '${nonExistentMetadataBlockName}'`
+    )
+
+    await expect(sut.getMetadataBlockByName(nonExistentMetadataBlockName)).rejects.toThrow(
+      errorExpected
+    )
+  })
+
   describe('getMetadataBlockByName', () => {
     test('should return error when metadata block does not exist', async () => {
       const nonExistentMetadataBlockName = 'nonExistentMetadataBlock'
