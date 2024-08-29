@@ -34,6 +34,7 @@ export const transformFilePreviewPayloadToFilePreview = (
     datasetId: Number(filePreviewPayload.dataset_id),
     datasetPersistentId: filePreviewPayload.dataset_persistent_id,
     datasetCitation: filePreviewPayload.dataset_citation,
-    publicationStatuses: publicationStatuses
+    publicationStatuses: publicationStatuses,
+    releaseOrCreateDate: new Date(filePreviewPayload.releaseOrCreateDate)
   }
 }

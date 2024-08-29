@@ -23,7 +23,8 @@ export const createFilePreviewModel = (): FilePreview => {
     datasetId: 1,
     datasetPersistentId: 'test pid1',
     datasetCitation: 'test citation',
-    publicationStatuses: [PublicationStatus.Published]
+    publicationStatuses: [PublicationStatus.Published],
+    releaseOrCreateDate: new Date('2023-05-15T08:21:01Z')
   }
   return filePreviewModel
 }
@@ -50,6 +51,7 @@ export const createFilePreviewPayload = (): FilePreviewPayload => {
     dataset_id: '1',
     dataset_persistent_id: 'test pid1',
     dataset_citation: 'test citation',
-    publicationStatuses: ['Published']
+    publicationStatuses: ['Published'],
+    releaseOrCreateDate: '2023-05-15T08:21:01Z'
   }
 }

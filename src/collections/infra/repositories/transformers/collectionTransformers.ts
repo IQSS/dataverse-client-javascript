@@ -12,6 +12,9 @@ import { DatasetPreviewPayload } from '../../../../datasets/infra/repositories/t
 import { FilePreviewPayload } from '../../../../files/infra/repositories/transformers/FilePreviewPayload'
 import { transformDatasetPreviewPayloadToDatasetPreview } from '../../../../datasets/infra/repositories/transformers/datasetPreviewsTransformers'
 import { transformFilePreviewPayloadToFilePreview } from '../../../../files/infra/repositories/transformers/filePreviewTransformers'
+import { transformCollectionPreviewPayloadToCollectionPreview } from './collectionPreviewsTransformers'
+import { CollectionPreviewPayload } from './CollectionPreviewPayload'
+import { CollectionPreview } from '../../../domain/models/CollectionPreview'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -64,13 +67,19 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
 ): CollectionItemSubset => {
   const responseDataPayload = response.data.data
   const itemsPayload = responseDataPayload.items
-  const items: (DatasetPreview | FilePreview)[] = []
+  const items: (DatasetPreview | FilePreview | CollectionPreview)[] = []
   itemsPayload.forEach(function (itemPayload: DatasetPreviewPayload | FilePreviewPayload) {
     if (itemPayload.type == 'file') {
       items.push(transformFilePreviewPayloadToFilePreview(itemPayload as FilePreviewPayload))
     } else if (itemPayload.type == 'dataset') {
       items.push(
         transformDatasetPreviewPayloadToDatasetPreview(itemPayload as DatasetPreviewPayload)
+      )
+    } else if (itemPayload.type == 'dataverse') {
+      items.push(
+        transformCollectionPreviewPayloadToCollectionPreview(
+          itemPayload as unknown as CollectionPreviewPayload
+        )
       )
     }
   })

@@ -18,6 +18,7 @@ export interface FilePreview {
   datasetPersistentId: string
   datasetCitation: string
   publicationStatuses: PublicationStatus[]
+  releaseOrCreateDate: Date
 }
 
 export interface FilePreviewChecksum {

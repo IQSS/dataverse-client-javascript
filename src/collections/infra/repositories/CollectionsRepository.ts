@@ -143,7 +143,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     if (offset !== undefined) {
       queryParams.start = offset
     }
-    return this.doGet('/search?q=*&type=dataset&type=file&sort=date&order=desc', true, queryParams)
+    return this.doGet('/search?q=*&sort=date&order=desc', true, queryParams)
       .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error

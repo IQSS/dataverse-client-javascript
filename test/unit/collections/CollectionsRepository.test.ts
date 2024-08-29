@@ -311,7 +311,7 @@ describe('CollectionsRepository', () => {
       }
     }
 
-    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?q=*&type=dataset&type=file&sort=date&order=desc`
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?q=*&sort=date&order=desc`
 
     test('should return item previews when response is successful', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue(testItemPreviewsResponse)
