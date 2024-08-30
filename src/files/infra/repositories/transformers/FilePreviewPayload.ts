@@ -9,7 +9,7 @@ export interface FilePreviewPayload {
   file_type: string
   file_content_type: string
   size_in_bytes: number
-  md5: string
+  md5?: string
   checksum?: FilePreviewChecksumPayload
   type?: string
   unf: string
