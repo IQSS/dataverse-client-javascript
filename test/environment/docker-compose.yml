@@ -90,7 +90,7 @@ services:
 
   test_solr_initializer:
     container_name: 'test_solr_initializer'
-    image: gdcc/configbaker:unstable
+    image: ${DATAVERSE_IMAGE_REGISTRY}/gdcc/configbaker:${DATAVERSE_IMAGE_TAG}
     restart: 'no'
     command:
       - sh
