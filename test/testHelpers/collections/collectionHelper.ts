@@ -62,7 +62,7 @@ export const createCollectionPayload = (): CollectionPayload => {
 
 export async function createCollectionViaApi(
   collectionAlias: string,
-  parentCollectionAlias?: string
+  parentCollectionAlias: string | undefined = undefined
 ): Promise<CollectionPayload> {
   try {
     if (parentCollectionAlias == undefined) {
