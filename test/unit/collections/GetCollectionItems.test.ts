@@ -4,11 +4,16 @@ import { ReadError } from '../../../src'
 import { createDatasetPreviewModel } from '../../testHelpers/datasets/datasetPreviewHelper'
 import { createFilePreviewModel } from '../../testHelpers/files/filePreviewHelper'
 import { CollectionItemSubset } from '../../../src/collections/domain/models/CollectionItemSubset'
+import { createCollectionPreviewModel } from '../../testHelpers/collections/collectionPreviewHelper'
 
 describe('execute', () => {
   test('should return item subset on repository success', async () => {
-    const testItems = [createDatasetPreviewModel(), createFilePreviewModel()]
-    const testTotalCount = 2
+    const testItems = [
+      createDatasetPreviewModel(),
+      createFilePreviewModel(),
+      createCollectionPreviewModel()
+    ]
+    const testTotalCount = 3
 
     const testItemSubset: CollectionItemSubset = {
       items: testItems,

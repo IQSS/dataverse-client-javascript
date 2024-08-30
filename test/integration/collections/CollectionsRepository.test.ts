@@ -1,6 +1,7 @@
 import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
+  CollectionPreview,
   CreatedDatasetIdentifiers,
   DatasetPreview,
   FilePreview,
@@ -212,13 +213,20 @@ describe('CollectionsRepository', () => {
 
   describe('getCollectionItems', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
+
     const testTextFile1Name = 'test-file-1.txt'
+    const testSubCollectionAlias = 'collectionsRepositoryTestSubCollection'
 
     beforeAll(async () => {
+      await createCollectionViaApi(testSubCollectionAlias, testCollectionAlias).catch(() => {
+        throw new Error(
+          `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
+        )
+      })
       try {
         testDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
-          testCollectionAlias
+          testSubCollectionAlias
         )
       } catch (error) {
         throw new Error('Tests beforeAll(): Error while creating test dataset')
@@ -232,7 +240,16 @@ describe('CollectionsRepository', () => {
       try {
         await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
       } catch (error) {
-        throw new Error('Tests afterAll(): Error while deleting test dataset')
+        throw new Error(
+          `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
+        )
+      }
+      try {
+        await deleteCollectionViaApi(testSubCollectionAlias)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
+        )
       }
     })
 
@@ -243,6 +260,7 @@ describe('CollectionsRepository', () => {
       let actual = await sut.getCollectionItems(testCollectionAlias)
       const actualFilePreview = actual.items[0] as FilePreview
       const actualDatasetPreview = actual.items[1] as DatasetPreview
+      const actualCollectionPreview = actual.items[2] as CollectionPreview
 
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
       const expectedDatasetCitationFragment =
@@ -264,6 +282,7 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
       expect(actualFilePreview.sizeInBytes).toBe(12)
       expect(actualFilePreview.url).not.toBeUndefined()
+      expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
 
       expect(actualDatasetPreview.title).toBe('Dataset created using the createDataset use case')
       expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
@@ -279,12 +298,23 @@ describe('CollectionsRepository', () => {
       expect(actualDatasetPreview.versionInfo.minorNumber).toBeUndefined()
       expect(actualDatasetPreview.versionInfo.state).toBe('DRAFT')
 
-      expect(actual.totalItemCount).toBe(2)
+      const expectedCollectionsName = 'Scientific Research'
+      expect(actualCollectionPreview.name).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.alias).toBe(testSubCollectionAlias)
+      expect(actualCollectionPreview.description).toBe('We do all the science.')
+      expect(actualCollectionPreview.imageUrl).toBe(undefined)
+      expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
+      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
+      expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
+      expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
+
+      expect(actual.totalItemCount).toBe(3)
 
       // Test limit and offset
       actual = await sut.getCollectionItems(testCollectionAlias, 1, 1)
       expect((actual.items[0] as DatasetPreview).persistentId).toBe(testDatasetIds.persistentId)
-      expect(actual.totalItemCount).toBe(2)
+      expect(actual.totalItemCount).toBe(3)
     })
 
     test('should return error when collection does not exist', async () => {

@@ -27,6 +27,10 @@ import {
   createFilePreviewPayload
 } from '../../testHelpers/files/filePreviewHelper'
 import { CollectionItemSubset } from '../../../src/collections/domain/models/CollectionItemSubset'
+import {
+  createCollectionPreviewModel,
+  createCollectionPreviewPayload
+} from '../../testHelpers/collections/collectionPreviewHelper'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -293,7 +297,11 @@ describe('CollectionsRepository', () => {
   })
 
   describe('getCollectionItems', () => {
-    const testItems = [createDatasetPreviewModel(), createFilePreviewModel()]
+    const testItems = [
+      createDatasetPreviewModel(),
+      createFilePreviewModel(),
+      createCollectionPreviewModel()
+    ]
     const testTotalCount = 2
 
     const testItemSubset: CollectionItemSubset = {
@@ -306,7 +314,11 @@ describe('CollectionsRepository', () => {
         status: 'OK',
         data: {
           total_count: testTotalCount,
-          items: [createDatasetPreviewPayload(), createFilePreviewPayload()]
+          items: [
+            createDatasetPreviewPayload(),
+            createFilePreviewPayload(),
+            createCollectionPreviewPayload()
+          ]
         }
       }
     }

@@ -60,11 +60,18 @@ export const createCollectionPayload = (): CollectionPayload => {
   return collectionPayload
 }
 
-export async function createCollectionViaApi(collectionAlias: string): Promise<CollectionPayload> {
+export async function createCollectionViaApi(
+  collectionAlias: string,
+  parentCollectionAlias?: string
+): Promise<CollectionPayload> {
   try {
+    if (parentCollectionAlias == undefined) {
+      parentCollectionAlias = 'root'
+    }
+
     return await axios
       .post(
-        `${TestConstants.TEST_API_URL}/dataverses/root`,
+        `${TestConstants.TEST_API_URL}/dataverses/${parentCollectionAlias}`,
         JSON.stringify({
           alias: collectionAlias,
           name: 'Scientific Research',
