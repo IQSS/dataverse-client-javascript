@@ -1,4 +1,5 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { CollectionSearchCriteria } from '../../../collections'
 import { CollectionItemSubset } from '../models/CollectionItemSubset'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 
@@ -16,13 +17,20 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
    * @param {string} [collectionId] - Collection id (optional).
    * @param {number} [limit] - Limit for pagination (optional).
    * @param {number} [offset] - Offset for pagination (optional).
+   * @param {CollectionSearchCriteria} [collectionSearchCriteria] - Supports filtering the collection items by different properties (optional).
    * @returns {Promise<CollectionItemSubset>}
    */
   async execute(
     collectionId?: string,
     limit?: number,
-    offset?: number
+    offset?: number,
+    collectionSearchCriteria?: CollectionSearchCriteria,
   ): Promise<CollectionItemSubset> {
-    return await this.collectionsRepository.getCollectionItems(collectionId, limit, offset)
+    return await this.collectionsRepository.getCollectionItems(
+      collectionId,
+      limit,
+      offset,
+      collectionSearchCriteria
+    )
   }
 }

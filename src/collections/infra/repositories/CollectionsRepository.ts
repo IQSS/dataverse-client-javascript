@@ -11,6 +11,7 @@ import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
+import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -42,6 +43,7 @@ export interface GetCollectionItemsQueryParams {
   subtree?: string
   per_page?: number
   start?: number
+  searchText?: string
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -131,7 +133,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   public async getCollectionItems(
     collectionId?: string,
     limit?: number,
-    offset?: number
+    offset?: number,
+    collectionSearchCriteria?: CollectionSearchCriteria
   ): Promise<CollectionItemSubset> {
     const queryParams: GetCollectionItemsQueryParams = {}
     if (collectionId !== undefined) {
@@ -143,10 +146,22 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     if (offset !== undefined) {
       queryParams.start = offset
     }
+    if (collectionSearchCriteria !== undefined) {
+      this.applyCollectionSearchCriteriaToQueryParams(queryParams, collectionSearchCriteria)
+    }
     return this.doGet('/search?q=*&sort=date&order=desc', true, queryParams)
       .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error
       })
+  }
+
+  private applyCollectionSearchCriteriaToQueryParams(
+    queryParams: GetCollectionItemsQueryParams,
+    collectionSearchCriteria: CollectionSearchCriteria
+  ) {
+    if (collectionSearchCriteria.searchText !== undefined) {
+      queryParams.searchText = collectionSearchCriteria.searchText
+    }
   }
 }
