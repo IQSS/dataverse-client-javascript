@@ -11,6 +11,7 @@ import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
+import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -39,6 +40,7 @@ export interface NewCollectionInputLevelRequestPayload {
 }
 
 export interface GetCollectionItemsQueryParams {
+  q: string
   subtree?: string
   per_page?: number
   start?: number
@@ -131,9 +133,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   public async getCollectionItems(
     collectionId?: string,
     limit?: number,
-    offset?: number
+    offset?: number,
+    collectionSearchCriteria?: CollectionSearchCriteria
   ): Promise<CollectionItemSubset> {
-    const queryParams: GetCollectionItemsQueryParams = {}
+    const queryParams: GetCollectionItemsQueryParams = {
+      q: '*'
+    }
     if (collectionId !== undefined) {
       queryParams.subtree = collectionId
     }
@@ -143,10 +148,22 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     if (offset !== undefined) {
       queryParams.start = offset
     }
-    return this.doGet('/search?q=*&sort=date&order=desc', true, queryParams)
+    if (collectionSearchCriteria !== undefined) {
+      this.applyCollectionSearchCriteriaToQueryParams(queryParams, collectionSearchCriteria)
+    }
+    return this.doGet('/search?sort=date&order=desc', true, queryParams)
       .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error
       })
+  }
+
+  private applyCollectionSearchCriteriaToQueryParams(
+    queryParams: GetCollectionItemsQueryParams,
+    collectionSearchCriteria: CollectionSearchCriteria
+  ) {
+    if (collectionSearchCriteria.searchText !== undefined) {
+      queryParams.q = encodeURIComponent(collectionSearchCriteria.searchText)
+    }
   }
 }

@@ -186,9 +186,13 @@ _See [use case](../src/collections/domain/useCases/GetCollectionItems.ts) implem
 
 Note that `collectionId` is an optional parameter to filter the items by a specific collection. If not set, the use case will return items starting from the root collection.
 
-Note that `limit` and `offset` are optional parameters for pagination.
-
 The `CollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
+
+This use case supports the following optional parameters depending on the search goals:
+
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
+- **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
 
 ### Collections Write Use Cases
 
