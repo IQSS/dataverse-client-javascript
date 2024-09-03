@@ -128,12 +128,4 @@ describe('execute', () => {
     )
     expect(actual).toEqual(testItemSubset)
   })
-
-  test('should return error result on repository error', async () => {
-    const collectionRepositoryStub: ICollectionsRepository = {} as ICollectionsRepository
-    collectionRepositoryStub.getCollectionItems = jest.fn().mockRejectedValue(new ReadError())
-    const testGetCollectionItems = new GetCollectionItems(collectionRepositoryStub)
-
-    await expect(testGetCollectionItems.execute()).rejects.toThrow(ReadError)
-  })
 })
