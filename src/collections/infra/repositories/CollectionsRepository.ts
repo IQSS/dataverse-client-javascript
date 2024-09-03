@@ -40,10 +40,10 @@ export interface NewCollectionInputLevelRequestPayload {
 }
 
 export interface GetCollectionItemsQueryParams {
+  q: string
   subtree?: string
   per_page?: number
   start?: number
-  searchText?: string
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -136,7 +136,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria
   ): Promise<CollectionItemSubset> {
-    const queryParams: GetCollectionItemsQueryParams = {}
+    const queryParams: GetCollectionItemsQueryParams = {
+      q: '*'
+    }
     if (collectionId !== undefined) {
       queryParams.subtree = collectionId
     }
@@ -149,7 +151,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     if (collectionSearchCriteria !== undefined) {
       this.applyCollectionSearchCriteriaToQueryParams(queryParams, collectionSearchCriteria)
     }
-    return this.doGet('/search?q=*&sort=date&order=desc', true, queryParams)
+    return this.doGet('/search?sort=date&order=desc', true, queryParams)
       .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error
@@ -161,7 +163,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionSearchCriteria: CollectionSearchCriteria
   ) {
     if (collectionSearchCriteria.searchText !== undefined) {
-      queryParams.searchText = collectionSearchCriteria.searchText
+      queryParams.q = encodeURIComponent(collectionSearchCriteria.searchText)
     }
   }
 }

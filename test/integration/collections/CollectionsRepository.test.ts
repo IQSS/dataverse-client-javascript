@@ -2,6 +2,7 @@ import { CollectionsRepository } from '../../../src/collections/infra/repositori
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   CollectionPreview,
+  CollectionSearchCriteria,
   CreatedDatasetIdentifiers,
   DatasetPreview,
   FilePreview,
@@ -265,26 +266,28 @@ describe('CollectionsRepository', () => {
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
       const expectedDatasetCitationFragment =
         'Admin, Dataverse; Owner, Dataverse, 2024, "Dataset created using the createDataset use case'
+      const expectedDatasetDescription = 'Dataset created using the createDataset use case'
+      const expectedFileName = 'test-file-1.txt'
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
       expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
-      expect(actualFilePreview.datasetName).toBe('Dataset created using the createDataset use case')
+      expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
       expect(actualFilePreview.description).toBe('')
       expect(actualFilePreview.fileContentType).toBe('text/plain')
       expect(actualFilePreview.fileId).not.toBeUndefined()
       expect(actualFilePreview.fileType).toBe('Plain Text')
       expect(actualFilePreview.md5).toBe(expectedFileMd5)
-      expect(actualFilePreview.name).toBe('test-file-1.txt')
+      expect(actualFilePreview.name).toBe(expectedFileName)
       expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
       expect(actualFilePreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
       expect(actualFilePreview.sizeInBytes).toBe(12)
       expect(actualFilePreview.url).not.toBeUndefined()
       expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
 
-      expect(actualDatasetPreview.title).toBe('Dataset created using the createDataset use case')
+      expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
       expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
@@ -314,7 +317,56 @@ describe('CollectionsRepository', () => {
       // Test limit and offset
       actual = await sut.getCollectionItems(testCollectionAlias, 1, 1)
       expect((actual.items[0] as DatasetPreview).persistentId).toBe(testDatasetIds.persistentId)
+      expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(3)
+
+      // Test search text
+      const collectionSearchCriteriaForFile = new CollectionSearchCriteria().withSearchText(
+        'test-fi'
+      )
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaForFile
+      )
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+
+      const collectionSearchCriteriaForDataset = new CollectionSearchCriteria().withSearchText(
+        'This is the description'
+      )
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaForDataset
+      )
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+
+      const collectionSearchCriteriaForDatasetAndCollection =
+        new CollectionSearchCriteria().withSearchText('the')
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaForDatasetAndCollection
+      )
+      expect(actual.totalItemCount).toBe(2)
+      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+      expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
+
+      // Test search text, limit and offset
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        1,
+        1,
+        collectionSearchCriteriaForDatasetAndCollection
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(2)
+      expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
     })
 
     test('should return error when collection does not exist', async () => {
