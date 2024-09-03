@@ -323,7 +323,7 @@ describe('CollectionsRepository', () => {
       }
     }
 
-    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?q=*&sort=date&order=desc`
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?sort=date&order=desc`
 
     test('should return item previews when response is successful', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue(testItemPreviewsResponse)
@@ -331,21 +331,34 @@ describe('CollectionsRepository', () => {
       // API Key auth
       let actual = await sut.getCollectionItems()
 
-      expect(axios.get).toHaveBeenCalledWith(
-        expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-      )
+      const expectedRequestParams = {
+        q: '*'
+      }
+
+      const expectedRequestConfigApiKey = {
+        params: expectedRequestParams,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
 
       expect(actual).toStrictEqual(testItemSubset)
 
       // Session cookie auth
+      const expectedRequestConfigSessionCookie = {
+        params: expectedRequestParams,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials
+      }
+
       ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
 
       actual = await sut.getCollectionItems()
 
       expect(axios.get).toHaveBeenCalledWith(
         expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        expectedRequestConfigSessionCookie
       )
       expect(actual).toStrictEqual(testItemSubset)
     })
@@ -360,6 +373,7 @@ describe('CollectionsRepository', () => {
       let actual = await sut.getCollectionItems(undefined, testLimit, testOffset)
 
       const expectedRequestParamsWithPagination = {
+        q: '*',
         per_page: testLimit,
         start: testOffset
       }
@@ -403,6 +417,7 @@ describe('CollectionsRepository', () => {
       let actual = await sut.getCollectionItems(testCollectionId, undefined, undefined)
 
       const expectedRequestParamsWithCollectionId = {
+        q: '*',
         subtree: testCollectionId
       }
 
@@ -442,10 +457,16 @@ describe('CollectionsRepository', () => {
       let error = undefined as unknown as ReadError
       await sut.getCollectionItems().catch((e) => (error = e))
 
-      expect(axios.get).toHaveBeenCalledWith(
-        expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-      )
+      const expectedRequestParams = {
+        q: '*'
+      }
+
+      const expectedRequestConfigApiKey = {
+        params: expectedRequestParams,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
       expect(error).toBeInstanceOf(Error)
     })
   })
