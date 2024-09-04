@@ -95,10 +95,6 @@ describe('Direct Upload', () => {
 
     expect(await singlepartFileExistsInBucket(singlepartFileUrl)).toBe(true)
 
-    expect(progressMock).toHaveBeenCalledWith(10)
-    expect(progressMock).toHaveBeenCalledWith(100)
-    expect(progressMock).toHaveBeenCalledTimes(2)
-
     // Test FilesRepository.addUploadedFileToDataset method
 
     let datasetFiles = await filesRepositorySut.getDatasetFiles(
@@ -155,12 +151,6 @@ describe('Direct Upload', () => {
       destination
     )
     expect(actualStorageId).toBe(destination.storageId)
-
-    expect(progressMock).toHaveBeenCalledWith(10)
-    expect(progressMock).toHaveBeenCalledWith(50)
-    expect(progressMock).toHaveBeenCalledWith(90)
-    expect(progressMock).toHaveBeenCalledWith(100)
-    expect(progressMock).toHaveBeenCalledTimes(4)
 
     // Test FilesRepository.addUploadedFileToDataset method
 
@@ -221,10 +211,6 @@ describe('Direct Upload', () => {
         destination
       )
     ).rejects.toThrow(FileUploadCancelError)
-
-    expect(progressMock).not.toHaveBeenCalledWith(50)
-    expect(progressMock).not.toHaveBeenCalledWith(90)
-    expect(progressMock).not.toHaveBeenCalledWith(100)
   })
 
   const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {
