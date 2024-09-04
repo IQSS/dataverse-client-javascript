@@ -11,7 +11,10 @@ import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
-import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
+import {
+  CollectionItemType,
+  CollectionSearchCriteria
+} from '../../domain/models/CollectionSearchCriteria'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -44,6 +47,7 @@ export interface GetCollectionItemsQueryParams {
   subtree?: string
   per_page?: number
   start?: number
+  type?: string
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -139,19 +143,29 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     const queryParams: GetCollectionItemsQueryParams = {
       q: '*'
     }
-    if (collectionId !== undefined) {
+    if (collectionId) {
       queryParams.subtree = collectionId
     }
-    if (limit !== undefined) {
+    if (limit) {
       queryParams.per_page = limit
     }
-    if (offset !== undefined) {
+    if (offset) {
       queryParams.start = offset
     }
-    if (collectionSearchCriteria !== undefined) {
+    if (collectionSearchCriteria) {
       this.applyCollectionSearchCriteriaToQueryParams(queryParams, collectionSearchCriteria)
     }
-    return this.doGet('/search?sort=date&order=desc', true, queryParams)
+
+    let url = '/search?sort=date&order=desc'
+
+    if (collectionSearchCriteria?.itemTypes) {
+      const itemTypesQueryString = collectionSearchCriteria.itemTypes
+        .map((itemType: CollectionItemType) => `type=${itemType.toString()}`)
+        .join('&')
+      url += `&${itemTypesQueryString}`
+    }
+
+    return this.doGet(url, true, queryParams)
       .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error
@@ -162,7 +176,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     queryParams: GetCollectionItemsQueryParams,
     collectionSearchCriteria: CollectionSearchCriteria
   ) {
-    if (collectionSearchCriteria.searchText !== undefined) {
+    if (collectionSearchCriteria.searchText) {
       queryParams.q = encodeURIComponent(collectionSearchCriteria.searchText)
     }
   }

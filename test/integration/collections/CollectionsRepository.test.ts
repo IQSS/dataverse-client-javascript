@@ -1,6 +1,7 @@
 import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
+  CollectionItemType,
   CollectionPreview,
   CollectionSearchCriteria,
   CreatedDatasetIdentifiers,
@@ -367,6 +368,63 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(2)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
+
+      // Test type collection
+      const collectionSearchCriteriaForCollectionType =
+        new CollectionSearchCriteria().withItemTypes([CollectionItemType.COLLECTION])
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaForCollectionType
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
+
+      // Test type dataset
+      const collectionSearchCriteriaForDatasetType = new CollectionSearchCriteria().withItemTypes([
+        CollectionItemType.DATASET
+      ])
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaForDatasetType
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+
+      // Test type file
+      const collectionSearchCriteriaForFileType = new CollectionSearchCriteria().withItemTypes([
+        CollectionItemType.FILE
+      ])
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaForFileType
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+
+      // Test multiple types
+      const collectionSearchCriteriaForMultiTypes = new CollectionSearchCriteria().withItemTypes([
+        CollectionItemType.FILE,
+        CollectionItemType.COLLECTION
+      ])
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaForMultiTypes
+      )
+      expect(actual.items.length).toBe(2)
+      expect(actual.totalItemCount).toBe(2)
+      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
     })
 
     test('should return error when collection does not exist', async () => {
