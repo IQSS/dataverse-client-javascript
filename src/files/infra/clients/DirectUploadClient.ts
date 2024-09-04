@@ -19,9 +19,6 @@ export class DirectUploadClient implements IDirectUploadClient {
   private filesRepository: IFilesRepository
   private maxMultipartRetries: number
 
-  private readonly progressAfterUrlGeneration: number = 10
-  private readonly progressAfterFileUpload: number = 100
-
   private readonly fileUploadTimeoutMs: number = 60_000
 
   constructor(filesRepository: IFilesRepository, maxMultipartRetries = 5) {
@@ -43,14 +40,12 @@ export class DirectUploadClient implements IDirectUploadClient {
           throw new UrlGenerationError(file.name, datasetId, error.message)
         })
     }
-    progress(this.progressAfterUrlGeneration)
 
     if (destination.urls.length === 1) {
-      await this.uploadSinglepartFile(datasetId, file, destination, abortController)
+      await this.uploadSinglepartFile(datasetId, file, destination, progress, abortController)
     } else {
       await this.uploadMultipartFile(datasetId, file, destination, progress, abortController)
     }
-    progress(this.progressAfterFileUpload)
 
     return destination.storageId
   }
@@ -59,6 +54,7 @@ export class DirectUploadClient implements IDirectUploadClient {
     datasetId: number | string,
     file: File,
     destination: FileUploadDestination,
+    progress: (now: number) => void,
     abortController: AbortController
   ): Promise<void> {
     try {
@@ -66,11 +62,12 @@ export class DirectUploadClient implements IDirectUploadClient {
       await axios.put(destination.urls[0], arrayBuffer, {
         headers: {
           'Content-Type': 'application/octet-stream',
-          'Content-Length': file.size.toString(),
           'x-amz-tagging': 'dv-state=temp'
         },
         timeout: this.fileUploadTimeoutMs,
-        signal: abortController.signal
+        signal: abortController.signal,
+        onUploadProgress: (progressEvent) =>
+          progress(Math.round((progressEvent.loaded * 100) / file.size))
       })
     } catch (error) {
       if (axios.isCancel(error)) {
@@ -92,8 +89,6 @@ export class DirectUploadClient implements IDirectUploadClient {
     const maxRetries = this.maxMultipartRetries
     const limitConcurrency = pLimit(1)
 
-    const progressPartSize = 80 / destination.urls.length
-
     const uploadPart = async (
       destinationUrl: string,
       index: number,
@@ -106,17 +101,17 @@ export class DirectUploadClient implements IDirectUploadClient {
       try {
         const response = await axios.put(destinationUrl, fileSlice, {
           headers: {
-            'Content-Type': 'application/octet-stream',
-            'Content-Length': fileSlice.size
+            'Content-Type': 'application/octet-stream'
           },
           maxBodyLength: Infinity,
           maxContentLength: Infinity,
           timeout: this.fileUploadTimeoutMs,
-          signal: abortController.signal
+          signal: abortController.signal,
+          onUploadProgress: (progressEvent) =>
+            progress(Math.round(((index * partSize + progressEvent.loaded) * 100) / file.size))
         })
         const eTag = response.headers['etag'].replace(/"/g, '')
         eTags[`${index + 1}`] = eTag
-        progress(Math.round(this.progressAfterUrlGeneration + progressPartSize * (index + 1)))
       } catch (error) {
         if (axios.isCancel(error)) {
           await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint)
