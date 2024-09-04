@@ -108,7 +108,7 @@ export class DirectUploadClient implements IDirectUploadClient {
           timeout: this.fileUploadTimeoutMs,
           signal: abortController.signal,
           onUploadProgress: (progressEvent) =>
-            progress(Math.round(((index * partSize + progressEvent.loaded) * 100) / file.size))
+            progress(Math.round(((offset + progressEvent.loaded) * 100) / file.size))
         })
         const eTag = response.headers['etag'].replace(/"/g, '')
         eTags[`${index + 1}`] = eTag
