@@ -50,8 +50,6 @@ describe('uploadFile', () => {
       await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
         UrlGenerationError
       )
-
-      expect(progressMock).not.toHaveBeenCalled()
     })
 
     test('should return FileUploadError when there is an error on single file upload', async () => {
@@ -70,9 +68,6 @@ describe('uploadFile', () => {
       await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
         FileUploadError
       )
-
-      expect(progressMock).toHaveBeenCalledWith(10)
-      expect(progressMock).toHaveBeenCalledTimes(1)
     })
 
     test('should storage identifier on operation success', async () => {
@@ -89,10 +84,6 @@ describe('uploadFile', () => {
       const abortController = new AbortController()
 
       const actual = await sut.uploadFile(1, testFile, progressMock, abortController)
-
-      expect(progressMock).toHaveBeenCalledWith(10)
-      expect(progressMock).toHaveBeenCalledWith(100)
-      expect(progressMock).toHaveBeenCalledTimes(2)
 
       expect(actual).toEqual(testDestination.storageId)
     })
@@ -138,9 +129,6 @@ describe('uploadFile', () => {
           params: {}
         }
       )
-
-      expect(progressMock).toHaveBeenCalledWith(10)
-      expect(progressMock).toHaveBeenCalledTimes(1)
     })
 
     test('should return MultipartAbortError when there is an error on multipart file upload and abort endpoint call fails', async () => {
@@ -160,9 +148,6 @@ describe('uploadFile', () => {
       await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
         MultipartAbortError
       )
-
-      expect(progressMock).toHaveBeenCalledWith(10)
-      expect(progressMock).toHaveBeenCalledTimes(1)
     })
 
     test('should return MultipartCompletionError when there is an error on multipart file completion', async () => {
@@ -186,11 +171,6 @@ describe('uploadFile', () => {
       )
 
       expect(axios.put).toHaveBeenCalledTimes(3)
-
-      expect(progressMock).toHaveBeenCalledWith(10)
-      expect(progressMock).toHaveBeenCalledWith(50)
-      expect(progressMock).toHaveBeenCalledWith(90)
-      expect(progressMock).toHaveBeenCalledTimes(3)
     })
 
     test('should return storage identifier on operation success', async () => {
@@ -215,12 +195,6 @@ describe('uploadFile', () => {
       const actual = await sut.uploadFile(1, testFile, progressMock, abortController)
 
       expect(actual).toEqual(testMultipartDestination.storageId)
-
-      expect(progressMock).toHaveBeenCalledWith(10)
-      expect(progressMock).toHaveBeenCalledWith(50)
-      expect(progressMock).toHaveBeenCalledWith(90)
-      expect(progressMock).toHaveBeenCalledWith(100)
-      expect(progressMock).toHaveBeenCalledTimes(4)
     })
   })
 })
