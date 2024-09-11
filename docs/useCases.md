@@ -16,6 +16,7 @@ The different use cases currently available in the package are classified below,
     - [List All Collection Items](#list-all-collection-items)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
+    - [Publish a Collection](#publish-a-collection)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -226,6 +227,28 @@ _See [use case](../src/collections/domain/useCases/CreateCollection.ts) implemen
 The above example creates the new collection in the `root` collection since no collection identifier is specified. If you want to create the collection in a different collection, you must add the collection identifier as a second parameter in the use case call.
 
 The use case returns a number, which is the identifier of the created collection.
+
+#### Publish a Collection
+
+Publishes a Collection, given the collection identifier.
+
+##### Example call:
+
+```typescript
+import { publishCollection } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+
+publishCollection.execute(collectionIdOrAlias)
+
+/* ... */
+```
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+_See [use case](../src/collections/domain/useCases/PublishCollection.ts)_ definition.
 
 ## Datasets
 

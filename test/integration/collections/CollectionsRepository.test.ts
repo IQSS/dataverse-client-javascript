@@ -107,6 +107,23 @@ describe('CollectionsRepository', () => {
     })
   })
 
+  describe('publishCollection', () => {
+    const testPublishCollectionAlias = 'publishCollection-test'
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(testPublishCollectionAlias)
+    })
+
+    test('should publish a collection', async () => {
+      const newCollectionDTO = createCollectionDTO(testPublishCollectionAlias)
+      const actualId = await sut.createCollection(newCollectionDTO)
+      await sut.publishCollection(actualId)
+      const createdCollection = await sut.getCollection(actualId)
+
+      expect(createdCollection.isReleased).toBe(true)
+      expect(createdCollection.name).toBe(newCollectionDTO.name)
+    })
+  })
   describe('createCollection', () => {
     const testCreateCollectionAlias1 = 'createCollection-test-1'
     const testCreateCollectionAlias2 = 'createCollection-test-2'

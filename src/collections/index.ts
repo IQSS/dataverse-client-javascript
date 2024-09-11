@@ -3,6 +3,7 @@ import { GetCollection } from './domain/useCases/GetCollection'
 import { GetCollectionFacets } from './domain/useCases/GetCollectionFacets'
 import { GetCollectionUserPermissions } from './domain/useCases/GetCollectionUserPermissions'
 import { GetCollectionItems } from './domain/useCases/GetCollectionItems'
+import { PublishCollection } from './domain/useCases/PublishCollection'
 
 import { CollectionsRepository } from './infra/repositories/CollectionsRepository'
 
@@ -13,13 +14,15 @@ const createCollection = new CreateCollection(collectionsRepository)
 const getCollectionFacets = new GetCollectionFacets(collectionsRepository)
 const getCollectionUserPermissions = new GetCollectionUserPermissions(collectionsRepository)
 const getCollectionItems = new GetCollectionItems(collectionsRepository)
+const publishCollection = new PublishCollection(collectionsRepository)
 
 export {
   getCollection,
   createCollection,
   getCollectionFacets,
   getCollectionUserPermissions,
-  getCollectionItems
+  getCollectionItems,
+  publishCollection
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'
