@@ -12,7 +12,6 @@ export const transformFilePreviewPayloadToFilePreview = (
   return {
     name: filePreviewPayload.name,
     url: filePreviewPayload.url,
-    imageUrl: filePreviewPayload.image_url,
     ...(filePreviewPayload.image_url && { imageUrl: filePreviewPayload.image_url }),
     fileId: Number(filePreviewPayload.file_id),
     ...(filePreviewPayload.file_persistent_id && {
