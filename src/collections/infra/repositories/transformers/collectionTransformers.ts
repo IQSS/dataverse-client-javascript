@@ -68,14 +68,16 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
   const responseDataPayload = response.data.data
   const itemsPayload = responseDataPayload.items
   const items: (DatasetPreview | FilePreview | CollectionPreview)[] = []
-  itemsPayload.forEach(function (itemPayload: DatasetPreviewPayload | FilePreviewPayload) {
-    if (itemPayload.type == 'file') {
+  itemsPayload.forEach(function (
+    itemPayload: CollectionPreviewPayload | DatasetPreviewPayload | FilePreviewPayload
+  ) {
+    if (itemPayload.type === 'file') {
       items.push(transformFilePreviewPayloadToFilePreview(itemPayload as FilePreviewPayload))
-    } else if (itemPayload.type == 'dataset') {
+    } else if (itemPayload.type === 'dataset') {
       items.push(
         transformDatasetPreviewPayloadToDatasetPreview(itemPayload as DatasetPreviewPayload)
       )
-    } else if (itemPayload.type == 'dataverse') {
+    } else if (itemPayload.type === 'dataverse') {
       items.push(
         transformCollectionPreviewPayloadToCollectionPreview(
           itemPayload as unknown as CollectionPreviewPayload
