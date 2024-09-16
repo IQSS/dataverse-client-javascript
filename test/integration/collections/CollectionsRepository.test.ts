@@ -329,6 +329,8 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
       expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
       expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
+      expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
+      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
 
       expect(actual.totalItemCount).toBe(3)
 

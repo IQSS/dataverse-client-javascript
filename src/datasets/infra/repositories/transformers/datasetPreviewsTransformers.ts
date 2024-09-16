@@ -43,6 +43,8 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
     },
     citation: datasetPreviewPayload.citation,
     description: datasetPreviewPayload.description,
-    publicationStatuses: publicationStatuses
+    publicationStatuses: publicationStatuses,
+    parentCollectionAlias: datasetPreviewPayload.identifier_of_dataverse,
+    parentCollectionName: datasetPreviewPayload.name_of_dataverse
   }
 }

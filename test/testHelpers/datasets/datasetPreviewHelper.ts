@@ -25,7 +25,9 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
     },
     citation: DATASET_CITATION,
     description: 'test',
-    publicationStatuses: [PublicationStatus.Draft, PublicationStatus.Unpublished]
+    publicationStatuses: [PublicationStatus.Draft, PublicationStatus.Unpublished],
+    parentCollectionAlias: 'parentCollection',
+    parentCollectionName: 'Parent Collection'
   }
   return datasetPreviewModel
 }
@@ -44,6 +46,8 @@ export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
     citation: DATASET_CITATION,
     description: 'test',
     type: 'dataset',
-    publicationStatuses: ['Draft', 'Unpublished']
+    publicationStatuses: ['Draft', 'Unpublished'],
+    identifier_of_dataverse: 'parentCollection',
+    name_of_dataverse: 'Parent Collection'
   }
 }

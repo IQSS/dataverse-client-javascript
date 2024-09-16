@@ -12,4 +12,6 @@ export interface DatasetPreviewPayload {
   description: string
   type?: string
   publicationStatuses: string[]
+  identifier_of_dataverse: string
+  name_of_dataverse: string
 }
