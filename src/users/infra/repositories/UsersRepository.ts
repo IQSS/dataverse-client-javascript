@@ -4,9 +4,19 @@ import { AuthenticatedUser } from '../../domain/models/AuthenticatedUser'
 import { AxiosResponse } from 'axios'
 
 export class UsersRepository extends ApiRepository implements IUsersRepository {
+  private readonly usersResourceName: string = 'users'
+
   public async getCurrentAuthenticatedUser(): Promise<AuthenticatedUser> {
-    return this.doGet('/users/:me', true)
+    return this.doGet(`/${this.usersResourceName}/:me`, true)
       .then((response) => this.getAuthenticatedUserFromResponse(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async recreateApiToken(): Promise<string> {
+    return this.doPost(`/${this.usersResourceName}/token/recreate`, {})
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })

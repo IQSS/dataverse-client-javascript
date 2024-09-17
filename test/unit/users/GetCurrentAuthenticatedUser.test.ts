@@ -6,9 +6,10 @@ import { createAuthenticatedUser } from '../../testHelpers/users/authenticatedUs
 describe('execute', () => {
   test('should return successful result with authenticated user on repository success', async () => {
     const testAuthenticatedUser = createAuthenticatedUser()
-    const usersRepositoryStub: IUsersRepository = {
-      getCurrentAuthenticatedUser: jest.fn().mockReturnValue(testAuthenticatedUser)
-    }
+    const usersRepositoryStub: IUsersRepository = {} as IUsersRepository
+    usersRepositoryStub.getCurrentAuthenticatedUser = jest
+      .fn()
+      .mockResolvedValue(testAuthenticatedUser)
     const sut = new GetCurrentAuthenticatedUser(usersRepositoryStub)
 
     const actual = await sut.execute()
@@ -17,14 +18,10 @@ describe('execute', () => {
   })
 
   test('should return error result on repository error', async () => {
-    const usersRepositoryStub: IUsersRepository = {
-      getCurrentAuthenticatedUser: jest.fn().mockRejectedValue(new ReadError())
-    }
+    const usersRepositoryStub: IUsersRepository = {} as IUsersRepository
+    usersRepositoryStub.getCurrentAuthenticatedUser = jest.fn().mockRejectedValue(new ReadError())
     const sut = new GetCurrentAuthenticatedUser(usersRepositoryStub)
 
-    let actualError: ReadError = undefined
-    await sut.execute().catch((e) => (actualError = e))
-
-    expect(actualError).toBeInstanceOf(ReadError)
+    await expect(sut.execute()).rejects.toThrow(ReadError)
   })
 })
