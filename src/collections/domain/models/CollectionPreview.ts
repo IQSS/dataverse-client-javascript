@@ -1,6 +1,8 @@
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
+import { CollectionItemType } from './CollectionItemType'
 
 export interface CollectionPreview {
+  type: CollectionItemType.COLLECTION
   name: string
   parentName: string
   alias: string

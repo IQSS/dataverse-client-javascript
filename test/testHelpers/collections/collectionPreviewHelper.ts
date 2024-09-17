@@ -1,9 +1,10 @@
-import { CollectionPreview } from '../../../src'
+import { CollectionItemType, CollectionPreview } from '../../../src'
 import { CollectionPreviewPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPreviewPayload'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 
 export const createCollectionPreviewModel = (): CollectionPreview => {
   const collectionPreviewModel: CollectionPreview = {
+    type: CollectionItemType.COLLECTION,
     name: 'test collection',
     parentName: 'parent collection',
     alias: 'testcollection',

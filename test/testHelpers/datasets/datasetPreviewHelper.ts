@@ -2,6 +2,7 @@ import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPrevi
 import { DatasetVersionState } from '../../../src/datasets/domain/models/Dataset'
 import { DatasetPreviewPayload } from '../../../src/datasets/infra/repositories/transformers/DatasetPreviewPayload'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../src'
 
 const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z'
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z'
@@ -12,6 +13,7 @@ const DATASET_CITATION =
 
 export const createDatasetPreviewModel = (): DatasetPreview => {
   const datasetPreviewModel: DatasetPreview = {
+    type: CollectionItemType.DATASET,
     persistentId: 'doi:10.5072/FK2/HC6KTB',
     title: 'Test Dataset 1',
     versionId: 19,

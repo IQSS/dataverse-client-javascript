@@ -29,7 +29,5 @@ export { CollectionFacet } from './domain/models/CollectionFacet'
 export { CollectionUserPermissions } from './domain/models/CollectionUserPermissions'
 export { CollectionDTO, CollectionInputLevelDTO } from './domain/dtos/CollectionDTO'
 export { CollectionPreview } from './domain/models/CollectionPreview'
-export {
-  CollectionSearchCriteria,
-  CollectionItemType
-} from './domain/models/CollectionSearchCriteria'
+export { CollectionItemType } from './domain/models/CollectionItemType'
+export { CollectionSearchCriteria } from './domain/models/CollectionSearchCriteria'

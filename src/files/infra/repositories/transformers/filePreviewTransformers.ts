@@ -1,3 +1,4 @@
+import { CollectionItemType } from '../../../../collections/domain/models/CollectionItemType'
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 import { FilePreview } from '../../../domain/models/FilePreview'
 import { FilePreviewPayload } from './FilePreviewPayload'
@@ -10,6 +11,7 @@ export const transformFilePreviewPayloadToFilePreview = (
     publicationStatuses.push(element as unknown as PublicationStatus)
   })
   return {
+    type: CollectionItemType.FILE,
     name: filePreviewPayload.name,
     url: filePreviewPayload.url,
     ...(filePreviewPayload.image_url && { imageUrl: filePreviewPayload.image_url }),

@@ -1,9 +1,10 @@
-import { FilePreview } from '../../../src'
+import { CollectionItemType, FilePreview } from '../../../src'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 import { FilePreviewPayload } from '../../../src/files/infra/repositories/transformers/FilePreviewPayload'
 
 export const createFilePreviewModel = (): FilePreview => {
   const filePreviewModel: FilePreview = {
+    type: CollectionItemType.FILE,
     name: 'test file',
     url: 'http://dataverse.com',
     imageUrl: 'http://dataverseimage.com',

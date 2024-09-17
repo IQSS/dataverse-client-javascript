@@ -1,3 +1,5 @@
+import { CollectionItemType } from './CollectionItemType'
+
 export class CollectionSearchCriteria {
   constructor(
     public readonly searchText?: string,
@@ -11,10 +13,4 @@ export class CollectionSearchCriteria {
   withItemTypes(itemTypes: CollectionItemType[] | undefined): CollectionSearchCriteria {
     return new CollectionSearchCriteria(this.searchText, itemTypes)
   }
-}
-
-export enum CollectionItemType {
-  FILE = 'file',
-  DATASET = 'dataset',
-  COLLECTION = 'dataverse'
 }

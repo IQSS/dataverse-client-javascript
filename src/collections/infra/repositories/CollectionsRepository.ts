@@ -11,10 +11,8 @@ import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
-import {
-  CollectionItemType,
-  CollectionSearchCriteria
-} from '../../domain/models/CollectionSearchCriteria'
+import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
+import { CollectionItemType } from '../../domain/models/CollectionItemType'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -170,8 +168,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     if (collectionSearchCriteria?.itemTypes) {
       const itemTypesQueryString = collectionSearchCriteria.itemTypes
-        .map((itemType: CollectionItemType) => `type=${itemType.toString()}`)
+        .map((itemType: CollectionItemType) => {
+          const mappedItemType =
+            itemType === CollectionItemType.COLLECTION ? 'dataverse' : itemType.toString()
+          return `type=${mappedItemType}`
+        })
         .join('&')
+
       url += `&${itemTypesQueryString}`
     }
 

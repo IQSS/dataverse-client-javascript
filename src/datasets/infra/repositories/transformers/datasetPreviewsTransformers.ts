@@ -4,6 +4,7 @@ import { DatasetVersionState } from '../../../domain/models/Dataset'
 import { DatasetPreviewSubset } from '../../../domain/models/DatasetPreviewSubset'
 import { DatasetPreviewPayload } from './DatasetPreviewPayload'
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../../collections/domain/models/CollectionItemType'
 
 export const transformDatasetPreviewsResponseToDatasetPreviewSubset = (
   response: AxiosResponse
@@ -28,6 +29,7 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
     publicationStatuses.push(element as unknown as PublicationStatus)
   })
   return {
+    type: CollectionItemType.DATASET,
     persistentId: datasetPreviewPayload.global_id,
     title: datasetPreviewPayload.name,
     versionId: datasetPreviewPayload.versionId,

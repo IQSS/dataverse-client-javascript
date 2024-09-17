@@ -1,4 +1,5 @@
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../../collections/domain/models/CollectionItemType'
 import { CollectionPreview } from '../../../domain/models/CollectionPreview'
 import { CollectionPreviewPayload } from './CollectionPreviewPayload'
 
@@ -10,6 +11,7 @@ export const transformCollectionPreviewPayloadToCollectionPreview = (
     publicationStatuses.push(element as unknown as PublicationStatus)
   })
   return {
+    type: CollectionItemType.COLLECTION,
     name: collectionPreviewPayload.name,
     parentName: collectionPreviewPayload.parentDataverseName,
     alias: collectionPreviewPayload.identifier,

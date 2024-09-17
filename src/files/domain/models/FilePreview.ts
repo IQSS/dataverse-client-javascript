@@ -1,6 +1,8 @@
+import { CollectionItemType } from '../../../collections'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 
 export interface FilePreview {
+  type: CollectionItemType.FILE
   name: string
   url: string
   imageUrl?: string
