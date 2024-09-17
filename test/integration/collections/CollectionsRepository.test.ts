@@ -286,6 +286,7 @@ describe('CollectionsRepository', () => {
         'Admin, Dataverse; Owner, Dataverse, 2024, "Dataset created using the createDataset use case'
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-1.txt'
+      const expectedCollectionsName = 'Scientific Research'
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
@@ -304,6 +305,7 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.sizeInBytes).toBe(12)
       expect(actualFilePreview.url).not.toBeUndefined()
       expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
+      expect(actualFilePreview.type).toBe(CollectionItemType.FILE)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
       expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
@@ -318,8 +320,12 @@ describe('CollectionsRepository', () => {
       expect(actualDatasetPreview.versionInfo.majorNumber).toBeUndefined()
       expect(actualDatasetPreview.versionInfo.minorNumber).toBeUndefined()
       expect(actualDatasetPreview.versionInfo.state).toBe('DRAFT')
+      expect(actualDatasetPreview.parentCollectionAlias).toBe(
+        'collectionsRepositoryTestSubCollection'
+      )
+      expect(actualDatasetPreview.parentCollectionName).toBe(expectedCollectionsName)
+      expect(actualDatasetPreview.type).toBe(CollectionItemType.DATASET)
 
-      const expectedCollectionsName = 'Scientific Research'
       expect(actualCollectionPreview.name).toBe(expectedCollectionsName)
       expect(actualCollectionPreview.alias).toBe(testSubCollectionAlias)
       expect(actualCollectionPreview.description).toBe('We do all the science.')
@@ -331,6 +337,7 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
       expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
       expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
 
       expect(actual.totalItemCount).toBe(3)
 
