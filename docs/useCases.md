@@ -52,6 +52,10 @@ The different use cases currently available in the package are classified below,
 - [Users](#Users)
   - [Users read use cases](#users-read-use-cases)
     - [Get Current Authenticated User](#get-current-authenticated-user)
+    - [Get Current API Token](#get-current-api-token)
+  - [Users write use cases](#users-write-use-cases)
+    - [Delete Current API Token](#delete-current-api-token)
+    - [Recreate Current API Token](#recreate-current-api-token)
 - [Info](#Info)
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
@@ -1136,6 +1140,66 @@ getCurrentAuthenticatedUser.execute().then((user: AuthenticatedUser) => {
 ```
 
 _See [use case](../src/users/domain/useCases/GetCurrentAuthenticatedUser.ts) implementation_.
+
+### Get Current API Token
+
+Returns the current [ApiTokenInfo](../src/users/domain/models/ApiTokenInfo.ts) corresponding to the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getCurrentApiToken } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getCurrentApiToken.execute().then((apiTokenInfo: ApiTokenInfo) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/users/domain/useCases/GetCurrentApiToken.ts) implementation_.
+
+### Users write use cases
+
+### Delete Current API Token
+
+Deletes the API token of the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { deleteCurrentApiToken } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+deleteCurrentApiToken.execute()
+
+/* ... */
+```
+
+_See [use case](../src/users/domain/useCases/DeleteCurrentApiToken.ts) implementation_.
+
+### Recreate Current API Token
+
+Reacreates the API token of the current authenticated user and returns the new [ApiTokenInfo](../src/users/domain/models/ApiTokenInfo.ts).
+
+##### Example call:
+
+```typescript
+import { recreateCurrentApiToken } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+recreateCurrentApiToken.execute().then((apiTokenInfo: ApiTokenInfo) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/users/domain/useCases/RecreateCurrentApiToken.ts) implementation_.
 
 ## Info
 

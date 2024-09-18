@@ -10,7 +10,7 @@ export class GetCurrentApiToken implements UseCase<ApiTokenInfo> {
   }
 
   /**
-   * Returns the current API token information corresponding to the current user authenticated through ApiConfig.
+   * Returns the current ApiTokenInfo corresponding to the current authenticated user.
    *
    * @returns {Promise<ApiTokenInfo>}
    */

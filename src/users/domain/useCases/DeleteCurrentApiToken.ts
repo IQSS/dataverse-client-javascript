@@ -9,7 +9,7 @@ export class DeleteCurrentApiToken implements UseCase<void> {
   }
 
   /**
-   * Deletes the API token of the current authenticated user in ApiConfig.
+   * Deletes the API token of the current authenticated user.
    *
    * @returns {Promise<void>}
    */

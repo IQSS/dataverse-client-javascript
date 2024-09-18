@@ -10,7 +10,7 @@ export class RecreateCurrentApiToken implements UseCase<ApiTokenInfo> {
   }
 
   /**
-   * Reacreates the API token of the current authenticated user in ApiConfig and returns the new API token info.
+   * Reacreates the API token of the current authenticated user and returns the new ApiTokenInfo.
    *
    * @returns {Promise<ApiTokenInfo>}
    */
