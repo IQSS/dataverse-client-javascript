@@ -1,7 +1,11 @@
 import { UsersRepository } from './infra/repositories/UsersRepository'
 import { GetCurrentAuthenticatedUser } from './domain/useCases/GetCurrentAuthenticatedUser'
+import { RecreateApiToken } from './domain/useCases/RecreateApiToken'
 
-const getCurrentAuthenticatedUser = new GetCurrentAuthenticatedUser(new UsersRepository())
+const usersRepository = new UsersRepository()
 
-export { getCurrentAuthenticatedUser }
+const getCurrentAuthenticatedUser = new GetCurrentAuthenticatedUser(usersRepository)
+const recreateApiToken = new RecreateApiToken(usersRepository)
+
+export { getCurrentAuthenticatedUser, recreateApiToken }
 export { AuthenticatedUser } from './domain/models/AuthenticatedUser'
