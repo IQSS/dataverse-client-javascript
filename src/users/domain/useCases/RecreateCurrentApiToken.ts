@@ -2,7 +2,7 @@ import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { ApiTokenInfo } from '../models/ApiTokenInfo'
 import { IUsersRepository } from '../repositories/IUsersRepository'
 
-export class RecreateApiToken implements UseCase<ApiTokenInfo> {
+export class RecreateCurrentApiToken implements UseCase<ApiTokenInfo> {
   private usersRepository: IUsersRepository
 
   constructor(usersRepository: IUsersRepository) {
@@ -15,6 +15,6 @@ export class RecreateApiToken implements UseCase<ApiTokenInfo> {
    * @returns {Promise<ApiTokenInfo>}
    */
   async execute(): Promise<ApiTokenInfo> {
-    return await this.usersRepository.recreateApiToken()
+    return await this.usersRepository.recreateCurrentApiToken()
   }
 }

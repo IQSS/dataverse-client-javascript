@@ -37,11 +37,11 @@ describe('UsersRepository', () => {
     })
   })
 
-  describe('recreateApiToken', () => {
+  describe('recreateCurrentApiToken', () => {
     test('should recreate API token and return the new API token info when valid authentication is provided', async () => {
-      const testApiToken = await createApiTokenViaApi('recreateApiTokenITUser')
+      const testApiToken = await createApiTokenViaApi('recreateCurrentApiTokenITUser')
       ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, testApiToken)
-      const actualRecreatedApiTokenInfo = await sut.recreateApiToken()
+      const actualRecreatedApiTokenInfo = await sut.recreateCurrentApiToken()
       expect(actualRecreatedApiTokenInfo.apiToken).not.toBeUndefined()
       expect(actualRecreatedApiTokenInfo.apiToken).not.toBe(testApiToken)
       expect(typeof actualRecreatedApiTokenInfo.expirationDate).toBe('object')
@@ -51,7 +51,7 @@ describe('UsersRepository', () => {
       ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, 'invalidApiKey')
 
       const errorExpected: WriteError = new WriteError('[401] Bad API key')
-      await expect(sut.recreateApiToken()).rejects.toThrow(errorExpected)
+      await expect(sut.recreateCurrentApiToken()).rejects.toThrow(errorExpected)
     })
   })
 

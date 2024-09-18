@@ -1,5 +1,5 @@
 import { IUsersRepository } from '../../../src/users/domain/repositories/IUsersRepository'
-import { RecreateApiToken } from '../../../src/users/domain/useCases/RecreateApiToken'
+import { RecreateCurrentApiToken } from '../../../src/users/domain/useCases/RecreateCurrentApiToken'
 import { WriteError } from '../../../src'
 import { ApiTokenInfo } from '../../../src/users/domain/models/ApiTokenInfo'
 import { TestConstants } from '../../testHelpers/TestConstants'
@@ -11,8 +11,8 @@ describe('execute', () => {
       expirationDate: new Date()
     }
     const usersRepositoryStub: IUsersRepository = {} as IUsersRepository
-    usersRepositoryStub.recreateApiToken = jest.fn().mockResolvedValue(testNewTokenInfo)
-    const sut = new RecreateApiToken(usersRepositoryStub)
+    usersRepositoryStub.recreateCurrentApiToken = jest.fn().mockResolvedValue(testNewTokenInfo)
+    const sut = new RecreateCurrentApiToken(usersRepositoryStub)
 
     const actual = await sut.execute()
 
@@ -21,8 +21,8 @@ describe('execute', () => {
 
   test('should return error result on repository error', async () => {
     const usersRepositoryStub: IUsersRepository = {} as IUsersRepository
-    usersRepositoryStub.recreateApiToken = jest.fn().mockRejectedValue(new WriteError())
-    const sut = new RecreateApiToken(usersRepositoryStub)
+    usersRepositoryStub.recreateCurrentApiToken = jest.fn().mockRejectedValue(new WriteError())
+    const sut = new RecreateCurrentApiToken(usersRepositoryStub)
 
     await expect(sut.execute()).rejects.toThrow(WriteError)
   })

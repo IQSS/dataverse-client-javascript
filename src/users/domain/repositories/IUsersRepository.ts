@@ -3,7 +3,7 @@ import { AuthenticatedUser } from '../models/AuthenticatedUser'
 
 export interface IUsersRepository {
   getCurrentAuthenticatedUser(): Promise<AuthenticatedUser>
-  recreateApiToken(): Promise<ApiTokenInfo>
+  recreateCurrentApiToken(): Promise<ApiTokenInfo>
   getCurrentApiToken(): Promise<ApiTokenInfo>
   deleteCurrentApiToken(): Promise<void>
 }
