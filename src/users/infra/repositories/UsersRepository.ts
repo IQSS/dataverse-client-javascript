@@ -16,7 +16,7 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
 
   public async recreateApiToken(): Promise<string> {
     return this.doPost(`/${this.usersResourceName}/token/recreate`, {})
-      .then((response) => response.data.data)
+      .then((response) => response.data.data.message.split(' ').pop())
       .catch((error) => {
         throw error
       })
