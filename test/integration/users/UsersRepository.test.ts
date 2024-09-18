@@ -52,4 +52,24 @@ describe('UsersRepository', () => {
       await expect(sut.recreateApiToken()).rejects.toThrow(errorExpected)
     })
   })
+
+  describe('getCurrentApiToken', () => {
+    test('should return API token info when valid authentication is provided', async () => {
+      ApiConfig.init(
+        TestConstants.TEST_API_URL,
+        DataverseApiAuthMechanism.API_KEY,
+        process.env.TEST_API_KEY
+      )
+      const actualApiTokenInfo = await sut.getCurrentApiToken()
+      expect(actualApiTokenInfo.apiToken).toBe(process.env.TEST_API_KEY)
+      expect(typeof actualApiTokenInfo.expirationDate).toBe('object')
+    })
+
+    test('should return error when authentication is not valid', async () => {
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, 'invalidApiKey')
+
+      const errorExpected: ReadError = new ReadError('[401] Bad API key')
+      await expect(sut.getCurrentApiToken()).rejects.toThrow(errorExpected)
+    })
+  })
 })

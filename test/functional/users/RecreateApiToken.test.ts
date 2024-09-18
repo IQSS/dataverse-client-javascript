@@ -4,6 +4,14 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import { createApiTokenViaApi } from '../../testHelpers/users/apiTokenHelper'
 
 describe('execute', () => {
+  beforeAll(async () => {
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.API_KEY,
+      process.env.TEST_API_KEY
+    )
+  })
+
   afterAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
