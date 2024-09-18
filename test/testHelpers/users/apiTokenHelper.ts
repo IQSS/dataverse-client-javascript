@@ -1,18 +1,15 @@
 import axios from 'axios'
 import { TestConstants } from '../TestConstants'
 
-const CREATE_USER_ENDPOINT = '/builtin-users?key=burrito&password=testuser'
-const API_TOKEN_USER_ENDPOINT = '/builtin-users/testuser/api-token'
-
-export const createApiTokenViaApi = async (): Promise<string> => {
+export const createApiTokenViaApi = async (userName: string): Promise<string> => {
   try {
     await axios.post(
-      `${TestConstants.TEST_API_URL}${CREATE_USER_ENDPOINT}`,
+      `${TestConstants.TEST_API_URL}/builtin-users?key=burrito&password=${userName}`,
       JSON.stringify({
-        userName: 'testuser',
+        userName: userName,
         firstName: 'John',
         lastName: 'Doe',
-        email: 'test@test.com'
+        email: `${userName}@test.com`
       }),
       {
         headers: {
@@ -21,9 +18,10 @@ export const createApiTokenViaApi = async (): Promise<string> => {
       }
     )
     return axios
-      .get(`${TestConstants.TEST_API_URL}${API_TOKEN_USER_ENDPOINT}?password=testuser`)
+      .get(`${TestConstants.TEST_API_URL}/builtin-users/${userName}/api-token?password=${userName}`)
       .then((response) => response.data.data.message)
   } catch (error) {
+    console.log(error)
     throw new Error(`Error while creating API token`)
   }
 }

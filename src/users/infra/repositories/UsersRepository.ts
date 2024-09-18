@@ -3,7 +3,10 @@ import { IUsersRepository } from '../../domain/repositories/IUsersRepository'
 import { AuthenticatedUser } from '../../domain/models/AuthenticatedUser'
 import { AxiosResponse } from 'axios'
 import { ApiTokenInfo } from '../../domain/models/ApiTokenInfo'
-import { transformApiTokenInfoResponseToApiTokenInfo } from './transformers/apiTokenInfoTransformers'
+import {
+  transformGetApiTokenResponseToApiTokenInfo,
+  transformRecreateApiTokenResponseToApiTokenInfo
+} from './transformers/apiTokenInfoTransformers'
 
 export class UsersRepository extends ApiRepository implements IUsersRepository {
   private readonly usersResourceName: string = 'users'
@@ -16,9 +19,9 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
       })
   }
 
-  public async recreateApiToken(): Promise<string> {
-    return this.doPost(`/${this.usersResourceName}/token/recreate`, {})
-      .then((response) => response.data.data.message.split(' ').pop())
+  public async recreateApiToken(): Promise<ApiTokenInfo> {
+    return this.doPost(`/${this.usersResourceName}/token/recreate?returnExpiration=true`, {})
+      .then((response) => transformRecreateApiTokenResponseToApiTokenInfo(response))
       .catch((error) => {
         throw error
       })
@@ -26,7 +29,7 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
 
   public async getCurrentApiToken(): Promise<ApiTokenInfo> {
     return this.doGet(`/${this.usersResourceName}/token`, true)
-      .then((response) => transformApiTokenInfoResponseToApiTokenInfo(response))
+      .then((response) => transformGetApiTokenResponseToApiTokenInfo(response))
       .catch((error) => {
         throw error
       })

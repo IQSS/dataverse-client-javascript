@@ -38,11 +38,13 @@ describe('UsersRepository', () => {
   })
 
   describe('recreateApiToken', () => {
-    test('should recreate API token when valid authentication is provided', async () => {
-      const testApiToken = await createApiTokenViaApi()
+    test('should recreate API token and return the new API token info when valid authentication is provided', async () => {
+      const testApiToken = await createApiTokenViaApi('recreateApiTokenITUser')
       ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, testApiToken)
-      const actualRecreatedApiToken = await sut.recreateApiToken()
-      expect(actualRecreatedApiToken).not.toBe(testApiToken)
+      const actualRecreatedApiTokenInfo = await sut.recreateApiToken()
+      expect(actualRecreatedApiTokenInfo.apiToken).not.toBeUndefined()
+      expect(actualRecreatedApiTokenInfo.apiToken).not.toBe(testApiToken)
+      expect(typeof actualRecreatedApiTokenInfo.expirationDate).toBe('object')
     })
 
     test('should return error when authentication is not valid', async () => {
@@ -61,6 +63,7 @@ describe('UsersRepository', () => {
         process.env.TEST_API_KEY
       )
       const actualApiTokenInfo = await sut.getCurrentApiToken()
+      expect(actualApiTokenInfo.apiToken).not.toBeUndefined()
       expect(actualApiTokenInfo.apiToken).toBe(process.env.TEST_API_KEY)
       expect(typeof actualApiTokenInfo.expirationDate).toBe('object')
     })

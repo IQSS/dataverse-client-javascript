@@ -21,9 +21,11 @@ describe('execute', () => {
   })
 
   test('should successfully recreate the API token', async () => {
-    const testApiToken = await createApiTokenViaApi()
+    const testApiToken = await createApiTokenViaApi('recreateApiTokenFTUser')
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, testApiToken)
-    const actualNewApiToken = await recreateApiToken.execute()
-    expect(actualNewApiToken).not.toBe(testApiToken)
+    const actualRecreatedApiTokenInfo = await recreateApiToken.execute()
+    expect(actualRecreatedApiTokenInfo.apiToken).not.toBeUndefined()
+    expect(actualRecreatedApiTokenInfo.apiToken).not.toBe(testApiToken)
+    expect(typeof actualRecreatedApiTokenInfo.expirationDate).toBe('object')
   })
 })

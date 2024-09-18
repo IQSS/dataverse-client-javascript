@@ -1,7 +1,8 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { ApiTokenInfo } from '../models/ApiTokenInfo'
 import { IUsersRepository } from '../repositories/IUsersRepository'
 
-export class RecreateApiToken implements UseCase<string> {
+export class RecreateApiToken implements UseCase<ApiTokenInfo> {
   private usersRepository: IUsersRepository
 
   constructor(usersRepository: IUsersRepository) {
@@ -9,11 +10,11 @@ export class RecreateApiToken implements UseCase<string> {
   }
 
   /**
-   * Reacreates the API token of the current authenticated user and returns the new one.
+   * Reacreates the API token of the current authenticated user in ApiConfig and returns the new API token info.
    *
-   * @returns {Promise<AuthenticatedUser>}
+   * @returns {Promise<ApiTokenInfo>}
    */
-  async execute(): Promise<string> {
+  async execute(): Promise<ApiTokenInfo> {
     return await this.usersRepository.recreateApiToken()
   }
 }
