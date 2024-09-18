@@ -2,6 +2,7 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRepository'
 import {
   transformCollectionFacetsResponseToCollectionFacets,
+  transformCollectionItemsResponseToCollectionItemSubset,
   transformCollectionResponseToCollection
 } from './transformers/collectionTransformers'
 import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collection'
@@ -9,6 +10,9 @@ import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
 import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
+import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
+import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
+import { CollectionItemType } from '../../domain/models/CollectionItemType'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -34,6 +38,14 @@ export interface NewCollectionInputLevelRequestPayload {
   datasetFieldTypeName: string
   include: boolean
   required: boolean
+}
+
+export interface GetCollectionItemsQueryParams {
+  q: string
+  subtree?: string
+  per_page?: number
+  start?: number
+  type?: string
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -128,5 +140,57 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       .catch((error) => {
         throw error
       })
+  }
+
+  public async getCollectionItems(
+    collectionId?: string,
+    limit?: number,
+    offset?: number,
+    collectionSearchCriteria?: CollectionSearchCriteria
+  ): Promise<CollectionItemSubset> {
+    const queryParams: GetCollectionItemsQueryParams = {
+      q: '*'
+    }
+    if (collectionId) {
+      queryParams.subtree = collectionId
+    }
+    if (limit) {
+      queryParams.per_page = limit
+    }
+    if (offset) {
+      queryParams.start = offset
+    }
+    if (collectionSearchCriteria) {
+      this.applyCollectionSearchCriteriaToQueryParams(queryParams, collectionSearchCriteria)
+    }
+
+    let url = '/search?sort=date&order=desc'
+
+    if (collectionSearchCriteria?.itemTypes) {
+      const itemTypesQueryString = collectionSearchCriteria.itemTypes
+        .map((itemType: CollectionItemType) => {
+          const mappedItemType =
+            itemType === CollectionItemType.COLLECTION ? 'dataverse' : itemType.toString()
+          return `type=${mappedItemType}`
+        })
+        .join('&')
+
+      url += `&${itemTypesQueryString}`
+    }
+
+    return this.doGet(url, true, queryParams)
+      .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  private applyCollectionSearchCriteriaToQueryParams(
+    queryParams: GetCollectionItemsQueryParams,
+    collectionSearchCriteria: CollectionSearchCriteria
+  ) {
+    if (collectionSearchCriteria.searchText) {
+      queryParams.q = encodeURIComponent(collectionSearchCriteria.searchText)
+    }
   }
 }

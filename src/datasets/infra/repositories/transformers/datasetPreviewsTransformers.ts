@@ -2,20 +2,9 @@ import { AxiosResponse } from 'axios'
 import { DatasetPreview } from '../../../domain/models/DatasetPreview'
 import { DatasetVersionState } from '../../../domain/models/Dataset'
 import { DatasetPreviewSubset } from '../../../domain/models/DatasetPreviewSubset'
-
-export interface DatasetPreviewPayload {
-  global_id: string
-  name: string
-  versionId: number
-  majorVersion: number
-  minorVersion: number
-  versionState: string
-  createdAt: string
-  updatedAt: string
-  published_at?: string
-  citation: string
-  description: string
-}
+import { DatasetPreviewPayload } from './DatasetPreviewPayload'
+import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../../collections/domain/models/CollectionItemType'
 
 export const transformDatasetPreviewsResponseToDatasetPreviewSubset = (
   response: AxiosResponse
@@ -32,10 +21,15 @@ export const transformDatasetPreviewsResponseToDatasetPreviewSubset = (
   }
 }
 
-const transformDatasetPreviewPayloadToDatasetPreview = (
+export const transformDatasetPreviewPayloadToDatasetPreview = (
   datasetPreviewPayload: DatasetPreviewPayload
 ): DatasetPreview => {
+  const publicationStatuses: PublicationStatus[] = []
+  datasetPreviewPayload.publicationStatuses.forEach((element) => {
+    publicationStatuses.push(element as unknown as PublicationStatus)
+  })
   return {
+    type: CollectionItemType.DATASET,
     persistentId: datasetPreviewPayload.global_id,
     title: datasetPreviewPayload.name,
     versionId: datasetPreviewPayload.versionId,
@@ -50,6 +44,9 @@ const transformDatasetPreviewPayloadToDatasetPreview = (
       })
     },
     citation: datasetPreviewPayload.citation,
-    description: datasetPreviewPayload.description
+    description: datasetPreviewPayload.description,
+    publicationStatuses: publicationStatuses,
+    parentCollectionAlias: datasetPreviewPayload.identifier_of_dataverse,
+    parentCollectionName: datasetPreviewPayload.name_of_dataverse
   }
 }

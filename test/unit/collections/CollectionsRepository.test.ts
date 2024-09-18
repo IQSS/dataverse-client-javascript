@@ -18,6 +18,19 @@ import {
   createCollectionUserPermissionsModel,
   createCollectionUserPermissionsPayload
 } from '../../testHelpers/collections/collectionUserPermissionsHelper'
+import {
+  createDatasetPreviewModel,
+  createDatasetPreviewPayload
+} from '../../testHelpers/datasets/datasetPreviewHelper'
+import {
+  createFilePreviewModel,
+  createFilePreviewPayload
+} from '../../testHelpers/files/filePreviewHelper'
+import { CollectionItemSubset } from '../../../src/collections/domain/models/CollectionItemSubset'
+import {
+  createCollectionPreviewModel,
+  createCollectionPreviewPayload
+} from '../../testHelpers/collections/collectionPreviewHelper'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -280,6 +293,181 @@ describe('CollectionsRepository', () => {
         )
         expect(error).toBeInstanceOf(Error)
       })
+    })
+  })
+
+  describe('getCollectionItems', () => {
+    const testItems = [
+      createDatasetPreviewModel(),
+      createFilePreviewModel(),
+      createCollectionPreviewModel()
+    ]
+    const testTotalCount = 2
+
+    const testItemSubset: CollectionItemSubset = {
+      items: testItems,
+      totalItemCount: testTotalCount
+    }
+
+    const testItemPreviewsResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          total_count: testTotalCount,
+          items: [
+            createDatasetPreviewPayload(),
+            createFilePreviewPayload(),
+            createCollectionPreviewPayload()
+          ]
+        }
+      }
+    }
+
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?sort=date&order=desc`
+
+    test('should return item previews when response is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testItemPreviewsResponse)
+
+      // API Key auth
+      let actual = await sut.getCollectionItems()
+
+      const expectedRequestParams = {
+        q: '*'
+      }
+
+      const expectedRequestConfigApiKey = {
+        params: expectedRequestParams,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+
+      expect(actual).toStrictEqual(testItemSubset)
+
+      // Session cookie auth
+      const expectedRequestConfigSessionCookie = {
+        params: expectedRequestParams,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials
+      }
+
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.getCollectionItems()
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedRequestConfigSessionCookie
+      )
+      expect(actual).toStrictEqual(testItemSubset)
+    })
+
+    test('should return item previews when providing pagination params and response is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testItemPreviewsResponse)
+
+      const testLimit = 10
+      const testOffset = 20
+
+      // API Key auth
+      let actual = await sut.getCollectionItems(undefined, testLimit, testOffset)
+
+      const expectedRequestParamsWithPagination = {
+        q: '*',
+        per_page: testLimit,
+        start: testOffset
+      }
+
+      const expectedRequestConfigApiKeyWithPagination = {
+        params: expectedRequestParamsWithPagination,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedRequestConfigApiKeyWithPagination
+      )
+      expect(actual).toStrictEqual(testItemSubset)
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.getCollectionItems(undefined, testLimit, testOffset)
+
+      const expectedRequestConfigSessionCookieWithPagination = {
+        params: expectedRequestParamsWithPagination,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedRequestConfigSessionCookieWithPagination
+      )
+      expect(actual).toStrictEqual(testItemSubset)
+    })
+
+    it('should return item previews when providing collection id and response is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testItemPreviewsResponse)
+
+      const testCollectionId = 'testCollectionId'
+
+      // API Key auth
+      let actual = await sut.getCollectionItems(testCollectionId, undefined, undefined)
+
+      const expectedRequestParamsWithCollectionId = {
+        q: '*',
+        subtree: testCollectionId
+      }
+
+      const expectedRequestConfigApiKeyWithCollectionId = {
+        params: expectedRequestParamsWithCollectionId,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedRequestConfigApiKeyWithCollectionId
+      )
+      expect(actual).toStrictEqual(testItemSubset)
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.getCollectionItems(testCollectionId, undefined, undefined)
+
+      const expectedRequestConfigSessionCookieWithCollectionId = {
+        params: expectedRequestParamsWithCollectionId,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedRequestConfigSessionCookieWithCollectionId
+      )
+      expect(actual).toStrictEqual(testItemSubset)
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error = undefined as unknown as ReadError
+      await sut.getCollectionItems().catch((e) => (error = e))
+
+      const expectedRequestParams = {
+        q: '*'
+      }
+
+      const expectedRequestConfigApiKey = {
+        params: expectedRequestParams,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+      expect(error).toBeInstanceOf(Error)
     })
   })
 })

@@ -13,6 +13,7 @@ The different use cases currently available in the package are classified below,
     - [Get a Collection](#get-a-collection)
     - [Get Collection Facets](#get-collection-facets)
     - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
+    - [List All Collection Items](#list-all-collection-items)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
     - [Publish a Collection](#publish-a-collection)
@@ -159,6 +160,40 @@ _See [use case](../src/collections/domain/useCases/GetCollectionUserPermissions.
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+#### List All Collection Items
+
+Returns an instance of [CollectionItemSubset](../src/collections/domain/models/CollectionItemSubset.ts) that contains reduced information for each collection item that the calling user can access in the installation.
+
+##### Example call:
+
+```typescript
+import { getCollectionItems } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionId = 'subcollection1'
+const limit = 10
+const offset = 20
+
+getCollectionItems.execute(collectionId, limit, offset).then((subset: CollectionItemSubset) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionItems.ts) implementation_.
+
+Note that `collectionId` is an optional parameter to filter the items by a specific collection. If not set, the use case will return items starting from the root collection.
+
+The `CollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
+
+This use case supports the following optional parameters depending on the search goals:
+
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
+- **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
 
 ### Collections Write Use Cases
 

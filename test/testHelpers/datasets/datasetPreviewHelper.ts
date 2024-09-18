@@ -1,6 +1,8 @@
 import { DatasetPreview } from '../../../src/datasets/domain/models/DatasetPreview'
 import { DatasetVersionState } from '../../../src/datasets/domain/models/Dataset'
-import { DatasetPreviewPayload } from '../../../src/datasets/infra/repositories/transformers/datasetPreviewsTransformers'
+import { DatasetPreviewPayload } from '../../../src/datasets/infra/repositories/transformers/DatasetPreviewPayload'
+import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../src'
 
 const DATASET_CREATE_TIME_STR = '2023-05-15T08:21:01Z'
 const DATASET_UPDATE_TIME_STR = '2023-05-15T08:21:03Z'
@@ -11,6 +13,7 @@ const DATASET_CITATION =
 
 export const createDatasetPreviewModel = (): DatasetPreview => {
   const datasetPreviewModel: DatasetPreview = {
+    type: CollectionItemType.DATASET,
     persistentId: 'doi:10.5072/FK2/HC6KTB',
     title: 'Test Dataset 1',
     versionId: 19,
@@ -23,7 +26,10 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
       releaseTime: new Date(DATASET_RELEASE_TIME_STR)
     },
     citation: DATASET_CITATION,
-    description: 'test'
+    description: 'test',
+    publicationStatuses: [PublicationStatus.Draft, PublicationStatus.Unpublished],
+    parentCollectionAlias: 'parentCollection',
+    parentCollectionName: 'Parent Collection'
   }
   return datasetPreviewModel
 }
@@ -40,6 +46,10 @@ export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
     updatedAt: DATASET_UPDATE_TIME_STR,
     published_at: DATASET_RELEASE_TIME_STR,
     citation: DATASET_CITATION,
-    description: 'test'
+    description: 'test',
+    type: 'dataset',
+    publicationStatuses: ['Draft', 'Unpublished'],
+    identifier_of_dataverse: 'parentCollection',
+    name_of_dataverse: 'Parent Collection'
   }
 }
