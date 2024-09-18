@@ -35,6 +35,14 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
       })
   }
 
+  public async deleteCurrentApiToken(): Promise<void> {
+    return this.doDelete(`/${this.usersResourceName}/token`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
   private getAuthenticatedUserFromResponse(response: AxiosResponse): AuthenticatedUser {
     const responseData = response.data.data
     return {

@@ -5,4 +5,5 @@ export interface IUsersRepository {
   getCurrentAuthenticatedUser(): Promise<AuthenticatedUser>
   recreateApiToken(): Promise<ApiTokenInfo>
   getCurrentApiToken(): Promise<ApiTokenInfo>
+  deleteCurrentApiToken(): Promise<void>
 }

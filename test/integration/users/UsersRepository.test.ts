@@ -75,4 +75,22 @@ describe('UsersRepository', () => {
       await expect(sut.getCurrentApiToken()).rejects.toThrow(errorExpected)
     })
   })
+
+  describe('deleteCurrentApiToken', () => {
+    test('should return API token info when valid authentication is provided', async () => {
+      const testApiToken = await createApiTokenViaApi('deleteCurrentApiTokenITUser')
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, testApiToken)
+      await sut.deleteCurrentApiToken()
+      // Since the token has been deleted, the next call using it should return 401
+      const errorExpected: WriteError = new WriteError('[401] Bad API key')
+      await expect(sut.deleteCurrentApiToken()).rejects.toThrow(errorExpected)
+    })
+
+    test('should return error when authentication is not valid', async () => {
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, 'invalidApiKey')
+
+      const errorExpected: WriteError = new WriteError('[401] Bad API key')
+      await expect(sut.deleteCurrentApiToken()).rejects.toThrow(errorExpected)
+    })
+  })
 })
