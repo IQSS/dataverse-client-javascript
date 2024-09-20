@@ -4,7 +4,7 @@ export interface Collection {
   id: number
   alias: string
   name: string
-  isReleased: string
+  isReleased: boolean
   affiliation?: string
   description?: string
   isPartOf: DvObjectOwnerNode

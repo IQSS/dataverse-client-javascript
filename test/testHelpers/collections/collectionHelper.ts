@@ -8,7 +8,7 @@ import { NewCollectionRequestPayload } from '../../../src/collections/infra/repo
 import { CollectionFacetPayload } from '../../../src/collections/infra/repositories/transformers/CollectionFacetPayload'
 
 const COLLECTION_ID = 11111
-const COLLECTION_IS_RELEASED = 'true'
+const COLLECTION_IS_RELEASED = true
 const COLLECTION_ALIAS_STR = 'secondCollection'
 const COLLECTION_NAME_STR = 'Laboratory Research'
 const COLLECTION_AFFILIATION_STR = 'Laboratory Research Corporation'

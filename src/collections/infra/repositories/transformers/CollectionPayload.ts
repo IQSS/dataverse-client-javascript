@@ -5,7 +5,7 @@ export interface CollectionPayload {
   alias: string
   name: string
   affiliation?: string
-  isReleased: string
+  isReleased: boolean
   description?: string
   isPartOf: OwnerNodePayload
   inputLevels?: CollectionInputLevelPayload[]
