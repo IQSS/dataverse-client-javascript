@@ -82,7 +82,7 @@ jobs:
           echo "${NEW_INCREMENTAL_NUMBER}" > .alpha_version
 
           # Update package version with 2.0.0.alpha.<incremental_number>
-          NEW_VERSION="2.0.0.test.${INCREMENTAL_NUMBER}"
+          NEW_VERSION="2.0.0-test.${INCREMENTAL_NUMBER}"
           npm version "${NEW_VERSION}" --no-git-tag-version
 
           # Commit the version update and incremental number
