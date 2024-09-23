@@ -81,8 +81,8 @@ jobs:
           # Save the new incremental number to the file
           echo "${NEW_INCREMENTAL_NUMBER}" > .alpha_version
 
-          # Update package version with 2.0.0.alpha.<incremental_number>
-          NEW_VERSION="2.0.0-test.${INCREMENTAL_NUMBER}"
+          # Update package version with 2.0.0-alpha.<incremental_number>
+          NEW_VERSION="2.0.0-test1.${INCREMENTAL_NUMBER}"
           npm version "${NEW_VERSION}" --no-git-tag-version
 
           # Commit the version update and incremental number
@@ -90,6 +90,9 @@ jobs:
           git config --global user.name "GitHub Actions"
           git add package.json .alpha_version
           git commit -m "Update version to ${NEW_VERSION}"
+
+          # Push the changes to the repository
+          git push origin develop
 
       - name: Publish package
         run: |
