@@ -74,17 +74,17 @@ jobs:
             echo "1" > .alpha_version
           fi
           INCREMENTAL_NUMBER=$(cat .alpha_version)
-          
+
           # Increment version number
           NEW_INCREMENTAL_NUMBER=$((INCREMENTAL_NUMBER+1))
-          
+
           # Save the new incremental number to the file
           echo "${NEW_INCREMENTAL_NUMBER}" > .alpha_version
-          
+
           # Update package version with 2.0.0.alpha.<incremental_number>
           NEW_VERSION="2.0.0.alpha.${INCREMENTAL_NUMBER}"
           npm version "${NEW_VERSION}" --no-git-tag-version
-          
+
           # Commit the version update and incremental number
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
