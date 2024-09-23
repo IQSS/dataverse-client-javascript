@@ -92,7 +92,7 @@ jobs:
           git commit -m "Update version to ${NEW_VERSION}"
 
           # Push the changes to the repository
-          git push origin develop
+          git push origin "${{ github.ref_name }}"
 
       - name: Publish package
         run: |
