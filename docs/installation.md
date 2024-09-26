@@ -18,6 +18,19 @@ An unstable 2.x version of this package with breaking changes is under developme
 
 Until a 2.0 version is officially released, it can be installed from https://github.com/IQSS/dataverse-client-javascript/pkgs/npm/dataverse-client-javascript
 
+Two different versions are being pushed to the GitHub Packages registry:
+
+1. **PR-Generated Versions**:
+
+   - These versions are generated from pull request commits.
+   - They follow the structure `2.0.0-pr<pr_number>.<commit_hash>`, where `pr_number` is the number of the pull request, and `commit_hash` is the specific commit hash from the PR branch.
+   - These versions are unstable and correspond to the state of the package during the pull request.
+
+2. **Develop Alpha Versions**:
+   - These versions are generated on every commit made to the `develop` branch, ideally after each pull request is merged.
+   - They follow the structure `2.0.0-alpha.<number>`, where `number` is an incremental value that starts at 1 and increases with each build.
+   - These versions are also unstable and represent the latest work in progress on the `develop` branch.
+
 ### Create a `.npmrc` file and add a token
 
 To install the [@iqss/dataverse-client-javascript](https://github.com/IQSS/dataverse-client-javascript/pkgs/npm/dataverse-client-javascript)
