@@ -2,11 +2,42 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IUsersRepository } from '../../domain/repositories/IUsersRepository'
 import { AuthenticatedUser } from '../../domain/models/AuthenticatedUser'
 import { AxiosResponse } from 'axios'
+import { ApiTokenInfo } from '../../domain/models/ApiTokenInfo'
+import {
+  transformGetApiTokenResponseToApiTokenInfo,
+  transformRecreateApiTokenResponseToApiTokenInfo
+} from './transformers/apiTokenInfoTransformers'
 
 export class UsersRepository extends ApiRepository implements IUsersRepository {
+  private readonly usersResourceName: string = 'users'
+
   public async getCurrentAuthenticatedUser(): Promise<AuthenticatedUser> {
-    return this.doGet('/users/:me', true)
+    return this.doGet(`/${this.usersResourceName}/:me`, true)
       .then((response) => this.getAuthenticatedUserFromResponse(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async recreateCurrentApiToken(): Promise<ApiTokenInfo> {
+    return this.doPost(`/${this.usersResourceName}/token/recreate?returnExpiration=true`, {})
+      .then((response) => transformRecreateApiTokenResponseToApiTokenInfo(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getCurrentApiToken(): Promise<ApiTokenInfo> {
+    return this.doGet(`/${this.usersResourceName}/token`, true)
+      .then((response) => transformGetApiTokenResponseToApiTokenInfo(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deleteCurrentApiToken(): Promise<void> {
+    return this.doDelete(`/${this.usersResourceName}/token`)
+      .then(() => undefined)
       .catch((error) => {
         throw error
       })

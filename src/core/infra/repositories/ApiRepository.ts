@@ -35,6 +35,15 @@ export abstract class ApiRepository {
     return await this.doRequest('put', apiEndpoint, data, queryParams)
   }
 
+  public async doDelete(apiEndpoint: string, queryParams: object = {}): Promise<AxiosResponse> {
+    return await axios
+      .delete(buildRequestUrl(apiEndpoint), buildRequestConfig(true, queryParams))
+      .then((response) => response)
+      .catch((error) => {
+        throw new WriteError(this.buildErrorMessage(error))
+      })
+  }
+
   protected buildApiEndpoint(
     resourceName: string,
     operation: string,
