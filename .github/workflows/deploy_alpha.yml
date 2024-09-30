@@ -3,7 +3,7 @@ name: 'deploy_alpha'
 on:
   push:
     branches:
-      - 196-github-action-fix
+      - develop
 
 jobs:
   test-unit:
@@ -72,24 +72,22 @@ jobs:
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
 
-          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --registry=https://npm.pkg.github.com/ --json | jq -r '.[]' | grep "^2.0.0-test." | sort -V | tail -n 1)
+          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --registry=https://npm.pkg.github.com/ --json | jq -r '.[]' | grep "^2.0.0-alpha." | sort -V | tail -n 1)
 
           if [ -z "$LATEST_VERSION" ]; then
             NEW_INCREMENTAL_NUMBER=1
           else
-            CURRENT_INCREMENTAL_NUMBER=$(echo $LATEST_VERSION | sed 's/2.0.0-test.//')
+            CURRENT_INCREMENTAL_NUMBER=$(echo $LATEST_VERSION | sed 's/2.0.0-alpha.//')
             NEW_INCREMENTAL_NUMBER=$((CURRENT_INCREMENTAL_NUMBER + 1))
           fi
 
-          NEW_VERSION="2.0.0-test.${NEW_INCREMENTAL_NUMBER}"
+          NEW_VERSION="2.0.0-alpha.${NEW_INCREMENTAL_NUMBER}"
 
           echo "Latest version: $LATEST_VERSION"
           echo "New version: $NEW_VERSION"
 
           echo "Setting package version to: ${NEW_VERSION}"          
           npm version "${NEW_VERSION}" --no-git-tag-version
-
-          #
 
       - name: Publish package
         run: |
