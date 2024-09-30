@@ -67,8 +67,12 @@ jobs:
         run: npm run build
 
       - name: Fetch latest alpha version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --json | jq -r '.[]' | grep "^2.0.0-alphatest." | sort -V | tail -n 1)
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+
+          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --registry=https://npm.pkg.github.com/ --json | jq -r '.[]' | grep "^2.0.0-alphatest." | sort -V | tail -n 1)
 
           if [ -z "$LATEST_VERSION" ]; then
             NEW_INCREMENTAL_NUMBER=1
