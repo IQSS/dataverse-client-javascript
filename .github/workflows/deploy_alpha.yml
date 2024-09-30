@@ -66,7 +66,7 @@ jobs:
       - name: Build package
         run: npm run build
 
-      - name: Fetch latest alpha version
+      - name: Update package version
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -86,8 +86,6 @@ jobs:
           echo "Latest version: $LATEST_VERSION"
           echo "New version: $NEW_VERSION"
 
-      - name: Update package version
-        run: |
           echo "Setting package version to: ${NEW_VERSION}"          
           npm version "${NEW_VERSION}" --no-git-tag-version
 
