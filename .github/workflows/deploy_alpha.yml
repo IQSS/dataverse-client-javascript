@@ -89,6 +89,8 @@ jobs:
           echo "Setting package version to: ${NEW_VERSION}"          
           npm version "${NEW_VERSION}" --no-git-tag-version
 
+          #
+
       - name: Publish package
         run: |
           echo "$(jq '.publishConfig.registry = "https://npm.pkg.github.com"' package.json)" > package.json
