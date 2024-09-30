@@ -88,6 +88,7 @@ jobs:
 
       - name: Update package version
         run: |
+          echo "Setting package version to: ${NEW_VERSION}"          
           npm version "${NEW_VERSION}" --no-git-tag-version
 
       - name: Publish package
