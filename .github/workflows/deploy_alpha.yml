@@ -3,7 +3,7 @@ name: 'deploy_alpha'
 on:
   push:
     branches:
-      - develop
+      - 196-github-action-fix
 
 jobs:
   test-unit:
@@ -68,16 +68,16 @@ jobs:
 
       - name: Fetch latest alpha version
         run: |
-          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --json | jq -r '.[]' | grep "^2.0.0-alpha." | sort -V | tail -n 1)
+          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --json | jq -r '.[]' | grep "^2.0.0-alphatest." | sort -V | tail -n 1)
 
           if [ -z "$LATEST_VERSION" ]; then
             NEW_INCREMENTAL_NUMBER=1
           else
-            CURRENT_INCREMENTAL_NUMBER=$(echo $LATEST_VERSION | sed 's/2.0.0-alpha.//')
+            CURRENT_INCREMENTAL_NUMBER=$(echo $LATEST_VERSION | sed 's/2.0.0-alphatest.//')
             NEW_INCREMENTAL_NUMBER=$((CURRENT_INCREMENTAL_NUMBER + 1))
           fi
 
-          NEW_VERSION="2.0.0-alpha.${NEW_INCREMENTAL_NUMBER}"
+          NEW_VERSION="2.0.0-alphatest.${NEW_INCREMENTAL_NUMBER}"
 
           echo "Latest version: $LATEST_VERSION"
           echo "New version: $NEW_VERSION"
