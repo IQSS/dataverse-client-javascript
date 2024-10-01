@@ -12,6 +12,7 @@ export const transformPayloadToOwnerNode = (
       persistentIdentifier: ownerNodePayload.persistentIdentifier
     }),
     ...(ownerNodePayload.version && { version: ownerNodePayload.version }),
+    ...(ownerNodePayload.isReleased !== undefined && { isReleased: ownerNodePayload.isReleased }),
     ...(ownerNodePayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(ownerNodePayload.isPartOf)
     })
