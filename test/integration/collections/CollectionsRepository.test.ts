@@ -148,6 +148,7 @@ describe('CollectionsRepository', () => {
       expect(createdCollection.isPartOf.type).toBe('DATAVERSE')
       expect(createdCollection.isPartOf.displayName).toBe('Root')
       expect(createdCollection.isPartOf.identifier).toBe('root')
+      expect(createdCollection.isPartOf.isReleased).toBe(true)
 
       expect(createdCollection.inputLevels?.length).toBe(1)
       const inputLevel = createdCollection.inputLevels?.[0]

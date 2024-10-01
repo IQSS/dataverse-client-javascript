@@ -246,6 +246,35 @@ describe('DatasetsRepository', () => {
         ).rejects.toThrow(expectedError)
       })
     })
+
+    describe('returns correct isPartOf properties', () => {
+      test('should return isPartOf property correctly when dataset is part of an unpublished collection', async () => {
+        const isPartOfTestCollectionAlias = 'isPartOfTestCollection'
+
+        const { alias: createdCollectionAlias } = await createCollectionViaApi(
+          isPartOfTestCollectionAlias
+        )
+
+        const { numericId: createdDatasetNumericId } = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          createdCollectionAlias
+        )
+
+        const actual = await sut.getDataset(
+          createdDatasetNumericId,
+          DatasetNotNumberedVersion.LATEST,
+          false
+        )
+
+        expect(actual.id).toBe(createdDatasetNumericId)
+        expect(actual.isPartOf.type).toBe('DATAVERSE')
+        expect(actual.isPartOf.identifier).toBe(isPartOfTestCollectionAlias)
+        expect(actual.isPartOf.isReleased).toBe(false)
+
+        await deleteUnpublishedDatasetViaApi(createdDatasetNumericId)
+        await deleteCollectionViaApi(isPartOfTestCollectionAlias)
+      })
+    })
   })
 
   describe('Private URLs', () => {
