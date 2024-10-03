@@ -53,7 +53,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-      contents: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -69,32 +68,26 @@ jobs:
 
       - name: Update package version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Fetch or initialize the version counter
-          if [ ! -f .alpha_version ]; then
-            echo "1" > .alpha_version
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+
+          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --registry=https://npm.pkg.github.com/ --json | jq -r '.[]' | grep "^2.0.0-alpha." | sort -V | tail -n 1)
+
+          if [ -z "$LATEST_VERSION" ]; then
+            NEW_INCREMENTAL_NUMBER=1
+          else
+            CURRENT_INCREMENTAL_NUMBER=$(echo $LATEST_VERSION | sed 's/2.0.0-alpha.//')
+            NEW_INCREMENTAL_NUMBER=$((CURRENT_INCREMENTAL_NUMBER + 1))
           fi
-          INCREMENTAL_NUMBER=$(cat .alpha_version)
 
-          # Increment version number
-          NEW_INCREMENTAL_NUMBER=$((INCREMENTAL_NUMBER+1))
+          NEW_VERSION="2.0.0-alpha.${NEW_INCREMENTAL_NUMBER}"
 
-          # Save the new incremental number to the file
-          echo "${NEW_INCREMENTAL_NUMBER}" > .alpha_version
+          echo "Latest version: $LATEST_VERSION"
+          echo "New version: $NEW_VERSION"
 
-          # Update package version with 2.0.0-alpha.<incremental_number>
-          NEW_VERSION="2.0.0-alpha.${INCREMENTAL_NUMBER}"
+          echo "Setting package version to: ${NEW_VERSION}"          
           npm version "${NEW_VERSION}" --no-git-tag-version
-
-          # Commit the version update and incremental number
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "GitHub Actions"
-          git add package.json .alpha_version
-          git commit -m "Update version to ${NEW_VERSION}"
-
-          # Push the changes to the repository
-          git push origin "${{ github.ref_name }}"
 
       - name: Publish package
         run: |
