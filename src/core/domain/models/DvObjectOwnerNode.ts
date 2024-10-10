@@ -4,6 +4,7 @@ export interface DvObjectOwnerNode {
   identifier: string
   persistentIdentifier?: string
   version?: string
+  isReleased?: boolean
   isPartOf?: DvObjectOwnerNode
 }
 

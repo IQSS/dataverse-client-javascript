@@ -4,5 +4,6 @@ export interface OwnerNodePayload {
   identifier: string
   persistentIdentifier?: string
   version?: string
+  isReleased?: boolean
   isPartOf?: OwnerNodePayload
 }
