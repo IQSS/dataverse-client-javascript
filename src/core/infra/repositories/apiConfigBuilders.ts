@@ -34,8 +34,9 @@ export const buildRequestConfig = (
       break
     case DataverseApiAuthMechanism.BEARER_TOKEN:
       // TODO: ROCP_token name should be configurable and extracted to an environment variable / application constant.
-      const token = localStorage.getItem('ROCP_token')
+      let token = localStorage.getItem('ROCP_token')
       if (token) {
+        token = token.replace(/^"(.*)"$/, '$1')
         requestConfig.headers['Authorization'] = 'Bearer ' + token
       }
       break
