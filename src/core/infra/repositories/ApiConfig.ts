@@ -16,5 +16,6 @@ export class ApiConfig {
 
 export enum DataverseApiAuthMechanism {
   API_KEY = 'api-key',
-  SESSION_COOKIE = 'session-cookie' // Temporal and only for dev purposes
+  SESSION_COOKIE = 'session-cookie', // Temporal and only for dev purposes
+  BEARER_TOKEN = 'bearer-token'
 }
