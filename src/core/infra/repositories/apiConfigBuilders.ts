@@ -39,6 +39,7 @@ export const buildRequestConfig = (
         token = token.replace(/^"(.*)"$/, '$1')
         requestConfig.headers['Authorization'] = 'Bearer ' + token
       }
+      requestConfig.withCredentials = false
       break
   }
   return requestConfig
