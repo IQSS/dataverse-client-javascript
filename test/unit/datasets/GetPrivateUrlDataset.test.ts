@@ -15,7 +15,10 @@ describe('execute', () => {
     const actual = await sut.execute(testPrivateUrlToken)
 
     expect(actual).toEqual(testDataset)
-    expect(datasetsRepositoryStub.getPrivateUrlDataset).toHaveBeenCalledWith(testPrivateUrlToken)
+    expect(datasetsRepositoryStub.getPrivateUrlDataset).toHaveBeenCalledWith(
+      testPrivateUrlToken,
+      false
+    )
   })
 
   test('should return error result on repository error', async () => {

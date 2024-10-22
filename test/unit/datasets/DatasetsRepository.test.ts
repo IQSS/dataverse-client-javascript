@@ -125,7 +125,8 @@ describe('DatasetsRepository', () => {
         let actual = await sut.getDataset(
           testDatasetModel.id,
           testVersionId,
-          testIncludeDeaccessioned
+          testIncludeDeaccessioned,
+          false
         )
 
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
@@ -133,7 +134,12 @@ describe('DatasetsRepository', () => {
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
-        actual = await sut.getDataset(testDatasetModel.id, testVersionId, testIncludeDeaccessioned)
+        actual = await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned,
+          false
+        )
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,
           expectedRequestConfigSessionCookie
@@ -154,7 +160,8 @@ describe('DatasetsRepository', () => {
         const actual = await sut.getDataset(
           testDatasetModel.id,
           testVersionId,
-          testIncludeDeaccessioned
+          testIncludeDeaccessioned,
+          false
         )
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -177,7 +184,8 @@ describe('DatasetsRepository', () => {
         const actual = await sut.getDataset(
           testDatasetModel.id,
           testVersionId,
-          testIncludeDeaccessioned
+          testIncludeDeaccessioned,
+          false
         )
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -203,7 +211,8 @@ describe('DatasetsRepository', () => {
         const actual = await sut.getDataset(
           testDatasetModel.id,
           testVersionId,
-          testIncludeDeaccessioned
+          testIncludeDeaccessioned,
+          false
         )
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -218,7 +227,7 @@ describe('DatasetsRepository', () => {
 
         let error = undefined as unknown as ReadError
         await sut
-          .getDataset(testDatasetModel.id, testVersionId, testIncludeDeaccessioned)
+          .getDataset(testDatasetModel.id, testVersionId, testIncludeDeaccessioned, false)
           .catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -237,7 +246,8 @@ describe('DatasetsRepository', () => {
         let actual = await sut.getDataset(
           testDatasetModel.persistentId,
           testVersionId,
-          testIncludeDeaccessioned
+          testIncludeDeaccessioned,
+          false
         )
 
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
@@ -249,7 +259,8 @@ describe('DatasetsRepository', () => {
         actual = await sut.getDataset(
           testDatasetModel.persistentId,
           testVersionId,
-          testIncludeDeaccessioned
+          testIncludeDeaccessioned,
+          false
         )
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -264,7 +275,7 @@ describe('DatasetsRepository', () => {
 
         let error = undefined as unknown as ReadError
         await sut
-          .getDataset(testDatasetModel.persistentId, testVersionId, testIncludeDeaccessioned)
+          .getDataset(testDatasetModel.persistentId, testVersionId, testIncludeDeaccessioned, false)
           .catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -284,7 +295,7 @@ describe('DatasetsRepository', () => {
     test('should return Dataset when response is successful', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
 
-      const actual = await sut.getPrivateUrlDataset(testPrivateUrlToken)
+      const actual = await sut.getPrivateUrlDataset(testPrivateUrlToken, false)
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`,
@@ -297,7 +308,7 @@ describe('DatasetsRepository', () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
       let error = undefined as unknown as ReadError
-      await sut.getPrivateUrlDataset(testPrivateUrlToken).catch((e) => (error = e))
+      await sut.getPrivateUrlDataset(testPrivateUrlToken, false).catch((e) => (error = e))
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}`,
@@ -821,7 +832,7 @@ describe('DatasetsRepository', () => {
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      let error: WriteError = undefined
+      let error: WriteError | undefined = undefined
       await sut.publishDataset(testDatasetModel.id, testVersionUpdateType).catch((e) => (error = e))
 
       expect(axios.post).toHaveBeenCalledWith(
@@ -878,7 +889,7 @@ describe('DatasetsRepository', () => {
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'put').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      let error: WriteError = undefined
+      let error: WriteError | undefined = undefined
       await sut
         .updateDataset(testDatasetModel.id, testNewDataset, testMetadataBlocks)
         .catch((e) => (error = e))
