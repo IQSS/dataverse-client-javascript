@@ -4,6 +4,7 @@ import { GetCollectionFacets } from './domain/useCases/GetCollectionFacets'
 import { GetCollectionUserPermissions } from './domain/useCases/GetCollectionUserPermissions'
 import { GetCollectionItems } from './domain/useCases/GetCollectionItems'
 import { PublishCollection } from './domain/useCases/PublishCollection'
+import { UpdateCollection } from './domain/useCases/UpdateCollection'
 
 import { CollectionsRepository } from './infra/repositories/CollectionsRepository'
 
@@ -15,6 +16,7 @@ const getCollectionFacets = new GetCollectionFacets(collectionsRepository)
 const getCollectionUserPermissions = new GetCollectionUserPermissions(collectionsRepository)
 const getCollectionItems = new GetCollectionItems(collectionsRepository)
 const publishCollection = new PublishCollection(collectionsRepository)
+const updateCollection = new UpdateCollection(collectionsRepository)
 
 export {
   getCollection,
@@ -22,7 +24,8 @@ export {
   getCollectionFacets,
   getCollectionUserPermissions,
   getCollectionItems,
-  publishCollection
+  publishCollection,
+  updateCollection
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'

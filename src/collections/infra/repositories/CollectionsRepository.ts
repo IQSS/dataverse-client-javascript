@@ -185,6 +185,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
+  public updateCollection(
+    collectionIdOrAlias: string | number,
+    updatedCollection: CollectionDTO
+  ): Promise<void> {
+    throw new Error('Method not implemented ' + collectionIdOrAlias + ' ' + updatedCollection.alias)
+  }
+
   private applyCollectionSearchCriteriaToQueryParams(
     queryParams: GetCollectionItemsQueryParams,
     collectionSearchCriteria: CollectionSearchCriteria
