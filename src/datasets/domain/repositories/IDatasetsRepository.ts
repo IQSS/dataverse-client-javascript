@@ -10,7 +10,8 @@ export interface IDatasetsRepository {
   getDataset(
     datasetId: number | string,
     datasetVersionId: string,
-    includeDeaccessioned: boolean
+    includeDeaccessioned: boolean,
+    keepRawFields: boolean
   ): Promise<Dataset>
   getDatasetLocks(datasetId: number | string): Promise<DatasetLock[]>
   getDatasetCitation(
@@ -18,7 +19,7 @@ export interface IDatasetsRepository {
     datasetVersionId: string,
     includeDeaccessioned: boolean
   ): Promise<string>
-  getPrivateUrlDataset(token: string): Promise<Dataset>
+  getPrivateUrlDataset(token: string, keepRawFields: boolean): Promise<Dataset>
   getAllDatasetPreviews(
     limit?: number,
     offset?: number,

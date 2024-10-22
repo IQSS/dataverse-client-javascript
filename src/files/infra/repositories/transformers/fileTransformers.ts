@@ -27,7 +27,7 @@ export const transformFileResponseToFile = (
   if (returnDatasetVersion) {
     return [
       transformFilePayloadToFile(filePayload),
-      transformVersionPayloadToDataset(filePayload.datasetVersion)
+      transformVersionPayloadToDataset(filePayload.datasetVersion, false)
     ]
   }
   return transformFilePayloadToFile(filePayload)
