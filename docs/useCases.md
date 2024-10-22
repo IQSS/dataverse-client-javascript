@@ -309,7 +309,7 @@ getPrivateUrlDataset.execute(token).then((dataset: Dataset) => {
 
 _See [use case](../src/datasets/domain/useCases/GetPrivateUrlDataset.ts)_ definition.
 
-There is an optional second parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to markdown. The default value is `false`.
+There is an optional second parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to Markdown. The default value is `false`.
 
 #### Get Dataset Citation Text
 
