@@ -67,36 +67,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionDTO: CollectionDTO,
     parentCollectionId: number | string = ROOT_COLLECTION_ALIAS
   ): Promise<number> {
-    const dataverseContacts: NewCollectionContactRequestPayload[] = collectionDTO.contacts.map(
-      (contact) => ({
-        contactEmail: contact
-      })
-    )
-
-    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
-      collectionDTO.inputLevels?.map((inputLevel) => ({
-        datasetFieldTypeName: inputLevel.datasetFieldName,
-        include: inputLevel.include,
-        required: inputLevel.required
-      }))
-
-    const requestBody: NewCollectionRequestPayload = {
-      alias: collectionDTO.alias,
-      name: collectionDTO.name,
-      dataverseContacts: dataverseContacts,
-      dataverseType: collectionDTO.type,
-      ...(collectionDTO.description && {
-        description: collectionDTO.description
-      }),
-      ...(collectionDTO.affiliation && {
-        affiliation: collectionDTO.affiliation
-      }),
-      metadataBlocks: {
-        metadataBlockNames: collectionDTO.metadataBlockNames,
-        facetIds: collectionDTO.facetIds,
-        inputLevels: inputLevelsRequestBody
-      }
-    }
+    const requestBody = this.createCreateOrUpdateRequestBody(collectionDTO)
 
     return this.doPost(`/${this.collectionsResourceName}/${parentCollectionId}`, requestBody)
       .then((response) => response.data.data.id)
@@ -183,6 +154,50 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       .catch((error) => {
         throw error
       })
+  }
+
+  public async updateCollection(
+    collectionIdOrAlias: string | number,
+    updatedCollection: CollectionDTO
+  ): Promise<void> {
+    const requestBody = this.createCreateOrUpdateRequestBody(updatedCollection)
+
+    return this.doPut(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, requestBody)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  private createCreateOrUpdateRequestBody(
+    collectionDTO: CollectionDTO
+  ): NewCollectionRequestPayload {
+    const dataverseContacts: NewCollectionContactRequestPayload[] = collectionDTO.contacts.map(
+      (contact) => ({
+        contactEmail: contact
+      })
+    )
+
+    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
+      collectionDTO.inputLevels?.map((inputLevel) => ({
+        datasetFieldTypeName: inputLevel.datasetFieldName,
+        include: inputLevel.include,
+        required: inputLevel.required
+      }))
+
+    return {
+      alias: collectionDTO.alias,
+      name: collectionDTO.name,
+      dataverseContacts: dataverseContacts,
+      dataverseType: collectionDTO.type,
+      ...(collectionDTO.description && { description: collectionDTO.description }),
+      ...(collectionDTO.affiliation && { affiliation: collectionDTO.affiliation }),
+      metadataBlocks: {
+        metadataBlockNames: collectionDTO.metadataBlockNames,
+        facetIds: collectionDTO.facetIds,
+        inputLevels: inputLevelsRequestBody
+      }
+    }
   }
 
   private applyCollectionSearchCriteriaToQueryParams(
