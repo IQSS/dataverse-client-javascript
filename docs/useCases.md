@@ -16,6 +16,7 @@ The different use cases currently available in the package are classified below,
     - [List All Collection Items](#list-all-collection-items)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
+    - [Update a Collection](#update-a-collection)
     - [Publish a Collection](#publish-a-collection)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
@@ -231,6 +232,34 @@ _See [use case](../src/collections/domain/useCases/CreateCollection.ts) implemen
 The above example creates the new collection in the `root` collection since no collection identifier is specified. If you want to create the collection in a different collection, you must add the collection identifier as a second parameter in the use case call.
 
 The use case returns a number, which is the identifier of the created collection.
+
+#### Update a Collection
+
+Updates an existing collection, given a collection identifier and a [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) including the updated collection data.
+
+##### Example call:
+
+```typescript
+import { updateCollection } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+const collectionDTO: CollectionDTO = {
+  alias: alias,
+  name: 'Updated Collection Name',
+  contacts: ['dataverse@test.com'],
+  type: CollectionType.DEPARTMENT
+}
+
+updateCollection.execute(collectionIdOrAlias, collectionDTO)
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/UpdateCollection.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 #### Publish a Collection
 
