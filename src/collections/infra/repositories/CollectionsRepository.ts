@@ -185,11 +185,46 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
-  public updateCollection(
+  public async updateCollection(
     collectionIdOrAlias: string | number,
     updatedCollection: CollectionDTO
   ): Promise<void> {
-    throw new Error('Method not implemented ' + collectionIdOrAlias + ' ' + updatedCollection.alias)
+    const dataverseContacts: NewCollectionContactRequestPayload[] = updatedCollection.contacts.map(
+      (contact) => ({
+        contactEmail: contact
+      })
+    )
+
+    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
+      updatedCollection.inputLevels?.map((inputLevel) => ({
+        datasetFieldTypeName: inputLevel.datasetFieldName,
+        include: inputLevel.include,
+        required: inputLevel.required
+      }))
+
+    const requestBody: NewCollectionRequestPayload = {
+      alias: updatedCollection.alias,
+      name: updatedCollection.name,
+      dataverseContacts: dataverseContacts,
+      dataverseType: updatedCollection.type,
+      ...(updatedCollection.description && {
+        description: updatedCollection.description
+      }),
+      ...(updatedCollection.affiliation && {
+        affiliation: updatedCollection.affiliation
+      }),
+      metadataBlocks: {
+        metadataBlockNames: updatedCollection.metadataBlockNames,
+        facetIds: updatedCollection.facetIds,
+        inputLevels: inputLevelsRequestBody
+      }
+    }
+
+    return this.doPut(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, requestBody)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
   }
 
   private applyCollectionSearchCriteriaToQueryParams(
