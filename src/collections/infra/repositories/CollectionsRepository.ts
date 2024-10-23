@@ -67,13 +67,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionDTO: CollectionDTO,
     parentCollectionId: number | string = ROOT_COLLECTION_ALIAS
   ): Promise<number> {
-    const requestBody = this.createCreateOrUpdateRequestBody(collectionDTO);
+    const requestBody = this.createCreateOrUpdateRequestBody(collectionDTO)
 
     return this.doPost(`/${this.collectionsResourceName}/${parentCollectionId}`, requestBody)
       .then((response) => response.data.data.id)
       .catch((error) => {
-        throw error;
-      });
+        throw error
+      })
   }
 
   public async getCollectionFacets(
@@ -160,26 +160,30 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionIdOrAlias: string | number,
     updatedCollection: CollectionDTO
   ): Promise<void> {
-    const requestBody = this.createCreateOrUpdateRequestBody(updatedCollection);
+    const requestBody = this.createCreateOrUpdateRequestBody(updatedCollection)
 
     return this.doPut(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, requestBody)
       .then(() => undefined)
       .catch((error) => {
-        throw error;
-      });
+        throw error
+      })
   }
 
-  private createCreateOrUpdateRequestBody(collectionDTO: CollectionDTO): NewCollectionRequestPayload {
-    const dataverseContacts: NewCollectionContactRequestPayload[] = collectionDTO.contacts.map((contact) => ({
-      contactEmail: contact
-    }));
+  private createCreateOrUpdateRequestBody(
+    collectionDTO: CollectionDTO
+  ): NewCollectionRequestPayload {
+    const dataverseContacts: NewCollectionContactRequestPayload[] = collectionDTO.contacts.map(
+      (contact) => ({
+        contactEmail: contact
+      })
+    )
 
     const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
       collectionDTO.inputLevels?.map((inputLevel) => ({
         datasetFieldTypeName: inputLevel.datasetFieldName,
         include: inputLevel.include,
         required: inputLevel.required
-      }));
+      }))
 
     return {
       alias: collectionDTO.alias,
@@ -193,7 +197,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         facetIds: collectionDTO.facetIds,
         inputLevels: inputLevelsRequestBody
       }
-    };
+    }
   }
 
   private applyCollectionSearchCriteriaToQueryParams(
