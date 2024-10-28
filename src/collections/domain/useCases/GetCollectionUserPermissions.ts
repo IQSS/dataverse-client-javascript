@@ -1,6 +1,7 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
+import { ROOT_COLLECTION_KEY } from '../models/Collection'
 
 export class GetCollectionUserPermissions implements UseCase<CollectionUserPermissions> {
   private collectionsRepository: ICollectionsRepository
@@ -16,7 +17,9 @@ export class GetCollectionUserPermissions implements UseCase<CollectionUserPermi
    * If this parameter is not set, the default value is: 'root'
    * @returns {Promise<CollectionUserPermissions>}
    */
-  async execute(collectionIdOrAlias: number | string): Promise<CollectionUserPermissions> {
+  async execute(
+    collectionIdOrAlias: number | string = ROOT_COLLECTION_KEY
+  ): Promise<CollectionUserPermissions> {
     return await this.collectionsRepository.getCollectionUserPermissions(collectionIdOrAlias)
   }
 }

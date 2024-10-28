@@ -18,6 +18,22 @@ describe('execute', () => {
     )
   })
 
+  test('should return user permissions for the default collection', async () => {
+    let actual: CollectionUserPermissions
+    try {
+      actual = await getCollectionUserPermissions.execute()
+    } catch (error) {
+      throw new Error('Permissions should be retrieved')
+    } finally {
+      expect(actual.canAddDataset).toBe(true)
+      expect(actual.canAddCollection).toBe(true)
+      expect(actual.canDeleteCollection).toBe(true)
+      expect(actual.canEditCollection).toBe(true)
+      expect(actual.canManageCollectionPermissions).toBe(true)
+      expect(actual.canPublishCollection).toBe(true)
+      expect(actual.canViewUnpublishedCollection).toBe(true)
+    }
+  })
   test('should return user permissions when a valid collection alias is provided', async () => {
     let actual: CollectionUserPermissions
     try {
