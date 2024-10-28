@@ -13,7 +13,7 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError, WriteError } from '../../../src'
-import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
+import { ROOT_COLLECTION_KEY } from '../../../src/collections/domain/models/Collection'
 import {
   createCollectionUserPermissionsModel,
   createCollectionUserPermissionsPayload
@@ -109,7 +109,7 @@ describe('CollectionsRepository', () => {
     describe('by default root id', () => {
       test('should return a Collection when no collection id, using ROOT instead is successful', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testCollectionSuccessfulResponse)
-        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${ROOT_COLLECTION_ALIAS}`
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${ROOT_COLLECTION_KEY}`
 
         // API Key auth
         const actual = await sut.getCollection()
@@ -120,7 +120,7 @@ describe('CollectionsRepository', () => {
 
       test('should return error on repository read error', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
-        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${ROOT_COLLECTION_ALIAS}`
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${ROOT_COLLECTION_KEY}`
 
         let error = undefined as unknown as ReadError
 
@@ -148,7 +148,7 @@ describe('CollectionsRepository', () => {
     const expectedNewCollectionRequestPayloadJson = JSON.stringify(
       createNewCollectionRequestPayload()
     )
-    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/root`
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/:root`
 
     test('should call the API with a correct request payload', async () => {
       jest.spyOn(axios, 'post').mockResolvedValue(testCreateCollectionResponse)

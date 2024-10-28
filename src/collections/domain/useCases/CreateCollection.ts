@@ -1,6 +1,6 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { CollectionDTO } from '../dtos/CollectionDTO'
-import { ROOT_COLLECTION_ALIAS } from '../models/Collection'
+import { ROOT_COLLECTION_KEY } from '../models/Collection'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 
 export class CreateCollection implements UseCase<number> {
@@ -20,7 +20,7 @@ export class CreateCollection implements UseCase<number> {
    */
   async execute(
     newCollection: CollectionDTO,
-    parentCollectionId: number | string = ROOT_COLLECTION_ALIAS
+    parentCollectionId: number | string = ROOT_COLLECTION_KEY
   ): Promise<number> {
     return await this.collectionsRepository.createCollection(newCollection, parentCollectionId)
   }

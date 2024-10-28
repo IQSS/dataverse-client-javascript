@@ -1,6 +1,6 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
-import { ROOT_COLLECTION_ALIAS } from '../models/Collection'
+import { ROOT_COLLECTION_KEY } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
 
 export class GetCollectionFacets implements UseCase<CollectionFacet[]> {
@@ -18,7 +18,7 @@ export class GetCollectionFacets implements UseCase<CollectionFacet[]> {
    * @returns {Promise<string[]>}
    */
   async execute(
-    collectionIdOrAlias: number | string = ROOT_COLLECTION_ALIAS
+    collectionIdOrAlias: number | string = ROOT_COLLECTION_KEY
   ): Promise<CollectionFacet[]> {
     return await this.collectionsRepository.getCollectionFacets(collectionIdOrAlias)
   }

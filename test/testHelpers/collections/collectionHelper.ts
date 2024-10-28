@@ -186,3 +186,4 @@ export const createCollectionFacetRequestPayload = (): CollectionFacetPayload =>
     displayName: 'testDisplayName'
   }
 }
+export const ROOT_COLLECTION_ALIAS = 'root'

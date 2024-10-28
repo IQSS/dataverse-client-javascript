@@ -3,7 +3,7 @@ import { DatasetDTO } from '../dtos/DatasetDTO'
 import { ResourceValidator } from '../../../core/domain/useCases/validators/ResourceValidator'
 import { IMetadataBlocksRepository } from '../../../metadataBlocks/domain/repositories/IMetadataBlocksRepository'
 import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers'
-import { ROOT_COLLECTION_ALIAS } from '../../../collections/domain/models/Collection'
+import { ROOT_COLLECTION_KEY } from '../../../collections/domain/models/Collection'
 import { DatasetWriteUseCase } from './DatasetWriteUseCase'
 
 export class CreateDataset extends DatasetWriteUseCase<CreatedDatasetIdentifiers> {
@@ -27,7 +27,7 @@ export class CreateDataset extends DatasetWriteUseCase<CreatedDatasetIdentifiers
    */
   async execute(
     newDataset: DatasetDTO,
-    collectionId = ROOT_COLLECTION_ALIAS
+    collectionId = ROOT_COLLECTION_KEY
   ): Promise<CreatedDatasetIdentifiers> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(newDataset)
     this.getNewDatasetValidator().validate(newDataset, metadataBlocks)

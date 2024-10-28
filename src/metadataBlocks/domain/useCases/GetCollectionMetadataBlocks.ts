@@ -1,6 +1,6 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { MetadataBlock } from '../..'
-import { ROOT_COLLECTION_ALIAS } from '../../../collections/domain/models/Collection'
+import { ROOT_COLLECTION_KEY } from '../../../collections/domain/models/Collection'
 import { IMetadataBlocksRepository } from '../repositories/IMetadataBlocksRepository'
 
 export class GetCollectionMetadataBlocks implements UseCase<MetadataBlock[]> {
@@ -19,7 +19,7 @@ export class GetCollectionMetadataBlocks implements UseCase<MetadataBlock[]> {
    * @returns {Promise<MetadataBlock[]>}
    */
   async execute(
-    collectionIdOrAlias: number | string = ROOT_COLLECTION_ALIAS,
+    collectionIdOrAlias: number | string = ROOT_COLLECTION_KEY,
     onlyDisplayedOnCreate = false
   ): Promise<MetadataBlock[]> {
     return await this.metadataBlocksRepository.getCollectionMetadataBlocks(
