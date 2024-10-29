@@ -157,6 +157,7 @@ describe('DatasetsRepository', () => {
         const actual = await sut.getDataset(
           testDatasetIds.numericId,
           DatasetNotNumberedVersion.LATEST,
+          false,
           false
         )
         expect(actual.id).toBe(testDatasetIds.numericId)
@@ -170,7 +171,8 @@ describe('DatasetsRepository', () => {
         const actual = await sut.getDataset(
           testDatasetIds.numericId,
           DatasetNotNumberedVersion.LATEST,
-          true
+          true,
+          false
         )
 
         expect(actual.id).toBe(testDatasetIds.numericId)
@@ -181,7 +183,8 @@ describe('DatasetsRepository', () => {
         const actual = await sut.getDataset(
           testDatasetIds.numericId,
           DatasetNotNumberedVersion.LATEST,
-          true
+          true,
+          false
         )
         expect(actual.id).toBe(testDatasetIds.numericId)
         ApiConfig.init(
@@ -196,7 +199,7 @@ describe('DatasetsRepository', () => {
           `[404] Dataset version ${DatasetNotNumberedVersion.LATEST} of dataset ${testDatasetIds.numericId} not found`
         )
         await expect(
-          sut.getDataset(testDatasetIds.numericId, DatasetNotNumberedVersion.LATEST, false)
+          sut.getDataset(testDatasetIds.numericId, DatasetNotNumberedVersion.LATEST, false, false)
         ).rejects.toThrow(expectedError)
       })
 
@@ -206,7 +209,7 @@ describe('DatasetsRepository', () => {
         )
 
         await expect(
-          sut.getDataset(nonExistentTestDatasetId, DatasetNotNumberedVersion.LATEST, false)
+          sut.getDataset(nonExistentTestDatasetId, DatasetNotNumberedVersion.LATEST, false, false)
         ).rejects.toThrow(expectedError)
       })
     })
@@ -226,11 +229,13 @@ describe('DatasetsRepository', () => {
         const createdDataset = await sut.getDataset(
           testDatasetIds.numericId,
           DatasetNotNumberedVersion.LATEST,
+          false,
           false
         )
         const actual = await sut.getDataset(
           createdDataset.persistentId,
           DatasetNotNumberedVersion.LATEST,
+          false,
           false
         )
         expect(actual.id).toBe(testDatasetIds.numericId)
@@ -242,7 +247,7 @@ describe('DatasetsRepository', () => {
           `[400] Bad dataset ID number: ${testWrongPersistentId}.`
         )
         await expect(
-          sut.getDataset(testWrongPersistentId, DatasetNotNumberedVersion.LATEST, false)
+          sut.getDataset(testWrongPersistentId, DatasetNotNumberedVersion.LATEST, false, false)
         ).rejects.toThrow(expectedError)
       })
     })
@@ -263,6 +268,7 @@ describe('DatasetsRepository', () => {
         const actual = await sut.getDataset(
           createdDatasetNumericId,
           DatasetNotNumberedVersion.LATEST,
+          false,
           false
         )
 
@@ -294,13 +300,13 @@ describe('DatasetsRepository', () => {
 
     describe('getPrivateUrlDataset', () => {
       test('should return dataset when token is valid', async () => {
-        const actual = await sut.getPrivateUrlDataset(privateUrlToken)
+        const actual = await sut.getPrivateUrlDataset(privateUrlToken, false)
         expect(actual.id).toBe(testDatasetIds.numericId)
       })
 
       test('should return error when token is not valid', async () => {
         const expectedError = new ReadError(expectedErrorInvalidToken)
-        await expect(sut.getPrivateUrlDataset('invalidToken')).rejects.toThrow(expectedError)
+        await expect(sut.getPrivateUrlDataset('invalidToken', false)).rejects.toThrow(expectedError)
       })
     })
 
@@ -471,6 +477,7 @@ describe('DatasetsRepository', () => {
       const actualCreatedDataset = await sut.getDataset(
         createdDataset.numericId,
         DatasetNotNumberedVersion.LATEST,
+        false,
         false
       )
 
@@ -528,6 +535,7 @@ describe('DatasetsRepository', () => {
       const newDatasetVersion = await sut.getDataset(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
+        false,
         false
       )
 
@@ -568,6 +576,7 @@ describe('DatasetsRepository', () => {
       const datasetAfterFirstPublish = await sut.getDataset(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
+        false,
         false
       )
 
@@ -587,6 +596,7 @@ describe('DatasetsRepository', () => {
       const datasetAfterUpdatingCurrentVersion = await sut.getDataset(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
+        false,
         false
       )
 
@@ -651,6 +661,7 @@ describe('DatasetsRepository', () => {
       const actualCreatedDataset = await sut.getDataset(
         createdDataset.numericId,
         DatasetNotNumberedVersion.LATEST,
+        false,
         false
       )
 
@@ -668,6 +679,7 @@ describe('DatasetsRepository', () => {
       const actualUpdatedDataset = await sut.getDataset(
         createdDataset.numericId,
         DatasetNotNumberedVersion.LATEST,
+        false,
         false
       )
 
