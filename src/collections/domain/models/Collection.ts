@@ -17,4 +17,4 @@ export interface CollectionInputLevel {
   required: boolean
 }
 
-export const ROOT_COLLECTION_KEY = ':root'
+export const ROOT_COLLECTION_ID = ':root'
