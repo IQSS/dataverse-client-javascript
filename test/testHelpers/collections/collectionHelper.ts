@@ -66,7 +66,7 @@ export async function createCollectionViaApi(
 ): Promise<CollectionPayload> {
   try {
     if (parentCollectionAlias == undefined) {
-      parentCollectionAlias = 'root'
+      parentCollectionAlias = ':root'
     }
 
     return await axios
