@@ -33,7 +33,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async getPrivateUrlDataset(token: string, keepRawFields: boolean): Promise<Dataset> {
+  public async getPrivateUrlDataset(token: string): Promise<Dataset> {
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `privateUrlDatasetVersion/${token}`),
       false,
@@ -41,7 +41,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         returnOwners: true
       }
     )
-      .then((response) => transformVersionResponseToDataset(response, keepRawFields))
+      .then((response) => transformVersionResponseToDataset(response))
       .catch((error) => {
         throw error
       })
@@ -50,8 +50,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async getDataset(
     datasetId: number | string,
     datasetVersionId: string,
-    includeDeaccessioned: boolean,
-    keepRawFields: boolean
+    includeDeaccessioned: boolean
   ): Promise<Dataset> {
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}`, datasetId),
@@ -62,7 +61,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         returnOwners: true
       }
     )
-      .then((response) => transformVersionResponseToDataset(response, keepRawFields))
+      .then((response) => transformVersionResponseToDataset(response))
       .catch((error) => {
         throw error
       })

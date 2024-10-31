@@ -209,18 +209,12 @@ export const transformMetadataChildFieldValueToRequestPayload = (
   return metadataChildFieldRequestPayload
 }
 
-export const transformVersionResponseToDataset = (
-  response: AxiosResponse,
-  keepRawFields: boolean
-): Dataset => {
+export const transformVersionResponseToDataset = (response: AxiosResponse): Dataset => {
   const versionPayload = response.data.data
-  return transformVersionPayloadToDataset(versionPayload, keepRawFields)
+  return transformVersionPayloadToDataset(versionPayload)
 }
 
-export const transformVersionPayloadToDataset = (
-  versionPayload: DatasetPayload,
-  keepRawFields: boolean
-): Dataset => {
+export const transformVersionPayloadToDataset = (versionPayload: DatasetPayload): Dataset => {
   const datasetModel: Dataset = {
     id: versionPayload.datasetId,
     versionId: versionPayload.id,
@@ -233,10 +227,7 @@ export const transformVersionPayloadToDataset = (
       lastUpdateTime: new Date(versionPayload.lastUpdateTime),
       releaseTime: new Date(versionPayload.releaseTime)
     },
-    metadataBlocks: transformPayloadToDatasetMetadataBlocks(
-      versionPayload.metadataBlocks,
-      keepRawFields
-    ),
+    metadataBlocks: transformPayloadToDatasetMetadataBlocks(versionPayload.metadataBlocks),
     ...(versionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf)
     })
@@ -269,28 +260,25 @@ const transformPayloadToDatasetLicense = (licensePayload: LicensePayload): Datas
 }
 
 const transformPayloadToDatasetMetadataBlocks = (
-  metadataBlocksPayload: MetadataBlocksPayload,
-  keepRawFields: boolean
+  metadataBlocksPayload: MetadataBlocksPayload
 ): DatasetMetadataBlocks => {
   return Object.keys(metadataBlocksPayload).map((metadataBlockKey) => {
     const metadataBlock = metadataBlocksPayload[metadataBlockKey]
     return {
       name: metadataBlock.name,
-      fields: transformPayloadToDatasetMetadataFields(metadataBlock.fields, keepRawFields)
+      fields: transformPayloadToDatasetMetadataFields(metadataBlock.fields)
     }
   }) as DatasetMetadataBlocks
 }
 
 const transformPayloadToDatasetMetadataFields = (
-  metadataFieldsPayload: MetadataFieldPayload[],
-  keepRawFields: boolean
+  metadataFieldsPayload: MetadataFieldPayload[]
 ): DatasetMetadataFields => {
   return metadataFieldsPayload.reduce(
     (datasetMetadataFieldsMap: DatasetMetadataFields, field: MetadataFieldPayload) => {
       datasetMetadataFieldsMap[field.typeName] = transformPayloadToDatasetMetadataFieldValue(
         field.value,
-        field.typeClass,
-        keepRawFields
+        field.typeClass
       )
       return datasetMetadataFieldsMap
     },
@@ -300,8 +288,7 @@ const transformPayloadToDatasetMetadataFields = (
 
 const transformPayloadToDatasetMetadataFieldValue = (
   metadataFieldValuePayload: MetadataFieldValuePayload,
-  typeClass: string,
-  keepRawFields: boolean
+  typeClass: string
 ): DatasetMetadataFieldValue => {
   function isArrayOfSubfieldValue(
     array: (string | MetadataSubfieldValuePayload)[]
@@ -314,37 +301,29 @@ const transformPayloadToDatasetMetadataFieldValue = (
   }
 
   if (typeof metadataFieldValuePayload === 'string') {
-    if (keepRawFields) {
-      return metadataFieldValuePayload
-    }
     return transformHtmlToMarkdown(metadataFieldValuePayload)
   } else if (Array.isArray(metadataFieldValuePayload)) {
     if (isArrayOfSubfieldValue(metadataFieldValuePayload)) {
       return metadataFieldValuePayload.map((metadataSubfieldValuePayload) =>
-        transformPayloadToDatasetMetadataSubfieldValue(metadataSubfieldValuePayload, keepRawFields)
+        transformPayloadToDatasetMetadataSubfieldValue(metadataSubfieldValuePayload)
       )
     } else {
-      if (keepRawFields) {
-        return metadataFieldValuePayload
-      }
       return metadataFieldValuePayload.map(transformHtmlToMarkdown)
     }
   } else {
     return transformPayloadToDatasetMetadataSubfieldValue(
-      metadataFieldValuePayload as MetadataSubfieldValuePayload,
-      keepRawFields
+      metadataFieldValuePayload as MetadataSubfieldValuePayload
     )
   }
 }
 
 const transformPayloadToDatasetMetadataSubfieldValue = (
-  metadataSubfieldValuePayload: MetadataSubfieldValuePayload,
-  keepRawFields: boolean
+  metadataSubfieldValuePayload: MetadataSubfieldValuePayload
 ): DatasetMetadataSubField => {
   const result: DatasetMetadataSubField = {}
   Object.keys(metadataSubfieldValuePayload).forEach((key) => {
     const subFieldValue = metadataSubfieldValuePayload[key].value
-    result[key] = keepRawFields ? subFieldValue : transformHtmlToMarkdown(subFieldValue)
+    result[key] = transformHtmlToMarkdown(subFieldValue)
   })
   return result
 }
