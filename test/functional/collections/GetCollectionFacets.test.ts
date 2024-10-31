@@ -1,7 +1,8 @@
 import { ApiConfig, CollectionFacet, ReadError, getCollectionFacets } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
-import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
+
+import { ROOT_COLLECTION_ALIAS } from '../../testHelpers/collections/collectionHelper'
 
 describe('execute', () => {
   beforeEach(async () => {

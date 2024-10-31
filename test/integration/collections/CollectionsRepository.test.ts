@@ -16,9 +16,9 @@ import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/
 import {
   createCollectionDTO,
   createCollectionViaApi,
-  deleteCollectionViaApi
+  deleteCollectionViaApi,
+  ROOT_COLLECTION_ALIAS
 } from '../../testHelpers/collections/collectionHelper'
-import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'

@@ -26,10 +26,10 @@ import {
   DatasetContact,
   DatasetDescription
 } from '../../../src/datasets/domain/models/Dataset'
-import { ROOT_COLLECTION_ALIAS } from '../../../src/collections/domain/models/Collection'
 import {
   createCollectionViaApi,
-  deleteCollectionViaApi
+  deleteCollectionViaApi,
+  ROOT_COLLECTION_ALIAS
 } from '../../testHelpers/collections/collectionHelper'
 
 describe('DatasetsRepository', () => {

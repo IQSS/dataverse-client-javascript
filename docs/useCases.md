@@ -108,7 +108,7 @@ _See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition
 
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
-If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
 
 #### Get Collection Facets
 
@@ -135,7 +135,7 @@ _See [use case](../src/collections/domain/useCases/GetCollectionFacets.ts)_ defi
 
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
-If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
 
 #### Get User Permissions on a Collection
 
@@ -163,7 +163,7 @@ _See [use case](../src/collections/domain/useCases/GetCollectionUserPermissions.
 
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
-If no collection identifier is specified, the default collection identifier; `root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
 
 #### List All Collection Items
 
@@ -203,7 +203,7 @@ This use case supports the following optional parameters depending on the search
 
 #### Create a Collection
 
-Creates a new Collection, given a [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) object and an optional parent collection identifier, which defaults to `root`.
+Creates a new Collection, given a [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) object and an optional parent collection identifier, which defaults to `:root`.
 
 ##### Example call:
 
@@ -228,7 +228,7 @@ createCollection.execute(collectionDTO).then((createdCollectionId: number) => {
 
 _See [use case](../src/collections/domain/useCases/CreateCollection.ts) implementation_.
 
-The above example creates the new collection in the `root` collection since no collection identifier is specified. If you want to create the collection in a different collection, you must add the collection identifier as a second parameter in the use case call.
+The above example creates the new collection in the root collection since no collection identifier is specified. If you want to create the collection in a different collection, you must add the collection identifier as a second parameter in the use case call.
 
 The use case returns a number, which is the identifier of the created collection.
 
@@ -454,7 +454,7 @@ _See [use case](../src/datasets/domain/useCases/GetAllDatasetPreviews.ts) implem
 
 Note that `limit` and `offset` are optional parameters for pagination.
 
-Note that `collectionId` is an optional parameter to filter datasets by collection. If not set, the default value is `root`.
+Note that `collectionId` is an optional parameter to filter datasets by collection. If not set, the default value is `:root`.
 
 The `DatasetPreviewSubset`returned instance contains a property called `totalDatasetCount` which is necessary for pagination.
 
@@ -462,7 +462,7 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 
 #### Create a Dataset
 
-Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object and an optional collection identifier, which defaults to `root`.
+Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object and an optional collection identifier, which defaults to `:root`.
 
 This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
 
@@ -517,7 +517,7 @@ createDataset.execute(datasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers
 
 _See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
 
-The above example creates the new dataset in the `root` collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call.
+The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call.
 
 The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 

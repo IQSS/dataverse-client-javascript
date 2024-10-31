@@ -5,7 +5,7 @@ import {
   transformCollectionItemsResponseToCollectionItemSubset,
   transformCollectionResponseToCollection
 } from './transformers/collectionTransformers'
-import { Collection, ROOT_COLLECTION_ALIAS } from '../../domain/models/Collection'
+import { Collection, ROOT_COLLECTION_ID } from '../../domain/models/Collection'
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
 import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
@@ -52,7 +52,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   private readonly collectionsResourceName: string = 'dataverses'
 
   public async getCollection(
-    collectionIdOrAlias: number | string = ROOT_COLLECTION_ALIAS
+    collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<Collection> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, true, {
       returnOwners: true
@@ -65,7 +65,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async createCollection(
     collectionDTO: CollectionDTO,
-    parentCollectionId: number | string = ROOT_COLLECTION_ALIAS
+    parentCollectionId: number | string = ROOT_COLLECTION_ID
   ): Promise<number> {
     const dataverseContacts: NewCollectionContactRequestPayload[] = collectionDTO.contacts.map(
       (contact) => ({
