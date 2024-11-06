@@ -464,4 +464,67 @@ describe('CollectionsRepository', () => {
       ).rejects.toThrow(expectedError)
     })
   })
+
+  describe('updateCollection', () => {
+    const testUpdatedCollectionAlias = 'updateCollection-test-updatedAlias'
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(testUpdatedCollectionAlias)
+    })
+
+    test('should update the collection', async () => {
+      // First we create a test collection using a CollectionDTO and createCollection method
+      const collectionDTO = createCollectionDTO('updatedCollection-test-originalAlias')
+      const testUpdateCollectionId = await sut.createCollection(collectionDTO)
+      const createdCollection = await sut.getCollection(testUpdateCollectionId)
+      expect(createdCollection.id).toBe(testUpdateCollectionId)
+      expect(createdCollection.alias).toBe(collectionDTO.alias)
+      expect(createdCollection.name).toBe(collectionDTO.name)
+      expect(createdCollection.affiliation).toBe(collectionDTO.affiliation)
+      expect(createdCollection.inputLevels?.length).toBe(1)
+      const inputLevel = createdCollection.inputLevels?.[0]
+      expect(inputLevel?.datasetFieldName).toBe('geographicCoverage')
+      expect(inputLevel?.include).toBe(true)
+      expect(inputLevel?.required).toBe(true)
+
+      // Now we update CollectionDTO and verify updates are correctly persisted after calling updateCollection method
+      collectionDTO.alias = testUpdatedCollectionAlias
+      const updatedCollectionName = 'updatedCollectionName'
+      collectionDTO.name = updatedCollectionName
+      const updatedCollectionAffiliation = 'updatedCollectionAffiliation'
+      collectionDTO.affiliation = updatedCollectionAffiliation
+      const updatedInputLevels = [
+        {
+          datasetFieldName: 'country',
+          required: false,
+          include: true
+        }
+      ]
+      collectionDTO.inputLevels = updatedInputLevels
+      await sut.updateCollection(testUpdateCollectionId, collectionDTO)
+      const updatedCollection = await sut.getCollection(testUpdateCollectionId)
+      expect(updatedCollection.id).toBe(testUpdateCollectionId)
+      expect(updatedCollection.alias).toBe(testUpdatedCollectionAlias)
+      expect(updatedCollection.name).toBe(updatedCollectionName)
+      expect(updatedCollection.affiliation).toBe(updatedCollectionAffiliation)
+      expect(updatedCollection.inputLevels?.length).toBe(1)
+      const updatedInputLevel = updatedCollection.inputLevels?.[0]
+      expect(updatedInputLevel?.datasetFieldName).toBe('country')
+      expect(updatedInputLevel?.include).toBe(true)
+      expect(updatedInputLevel?.required).toBe(false)
+    })
+
+    test('should return error when collection does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
+      )
+      const testCollectionAlias = 'updateCollection-not-found-test'
+      await expect(
+        sut.updateCollection(
+          TestConstants.TEST_DUMMY_COLLECTION_ID,
+          createCollectionDTO(testCollectionAlias)
+        )
+      ).rejects.toThrow(expectedError)
+    })
+  })
 })
