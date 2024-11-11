@@ -1,4 +1,6 @@
 import { DvObjectOwnerNode } from '../../../core'
+import { CollectionContact } from './CollectionContact'
+import { CollectionType } from './CollectionType'
 
 export interface Collection {
   id: number
@@ -9,6 +11,10 @@ export interface Collection {
   description?: string
   isPartOf: DvObjectOwnerNode
   inputLevels?: CollectionInputLevel[]
+  type: CollectionType
+  contacts?: CollectionContact[]
+  usesMetadataFieldsFromParent: boolean
+  usesBrowseSearchFacetsFromParent: boolean
 }
 
 export interface CollectionInputLevel {
