@@ -23,6 +23,7 @@ import { CollectionPayload } from '../../../src/collections/infra/repositories/t
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
+import { CollectionType } from '../../../src/collections/domain/models/CollectionType'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -61,6 +62,10 @@ describe('CollectionsRepository', () => {
         expect(actual.affiliation).toBe(undefined)
         expect(actual.description).toBe('The root dataverse.')
         expect(actual.inputLevels).toBe(undefined)
+        expect(actual.type).toBe(CollectionType.UNCATEGORIZED)
+        expect(actual.contacts).toEqual([{ email: 'root@mailinator.com', displayOrder: 0 }])
+        expect(actual.usesMetadataFieldsFromParent).toBe(true)
+        expect(actual.usesBrowseSearchFacetsFromParent).toBe(true)
       })
 
       test('should return isReleased is true for root collection', async () => {
