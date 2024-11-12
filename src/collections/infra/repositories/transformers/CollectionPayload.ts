@@ -11,8 +11,8 @@ export interface CollectionPayload {
   inputLevels?: CollectionInputLevelPayload[]
   dataverseContacts?: CollectionContactPayload[]
   dataverseType: string
-  usesMetadataFieldsFromParent: boolean
-  usesBrowseSearchFacetsFromParent: boolean
+  isMetadataBlockRoot: boolean
+  isFacetRoot: boolean
 }
 
 export interface CollectionInputLevelPayload {

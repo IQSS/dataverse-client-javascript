@@ -44,8 +44,8 @@ export const createCollectionModel = (): Collection => {
         displayOrder: 0
       }
     ],
-    usesMetadataFieldsFromParent: true,
-    usesBrowseSearchFacetsFromParent: true
+    isMetadataBlockRoot: true,
+    isFacetRoot: true
   }
   return collectionModel
 }
@@ -73,8 +73,8 @@ export const createCollectionPayload = (): CollectionPayload => {
         displayOrder: 0
       }
     ],
-    usesBrowseSearchFacetsFromParent: true,
-    usesMetadataFieldsFromParent: true
+    isMetadataBlockRoot: true,
+    isFacetRoot: true
   }
   return collectionPayload
 }

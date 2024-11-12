@@ -46,8 +46,8 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     isReleased: collectionPayload.isReleased,
     affiliation: collectionPayload.affiliation,
     type: collectionPayload.dataverseType as CollectionType,
-    usesMetadataFieldsFromParent: true, // collectionPayload.usesMetadataFieldsFromParent  // TODO:ME - Remove hardcoded value once https://github.com/IQSS/dataverse/issues/11012 is done
-    usesBrowseSearchFacetsFromParent: true, // collectionPayload.usesBrowseSearchFacetsFromParent collectionPayload.usesMetadataFieldsFromParent  // TODO:ME - Remove hardcoded value once https://github.com/IQSS/dataverse/issues/11012 is done
+    isMetadataBlockRoot: collectionPayload.isMetadataBlockRoot,
+    isFacetRoot: collectionPayload.isFacetRoot,
     ...(collectionPayload.description && {
       description: transformHtmlToMarkdown(collectionPayload.description)
     }),

@@ -64,8 +64,8 @@ describe('CollectionsRepository', () => {
         expect(actual.inputLevels).toBe(undefined)
         expect(actual.type).toBe(CollectionType.UNCATEGORIZED)
         expect(actual.contacts).toEqual([{ email: 'root@mailinator.com', displayOrder: 0 }])
-        expect(actual.usesMetadataFieldsFromParent).toBe(true)
-        expect(actual.usesBrowseSearchFacetsFromParent).toBe(true)
+        expect(actual.isMetadataBlockRoot).toBe(true)
+        expect(actual.isFacetRoot).toBe(true)
       })
 
       test('should return isReleased is true for root collection', async () => {
