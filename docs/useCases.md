@@ -444,9 +444,11 @@ const datasetId = 'doi:10.77777/FK2/AAAAAA'
 const oldVersion = '1.0'
 const newVersion = '2.0'
 
-getDatasetVersionDiff.execute(datasetId, oldVersion, newVersion).then((versionDiff: DatasetVersionDiff) => {
-  /* ... */
-})
+lgetDatasetVersionDiff
+  .execute(datasetId, oldVersion, newVersion)
+  .then((versionDiff: DatasetVersionDiff) => {
+    /* ... */
+  })
 
 /* ... */
 ```
@@ -456,7 +458,6 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetVersionDiff.ts) implem
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 The `oldVersion` and `newVersion` parameters specify the versions of the dataset to compare.
-
 
 #### List All Datasets
 
