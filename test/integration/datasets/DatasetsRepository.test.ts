@@ -472,7 +472,7 @@ describe('DatasetsRepository', () => {
   describe('getDatasetVersionDiff', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
       // Dataset is in draft, so we need to publish it first
       await sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.MAJOR)
@@ -528,7 +528,40 @@ describe('DatasetsRepository', () => {
       )
       expect(actual.filesAdded).toEqual(expectedFilesAdded)
     })
-    afterAll(async () => {
+    test('should return  diff between :latestPublished and :draft', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2']
+      }
+
+      const uploadResponse = await uploadFileViaApi(
+        testDatasetIds.numericId,
+        testTextFile1Name,
+        fileMetadata
+      )
+
+      const fileId = uploadResponse.data.data.files[0].dataFile.id
+      const expectedFilesAdded = [
+        {
+          fileName: 'test-file-1.txt',
+          type: 'text/plain',
+          isRestricted: false,
+          description: fileMetadata.description,
+          filePath: fileMetadata.directoryLabel,
+          categories: fileMetadata.categories,
+          MD5: '68b22040025784da775f55cfcb6dee2e',
+          fileId: fileId
+        }
+      ]
+      const actual = await sut.getDatasetVersionDiff(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST_PUBLISHED,
+        DatasetNotNumberedVersion.DRAFT
+      )
+      expect(actual.filesAdded).toEqual(expectedFilesAdded)
+    })
+    afterEach(async () => {
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
   })
