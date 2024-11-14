@@ -5,6 +5,7 @@ import { DatasetUserPermissions } from '../models/DatasetUserPermissions'
 import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers'
 import { DatasetDTO } from '../dtos/DatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
+import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -28,6 +29,11 @@ export interface IDatasetsRepository {
   getDatasetSummaryFieldNames(): Promise<string[]>
   getPrivateUrlDatasetCitation(token: string): Promise<string>
   getDatasetUserPermissions(datasetId: number | string): Promise<DatasetUserPermissions>
+  getDatasetVersionDiff(
+    datasetId: number | string,
+    newVersionId: string,
+    oldVersionId: string
+  ): Promise<DatasetVersionDiff>
   createDataset(
     newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],

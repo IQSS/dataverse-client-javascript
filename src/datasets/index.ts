@@ -15,6 +15,7 @@ import { SingleMetadataFieldValidator } from './domain/useCases/validators/Singl
 import { MultipleMetadataFieldValidator } from './domain/useCases/validators/MultipleMetadataFieldValidator'
 import { PublishDataset } from './domain/useCases/PublishDataset'
 import { UpdateDataset } from './domain/useCases/UpdateDataset'
+import { GetDatasetVersionDiff } from './domain/useCases/GetDatasetVersionDiff'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -26,6 +27,7 @@ const getAllDatasetPreviews = new GetAllDatasetPreviews(datasetsRepository)
 const getDatasetUserPermissions = new GetDatasetUserPermissions(datasetsRepository)
 const getDatasetSummaryFieldNames = new GetDatasetSummaryFieldNames(datasetsRepository)
 const getPrivateUrlDatasetCitation = new GetPrivateUrlDatasetCitation(datasetsRepository)
+const getDatasetVersionDiff = new GetDatasetVersionDiff(datasetsRepository)
 const singleMetadataFieldValidator = new SingleMetadataFieldValidator()
 const metadataFieldValidator = new MetadataFieldValidator(
   new SingleMetadataFieldValidator(),
@@ -54,6 +56,7 @@ export {
   getDatasetUserPermissions,
   getDatasetSummaryFieldNames,
   getPrivateUrlDatasetCitation,
+  getDatasetVersionDiff,
   publishDataset,
   createDataset,
   updateDataset

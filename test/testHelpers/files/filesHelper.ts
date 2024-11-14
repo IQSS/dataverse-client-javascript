@@ -9,8 +9,13 @@ import { FilePayload } from '../../../src/files/infra/repositories/transformers/
 
 interface FileMetadata {
   categories?: string[]
+  description?: string
+  directoryLabel?: string
 }
-
+export const testTextFile1Name = 'test-file-1.txt'
+export const testTextFile2Name = 'test-file-2.txt'
+export const testTextFile3Name = 'test-file-3.txt'
+export const testTabFile4Name = 'test-file-4.tab'
 export const createFileModel = (): FileModel => {
   return {
     id: 1,

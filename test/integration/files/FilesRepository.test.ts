@@ -8,7 +8,11 @@ import {
   createMultipartFileBlob,
   createSinglepartFileBlob,
   registerFileViaApi,
-  uploadFileViaApi
+  uploadFileViaApi,
+  testTextFile1Name,
+  testTextFile2Name,
+  testTextFile3Name,
+  testTabFile4Name
 } from '../../testHelpers/files/filesHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
@@ -43,10 +47,6 @@ describe('FilesRepository', () => {
 
   let testDatasetIds: CreatedDatasetIdentifiers
 
-  const testTextFile1Name = 'test-file-1.txt'
-  const testTextFile2Name = 'test-file-2.txt'
-  const testTextFile3Name = 'test-file-3.txt'
-  const testTabFile4Name = 'test-file-4.tab'
   const testCategoryName = 'testCategory'
 
   const nonExistentFiledId = 200
