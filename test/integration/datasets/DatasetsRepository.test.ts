@@ -501,6 +501,14 @@ describe('DatasetsRepository', () => {
         directoryLabel: 'directoryLabel',
         categories: ['category1', 'category2']
       }
+
+      const uploadResponse = await uploadFileViaApi(
+        testDatasetIds.numericId,
+        testTextFile1Name,
+        fileMetadata
+      )
+
+      const fileId = uploadResponse.data.data.files[0].dataFile.id
       const expectedFilesAdded = [
         {
           fileName: 'test-file-1.txt',
@@ -510,10 +518,9 @@ describe('DatasetsRepository', () => {
           filePath: fileMetadata.directoryLabel,
           categories: fileMetadata.categories,
           MD5: '68b22040025784da775f55cfcb6dee2e',
-          fileId: 50
+          fileId: fileId
         }
       ]
-      await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name, fileMetadata)
       const actual = await sut.getDatasetVersionDiff(
         testDatasetIds.numericId,
         '1.0',

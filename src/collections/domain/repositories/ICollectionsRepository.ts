@@ -22,4 +22,8 @@ export interface ICollectionsRepository {
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria
   ): Promise<CollectionItemSubset>
+  updateCollection(
+    collectionIdOrAlias: number | string,
+    updatedCollection: CollectionDTO
+  ): Promise<void>
 }

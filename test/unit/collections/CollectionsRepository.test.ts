@@ -191,6 +191,64 @@ describe('CollectionsRepository', () => {
     })
   })
 
+  describe('updateCollection', () => {
+    const testUpdatedCollection = createCollectionDTO()
+    const testAlias = 'testCollectionAlias'
+
+    const testCreatedCollectionId = 1
+    const testCreateCollectionResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          id: testCreatedCollectionId
+        }
+      }
+    }
+
+    const expectedUpdatedCollectionRequestPayloadJson = JSON.stringify(
+      createNewCollectionRequestPayload()
+    )
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${testAlias}`
+
+    test('should call the API with a correct request payload', async () => {
+      jest.spyOn(axios, 'put').mockResolvedValue(testCreateCollectionResponse)
+
+      // API Key auth
+      await sut.updateCollection(testAlias, testUpdatedCollection)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedUpdatedCollectionRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+
+      // Session cookie auth
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      await sut.updateCollection(testAlias, testUpdatedCollection)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedUpdatedCollectionRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+      )
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'put').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error = undefined as unknown as WriteError
+      await sut.updateCollection(testAlias, testUpdatedCollection).catch((e) => (error = e))
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        expectedUpdatedCollectionRequestPayloadJson,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
   describe('getCollectionFacets', () => {
     const testFacetsSuccessfulResponse = {
       data: {
