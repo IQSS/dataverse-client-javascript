@@ -76,6 +76,7 @@ export {
   DatasetMetadataFieldValue
 } from './domain/models/Dataset'
 export { DatasetPreview } from './domain/models/DatasetPreview'
+export { DatasetVersionDiff } from './domain/models/DatasetVersionDiff'
 export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset'
 export {
   DatasetDTO,
