@@ -26,6 +26,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Locks](#get-dataset-locks)
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
     - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
+    - [Get Differences between Two Dataset Versions](#get-differences-between-two-dataset-versions)
     - [List All Datasets](#list-all-datasets)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
@@ -427,6 +428,35 @@ getDatasetUserPermissions.execute(datasetId).then((permissions: DatasetUserPermi
 _See [use case](../src/datasets/domain/useCases/GetDatasetUserPermissions.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Get Differences between Two Dataset Versions
+
+Returns an instance of [DatasetVersionDiff](../src/datasets/domain/models/DatasetVersionDiff.ts) that contains the differences between two Dataset Versions.
+
+##### Example call:
+
+```typescript
+import { getDatasetVersionDiff } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+const oldVersion = '1.0'
+const newVersion = '2.0'
+
+getDatasetVersionDiff.execute(datasetId, oldVersion, newVersion).then((versionDiff: DatasetVersionDiff) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetVersionDiff.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `oldVersion` and `newVersion` parameters specify the versions of the dataset to compare.
+
 
 #### List All Datasets
 

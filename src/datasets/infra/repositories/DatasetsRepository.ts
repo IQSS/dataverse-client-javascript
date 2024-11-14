@@ -145,8 +145,8 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
 
   public async getDatasetVersionDiff(
     datasetId: string | number,
-    newVersionId: string,
-    oldVersionId: string
+    oldVersionId: string,
+    newVersionId: string
   ): Promise<DatasetVersionDiff> {
     return this.doGet(
       this.buildApiEndpoint(

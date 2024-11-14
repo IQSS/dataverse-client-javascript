@@ -490,8 +490,8 @@ describe('DatasetsRepository', () => {
       ])
       const actual = await sut.getDatasetVersionDiff(
         testDatasetIds.numericId,
-        DatasetNotNumberedVersion.DRAFT,
-        '1.0'
+        '1.0',
+        DatasetNotNumberedVersion.DRAFT
       )
       expect(actual.metadataChanges[0].blockName).toEqual('Citation Metadata')
     })
@@ -516,8 +516,8 @@ describe('DatasetsRepository', () => {
       await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name, fileMetadata)
       const actual = await sut.getDatasetVersionDiff(
         testDatasetIds.numericId,
-        DatasetNotNumberedVersion.DRAFT,
-        '1.0'
+        '1.0',
+        DatasetNotNumberedVersion.DRAFT
       )
       expect(actual.filesAdded).toEqual(expectedFilesAdded)
     })
