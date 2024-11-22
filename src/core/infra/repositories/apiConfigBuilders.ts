@@ -13,11 +13,14 @@ export const buildRequestConfig = (
     headers: {
       'Content-Type': contentType
     },
+    withCredentials: false,
     ...(abortSignal && { signal: abortSignal })
   }
+
   if (!authRequired) {
     return requestConfig
   }
+
   switch (ApiConfig.dataverseApiAuthMechanism) {
     case DataverseApiAuthMechanism.SESSION_COOKIE:
       /*
@@ -32,10 +35,36 @@ export const buildRequestConfig = (
         requestConfig.headers['X-Dataverse-Key'] = ApiConfig.dataverseApiKey
       }
       break
+
+    case DataverseApiAuthMechanism.BEARER_TOKEN: {
+      if (!ApiConfig.bearerTokenLocalStorageKey) {
+        throw new Error(
+          'Bearer token local storage key is not set in the ApiConfig, when using bearer token auth mechanism you must set the bearerTokenLocalStorageKey'
+        )
+      }
+
+      const token = getLocalStorageItem<string>(ApiConfig.bearerTokenLocalStorageKey)
+
+      if (token) {
+        requestConfig.headers.Authorization = `Bearer ${token}`
+      }
+      requestConfig.withCredentials = false
+      break
+    }
   }
   return requestConfig
 }
 
 export const buildRequestUrl = (apiEndpoint: string): string => {
   return `${ApiConfig.dataverseApiUrl}${apiEndpoint}`
+}
+
+export const getLocalStorageItem = <T>(key: string): T | null => {
+  try {
+    const item = localStorage.getItem(key)
+    return item ? (JSON.parse(item) as T) : null
+  } catch (error) {
+    console.error(`Error parsing localStorage key "${key}":`, error)
+    return null
+  }
 }
