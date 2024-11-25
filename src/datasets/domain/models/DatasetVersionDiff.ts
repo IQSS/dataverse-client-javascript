@@ -1,5 +1,3 @@
-// Details API
-
 export interface DatasetVersionDiff {
   oldVersion: VersionSummary
   newVersion: VersionSummary

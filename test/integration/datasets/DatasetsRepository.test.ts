@@ -478,6 +478,7 @@ describe('DatasetsRepository', () => {
       await sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.MAJOR)
       await waitForNoLocks(testDatasetIds.numericId, 10)
     })
+
     test('should return dataset metadata diff between two dataset versions', async () => {
       // Update dataset
       const metadataBlocksRepository = new MetadataBlocksRepository()
@@ -493,8 +494,10 @@ describe('DatasetsRepository', () => {
         '1.0',
         DatasetNotNumberedVersion.DRAFT
       )
+      expect(actual.metadataChanges[0]).not.toBeUndefined()
       expect(actual.metadataChanges[0].blockName).toEqual('Citation Metadata')
     })
+
     test('should return added file diff between two dataset versions', async () => {
       const fileMetadata = {
         description: 'test description',
@@ -528,6 +531,7 @@ describe('DatasetsRepository', () => {
       )
       expect(actual.filesAdded).toEqual(expectedFilesAdded)
     })
+
     test('should return  diff between :latestPublished and :draft', async () => {
       const fileMetadata = {
         description: 'test description',
@@ -561,6 +565,7 @@ describe('DatasetsRepository', () => {
       )
       expect(actual.filesAdded).toEqual(expectedFilesAdded)
     })
+
     afterEach(async () => {
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })

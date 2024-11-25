@@ -1,16 +1,6 @@
 import { AxiosResponse } from 'axios'
 import { DatasetVersionDiff } from '../../../domain/models/DatasetVersionDiff'
 
-/*
- oldVersion: VersionSummaryPayload
-  newVersion: VersionSummaryPayload
-  metadataChanges: MetadataBlockDiffPayload[]
-  filesAdded: FileSummaryPayload[]
-  filesRemoved: FileSummaryPayload[]
-  fileChanges: FileDiffPayload[]
-  filesReplaced: FileReplacementPayload[]
-  TermsOfAccess: FieldDiffPayload[]
- */
 export const transformDatasetVersionDiffResponseToDatasetVersionDiff = (
   response: AxiosResponse
 ): DatasetVersionDiff => {
