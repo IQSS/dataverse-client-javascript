@@ -70,7 +70,9 @@ describe('FilesRepository', () => {
       params: {
         size: testFileSize
       },
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
     const expectedRequestConfigSessionCookie = {
       params: {
@@ -243,7 +245,9 @@ describe('FilesRepository', () => {
         includeDeaccessioned: testIncludeDeaccessioned,
         orderCriteria: testFileOrderCriteria
       },
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
     const expectedRequestConfigSessionCookie = {
       params: {
@@ -268,7 +272,9 @@ describe('FilesRepository', () => {
 
     const expectedRequestConfigApiKeyWithOptional = {
       params: expectedRequestParamsWithOptional,
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
 
     const expectedFiles = createFilesSubsetModel(testTotalCount)
@@ -428,13 +434,15 @@ describe('FilesRepository', () => {
 
     const expectedRequestConfigApiKey = {
       params: { includeDeaccessioned: testIncludeDeaccessioned },
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
     const expectedRequestConfigSessionCookie = {
       params: { includeDeaccessioned: testIncludeDeaccessioned },
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
       withCredentials:
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials
     }
 
     const expectedRequestParamsWithOptional = {
@@ -447,7 +455,9 @@ describe('FilesRepository', () => {
 
     const expectedRequestConfigApiKeyWithOptional = {
       params: expectedRequestParamsWithOptional,
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
 
     const expectedCount = createFileCountsModel()
@@ -579,7 +589,9 @@ describe('FilesRepository', () => {
         mode: FileDownloadSizeMode.ARCHIVAL.toString(),
         includeDeaccessioned: testIncludeDeaccessioned
       },
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
     const expectedRequestConfigSessionCookie = {
       params: {
@@ -599,7 +611,9 @@ describe('FilesRepository', () => {
         categoryName: testFileCriteria.categoryName,
         tabularTagName: testFileCriteria.tabularTagName
       },
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetId}/versions/${testDatasetVersionId}/downloadsize`
 
@@ -1022,7 +1036,9 @@ describe('FilesRepository', () => {
 
     const expectedRequestConfigApiKey = {
       params: expectedRequestParams,
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
 
     const expectedRequestConfigSessionCookie = {

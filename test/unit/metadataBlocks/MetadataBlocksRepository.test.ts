@@ -29,7 +29,9 @@ describe('MetadataBlocksRepository', () => {
       params: {
         onlyDisplayedOnCreate: true,
         returnDatasetFieldTypes: true
-      }
+      },
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
 
     test('should return collection metadata blocks on successful response', async () => {

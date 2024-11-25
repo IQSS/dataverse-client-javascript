@@ -57,7 +57,9 @@ describe('CollectionsRepository', () => {
       params: {
         returnOwners: true
       },
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+      withCredentials:
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
     }
 
     describe('by numeric id', () => {
@@ -262,7 +264,9 @@ describe('CollectionsRepository', () => {
         params: {
           returnDetails: true
         },
-        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
       }
 
       test('should return facets when providing a valid id', async () => {
@@ -395,7 +399,9 @@ describe('CollectionsRepository', () => {
 
       const expectedRequestConfigApiKey = {
         params: expectedRequestParams,
-        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
       }
 
       expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
@@ -438,7 +444,9 @@ describe('CollectionsRepository', () => {
 
       const expectedRequestConfigApiKeyWithPagination = {
         params: expectedRequestParamsWithPagination,
-        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
       }
 
       expect(axios.get).toHaveBeenCalledWith(
@@ -481,7 +489,9 @@ describe('CollectionsRepository', () => {
 
       const expectedRequestConfigApiKeyWithCollectionId = {
         params: expectedRequestParamsWithCollectionId,
-        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
       }
 
       expect(axios.get).toHaveBeenCalledWith(
@@ -521,7 +531,9 @@ describe('CollectionsRepository', () => {
 
       const expectedRequestConfigApiKey = {
         params: expectedRequestParams,
-        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
+        withCredentials:
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
       }
 
       expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)

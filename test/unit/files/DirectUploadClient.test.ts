@@ -126,7 +126,8 @@ describe('uploadFile', () => {
         `${ApiConfig.dataverseApiUrl}/datasets/mpupload/testAbort`,
         {
           headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': 'dummyApiKey' },
-          params: {}
+          params: {},
+          withCredentials: false
         }
       )
     })
