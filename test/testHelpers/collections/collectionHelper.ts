@@ -3,9 +3,10 @@ import { DvObjectType } from '../../../src'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { TestConstants } from '../TestConstants'
 import axios from 'axios'
-import { CollectionDTO, CollectionType } from '../../../src/collections/domain/dtos/CollectionDTO'
+import { CollectionDTO } from '../../../src/collections/domain/dtos/CollectionDTO'
 import { NewCollectionRequestPayload } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { CollectionFacetPayload } from '../../../src/collections/infra/repositories/transformers/CollectionFacetPayload'
+import { CollectionType } from '../../../src/collections/domain/models/CollectionType'
 
 const COLLECTION_ID = 11111
 const COLLECTION_IS_RELEASED = true
@@ -35,7 +36,16 @@ export const createCollectionModel = (): Collection => {
         required: true,
         include: true
       }
-    ]
+    ],
+    type: CollectionType.UNCATEGORIZED,
+    contacts: [
+      {
+        email: 'dataverse@test.com',
+        displayOrder: 0
+      }
+    ],
+    isMetadataBlockRoot: true,
+    isFacetRoot: true
   }
   return collectionModel
 }
@@ -55,7 +65,16 @@ export const createCollectionPayload = (): CollectionPayload => {
         required: true,
         include: true
       }
-    ]
+    ],
+    dataverseType: CollectionType.UNCATEGORIZED,
+    dataverseContacts: [
+      {
+        contactEmail: 'dataverse@test.com',
+        displayOrder: 0
+      }
+    ],
+    isMetadataBlockRoot: true,
+    isFacetRoot: true
   }
   return collectionPayload
 }

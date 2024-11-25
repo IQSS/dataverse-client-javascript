@@ -1,6 +1,10 @@
 import { Collection, CollectionInputLevel } from '../../../domain/models/Collection'
 import { AxiosResponse } from 'axios'
-import { CollectionInputLevelPayload, CollectionPayload } from './CollectionPayload'
+import {
+  CollectionContactPayload,
+  CollectionInputLevelPayload,
+  CollectionPayload
+} from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import { transformHtmlToMarkdown } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
 import { CollectionFacet } from '../../../domain/models/CollectionFacet'
@@ -15,6 +19,8 @@ import { transformFilePreviewPayloadToFilePreview } from '../../../../files/infr
 import { transformCollectionPreviewPayloadToCollectionPreview } from './collectionPreviewsTransformers'
 import { CollectionPreviewPayload } from './CollectionPreviewPayload'
 import { CollectionPreview } from '../../../domain/models/CollectionPreview'
+import { CollectionContact } from '../../../domain/models/CollectionContact'
+import { CollectionType } from '../../../domain/models/CollectionType'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -39,6 +45,9 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     name: collectionPayload.name,
     isReleased: collectionPayload.isReleased,
     affiliation: collectionPayload.affiliation,
+    type: collectionPayload.dataverseType as CollectionType,
+    isMetadataBlockRoot: collectionPayload.isMetadataBlockRoot,
+    isFacetRoot: collectionPayload.isFacetRoot,
     ...(collectionPayload.description && {
       description: transformHtmlToMarkdown(collectionPayload.description)
     }),
@@ -47,6 +56,9 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     }),
     ...(collectionPayload.inputLevels && {
       inputLevels: transformInputLevelsPayloadToInputLevels(collectionPayload.inputLevels)
+    }),
+    ...(collectionPayload.dataverseContacts && {
+      contacts: transformContactsPayloadToContacts(collectionPayload.dataverseContacts)
     })
   }
   return collectionModel
@@ -89,4 +101,13 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
     items: items,
     totalItemCount: responseDataPayload.total_count
   }
+}
+
+const transformContactsPayloadToContacts = (
+  contactsPayload: CollectionContactPayload[]
+): CollectionContact[] => {
+  return contactsPayload.map((contactPayload) => ({
+    email: contactPayload.contactEmail,
+    displayOrder: contactPayload.displayOrder
+  }))
 }
