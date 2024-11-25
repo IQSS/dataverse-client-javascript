@@ -17,14 +17,16 @@ export class TestConstants {
     headers: {
       'Content-Type': 'application/json',
       'X-Dataverse-Key': TestConstants.TEST_DUMMY_API_KEY
-    }
+    },
+    withCredentials: false
   }
   static readonly TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY_INCLUDE_DEACCESSIONED = {
     params: { includeDeaccessioned: true },
     headers: {
       'Content-Type': 'application/json',
       'X-Dataverse-Key': TestConstants.TEST_DUMMY_API_KEY
-    }
+    },
+    withCredentials: false
   }
   static readonly TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE = {
     withCredentials: true,
@@ -45,7 +47,8 @@ export class TestConstants {
     params: {},
     headers: {
       'Content-Type': 'application/json'
-    }
+    },
+    withCredentials: false
   }
   static readonly TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_BEARER_TOKEN = {
     params: {},
