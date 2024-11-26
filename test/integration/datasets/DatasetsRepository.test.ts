@@ -16,7 +16,8 @@ import {
   DatasetPreviewSubset,
   VersionUpdateType,
   createDataset,
-  CreatedDatasetIdentifiers
+  CreatedDatasetIdentifiers,
+  DatasetDTO
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -31,6 +32,45 @@ import {
   deleteCollectionViaApi,
   ROOT_COLLECTION_ALIAS
 } from '../../testHelpers/collections/collectionHelper'
+import { testTextFile1Name, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
+
+const TEST_DIFF_DATASET_DTO: DatasetDTO = {
+  license: {
+    name: 'CC0 1.0',
+    uri: 'http://creativecommons.org/publicdomain/zero/1.0',
+    iconUri: 'https://licensebuttons.net/p/zero/1.0/88x31.png'
+  },
+  metadataBlockValues: [
+    {
+      name: 'citation',
+      fields: {
+        title: 'Updated Dataset Title',
+        author: [
+          {
+            authorName: 'Smith, John',
+            authorAffiliation: 'Dataverse.org'
+          },
+          {
+            authorName: 'Owner, Dataverse',
+            authorAffiliation: 'Dataversedemo.org'
+          }
+        ],
+        datasetContact: [
+          {
+            datasetContactEmail: 'bird@mailinator.com',
+            datasetContactName: 'Bird, Fiona'
+          }
+        ],
+        dsDescription: [
+          {
+            dsDescriptionValue: 'This is the updated description of the dataset.'
+          }
+        ],
+        subject: ['Medicine, Health and Life Sciences']
+      }
+    }
+  ]
+}
 
 describe('DatasetsRepository', () => {
   const testCollectionAlias = 'datasetsRepositoryTestCollection'
@@ -427,6 +467,107 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof actualDatasetCitation).toBe('string')
+    })
+  })
+  describe('getDatasetVersionDiff', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeEach(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      // Dataset is in draft, so we need to publish it first
+      await sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+    })
+
+    test('should return dataset metadata diff between two dataset versions', async () => {
+      // Update dataset
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+
+      await sut.updateDataset(testDatasetIds.numericId, TEST_DIFF_DATASET_DTO, [
+        citationMetadataBlock
+      ])
+      const actual = await sut.getDatasetVersionDiff(
+        testDatasetIds.numericId,
+        '1.0',
+        DatasetNotNumberedVersion.DRAFT
+      )
+      expect(actual.metadataChanges[0]).not.toBeUndefined()
+      expect(actual.metadataChanges[0].blockName).toEqual('Citation Metadata')
+    })
+
+    test('should return added file diff between two dataset versions', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2']
+      }
+
+      const uploadResponse = await uploadFileViaApi(
+        testDatasetIds.numericId,
+        testTextFile1Name,
+        fileMetadata
+      )
+
+      const fileId = uploadResponse.data.data.files[0].dataFile.id
+      const expectedFilesAdded = [
+        {
+          fileName: 'test-file-1.txt',
+          type: 'text/plain',
+          isRestricted: false,
+          description: fileMetadata.description,
+          filePath: fileMetadata.directoryLabel,
+          categories: fileMetadata.categories,
+          MD5: '68b22040025784da775f55cfcb6dee2e',
+          fileId: fileId
+        }
+      ]
+      const actual = await sut.getDatasetVersionDiff(
+        testDatasetIds.numericId,
+        '1.0',
+        DatasetNotNumberedVersion.DRAFT
+      )
+      expect(actual.filesAdded).toEqual(expectedFilesAdded)
+    })
+
+    test('should return  diff between :latestPublished and :draft', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2']
+      }
+
+      const uploadResponse = await uploadFileViaApi(
+        testDatasetIds.numericId,
+        testTextFile1Name,
+        fileMetadata
+      )
+
+      const fileId = uploadResponse.data.data.files[0].dataFile.id
+      const expectedFilesAdded = [
+        {
+          fileName: 'test-file-1.txt',
+          type: 'text/plain',
+          isRestricted: false,
+          description: fileMetadata.description,
+          filePath: fileMetadata.directoryLabel,
+          categories: fileMetadata.categories,
+          MD5: '68b22040025784da775f55cfcb6dee2e',
+          fileId: fileId
+        }
+      ]
+      const actual = await sut.getDatasetVersionDiff(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST_PUBLISHED,
+        DatasetNotNumberedVersion.DRAFT
+      )
+      expect(actual.filesAdded).toEqual(expectedFilesAdded)
+    })
+
+    afterEach(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
   })
 
