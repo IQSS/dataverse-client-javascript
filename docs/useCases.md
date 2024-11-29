@@ -1282,12 +1282,12 @@ import { registerUser } from '@iqss/dataverse-client-javascript'
 /* ... */
 
 const userDTO: UserDTO = {
-  username: 'johndoe'
-  firstName: 'John'
-  lastName: 'Doe'
-  emailAddress: 'johndoe@email.com'
-  position: ''
-  affiliation: ''
+  username: 'johndoe',
+  firstName: 'John',
+  lastName: 'Doe',
+  emailAddress: 'johndoe@email.com',
+  position: '',
+  affiliation: '',
   termsAccepted: true
 }
 
