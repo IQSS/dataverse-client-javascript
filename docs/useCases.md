@@ -58,6 +58,7 @@ The different use cases currently available in the package are classified below,
   - [Users write use cases](#users-write-use-cases)
     - [Delete Current API Token](#delete-current-api-token)
     - [Recreate Current API Token](#recreate-current-api-token)
+    - [Register User](#register-user)
 - [Info](#Info)
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
@@ -1268,6 +1269,34 @@ recreateCurrentApiToken.execute().then((apiTokenInfo: ApiTokenInfo) => {
 ```
 
 _See [use case](../src/users/domain/useCases/RecreateCurrentApiToken.ts) implementation_.
+
+### Register User
+
+Register a new user, given a [UserDTO](../src/users/domain/dtos/UserDTO.ts)
+
+##### Example call:
+
+```typescript
+import { registerUser } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const userDTO: UserDTO = {
+  username: 'johndoe'
+  firstName: 'John'
+  lastName: 'Doe'
+  emailAddress: 'johndoe@email.com'
+  position: ''
+  affiliation: ''
+  termsAccepted: true
+}
+
+registerUser.execute(userDTO)
+
+/* ... */
+```
+
+_See [use case](../src/users/domain/useCases/RegisterUser.ts) implementation_.
 
 ## Info
 
