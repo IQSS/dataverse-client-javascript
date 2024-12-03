@@ -103,9 +103,7 @@ describe('DatasetsRepository', () => {
         excludeFiles: true,
         returnOwners: true
       },
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
-      withCredentials:
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
     }
     const expectedRequestConfigSessionCookie = {
       params: {
@@ -292,8 +290,7 @@ describe('DatasetsRepository', () => {
   describe('getPrivateUrlDataset', () => {
     const expectedRequestConfig = {
       params: { returnOwners: true },
-      headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers,
-      withCredentials: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.withCredentials
+      headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
     }
     test('should return Dataset when response is successful', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
@@ -644,9 +641,7 @@ describe('DatasetsRepository', () => {
 
       const expectedRequestConfigApiKeyWithPagination = {
         params: expectedRequestParamsWithPagination,
-        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
-        withCredentials:
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
       }
 
       expect(axios.get).toHaveBeenCalledWith(
@@ -688,9 +683,7 @@ describe('DatasetsRepository', () => {
 
       const expectedRequestConfigApiKeyWithCollectionId = {
         params: expectedRequestParamsWithCollectionId,
-        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers,
-        withCredentials:
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.withCredentials
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
       }
 
       expect(axios.get).toHaveBeenCalledWith(

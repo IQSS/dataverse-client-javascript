@@ -47,9 +47,7 @@ describe('BearerTokenMechanism', () => {
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_BEARER_TOKEN.headers,
       params: {
         returnOwners: true
-      },
-      withCredentials:
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_BEARER_TOKEN.withCredentials
+      }
     }
 
     jest.spyOn(axios, 'get').mockResolvedValue(testCollectionSuccessfulResponse)

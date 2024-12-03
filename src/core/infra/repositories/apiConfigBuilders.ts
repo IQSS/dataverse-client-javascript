@@ -13,7 +13,6 @@ export const buildRequestConfig = (
     headers: {
       'Content-Type': contentType
     },
-    withCredentials: false,
     ...(abortSignal && { signal: abortSignal })
   }
 
@@ -48,7 +47,6 @@ export const buildRequestConfig = (
       if (token) {
         requestConfig.headers.Authorization = `Bearer ${token}`
       }
-      requestConfig.withCredentials = false
       break
     }
   }
