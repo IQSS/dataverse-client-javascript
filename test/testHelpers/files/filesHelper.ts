@@ -32,7 +32,7 @@ export const createFileModel = (): FileModel => {
     previousDataFileId: 4,
     md5: '29e413e0c881e17314ce8116fed4d1a7',
     metadataId: 4,
-    creationDate: new Date('2023-07-11'),
+    creationDate: '2023-07-11',
     embargo: {
       dateAvailable: new Date('2023-07-11'),
       reason: 'test'
@@ -59,7 +59,7 @@ export const createFileModel = (): FileModel => {
     originalSize: 127426,
     originalName: 'originalName',
     tabularTags: ['tag1', 'tag2'],
-    publicationDate: new Date('2023-07-11')
+    publicationDate: '2023-07-11'
   }
 }
 

@@ -28,8 +28,8 @@ export interface FileModel {
   checksum?: FileChecksum
   metadataId?: number
   tabularTags?: string[]
-  creationDate?: Date
-  publicationDate?: Date
+  creationDate?: string
+  publicationDate?: string
   deleted: boolean
   tabularData: boolean
   fileAccessRequest?: boolean
