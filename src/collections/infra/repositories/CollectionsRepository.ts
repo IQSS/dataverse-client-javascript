@@ -13,6 +13,7 @@ import { transformCollectionUserPermissionsResponseToCollectionUserPermissions }
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
 import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
+import { GetCollectionItemsQueryParams } from '../../domain/models/GetCollectionItemsQueryParams'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -38,14 +39,6 @@ export interface NewCollectionInputLevelRequestPayload {
   datasetFieldTypeName: string
   include: boolean
   required: boolean
-}
-
-export interface GetCollectionItemsQueryParams {
-  q: string
-  subtree?: string
-  per_page?: number
-  start?: number
-  type?: string
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -119,37 +112,30 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria
   ): Promise<CollectionItemSubset> {
-    const queryParams: GetCollectionItemsQueryParams = {
-      q: '*'
-    }
+    const queryParams = new URLSearchParams({
+      [GetCollectionItemsQueryParams.QUERY]: '*',
+      [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+      [GetCollectionItemsQueryParams.SORT]: 'date',
+      [GetCollectionItemsQueryParams.ORDER]: 'desc'
+    })
+
     if (collectionId) {
-      queryParams.subtree = collectionId
+      queryParams.set(GetCollectionItemsQueryParams.SUBTREE, collectionId)
     }
+
     if (limit) {
-      queryParams.per_page = limit
+      queryParams.set(GetCollectionItemsQueryParams.PER_PAGE, limit.toString())
     }
+
     if (offset) {
-      queryParams.start = offset
+      queryParams.set(GetCollectionItemsQueryParams.START, offset.toString())
     }
+
     if (collectionSearchCriteria) {
       this.applyCollectionSearchCriteriaToQueryParams(queryParams, collectionSearchCriteria)
     }
 
-    let url = '/search?sort=date&order=desc'
-
-    if (collectionSearchCriteria?.itemTypes) {
-      const itemTypesQueryString = collectionSearchCriteria.itemTypes
-        .map((itemType: CollectionItemType) => {
-          const mappedItemType =
-            itemType === CollectionItemType.COLLECTION ? 'dataverse' : itemType.toString()
-          return `type=${mappedItemType}`
-        })
-        .join('&')
-
-      url += `&${itemTypesQueryString}`
-    }
-
-    return this.doGet(url, true, queryParams)
+    return this.doGet('/search', true, queryParams)
       .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error
@@ -201,11 +187,22 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   }
 
   private applyCollectionSearchCriteriaToQueryParams(
-    queryParams: GetCollectionItemsQueryParams,
+    queryParams: URLSearchParams,
     collectionSearchCriteria: CollectionSearchCriteria
   ) {
     if (collectionSearchCriteria.searchText) {
-      queryParams.q = encodeURIComponent(collectionSearchCriteria.searchText)
+      queryParams.set(
+        GetCollectionItemsQueryParams.QUERY,
+        encodeURIComponent(collectionSearchCriteria.searchText)
+      )
+    }
+
+    if (collectionSearchCriteria?.itemTypes) {
+      collectionSearchCriteria.itemTypes.forEach((itemType) => {
+        const mappedItemType = itemType === CollectionItemType.COLLECTION ? 'dataverse' : itemType
+
+        queryParams.append(GetCollectionItemsQueryParams.TYPE, mappedItemType)
+      })
     }
   }
 }

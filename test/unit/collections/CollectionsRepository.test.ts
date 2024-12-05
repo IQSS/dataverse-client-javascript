@@ -31,6 +31,7 @@ import {
   createCollectionPreviewModel,
   createCollectionPreviewPayload
 } from '../../testHelpers/collections/collectionPreviewHelper'
+import { GetCollectionItemsQueryParams } from '../../../src/collections/domain/models/GetCollectionItemsQueryParams'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -381,7 +382,7 @@ describe('CollectionsRepository', () => {
       }
     }
 
-    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?sort=date&order=desc`
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search`
 
     test('should return item previews when response is successful', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue(testItemPreviewsResponse)
@@ -389,9 +390,12 @@ describe('CollectionsRepository', () => {
       // API Key auth
       let actual = await sut.getCollectionItems()
 
-      const expectedRequestParams = {
-        q: '*'
-      }
+      const expectedRequestParams = new URLSearchParams({
+        [GetCollectionItemsQueryParams.QUERY]: '*',
+        [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+        [GetCollectionItemsQueryParams.SORT]: 'date',
+        [GetCollectionItemsQueryParams.ORDER]: 'desc'
+      })
 
       const expectedRequestConfigApiKey = {
         params: expectedRequestParams,
@@ -430,11 +434,21 @@ describe('CollectionsRepository', () => {
       // API Key auth
       let actual = await sut.getCollectionItems(undefined, testLimit, testOffset)
 
-      const expectedRequestParamsWithPagination = {
-        q: '*',
-        per_page: testLimit,
-        start: testOffset
-      }
+      const expectedRequestParamsWithPagination = new URLSearchParams({
+        [GetCollectionItemsQueryParams.QUERY]: '*',
+        [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+        [GetCollectionItemsQueryParams.SORT]: 'date',
+        [GetCollectionItemsQueryParams.ORDER]: 'desc'
+      })
+
+      expectedRequestParamsWithPagination.set(
+        GetCollectionItemsQueryParams.PER_PAGE,
+        testLimit.toString()
+      )
+      expectedRequestParamsWithPagination.set(
+        GetCollectionItemsQueryParams.START,
+        testOffset.toString()
+      )
 
       const expectedRequestConfigApiKeyWithPagination = {
         params: expectedRequestParamsWithPagination,
@@ -474,10 +488,17 @@ describe('CollectionsRepository', () => {
       // API Key auth
       let actual = await sut.getCollectionItems(testCollectionId, undefined, undefined)
 
-      const expectedRequestParamsWithCollectionId = {
-        q: '*',
-        subtree: testCollectionId
-      }
+      const expectedRequestParamsWithCollectionId = new URLSearchParams({
+        [GetCollectionItemsQueryParams.QUERY]: '*',
+        [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+        [GetCollectionItemsQueryParams.SORT]: 'date',
+        [GetCollectionItemsQueryParams.ORDER]: 'desc'
+      })
+
+      expectedRequestParamsWithCollectionId.set(
+        GetCollectionItemsQueryParams.SUBTREE,
+        testCollectionId
+      )
 
       const expectedRequestConfigApiKeyWithCollectionId = {
         params: expectedRequestParamsWithCollectionId,
@@ -515,9 +536,12 @@ describe('CollectionsRepository', () => {
       let error = undefined as unknown as ReadError
       await sut.getCollectionItems().catch((e) => (error = e))
 
-      const expectedRequestParams = {
-        q: '*'
-      }
+      const expectedRequestParams = new URLSearchParams({
+        [GetCollectionItemsQueryParams.QUERY]: '*',
+        [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+        [GetCollectionItemsQueryParams.SORT]: 'date',
+        [GetCollectionItemsQueryParams.ORDER]: 'desc'
+      })
 
       const expectedRequestConfigApiKey = {
         params: expectedRequestParams,
