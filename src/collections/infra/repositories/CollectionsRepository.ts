@@ -216,5 +216,11 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     if (collectionSearchCriteria?.order) {
       queryParams.set(GetCollectionItemsQueryParams.ORDER, collectionSearchCriteria.order)
     }
+
+    if (collectionSearchCriteria?.filterQueries) {
+      collectionSearchCriteria.filterQueries.forEach((filterQuery) => {
+        queryParams.append(GetCollectionItemsQueryParams.FILTERQUERY, filterQuery)
+      })
+    }
   }
 }

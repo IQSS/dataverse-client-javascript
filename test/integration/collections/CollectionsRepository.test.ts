@@ -530,9 +530,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionAndFile)
 
-      // Test sort and order
-
-      // Sort by name ascending
+      // Test Sort by name ascending
       const collectionSearchCriteriaNameAscending = new CollectionSearchCriteria()
         .withSort(SortType.NAME)
         .withOrder(OrderType.ASC)
@@ -549,7 +547,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
 
-      // Sort by name descending
+      // Test Sort by name descending
       const collectionSearchCriteriaNameDescending = new CollectionSearchCriteria()
         .withSort(SortType.NAME)
         .withOrder(OrderType.DESC)
@@ -566,7 +564,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect((actual.items[2] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
 
-      // Sort by date ascending
+      // Test Sort by date ascending
       const collectionSearchCriteriaDateAscending = new CollectionSearchCriteria()
         .withSort(SortType.DATE)
         .withOrder(OrderType.ASC)
@@ -583,7 +581,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
 
-      // Sort by date descending
+      // Test Sort by date descending
       const collectionSearchCriteriaDateDescending = new CollectionSearchCriteria()
         .withSort(SortType.DATE)
         .withOrder(OrderType.DESC)
@@ -599,6 +597,54 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as FilePreview).type).toBe(CollectionItemType.FILE)
       expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[2] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
+
+      // Test with Filter query related to the collection
+      const collectionSearchCriteriaFilterQueryCollection =
+        new CollectionSearchCriteria().withFilterQueries(['dvCategory:Laboratory'])
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaFilterQueryCollection
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect(actual.facets).toEqual(expectedFacetsFromCollectionOnly)
+
+      // Test with Filter query related to the dataset
+      const collectionSearchCriteriaFilterQueryDataset =
+        new CollectionSearchCriteria().withFilterQueries([
+          'subject_ss:Medicine, Health and Life Sciences'
+        ])
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaFilterQueryDataset
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+      expect(actual.facets).toEqual(expectedFacetsFromDatasetOnly)
+
+      // Test with Filter query related to the file
+      const collectionSearchCriteriaFilterQuerieCollAndFile =
+        new CollectionSearchCriteria().withFilterQueries(['fileAccess:Public'])
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaFilterQuerieCollAndFile
+      )
+
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect(actual.facets).toEqual(expectedFacetsFromFileOnly)
     })
 
     test('should return error when collection does not exist', async () => {

@@ -6,7 +6,8 @@ export enum GetCollectionItemsQueryParams {
   SUBTREE = 'subtree',
   PER_PAGE = 'per_page',
   START = 'start',
-  TYPE = 'type'
+  TYPE = 'type',
+  FILTERQUERY = 'fq'
 }
 
 export enum SortType {
@@ -18,3 +19,5 @@ export enum OrderType {
   ASC = 'asc',
   DESC = 'desc'
 }
+
+export type FilterQuery = `${string}:${string}`

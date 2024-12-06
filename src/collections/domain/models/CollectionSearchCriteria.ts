@@ -1,12 +1,13 @@
 import { CollectionItemType } from './CollectionItemType'
-import { OrderType, SortType } from './GetCollectionItemsQueryParams'
+import { FilterQuery, OrderType, SortType } from './GetCollectionItemsQueryParams'
 
 export class CollectionSearchCriteria {
   constructor(
     public readonly searchText?: string,
     public readonly itemTypes?: CollectionItemType[],
     public readonly sort?: SortType,
-    public readonly order?: OrderType
+    public readonly order?: OrderType,
+    public readonly filterQueries?: FilterQuery[]
   ) {}
 
   withSearchText(searchText: string | undefined): CollectionSearchCriteria {
@@ -23,5 +24,15 @@ export class CollectionSearchCriteria {
 
   withOrder(order: OrderType | undefined): CollectionSearchCriteria {
     return new CollectionSearchCriteria(this.searchText, this.itemTypes, this.sort, order)
+  }
+
+  withFilterQueries(filterQueries: FilterQuery[] | undefined): CollectionSearchCriteria {
+    return new CollectionSearchCriteria(
+      this.searchText,
+      this.itemTypes,
+      this.sort,
+      this.order,
+      filterQueries
+    )
   }
 }
