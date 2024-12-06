@@ -24,6 +24,10 @@ import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 import { CollectionType } from '../../../src/collections/domain/models/CollectionType'
+import {
+  OrderType,
+  SortType
+} from '../../../src/collections/domain/models/GetCollectionItemsQueryParams'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -525,6 +529,76 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionAndFile)
+
+      // Test sort and order
+
+      // Sort by name ascending
+      const collectionSearchCriteriaNameAscending = new CollectionSearchCriteria()
+        .withSort(SortType.NAME)
+        .withOrder(OrderType.ASC)
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaNameAscending
+      )
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
+      expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
+      expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
+
+      // Sort by name descending
+      const collectionSearchCriteriaNameDescending = new CollectionSearchCriteria()
+        .withSort(SortType.NAME)
+        .withOrder(OrderType.DESC)
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaNameDescending
+      )
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as FilePreview).type).toBe(CollectionItemType.FILE)
+      expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
+      expect((actual.items[2] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
+
+      // Sort by date ascending
+      const collectionSearchCriteriaDateAscending = new CollectionSearchCriteria()
+        .withSort(SortType.DATE)
+        .withOrder(OrderType.ASC)
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaDateAscending
+      )
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
+      expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
+      expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
+
+      // Sort by date descending
+      const collectionSearchCriteriaDateDescending = new CollectionSearchCriteria()
+        .withSort(SortType.DATE)
+        .withOrder(OrderType.DESC)
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaDateDescending
+      )
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as FilePreview).type).toBe(CollectionItemType.FILE)
+      expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
+      expect((actual.items[2] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
     })
 
     test('should return error when collection does not exist', async () => {

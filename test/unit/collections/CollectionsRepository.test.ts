@@ -31,7 +31,11 @@ import {
   createCollectionPreviewModel,
   createCollectionPreviewPayload
 } from '../../testHelpers/collections/collectionPreviewHelper'
-import { GetCollectionItemsQueryParams } from '../../../src/collections/domain/models/GetCollectionItemsQueryParams'
+import {
+  GetCollectionItemsQueryParams,
+  OrderType,
+  SortType
+} from '../../../src/collections/domain/models/GetCollectionItemsQueryParams'
 import {
   createCollectionItemsFacetsModel,
   createCollectionItemsFacetsPayload
@@ -400,8 +404,8 @@ describe('CollectionsRepository', () => {
       const expectedRequestParams = new URLSearchParams({
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
-        [GetCollectionItemsQueryParams.SORT]: 'date',
-        [GetCollectionItemsQueryParams.ORDER]: 'desc'
+        [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
       })
 
       const expectedRequestConfigApiKey = {
@@ -444,8 +448,8 @@ describe('CollectionsRepository', () => {
       const expectedRequestParamsWithPagination = new URLSearchParams({
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
-        [GetCollectionItemsQueryParams.SORT]: 'date',
-        [GetCollectionItemsQueryParams.ORDER]: 'desc'
+        [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
       })
 
       expectedRequestParamsWithPagination.set(
@@ -498,8 +502,8 @@ describe('CollectionsRepository', () => {
       const expectedRequestParamsWithCollectionId = new URLSearchParams({
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
-        [GetCollectionItemsQueryParams.SORT]: 'date',
-        [GetCollectionItemsQueryParams.ORDER]: 'desc'
+        [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
       })
 
       expectedRequestParamsWithCollectionId.set(
@@ -546,8 +550,8 @@ describe('CollectionsRepository', () => {
       const expectedRequestParams = new URLSearchParams({
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
-        [GetCollectionItemsQueryParams.SORT]: 'date',
-        [GetCollectionItemsQueryParams.ORDER]: 'desc'
+        [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
       })
 
       const expectedRequestConfigApiKey = {

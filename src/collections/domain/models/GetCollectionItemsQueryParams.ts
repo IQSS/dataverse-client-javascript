@@ -8,3 +8,13 @@ export enum GetCollectionItemsQueryParams {
   START = 'start',
   TYPE = 'type'
 }
+
+export enum SortType {
+  NAME = 'name',
+  DATE = 'date'
+}
+
+export enum OrderType {
+  ASC = 'asc',
+  DESC = 'desc'
+}

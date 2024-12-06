@@ -13,7 +13,11 @@ import { transformCollectionUserPermissionsResponseToCollectionUserPermissions }
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
 import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
-import { GetCollectionItemsQueryParams } from '../../domain/models/GetCollectionItemsQueryParams'
+import {
+  GetCollectionItemsQueryParams,
+  OrderType,
+  SortType
+} from '../../domain/models/GetCollectionItemsQueryParams'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -115,8 +119,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     const queryParams = new URLSearchParams({
       [GetCollectionItemsQueryParams.QUERY]: '*',
       [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
-      [GetCollectionItemsQueryParams.SORT]: 'date',
-      [GetCollectionItemsQueryParams.ORDER]: 'desc'
+      [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+      [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
     })
 
     if (collectionId) {
@@ -203,6 +207,14 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
         queryParams.append(GetCollectionItemsQueryParams.TYPE, mappedItemType)
       })
+    }
+
+    if (collectionSearchCriteria?.sort) {
+      queryParams.set(GetCollectionItemsQueryParams.SORT, collectionSearchCriteria.sort)
+    }
+
+    if (collectionSearchCriteria?.order) {
+      queryParams.set(GetCollectionItemsQueryParams.ORDER, collectionSearchCriteria.order)
     }
   }
 }
