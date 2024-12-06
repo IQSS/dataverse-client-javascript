@@ -32,6 +32,10 @@ import {
   createCollectionPreviewPayload
 } from '../../testHelpers/collections/collectionPreviewHelper'
 import { GetCollectionItemsQueryParams } from '../../../src/collections/domain/models/GetCollectionItemsQueryParams'
+import {
+  createCollectionItemsFacetsModel,
+  createCollectionItemsFacetsPayload
+} from '../../testHelpers/collections/collectionItemsFacetsHelper'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -362,9 +366,11 @@ describe('CollectionsRepository', () => {
       createCollectionPreviewModel()
     ]
     const testTotalCount = 2
+    const testFacets = createCollectionItemsFacetsModel()
 
     const testItemSubset: CollectionItemSubset = {
       items: testItems,
+      facets: testFacets,
       totalItemCount: testTotalCount
     }
 
@@ -377,7 +383,8 @@ describe('CollectionsRepository', () => {
             createDatasetPreviewPayload(),
             createFilePreviewPayload(),
             createCollectionPreviewPayload()
-          ]
+          ],
+          facets: createCollectionItemsFacetsPayload()
         }
       }
     }

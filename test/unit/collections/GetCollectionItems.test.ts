@@ -5,6 +5,7 @@ import { createDatasetPreviewModel } from '../../testHelpers/datasets/datasetPre
 import { createFilePreviewModel } from '../../testHelpers/files/filePreviewHelper'
 import { CollectionItemSubset } from '../../../src/collections/domain/models/CollectionItemSubset'
 import { createCollectionPreviewModel } from '../../testHelpers/collections/collectionPreviewHelper'
+import { createCollectionItemsFacetsModel } from '../../testHelpers/collections/collectionItemsFacetsHelper'
 
 describe('execute', () => {
   let collectionRepositoryStub: ICollectionsRepository
@@ -16,9 +17,11 @@ describe('execute', () => {
     createCollectionPreviewModel()
   ]
   const testTotalCount = 3
+  const testFacets = createCollectionItemsFacetsModel()
 
   const testItemSubset: CollectionItemSubset = {
     items: testItems,
+    facets: testFacets,
     totalItemCount: testTotalCount
   }
 
