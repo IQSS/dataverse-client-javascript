@@ -449,17 +449,10 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
-        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+        [GetCollectionItemsQueryParams.PER_PAGE]: testLimit.toString(),
+        [GetCollectionItemsQueryParams.START]: testOffset.toString()
       })
-
-      expectedRequestParamsWithPagination.set(
-        GetCollectionItemsQueryParams.PER_PAGE,
-        testLimit.toString()
-      )
-      expectedRequestParamsWithPagination.set(
-        GetCollectionItemsQueryParams.START,
-        testOffset.toString()
-      )
 
       const expectedRequestConfigApiKeyWithPagination = {
         params: expectedRequestParamsWithPagination,
@@ -503,13 +496,9 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
-        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+        [GetCollectionItemsQueryParams.SUBTREE]: testCollectionId
       })
-
-      expectedRequestParamsWithCollectionId.set(
-        GetCollectionItemsQueryParams.SUBTREE,
-        testCollectionId
-      )
 
       const expectedRequestConfigApiKeyWithCollectionId = {
         params: expectedRequestParamsWithCollectionId,
