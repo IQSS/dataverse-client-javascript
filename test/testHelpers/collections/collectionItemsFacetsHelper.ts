@@ -4,22 +4,20 @@ import { CollectionItemsFacetPayload } from '../../../src/collections/infra/repo
 export const createCollectionItemsFacetsModel = (): CollectionItemsFacet[] => {
   return [
     {
-      facet1: {
-        friendly: 'Facet 1',
-        labels: [
-          { name: 'Label 1', count: 5 },
-          { name: 'Label 2', count: 4 }
-        ]
-      }
+      name: 'facet1',
+      friendlyName: 'Facet 1',
+      labels: [
+        { name: 'Label 1', count: 5 },
+        { name: 'Label 2', count: 4 }
+      ]
     },
     {
-      facet2: {
-        friendly: 'Facet 2',
-        labels: [
-          { name: 'Label 3', count: 8 },
-          { name: 'Label 4', count: 9 }
-        ]
-      }
+      name: 'facet2',
+      friendlyName: 'Facet 2',
+      labels: [
+        { name: 'Label 3', count: 8 },
+        { name: 'Label 4', count: 9 }
+      ]
     }
   ]
 }

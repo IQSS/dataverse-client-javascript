@@ -301,63 +301,63 @@ describe('CollectionsRepository', () => {
       //prettier-ignore
       const expectedFacetsAll = [
         {
-          dvCategory: { friendly: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }] }
+          name: 'dvCategory', friendlyName: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }]
         },
         {
-          publicationStatus: { friendly: 'Publication Status', labels: [{ name: 'Unpublished', count: 3 },{ name: 'Draft', count: 2 }] }
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Unpublished', count: 3 },{ name: 'Draft', count: 2 }]
         },
         {
-          authorName_ss: { friendly: 'Author Name', labels: [{ name: 'Admin, Dataverse', count: 1 },{ name: 'Owner, Dataverse', count: 1 }]}
+          name: 'authorName_ss', friendlyName: 'Author Name', labels: [{ name: 'Admin, Dataverse', count: 1 },{ name: 'Owner, Dataverse', count: 1 }]
         },
         {
-          subject_ss: { friendly: 'Subject', labels: [{ name: 'Medicine, Health and Life Sciences', count: 1 }]}
+          name: 'subject_ss', friendlyName: 'Subject', labels: [{ name: 'Medicine, Health and Life Sciences', count: 1 }]
         },
         {
-          fileTypeGroupFacet: { friendly: 'File Type', labels: [{ name: 'Text', count: 1 }] } 
+          name: 'fileTypeGroupFacet', friendlyName: 'File Type', labels: [{ name: 'Text', count: 1 }]
         },
         {
-          fileAccess: { friendly: 'Access', labels: [{ name: 'Public', count: 1 }] }
+          name: 'fileAccess', friendlyName: 'Access', labels: [{ name: 'Public', count: 1 }]
         }
       ]
       //prettier-ignore
       const expectedFacetsFromCollectionOnly = [
         {
-          dvCategory: { friendly: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }] }
+          name: 'dvCategory', friendlyName: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }]
         },
         {
-          publicationStatus: { friendly: 'Publication Status', labels: [{ name: 'Unpublished', count: 1 }]}
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Unpublished', count: 1 }]
         }
       ]
       //prettier-ignore
       const expectedFacetsFromDatasetOnly = [
         {
-          publicationStatus: { friendly: 'Publication Status', labels: [{ name: 'Draft', count: 1 },{ name: 'Unpublished', count: 1 }] }
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Draft', count: 1 },{ name: 'Unpublished', count: 1 }]
         },
         {
-          authorName_ss: { friendly: 'Author Name', labels: [{ name: 'Admin, Dataverse', count: 1 },{ name: 'Owner, Dataverse', count: 1 }] }
+          name: 'authorName_ss', friendlyName: 'Author Name', labels: [{ name: 'Admin, Dataverse', count: 1 },{ name: 'Owner, Dataverse', count: 1 }]
         },
         {
-          subject_ss: { friendly: 'Subject', labels: [{ name: 'Medicine, Health and Life Sciences', count: 1 }] }
+          name: 'subject_ss', friendlyName: 'Subject', labels: [{ name: 'Medicine, Health and Life Sciences', count: 1 }]
         }
       ]
       //prettier-ignore
       const expectedFacetsFromFileOnly = [
         {
-          publicationStatus: { friendly: 'Publication Status', labels: [{ name: 'Draft', count: 1 },{ name: 'Unpublished', count: 1 }] }
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Draft', count: 1 },{ name: 'Unpublished', count: 1 }]
         },
-        { fileTypeGroupFacet: { friendly: 'File Type', labels: [{ name: 'Text', count: 1 }] } },
-        { fileAccess: { friendly: 'Access', labels: [{ name: 'Public', count: 1 }] } }
+        { name: 'fileTypeGroupFacet', friendlyName: 'File Type', labels: [{ name: 'Text', count: 1 }] },
+        { name: 'fileAccess', friendlyName: 'Access', labels: [{ name: 'Public', count: 1 }] }
       ]
       //prettier-ignore
       const expectedFacetsFromCollectionAndFile = [
         {
-          dvCategory: { friendly: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }] }
+          name: 'dvCategory', friendlyName: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }]
         },
         {
-          publicationStatus: { friendly: 'Publication Status', labels: [{ name: 'Unpublished', count: 2 },{ name: 'Draft', count: 1 }] }
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Unpublished', count: 2 },{ name: 'Draft', count: 1 }]
         },
-        { fileTypeGroupFacet: { friendly: 'File Type', labels: [{ name: 'Text', count: 1 }] } },
-        { fileAccess: { friendly: 'Access', labels: [{ name: 'Public', count: 1 }] } }
+        { name: 'fileTypeGroupFacet', friendlyName: 'File Type', labels: [{ name: 'Text', count: 1 }] },
+        { name: 'fileAccess', friendlyName: 'Access', labels: [{ name: 'Public', count: 1 }] }
       ]
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')

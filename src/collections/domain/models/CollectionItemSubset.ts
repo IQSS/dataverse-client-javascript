@@ -9,11 +9,8 @@ export interface CollectionItemSubset {
 }
 
 export interface CollectionItemsFacet {
-  [key: string]: CollectionItemsFacetValue
-}
-
-interface CollectionItemsFacetValue {
-  friendly: string
+  name: string
+  friendlyName: string
   labels: CollectionItemsFacetLabel[]
 }
 

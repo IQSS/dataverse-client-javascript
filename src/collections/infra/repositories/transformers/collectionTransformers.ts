@@ -107,13 +107,12 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
 
   const transformedFacets: CollectionItemsFacet[] = Object.entries(facets[0]).map(
     ([key, facetData]) => ({
-      [key]: {
-        friendly: facetData.friendly,
-        labels: facetData.labels.map((label: Record<string, number>) => {
-          const [name, count] = Object.entries(label)[0]
-          return { name, count }
-        })
-      }
+      name: key,
+      friendlyName: facetData.friendly,
+      labels: facetData.labels.map((label: Record<string, number>) => {
+        const [name, count] = Object.entries(label)[0]
+        return { name, count }
+      })
     })
   )
 
