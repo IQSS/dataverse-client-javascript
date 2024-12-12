@@ -83,7 +83,7 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
 ): CollectionItemSubset => {
   const responseDataPayload = response.data.data
   const itemsPayload = responseDataPayload.items
-  const facets = responseDataPayload.facets as CollectionItemsFacetPayload
+  const facetsPayload = responseDataPayload.facets as CollectionItemsFacetPayload
 
   const items: (DatasetPreview | FilePreview | CollectionPreview)[] = []
 
@@ -105,7 +105,7 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
     }
   })
 
-  const transformedFacets: CollectionItemsFacet[] = Object.entries(facets[0]).map(
+  const facets: CollectionItemsFacet[] = Object.entries(facetsPayload[0]).map(
     ([key, facetData]) => ({
       name: key,
       friendlyName: facetData.friendly,
@@ -117,8 +117,8 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
   )
 
   return {
-    items: items,
-    facets: transformedFacets,
+    items,
+    facets,
     totalItemCount: responseDataPayload.total_count
   }
 }
