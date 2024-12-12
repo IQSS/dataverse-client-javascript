@@ -1,4 +1,7 @@
-import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
+import {
+  CollectionsRepository,
+  GetCollectionItemsQueryParams
+} from '../../../src/collections/infra/repositories/CollectionsRepository'
 import axios from 'axios'
 import {
   ApiConfig,
@@ -32,14 +35,13 @@ import {
   createCollectionPreviewPayload
 } from '../../testHelpers/collections/collectionPreviewHelper'
 import {
-  GetCollectionItemsQueryParams,
-  OrderType,
-  SortType
-} from '../../../src/collections/domain/models/GetCollectionItemsQueryParams'
-import {
   createCollectionItemsFacetsModel,
   createCollectionItemsFacetsPayload
 } from '../../testHelpers/collections/collectionItemsFacetsHelper'
+import {
+  OrderType,
+  SortType
+} from '../../../src/collections/domain/models/CollectionSearchCriteria'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()

@@ -1,5 +1,16 @@
 import { CollectionItemType } from './CollectionItemType'
-import { FilterQuery, OrderType, SortType } from './GetCollectionItemsQueryParams'
+
+export enum SortType {
+  NAME = 'name',
+  DATE = 'date'
+}
+
+export enum OrderType {
+  ASC = 'asc',
+  DESC = 'desc'
+}
+
+export type FilterQuery = `${string}:${string}`
 
 export class CollectionSearchCriteria {
   constructor(
@@ -11,19 +22,43 @@ export class CollectionSearchCriteria {
   ) {}
 
   withSearchText(searchText: string | undefined): CollectionSearchCriteria {
-    return new CollectionSearchCriteria(searchText, this.itemTypes, this.sort, this.order)
+    return new CollectionSearchCriteria(
+      searchText,
+      this.itemTypes,
+      this.sort,
+      this.order,
+      this.filterQueries
+    )
   }
 
   withItemTypes(itemTypes: CollectionItemType[] | undefined): CollectionSearchCriteria {
-    return new CollectionSearchCriteria(this.searchText, itemTypes, this.sort, this.order)
+    return new CollectionSearchCriteria(
+      this.searchText,
+      itemTypes,
+      this.sort,
+      this.order,
+      this.filterQueries
+    )
   }
 
   withSort(sort: SortType | undefined): CollectionSearchCriteria {
-    return new CollectionSearchCriteria(this.searchText, this.itemTypes, sort, this.order)
+    return new CollectionSearchCriteria(
+      this.searchText,
+      this.itemTypes,
+      sort,
+      this.order,
+      this.filterQueries
+    )
   }
 
   withOrder(order: OrderType | undefined): CollectionSearchCriteria {
-    return new CollectionSearchCriteria(this.searchText, this.itemTypes, this.sort, order)
+    return new CollectionSearchCriteria(
+      this.searchText,
+      this.itemTypes,
+      this.sort,
+      order,
+      this.filterQueries
+    )
   }
 
   withFilterQueries(filterQueries: FilterQuery[] | undefined): CollectionSearchCriteria {

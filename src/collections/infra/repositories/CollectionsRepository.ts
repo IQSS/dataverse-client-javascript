@@ -11,13 +11,12 @@ import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
-import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
-import { CollectionItemType } from '../../domain/models/CollectionItemType'
 import {
-  GetCollectionItemsQueryParams,
+  CollectionSearchCriteria,
   OrderType,
   SortType
-} from '../../domain/models/GetCollectionItemsQueryParams'
+} from '../../domain/models/CollectionSearchCriteria'
+import { CollectionItemType } from '../../domain/models/CollectionItemType'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -43,6 +42,18 @@ export interface NewCollectionInputLevelRequestPayload {
   datasetFieldTypeName: string
   include: boolean
   required: boolean
+}
+
+export enum GetCollectionItemsQueryParams {
+  QUERY = 'q',
+  SHOW_FACETS = 'show_facets',
+  SORT = 'sort',
+  ORDER = 'order',
+  SUBTREE = 'subtree',
+  PER_PAGE = 'per_page',
+  START = 'start',
+  TYPE = 'type',
+  FILTERQUERY = 'fq'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {

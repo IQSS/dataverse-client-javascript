@@ -27,7 +27,7 @@ import { CollectionType } from '../../../src/collections/domain/models/Collectio
 import {
   OrderType,
   SortType
-} from '../../../src/collections/domain/models/GetCollectionItemsQueryParams'
+} from '../../../src/collections/domain/models/CollectionSearchCriteria'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
