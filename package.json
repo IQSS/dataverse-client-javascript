@@ -27,8 +27,7 @@
     "format",
     "typecheck",
     "lint:fix",
-    "git:add",
-    "test:coverage:check"
+    "git:add"
   ],
   "repository": {
     "type": "git",
