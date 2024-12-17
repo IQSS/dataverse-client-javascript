@@ -63,6 +63,8 @@ The different use cases currently available in the package are classified below,
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
   - [Get ZIP Download Limit](#get-zip-download-limit)
+- [Contact](#Contact)
+  - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
 
 ## Collections
 
@@ -1363,3 +1365,23 @@ getZipDownloadLimit.execute().then((downloadLimit: number) => {
 ```
 
 _See [use case](../src/info/domain/useCases/GetZipDownloadLimit.ts) implementation_.
+
+##Contact
+
+#### Send Feedback to Object Contacts
+
+Returns a [Contact](../src/contactInfo/domain/models/Contact.ts) object, which contains contact return information, showing toEmail, fromEmail, subject, body.
+
+##### Example call:
+
+```typescript
+import { submitContactInfo } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+submitContactInfo.execute((contact: ContactDTO)).then( => {
+/* ... */
+})
+
+/* ... */
+```
