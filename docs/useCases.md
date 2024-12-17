@@ -1366,7 +1366,7 @@ getZipDownloadLimit.execute().then((downloadLimit: number) => {
 
 _See [use case](../src/info/domain/useCases/GetZipDownloadLimit.ts) implementation_.
 
-##Contact
+## Contact
 
 #### Send Feedback to Object Contacts
 
