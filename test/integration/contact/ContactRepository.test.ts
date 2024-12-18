@@ -33,16 +33,16 @@ describe('submitContactInfo', () => {
       console.error('Error during submission:', error.message, error.response?.data)
       throw error
     }
+  })
 
-    test('should return error if the target id is unexisted', async () => {
-      const invalidContactDTO: ContactDTO = {
-        targetId: 0,
-        subject: '',
-        body: '',
-        fromEmail: ''
-      }
-      const expectedError = new WriteError(`[400] Feedback target object not found`)
-      await expect(sut.submitContactInfo(invalidContactDTO)).rejects.toThrow(expectedError)
-    })
+  test('should return error if the target id is unexisted', async () => {
+    const invalidContactDTO: ContactDTO = {
+      targetId: 0,
+      subject: '',
+      body: '',
+      fromEmail: ''
+    }
+    const expectedError = new WriteError(`[400] Feedback target object not found`)
+    await expect(sut.submitContactInfo(invalidContactDTO)).rejects.toThrow(expectedError)
   })
 })

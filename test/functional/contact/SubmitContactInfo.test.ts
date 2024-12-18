@@ -25,7 +25,6 @@ describe('submitContactInfo', () => {
     let contactInfo
     try {
       contactInfo = await submitContactInfo.execute(contactDTO)
-      console.log('contactInfo:', contactInfo)
     } catch (error) {
       throw new Error('Contact info should be submitted')
     } finally {
