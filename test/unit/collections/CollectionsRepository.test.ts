@@ -1,4 +1,7 @@
-import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
+import {
+  CollectionsRepository,
+  GetCollectionItemsQueryParams
+} from '../../../src/collections/infra/repositories/CollectionsRepository'
 import axios from 'axios'
 import {
   ApiConfig,
@@ -31,6 +34,14 @@ import {
   createCollectionPreviewModel,
   createCollectionPreviewPayload
 } from '../../testHelpers/collections/collectionPreviewHelper'
+import {
+  createCollectionItemsFacetsModel,
+  createCollectionItemsFacetsPayload
+} from '../../testHelpers/collections/collectionItemsFacetsHelper'
+import {
+  OrderType,
+  SortType
+} from '../../../src/collections/domain/models/CollectionSearchCriteria'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -361,9 +372,11 @@ describe('CollectionsRepository', () => {
       createCollectionPreviewModel()
     ]
     const testTotalCount = 2
+    const testFacets = createCollectionItemsFacetsModel()
 
     const testItemSubset: CollectionItemSubset = {
       items: testItems,
+      facets: testFacets,
       totalItemCount: testTotalCount
     }
 
@@ -376,12 +389,13 @@ describe('CollectionsRepository', () => {
             createDatasetPreviewPayload(),
             createFilePreviewPayload(),
             createCollectionPreviewPayload()
-          ]
+          ],
+          facets: createCollectionItemsFacetsPayload()
         }
       }
     }
 
-    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search?sort=date&order=desc`
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/search`
 
     test('should return item previews when response is successful', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue(testItemPreviewsResponse)
@@ -389,9 +403,12 @@ describe('CollectionsRepository', () => {
       // API Key auth
       let actual = await sut.getCollectionItems()
 
-      const expectedRequestParams = {
-        q: '*'
-      }
+      const expectedRequestParams = new URLSearchParams({
+        [GetCollectionItemsQueryParams.QUERY]: '*',
+        [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+        [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
+      })
 
       const expectedRequestConfigApiKey = {
         params: expectedRequestParams,
@@ -430,11 +447,14 @@ describe('CollectionsRepository', () => {
       // API Key auth
       let actual = await sut.getCollectionItems(undefined, testLimit, testOffset)
 
-      const expectedRequestParamsWithPagination = {
-        q: '*',
-        per_page: testLimit,
-        start: testOffset
-      }
+      const expectedRequestParamsWithPagination = new URLSearchParams({
+        [GetCollectionItemsQueryParams.QUERY]: '*',
+        [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+        [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+        [GetCollectionItemsQueryParams.PER_PAGE]: testLimit.toString(),
+        [GetCollectionItemsQueryParams.START]: testOffset.toString()
+      })
 
       const expectedRequestConfigApiKeyWithPagination = {
         params: expectedRequestParamsWithPagination,
@@ -474,10 +494,13 @@ describe('CollectionsRepository', () => {
       // API Key auth
       let actual = await sut.getCollectionItems(testCollectionId, undefined, undefined)
 
-      const expectedRequestParamsWithCollectionId = {
-        q: '*',
-        subtree: testCollectionId
-      }
+      const expectedRequestParamsWithCollectionId = new URLSearchParams({
+        [GetCollectionItemsQueryParams.QUERY]: '*',
+        [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+        [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+        [GetCollectionItemsQueryParams.SUBTREE]: testCollectionId
+      })
 
       const expectedRequestConfigApiKeyWithCollectionId = {
         params: expectedRequestParamsWithCollectionId,
@@ -515,9 +538,12 @@ describe('CollectionsRepository', () => {
       let error = undefined as unknown as ReadError
       await sut.getCollectionItems().catch((e) => (error = e))
 
-      const expectedRequestParams = {
-        q: '*'
-      }
+      const expectedRequestParams = new URLSearchParams({
+        [GetCollectionItemsQueryParams.QUERY]: '*',
+        [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+        [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
+      })
 
       const expectedRequestConfigApiKey = {
         params: expectedRequestParams,

@@ -4,7 +4,7 @@ import { ApiConstants } from './ApiConstants'
 
 export const buildRequestConfig = (
   authRequired: boolean,
-  queryParams: object,
+  queryParams: object | URLSearchParams,
   contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON,
   abortSignal?: AbortSignal
 ): AxiosRequestConfig => {

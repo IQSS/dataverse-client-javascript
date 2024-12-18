@@ -11,7 +11,11 @@ import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
-import { CollectionSearchCriteria } from '../../domain/models/CollectionSearchCriteria'
+import {
+  CollectionSearchCriteria,
+  OrderType,
+  SortType
+} from '../../domain/models/CollectionSearchCriteria'
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
 
 export interface NewCollectionRequestPayload {
@@ -40,12 +44,16 @@ export interface NewCollectionInputLevelRequestPayload {
   required: boolean
 }
 
-export interface GetCollectionItemsQueryParams {
-  q: string
-  subtree?: string
-  per_page?: number
-  start?: number
-  type?: string
+export enum GetCollectionItemsQueryParams {
+  QUERY = 'q',
+  SHOW_FACETS = 'show_facets',
+  SORT = 'sort',
+  ORDER = 'order',
+  SUBTREE = 'subtree',
+  PER_PAGE = 'per_page',
+  START = 'start',
+  TYPE = 'type',
+  FILTERQUERY = 'fq'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -119,37 +127,30 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria
   ): Promise<CollectionItemSubset> {
-    const queryParams: GetCollectionItemsQueryParams = {
-      q: '*'
-    }
+    const queryParams = new URLSearchParams({
+      [GetCollectionItemsQueryParams.QUERY]: '*',
+      [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
+      [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
+      [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
+    })
+
     if (collectionId) {
-      queryParams.subtree = collectionId
+      queryParams.set(GetCollectionItemsQueryParams.SUBTREE, collectionId)
     }
+
     if (limit) {
-      queryParams.per_page = limit
+      queryParams.set(GetCollectionItemsQueryParams.PER_PAGE, limit.toString())
     }
+
     if (offset) {
-      queryParams.start = offset
+      queryParams.set(GetCollectionItemsQueryParams.START, offset.toString())
     }
+
     if (collectionSearchCriteria) {
       this.applyCollectionSearchCriteriaToQueryParams(queryParams, collectionSearchCriteria)
     }
 
-    let url = '/search?sort=date&order=desc'
-
-    if (collectionSearchCriteria?.itemTypes) {
-      const itemTypesQueryString = collectionSearchCriteria.itemTypes
-        .map((itemType: CollectionItemType) => {
-          const mappedItemType =
-            itemType === CollectionItemType.COLLECTION ? 'dataverse' : itemType.toString()
-          return `type=${mappedItemType}`
-        })
-        .join('&')
-
-      url += `&${itemTypesQueryString}`
-    }
-
-    return this.doGet(url, true, queryParams)
+    return this.doGet('/search', true, queryParams)
       .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error
@@ -201,11 +202,42 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   }
 
   private applyCollectionSearchCriteriaToQueryParams(
-    queryParams: GetCollectionItemsQueryParams,
+    queryParams: URLSearchParams,
     collectionSearchCriteria: CollectionSearchCriteria
   ) {
     if (collectionSearchCriteria.searchText) {
-      queryParams.q = encodeURIComponent(collectionSearchCriteria.searchText)
+      queryParams.set(
+        GetCollectionItemsQueryParams.QUERY,
+        encodeURIComponent(collectionSearchCriteria.searchText)
+      )
+    }
+
+    if (collectionSearchCriteria?.itemTypes) {
+      collectionSearchCriteria.itemTypes.forEach((itemType) => {
+        const mappedItemType = itemType === CollectionItemType.COLLECTION ? 'dataverse' : itemType
+
+        queryParams.append(GetCollectionItemsQueryParams.TYPE, mappedItemType)
+      })
+    }
+
+    if (collectionSearchCriteria?.sort) {
+      queryParams.set(GetCollectionItemsQueryParams.SORT, collectionSearchCriteria.sort)
+    }
+
+    if (collectionSearchCriteria?.order) {
+      queryParams.set(GetCollectionItemsQueryParams.ORDER, collectionSearchCriteria.order)
+    }
+
+    if (collectionSearchCriteria?.filterQueries) {
+      collectionSearchCriteria.filterQueries.forEach((filterQuery) => {
+        const [filterQueryKey, filterQueryValue] = filterQuery.split(':')
+
+        const filterQueryValueWithQuotes = `"${filterQueryValue}"`
+
+        const filterQueryToSet = `${filterQueryKey}:${filterQueryValueWithQuotes}`
+
+        queryParams.append(GetCollectionItemsQueryParams.FILTERQUERY, filterQueryToSet)
+      })
     }
   }
 }
