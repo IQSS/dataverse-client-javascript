@@ -22,17 +22,13 @@ describe('submitContactInfo', () => {
   const sut: ContactRepository = new ContactRepository()
 
   test('should return ContactDTO when contact info is successfully submitted', async () => {
-    try {
-      const contactInfo = await sut.submitContactInfo(testContactDTO)
-      expect(contactInfo).toBeDefined()
-      expect(contactInfo[0].fromEmail).toEqual(testContactDTO.fromEmail)
-      expect(contactInfo[0].subject).toEqual(expect.any(String))
-      expect(contactInfo[0].body).toEqual(expect.any(String))
-      expect(contactInfo[0].toEmail).toEqual(expect.any(String))
-    } catch (error) {
-      console.error('Error during submission:', error.message, error.response?.data)
-      throw error
-    }
+    const contactInfo = await sut.submitContactInfo(testContactDTO)
+
+    expect(contactInfo).toBeDefined()
+    expect(contactInfo[0].fromEmail).toEqual(testContactDTO.fromEmail)
+    expect(contactInfo[0].subject).toEqual(expect.any(String))
+    expect(contactInfo[0].body).toEqual(expect.any(String))
+    expect(contactInfo[0].toEmail).toEqual(expect.any(String))
   })
 
   test('should return error if the target id is unexisted', async () => {

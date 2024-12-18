@@ -2,7 +2,7 @@ import { WriteError, Contact, ContactDTO } from '../../../src'
 import { SubmitContactInfo } from '../../../src/contactInfo/domain/useCases/SubmitContactInfo'
 import { IContactRepository } from '../../../src/contactInfo/domain/repositories/IContactRepository'
 
-describe('execute', () => {
+describe('execute submit information to contacts', () => {
   test('should return a ContactDTO when repository call is successful', async () => {
     const fromEmail = '1314@gmail.com'
 

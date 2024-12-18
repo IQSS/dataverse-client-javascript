@@ -9,12 +9,14 @@ export class SubmitContactInfo implements UseCase<Contact[]> {
   constructor(contactRepository: IContactRepository) {
     this.contactRepository = contactRepository
   }
+
   /**
    * Submits contact information and returns a DTO containing the submitted data.
    *
    * @param {ContactDTO} contactDTO - The contact information to be submitted.
    * @returns {Promise<Contact>} A promise resolving to a ContactDTO.
    */
+
   async execute(contactDTO: ContactDTO): Promise<Contact[]> {
     try {
       return await this.contactRepository.submitContactInfo(contactDTO)
