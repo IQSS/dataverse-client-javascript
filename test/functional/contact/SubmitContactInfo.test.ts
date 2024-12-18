@@ -16,7 +16,7 @@ describe('submitContactInfo', () => {
     const fromEmail = '1314@gmail.com'
 
     const contactDTO: ContactDTO = {
-      targetId: 6,
+      targetId: 1,
       subject: subject,
       body: 'Please help me understand your data. Thank you!',
       fromEmail: fromEmail
@@ -31,9 +31,9 @@ describe('submitContactInfo', () => {
     } finally {
       expect(contactInfo).toBeDefined()
       expect(contactInfo[0].fromEmail).toEqual(fromEmail)
-      expect(contactInfo[0].subject).toBeDefined()
-      expect(contactInfo[0].body).toBeDefined()
-      expect(contactInfo[0].toEmail).toBeDefined()
+      expect(contactInfo[0].subject).toEqual(expect.any(String))
+      expect(contactInfo[0].body).toEqual(expect.any(String))
+      expect(contactInfo[0].toEmail).toEqual(expect.any(String))
     }
   })
 

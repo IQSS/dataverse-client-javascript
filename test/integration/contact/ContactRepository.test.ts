@@ -13,7 +13,7 @@ describe('submitContactInfo', () => {
   })
 
   const testContactDTO: ContactDTO = {
-    targetId: 6,
+    targetId: 1,
     subject: 'Data Question',
     body: 'Please help me understand your data. Thank you!',
     fromEmail: '1314@gmail.com'
@@ -22,23 +22,27 @@ describe('submitContactInfo', () => {
   const sut: ContactRepository = new ContactRepository()
 
   test('should return ContactDTO when contact info is successfully submitted', async () => {
-    const contactInfo = await sut.submitContactInfo(testContactDTO)
-
-    expect(contactInfo).toBeDefined()
-    expect(contactInfo[0].fromEmail).toEqual(testContactDTO.fromEmail)
-    expect(contactInfo[0].subject).toBeDefined()
-    expect(contactInfo[0].body).toBeDefined()
-    expect(contactInfo[0].toEmail).toBeDefined()
-  })
-
-  test('should return error if the target id is unexisted', async () => {
-    const invalidContactDTO: ContactDTO = {
-      targetId: 0,
-      subject: '',
-      body: '',
-      fromEmail: ''
+    try {
+      const contactInfo = await sut.submitContactInfo(testContactDTO)
+      expect(contactInfo).toBeDefined()
+      expect(contactInfo[0].fromEmail).toEqual(testContactDTO.fromEmail)
+      expect(contactInfo[0].subject).toEqual(expect.any(String))
+      expect(contactInfo[0].body).toEqual(expect.any(String))
+      expect(contactInfo[0].toEmail).toEqual(expect.any(String))
+    } catch (error) {
+      console.error('Error during submission:', error.message, error.response?.data)
+      throw error
     }
-    const expectedError = new WriteError(`[400] Feedback target object not found`)
-    await expect(sut.submitContactInfo(invalidContactDTO)).rejects.toThrow(expectedError)
+
+    test('should return error if the target id is unexisted', async () => {
+      const invalidContactDTO: ContactDTO = {
+        targetId: 0,
+        subject: '',
+        body: '',
+        fromEmail: ''
+      }
+      const expectedError = new WriteError(`[400] Feedback target object not found`)
+      await expect(sut.submitContactInfo(invalidContactDTO)).rejects.toThrow(expectedError)
+    })
   })
 })
