@@ -81,10 +81,10 @@ const transformFilePayloadToFile = (filePayload: FilePayload): FileModel => {
     ...(filePayload.dataFile.fileMetadataId && { metadataId: filePayload.dataFile.fileMetadataId }),
     ...(filePayload.dataFile.tabularTags && { tabularTags: filePayload.dataFile.tabularTags }),
     ...(filePayload.dataFile.creationDate && {
-      creationDate: new Date(filePayload.dataFile.creationDate)
+      creationDate: filePayload.dataFile.creationDate
     }),
     ...(filePayload.dataFile.publicationDate && {
-      publicationDate: new Date(filePayload.dataFile.publicationDate)
+      publicationDate: filePayload.dataFile.publicationDate
     }),
     deleted: filePayload.dataFile.deleted,
     tabularData: filePayload.dataFile.tabularData,
