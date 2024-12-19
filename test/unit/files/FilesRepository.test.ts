@@ -432,9 +432,9 @@ describe('FilesRepository', () => {
     }
     const expectedRequestConfigSessionCookie = {
       params: { includeDeaccessioned: testIncludeDeaccessioned },
+      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
       withCredentials:
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
-      headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials
     }
 
     const expectedRequestParamsWithOptional = {

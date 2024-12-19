@@ -4,6 +4,8 @@ export class TestConstants {
   static readonly TEST_API_URL = 'http://localhost:8080/api/v1'
   static readonly TEST_DUMMY_API_KEY = 'dummyApiKey'
   static readonly TEST_DUMMY_PERSISTENT_ID = 'doi:11.1111/AA1/AA1AAA'
+  static readonly TEST_BEARER_TOKEN_LOCAL_STORAGE_KEY = 'DV_TOKEN'
+  static readonly TEST_DUMMY_BEARER_TOKEN = '123456.abcdef.123456'
   static readonly TEST_ERROR_RESPONSE = {
     response: {
       status: 'ERROR',
@@ -25,11 +27,11 @@ export class TestConstants {
     }
   }
   static readonly TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE = {
-    withCredentials: true,
     params: {},
     headers: {
       'Content-Type': 'application/json'
-    }
+    },
+    withCredentials: true
   }
   static readonly TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE_INCLUDE_DEACCESSIONED =
     {
@@ -45,6 +47,14 @@ export class TestConstants {
       'Content-Type': 'application/json'
     }
   }
+  static readonly TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_BEARER_TOKEN = {
+    params: {},
+    headers: {
+      Authorization: `Bearer ${TestConstants.TEST_DUMMY_BEARER_TOKEN}`,
+      'Content-Type': 'application/json'
+    }
+  }
+
   static readonly TEST_DUMMY_COLLECTION_ID = 10001
   static readonly TEST_DUMMY_COLLECTION_ALIAS = 'dummyCollectionId'
   static readonly TEST_NEW_DATASET_DTO: DatasetDTO = {
