@@ -27,8 +27,7 @@ export const createFilePreviewModel = (): FilePreview => {
     publicationStatuses: [PublicationStatus.Published],
     releaseOrCreateDate: new Date('2023-05-15T08:21:01Z'),
     canDownloadFile: true,
-    restricted: false,
-    categories: []
+    restricted: false
   }
   return filePreviewModel
 }
@@ -58,7 +57,6 @@ export const createFilePreviewPayload = (): FilePreviewPayload => {
     publicationStatuses: ['Published'],
     releaseOrCreateDate: '2023-05-15T08:21:01Z',
     canDownloadFile: true,
-    restricted: false,
-    categories: []
+    restricted: false
   }
 }

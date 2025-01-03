@@ -39,7 +39,7 @@ export const transformFilePreviewPayloadToFilePreview = (
     releaseOrCreateDate: new Date(filePreviewPayload.releaseOrCreateDate),
     restricted: filePreviewPayload.restricted,
     canDownloadFile: filePreviewPayload.canDownloadFile,
-    categories: filePreviewPayload.categories,
+    ...(filePreviewPayload.categories && { categories: filePreviewPayload.categories }),
     ...(filePreviewPayload.tabularTags && {
       tabularTags: filePreviewPayload.tabularTags
     }),

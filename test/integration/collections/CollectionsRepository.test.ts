@@ -293,7 +293,7 @@ describe('CollectionsRepository', () => {
 
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
       const expectedDatasetCitationFragment =
-        'Admin, Dataverse; Owner, Dataverse, 2024, "Dataset created using the createDataset use case'
+        'Admin, Dataverse; Owner, Dataverse, 2025, "Dataset created using the createDataset use case'
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-1.txt'
       const expectedCollectionsName = 'Scientific Research'
@@ -378,6 +378,8 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.url).not.toBeUndefined()
       expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
       expect(actualFilePreview.type).toBe(CollectionItemType.FILE)
+      expect(actualFilePreview.restricted).toBe(false)
+      expect(actualFilePreview.canDownloadFile).toBe(true)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
       expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)

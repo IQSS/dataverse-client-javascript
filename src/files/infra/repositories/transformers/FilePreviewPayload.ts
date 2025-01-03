@@ -21,7 +21,7 @@ export interface FilePreviewPayload {
   releaseOrCreateDate: string
   restricted: boolean
   canDownloadFile: boolean
-  categories: string[]
+  categories?: string[]
   tabularTags?: string[]
   variables?: number
   observations?: number
