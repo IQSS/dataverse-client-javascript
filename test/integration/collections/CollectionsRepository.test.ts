@@ -28,6 +28,11 @@ import {
   OrderType,
   SortType
 } from '../../../src/collections/domain/models/CollectionSearchCriteria'
+import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
+import {
+  createCollectionFeaturedItemViaApi,
+  deleteCollectionFeaturedItemViaApi
+} from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -293,7 +298,7 @@ describe('CollectionsRepository', () => {
 
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
       const expectedDatasetCitationFragment =
-        'Admin, Dataverse; Owner, Dataverse, 2024, "Dataset created using the createDataset use case'
+        'Admin, Dataverse; Owner, Dataverse, 2025, "Dataset created using the createDataset use case'
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-1.txt'
       const expectedCollectionsName = 'Scientific Research'
@@ -718,6 +723,66 @@ describe('CollectionsRepository', () => {
           createCollectionDTO(testCollectionAlias)
         )
       ).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('getCollectionFeaturedItems', () => {
+    let tetFeaturedItemId: number
+
+    beforeAll(async () => {
+      try {
+        const featuredItemCreated = await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content</p>',
+          displayOrder: 1,
+          withFile: true,
+          fileName: 'featured-item-test-image.png'
+        })
+
+        tetFeaturedItemId = featuredItemCreated.id
+      } catch (error) {
+        throw new Error(`Error while creating collection featured item in ${testCollectionAlias}`)
+      }
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteCollectionFeaturedItemViaApi(tetFeaturedItemId)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting test dataset with id ${tetFeaturedItemId}`
+        )
+      }
+    })
+
+    test('should return empty featured items array given a valid collection alias when collection has no featured items', async () => {
+      const featuredItemsResponse = await sut.getCollectionFeaturedItems(ROOT_COLLECTION_ID)
+
+      expect(featuredItemsResponse).toStrictEqual([])
+    })
+
+    test('should return featured items array given a valid collection alias when collection has featured items', async () => {
+      const featuredItemsResponse = await sut.getCollectionFeaturedItems(testCollectionAlias)
+      console.log({ featuredItemsResponse })
+
+      expect(featuredItemsResponse.length).toBe(1)
+      expect(featuredItemsResponse[0].id).toBe(tetFeaturedItemId)
+      expect(featuredItemsResponse[0].displayOrder).toBe(1)
+      expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
+      expect(featuredItemsResponse[0].imageFileUrl).toBe(
+        'http://localhost:8080/api/access/dataverseFeatureItemImage/1'
+      )
+      expect(featuredItemsResponse[0].imageFileName).toBe('featured-item-test-image.png')
+    })
+
+    test('should return error when collection does not exist', async () => {
+      const invalidCollectionAlias = 'invalid-collection-alias'
+      const expectedError = new ReadError(
+        `[404] Can't find dataverse with identifier='${invalidCollectionAlias}'`
+      )
+
+      await expect(sut.getCollectionFeaturedItems(invalidCollectionAlias)).rejects.toThrow(
+        expectedError
+      )
     })
   })
 })
