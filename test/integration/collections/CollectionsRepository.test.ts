@@ -727,7 +727,7 @@ describe('CollectionsRepository', () => {
   })
 
   describe('getCollectionFeaturedItems', () => {
-    let tetFeaturedItemId: number
+    let testFeaturedItemId: number
 
     beforeAll(async () => {
       try {
@@ -738,7 +738,7 @@ describe('CollectionsRepository', () => {
           fileName: 'featured-item-test-image.png'
         })
 
-        tetFeaturedItemId = featuredItemCreated.id
+        testFeaturedItemId = featuredItemCreated.id
       } catch (error) {
         throw new Error(`Error while creating collection featured item in ${testCollectionAlias}`)
       }
@@ -746,10 +746,10 @@ describe('CollectionsRepository', () => {
 
     afterAll(async () => {
       try {
-        await deleteCollectionFeaturedItemViaApi(tetFeaturedItemId)
+        await deleteCollectionFeaturedItemViaApi(testFeaturedItemId)
       } catch (error) {
         throw new Error(
-          `Tests afterAll(): Error while deleting test dataset with id ${tetFeaturedItemId}`
+          `Tests afterAll(): Error while deleting featured item with id ${testFeaturedItemId}`
         )
       }
     })
@@ -765,7 +765,7 @@ describe('CollectionsRepository', () => {
       console.log({ featuredItemsResponse })
 
       expect(featuredItemsResponse.length).toBe(1)
-      expect(featuredItemsResponse[0].id).toBe(tetFeaturedItemId)
+      expect(featuredItemsResponse[0].id).toBe(testFeaturedItemId)
       expect(featuredItemsResponse[0].displayOrder).toBe(1)
       expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
       expect(featuredItemsResponse[0].imageFileUrl).toBe(
