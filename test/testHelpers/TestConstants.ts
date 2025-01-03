@@ -89,8 +89,7 @@ export class TestConstants {
               dsDescriptionValue: 'This is the description of the dataset.'
             }
           ],
-          subject: ['Medicine, Health and Life Sciences'],
-          imageUrl: 'http://dataverse.com'
+          subject: ['Medicine, Health and Life Sciences']
         }
       }
     ]
