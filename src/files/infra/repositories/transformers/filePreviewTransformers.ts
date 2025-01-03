@@ -36,6 +36,14 @@ export const transformFilePreviewPayloadToFilePreview = (
     datasetPersistentId: filePreviewPayload.dataset_persistent_id,
     datasetCitation: filePreviewPayload.dataset_citation,
     publicationStatuses: publicationStatuses,
-    releaseOrCreateDate: new Date(filePreviewPayload.releaseOrCreateDate)
+    releaseOrCreateDate: new Date(filePreviewPayload.releaseOrCreateDate),
+    restricted: filePreviewPayload.restricted,
+    canDownloadFile: filePreviewPayload.canDownloadFile,
+    categories: filePreviewPayload.categories,
+    ...(filePreviewPayload.tabularTags && {
+      tabularTags: filePreviewPayload.tabularTags
+    }),
+    ...(filePreviewPayload.variables && { variables: filePreviewPayload.variables }),
+    ...(filePreviewPayload.observations && { observations: filePreviewPayload.observations })
   }
 }

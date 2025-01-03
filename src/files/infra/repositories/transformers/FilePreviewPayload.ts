@@ -19,6 +19,12 @@ export interface FilePreviewPayload {
   dataset_citation: string
   publicationStatuses: string[]
   releaseOrCreateDate: string
+  restricted: boolean
+  canDownloadFile: boolean
+  categories: string[]
+  tabularTags?: string[]
+  variables?: number
+  observations?: number
 }
 
 export interface FilePreviewChecksumPayload {
