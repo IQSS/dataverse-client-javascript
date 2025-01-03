@@ -399,6 +399,7 @@ describe('CollectionsRepository', () => {
       )
       expect(actualDatasetPreview.parentCollectionName).toBe(expectedCollectionsName)
       expect(actualDatasetPreview.type).toBe(CollectionItemType.DATASET)
+      expect(actualDatasetPreview.imageUrl).toBe('http://dataverse.com')
 
       expect(actualCollectionPreview.name).toBe(expectedCollectionsName)
       expect(actualCollectionPreview.alias).toBe(testSubCollectionAlias)

@@ -29,7 +29,8 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
     description: 'test',
     publicationStatuses: [PublicationStatus.Draft, PublicationStatus.Unpublished],
     parentCollectionAlias: 'parentCollection',
-    parentCollectionName: 'Parent Collection'
+    parentCollectionName: 'Parent Collection',
+    imageUrl: 'http://dataverse.com'
   }
   return datasetPreviewModel
 }
@@ -50,6 +51,7 @@ export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
     type: 'dataset',
     publicationStatuses: ['Draft', 'Unpublished'],
     identifier_of_dataverse: 'parentCollection',
-    name_of_dataverse: 'Parent Collection'
+    name_of_dataverse: 'Parent Collection',
+    image_url: 'http://dataverse.com'
   }
 }
