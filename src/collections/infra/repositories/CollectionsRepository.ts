@@ -17,6 +17,8 @@ import {
   SortType
 } from '../../domain/models/CollectionSearchCriteria'
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
+import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedItem'
+import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -239,5 +241,17 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         queryParams.append(GetCollectionItemsQueryParams.FILTERQUERY, filterQueryToSet)
       })
     }
+  }
+
+  public async getCollectionFeaturedItems(
+    collectionIdOrAlias: number | string
+  ): Promise<CollectionFeaturedItem[]> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`, true)
+      .then((response) =>
+        transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems(response.data.data)
+      )
+      .catch((error) => {
+        throw error
+      })
   }
 }
