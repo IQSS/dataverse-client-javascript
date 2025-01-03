@@ -15,7 +15,7 @@ export class GetCollectionFeaturedItems implements UseCase<CollectionFeaturedIte
    *
    * @param {number | string} [collectionIdOrAlias = ':root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
    * If this parameter is not set, the default value is: ':root'
-   * @returns {Promise<CollectionFeaturedItem>}
+   * @returns {Promise<CollectionFeaturedItem[]>}
    */
   async execute(
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
