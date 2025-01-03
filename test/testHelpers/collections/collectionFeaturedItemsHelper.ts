@@ -3,6 +3,7 @@ import { File, Blob } from '@web-std/file'
 import { CollectionFeaturedItem } from '../../../src/collections/domain/models/CollectionFeaturedItem'
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
 import { TestConstants } from '../TestConstants'
+import { CollectionFeaturedItemPayload } from '../../../src/collections/infra/repositories/transformers/CollectionFeaturedItemPayload'
 
 interface CreateCollectionFeaturedItemData {
   content: string
@@ -60,6 +61,44 @@ export async function deleteCollectionFeaturedItemViaApi(featuredItemId: number)
   } catch (error) {
     throw new Error(`Error while deleting collection featured item with id ${featuredItemId}`)
   }
+}
+
+export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] => {
+  return [
+    {
+      id: 1,
+      content: 'This is a featured item',
+      displayOrder: 1,
+      imageFileName: 'test-image.png',
+      imageFileUrl: 'http://localhost:8080/api/access/dataverseFeatureItemImage/1'
+    },
+    {
+      id: 2,
+      content: 'This is another featured item',
+      displayOrder: 2,
+      imageFileName: undefined,
+      imageFileUrl: undefined
+    }
+  ]
+}
+
+export const createCollectionFeaturedItemsPayload = (): CollectionFeaturedItemPayload[] => {
+  return [
+    {
+      id: 1,
+      content: 'This is a featured item',
+      displayOrder: 1,
+      imageFileName: 'test-image.png',
+      imageFileUrl: 'http://localhost:8080/api/access/dataverseFeatureItemImage/1'
+    },
+    {
+      id: 2,
+      content: 'This is another featured item',
+      displayOrder: 2,
+      imageFileName: null,
+      imageFileUrl: null
+    }
+  ]
 }
 
 export function createImageFile(fileName = 'test-image.png'): File {

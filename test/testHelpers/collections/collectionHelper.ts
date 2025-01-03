@@ -8,6 +8,8 @@ import { NewCollectionRequestPayload } from '../../../src/collections/infra/repo
 import { CollectionFacetPayload } from '../../../src/collections/infra/repositories/transformers/CollectionFacetPayload'
 import { CollectionType } from '../../../src/collections/domain/models/CollectionType'
 
+export const ROOT_COLLECTION_ALIAS = 'root'
+
 const COLLECTION_ID = 11111
 const COLLECTION_IS_RELEASED = true
 const COLLECTION_ALIAS_STR = 'secondCollection'
@@ -205,4 +207,3 @@ export const createCollectionFacetRequestPayload = (): CollectionFacetPayload =>
     displayName: 'testDisplayName'
   }
 }
-export const ROOT_COLLECTION_ALIAS = 'root'
