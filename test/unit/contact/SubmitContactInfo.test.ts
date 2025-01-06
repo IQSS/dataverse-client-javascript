@@ -3,7 +3,7 @@ import { SubmitContactInfo } from '../../../src/contactInfo/domain/useCases/Subm
 import { IContactRepository } from '../../../src/contactInfo/domain/repositories/IContactRepository'
 
 describe('execute submit information to contacts', () => {
-  test('should return a ContactDTO when repository call is successful', async () => {
+  test('should return a Contact when repository call is successful', async () => {
     const fromEmail = '1314@gmail.com'
 
     const contactDTO: ContactDTO = {

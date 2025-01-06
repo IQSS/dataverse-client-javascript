@@ -11,17 +11,13 @@ export class SubmitContactInfo implements UseCase<Contact[]> {
   }
 
   /**
-   * Submits contact information and returns a DTO containing the submitted data.
+   * Submits contact information and returns a Contact model containing the submitted data.
    *
    * @param {ContactDTO} contactDTO - The contact information to be submitted.
-   * @returns {Promise<Contact>} A promise resolving to a ContactDTO.
+   * @returns {Promise<Contact[]>} A promise resolving to a ContactDTO.
    */
 
   async execute(contactDTO: ContactDTO): Promise<Contact[]> {
-    try {
-      return await this.contactRepository.submitContactInfo(contactDTO)
-    } catch (error) {
-      throw new Error(`${error.message}`)
-    }
+    return await this.contactRepository.submitContactInfo(contactDTO)
   }
 }

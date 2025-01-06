@@ -21,7 +21,7 @@ describe('submitContactInfo', () => {
 
   const sut: ContactRepository = new ContactRepository()
 
-  test('should return ContactDTO when contact info is successfully submitted', async () => {
+  test('should return Contact when contact info is successfully submitted', async () => {
     const contactInfo = await sut.submitContactInfo(testContactDTO)
 
     expect(contactInfo).toBeDefined()
