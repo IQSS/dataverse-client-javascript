@@ -1,4 +1,5 @@
 import { CollectionDTO } from '../dtos/CollectionDTO'
+import { CollectionFeaturedItemsDTO } from '../dtos/CollectionFeaturedItemsDTO'
 import { Collection } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
 import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
@@ -29,5 +30,9 @@ export interface ICollectionsRepository {
   ): Promise<void>
   getCollectionFeaturedItems(
     collectionIdOrAlias: number | string
+  ): Promise<CollectionFeaturedItem[]>
+  updateCollectionFeaturedItems(
+    collectionIdOrAlias: number | string,
+    featuredItemDTOs: CollectionFeaturedItemsDTO
   ): Promise<CollectionFeaturedItem[]>
 }

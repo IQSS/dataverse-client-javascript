@@ -7,6 +7,7 @@ import { PublishCollection } from './domain/useCases/PublishCollection'
 import { UpdateCollection } from './domain/useCases/UpdateCollection'
 import { GetCollectionFeaturedItems } from './domain/useCases/GetCollectionFeaturedItems'
 import { CollectionsRepository } from './infra/repositories/CollectionsRepository'
+import { UpdateCollectionFeaturedItems } from './domain/useCases/UpdateCollectionFeaturedItems'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -18,6 +19,7 @@ const getCollectionItems = new GetCollectionItems(collectionsRepository)
 const publishCollection = new PublishCollection(collectionsRepository)
 const updateCollection = new UpdateCollection(collectionsRepository)
 const getCollectionFeaturedItems = new GetCollectionFeaturedItems(collectionsRepository)
+const updateCollectionFeaturedItems = new UpdateCollectionFeaturedItems(collectionsRepository)
 
 export {
   getCollection,
@@ -27,7 +29,8 @@ export {
   getCollectionItems,
   publishCollection,
   updateCollection,
-  getCollectionFeaturedItems
+  getCollectionFeaturedItems,
+  updateCollectionFeaturedItems
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'
@@ -37,3 +40,4 @@ export { CollectionPreview } from './domain/models/CollectionPreview'
 export { CollectionItemType } from './domain/models/CollectionItemType'
 export { CollectionSearchCriteria } from './domain/models/CollectionSearchCriteria'
 export { CollectionFeaturedItem } from './domain/models/CollectionFeaturedItem'
+export { CollectionFeaturedItemsDTO } from './domain/dtos/CollectionFeaturedItemsDTO'

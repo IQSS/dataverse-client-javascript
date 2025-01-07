@@ -19,6 +19,8 @@ import {
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
 import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedItem'
 import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
+import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
+import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -253,5 +255,48 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       .catch((error) => {
         throw error
       })
+  }
+
+  public async updateCollectionFeaturedItems(
+    collectionIdOrAlias: number | string,
+    featuredItemsDTO: CollectionFeaturedItemsDTO
+  ): Promise<CollectionFeaturedItem[]> {
+    const featuredItemsFormData =
+      this.defineUpdateCollectionFeaturedItemsRequestBody(featuredItemsDTO)
+
+    return this.doPut(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`,
+      featuredItemsFormData,
+      undefined,
+      ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
+    )
+      .then((response) =>
+        transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems(response.data.data)
+      )
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  private defineUpdateCollectionFeaturedItemsRequestBody(
+    featuredItemsDTO: CollectionFeaturedItemsDTO
+  ): FormData {
+    const formData = new FormData()
+
+    featuredItemsDTO.forEach((item) => {
+      const { id, content, displayOrder, file, keepFile } = item
+
+      // TODO: We need to configure this project to use strict typescript rules or at least strictNullChecks: true
+      // id is inferred here as number but it should be a number | undefined, same for file
+      // This config change should be done in a separate issue because it will require changes in some other ts files
+
+      formData.append(`items[${item.displayOrder}][id]`, id ? id.toString() : '0')
+      formData.append(`items[${item.displayOrder}][displayOrder]`, displayOrder.toString())
+      formData.append(`items[${item.displayOrder}][content]`, content)
+      formData.append(`items[${item.displayOrder}][file]`, file ? file : 'false')
+      formData.append(`items[${item.displayOrder}][keepFile]`, keepFile.toString())
+    })
+
+    return formData
   }
 }

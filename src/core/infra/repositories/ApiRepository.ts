@@ -30,9 +30,10 @@ export abstract class ApiRepository {
   public async doPut(
     apiEndpoint: string,
     data: string | object,
-    queryParams: object = {}
+    queryParams: object = {},
+    contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
   ): Promise<AxiosResponse> {
-    return await this.doRequest('put', apiEndpoint, data, queryParams)
+    return await this.doRequest('put', apiEndpoint, data, queryParams, contentType)
   }
 
   public async doDelete(apiEndpoint: string, queryParams: object = {}): Promise<AxiosResponse> {
