@@ -292,8 +292,7 @@ describe('CollectionsRepository', () => {
       const actualCollectionPreview = actual.items[2] as CollectionPreview
 
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
-      const expectedDatasetCitationFragment =
-        'Admin, Dataverse; Owner, Dataverse, 2024, "Dataset created using the createDataset use case'
+      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${new Date().getFullYear()}, "Dataset created using the createDataset use case`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-1.txt'
       const expectedCollectionsName = 'Scientific Research'
