@@ -8,7 +8,7 @@ export const buildRequestConfig = (
   contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON,
   abortSignal?: AbortSignal
 ): AxiosRequestConfig => {
-  const requestConfig: AxiosRequestConfig = {
+  const requestConfig: AxiosRequestConfig & { headers: Record<string, unknown> } = {
     params: queryParams,
     headers: {
       'Content-Type': contentType

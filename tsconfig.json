@@ -12,7 +12,8 @@
     "target": "es2015",
     "outDir": "./dist",
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "strictNullChecks": true
   },
   "include": ["src/**/*"],
   "exclude": [

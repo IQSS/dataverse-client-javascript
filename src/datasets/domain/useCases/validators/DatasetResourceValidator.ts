@@ -17,9 +17,10 @@ export class DatasetResourceValidator implements ResourceValidator {
     metadataBlocks: MetadataBlock[]
   ) {
     const metadataBlockName = metadataBlockValues.name
-    const metadataBlock: MetadataBlock = metadataBlocks.find(
+    const metadataBlock = metadataBlocks.find(
       (metadataBlock) => metadataBlock.name === metadataBlockName
-    )
+    ) as MetadataBlock
+
     for (const metadataFieldKey of Object.keys(metadataBlock.metadataFields)) {
       this.metadataFieldValidator.validate({
         metadataFieldInfo: metadataBlock.metadataFields[metadataFieldKey],
