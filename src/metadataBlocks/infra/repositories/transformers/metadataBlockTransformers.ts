@@ -64,15 +64,19 @@ const transformMetadataBlockPayloadToMetadataBlock = (
 
 const getChildFieldKeys = (metadataBlockFieldsPayload: Record<string, unknown>): Set<string> => {
   const childFieldKeys = new Set<string>()
-  Object.values(metadataBlockFieldsPayload).forEach(
-    (fieldInfo: { childFields?: Record<string, unknown> }) => {
-      if (fieldInfo.childFields) {
-        Object.keys(fieldInfo.childFields).forEach((childKey) => {
-          childFieldKeys.add(childKey)
-        })
-      }
+  Object.values(metadataBlockFieldsPayload).forEach((fieldInfo) => {
+    if (
+      fieldInfo &&
+      typeof fieldInfo === 'object' &&
+      'childFields' in fieldInfo &&
+      typeof fieldInfo.childFields === 'object' &&
+      (fieldInfo?.childFields as Record<string, unknown>)
+    ) {
+      Object.keys(fieldInfo.childFields as Record<string, unknown>).forEach((childKey) => {
+        childFieldKeys.add(childKey)
+      })
     }
-  )
+  })
   return childFieldKeys
 }
 
