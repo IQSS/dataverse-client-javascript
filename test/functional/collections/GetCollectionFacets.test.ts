@@ -27,7 +27,7 @@ describe('execute', () => {
 
   test('should throw an error when collection does not exist', async () => {
     expect.assertions(2)
-    let readError: ReadError
+    let readError: ReadError | undefined = undefined
     try {
       await getCollectionFacets.execute(TestConstants.TEST_DUMMY_COLLECTION_ID)
       throw new Error('Use case should throw an error')
@@ -35,7 +35,7 @@ describe('execute', () => {
       readError = error
     } finally {
       expect(readError).toBeInstanceOf(ReadError)
-      expect(readError.message).toEqual(
+      expect(readError?.message).toEqual(
         `There was an error when reading the resource. Reason was: [404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
       )
     }

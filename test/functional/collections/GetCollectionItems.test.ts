@@ -15,7 +15,6 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
-import { CollectionItemSubset } from '../../../src/collections/domain/models/CollectionItemSubset'
 
 describe('execute', () => {
   const testCollectionAlias = 'collectionsRepositoryFunctionalTestCollection'
@@ -59,12 +58,9 @@ describe('execute', () => {
     // Give enough time to Solr for indexing
     await new Promise((resolve) => setTimeout(resolve, 5000))
 
-    let actual: CollectionItemSubset
     try {
-      actual = await getCollectionItems.execute(testCollectionAlias)
-    } catch (error) {
-      throw new Error('Item subset should be retrieved')
-    } finally {
+      const actual = await getCollectionItems.execute(testCollectionAlias)
+
       const actualFilePreview = actual.items[0] as FilePreview
       const actualDatasetPreview = actual.items[1] as DatasetPreview
 
@@ -72,12 +68,14 @@ describe('execute', () => {
       expect(actualDatasetPreview.title).toBe('Dataset created using the createDataset use case')
 
       expect(actual.totalItemCount).toBe(2)
+    } catch (error) {
+      throw new Error('Item subset should be retrieved')
     }
   })
 
   test('should throw an error when collection does not exist', async () => {
     expect.assertions(2)
-    let readError: ReadError
+    let readError: ReadError | undefined = undefined
     try {
       await getCollectionItems.execute(TestConstants.TEST_DUMMY_COLLECTION_ALIAS)
       throw new Error('Use case should throw an error')
@@ -85,7 +83,7 @@ describe('execute', () => {
       readError = error
     } finally {
       expect(readError).toBeInstanceOf(ReadError)
-      expect(readError.message).toEqual(
+      expect(readError?.message).toEqual(
         `There was an error when reading the resource. Reason was: [400] Could not find dataverse with alias ${TestConstants.TEST_DUMMY_COLLECTION_ALIAS}`
       )
     }

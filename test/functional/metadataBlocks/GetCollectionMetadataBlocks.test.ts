@@ -12,21 +12,21 @@ describe('execute', () => {
   })
 
   test('should successfully return collection metadatablocks when collection exists', async () => {
-    let collectionMetadataBlocks: MetadataBlock[] = null
+    let collectionMetadataBlocks: MetadataBlock[] | null = null
     try {
       collectionMetadataBlocks = await getCollectionMetadataBlocks.execute('root')
     } catch (error) {
       throw new Error('Should not raise an error')
     } finally {
       expect(collectionMetadataBlocks).not.toBeNull()
-      expect(collectionMetadataBlocks.length).toBe(1)
-      expect(collectionMetadataBlocks[0].metadataFields.title.name).toBe('title')
+      expect(collectionMetadataBlocks?.length).toBe(1)
+      expect(collectionMetadataBlocks?.[0].metadataFields.title.name).toBe('title')
     }
   })
 
   test('should throw an error when a collection is not found', async () => {
     expect.assertions(2)
-    let readError: ReadError
+    let readError: ReadError | undefined = undefined
     try {
       await getCollectionMetadataBlocks.execute('notFoundCollectionAlias')
       throw new Error('Use case should throw an error')
@@ -34,7 +34,7 @@ describe('execute', () => {
       readError = error
     } finally {
       expect(readError).toBeInstanceOf(ReadError)
-      expect(readError.message).toEqual(
+      expect(readError?.message).toEqual(
         `There was an error when reading the resource. Reason was: [404] Can't find dataverse with identifier='notFoundCollectionAlias'`
       )
     }
