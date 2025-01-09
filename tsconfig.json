@@ -13,7 +13,7 @@
     "outDir": "./dist",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "strictNullChecks": true
+    "strict": true
   },
   "include": ["src/**/*"],
   "exclude": [
