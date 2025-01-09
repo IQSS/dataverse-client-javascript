@@ -261,7 +261,7 @@ describe('FilesRepository', () => {
       offset: testOffset,
       orderCriteria: testFileOrderCriteria,
       contentType: testFileCriteria.contentType,
-      accessStatus: testFileCriteria.accessStatus.toString(),
+      accessStatus: testFileCriteria.accessStatus?.toString(),
       categoryName: testFileCriteria.categoryName,
       tabularTagName: testFileCriteria.tabularTagName
     }
@@ -330,7 +330,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getDatasetFiles(
             testDatasetId,
@@ -402,7 +402,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getDatasetFiles(
             TestConstants.TEST_DUMMY_PERSISTENT_ID,
@@ -440,7 +440,7 @@ describe('FilesRepository', () => {
     const expectedRequestParamsWithOptional = {
       includeDeaccessioned: testIncludeDeaccessioned,
       contentType: testFileCriteria.contentType,
-      accessStatus: testFileCriteria.accessStatus.toString(),
+      accessStatus: testFileCriteria.accessStatus?.toString(),
       categoryName: testFileCriteria.categoryName,
       tabularTagName: testFileCriteria.tabularTagName
     }
@@ -504,7 +504,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getDatasetFileCounts(testDatasetId, testDatasetVersionId, testIncludeDeaccessioned)
           .catch((e) => (error = e))
@@ -549,7 +549,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getDatasetFileCounts(
             TestConstants.TEST_DUMMY_PERSISTENT_ID,
@@ -595,7 +595,7 @@ describe('FilesRepository', () => {
         mode: FileDownloadSizeMode.ARCHIVAL.toString(),
         includeDeaccessioned: testIncludeDeaccessioned,
         contentType: testFileCriteria.contentType,
-        accessStatus: testFileCriteria.accessStatus.toString(),
+        accessStatus: testFileCriteria.accessStatus?.toString(),
         categoryName: testFileCriteria.categoryName,
         tabularTagName: testFileCriteria.tabularTagName
       },
@@ -656,7 +656,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getDatasetFilesTotalDownloadSize(
             testDatasetId,
@@ -708,7 +708,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getDatasetFilesTotalDownloadSize(
             TestConstants.TEST_DUMMY_PERSISTENT_ID,
@@ -765,7 +765,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut.getFileDownloadCount(testFile.id).catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -806,7 +806,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getFileDownloadCount(TestConstants.TEST_DUMMY_PERSISTENT_ID)
           .catch((e) => (error = e))
@@ -859,7 +859,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut.getFileUserPermissions(testFile.id).catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -899,7 +899,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getFileUserPermissions(TestConstants.TEST_DUMMY_PERSISTENT_ID)
           .catch((e) => (error = e))
@@ -952,7 +952,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut.getFileDataTables(testFile.id).catch((e) => (error = e))
 
         expect(axios.get).toHaveBeenCalledWith(
@@ -993,7 +993,7 @@ describe('FilesRepository', () => {
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-        let error: ReadError = undefined
+        let error: ReadError | undefined = undefined
         await sut
           .getFileDataTables(TestConstants.TEST_DUMMY_PERSISTENT_ID)
           .catch((e) => (error = e))
