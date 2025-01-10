@@ -25,7 +25,9 @@ export const createFilePreviewModel = (): FilePreview => {
     datasetPersistentId: 'test pid1',
     datasetCitation: 'test citation',
     publicationStatuses: [PublicationStatus.Published],
-    releaseOrCreateDate: new Date('2023-05-15T08:21:01Z')
+    releaseOrCreateDate: new Date('2023-05-15T08:21:01Z'),
+    canDownloadFile: true,
+    restricted: false
   }
   return filePreviewModel
 }
@@ -53,6 +55,8 @@ export const createFilePreviewPayload = (): FilePreviewPayload => {
     dataset_persistent_id: 'test pid1',
     dataset_citation: 'test citation',
     publicationStatuses: ['Published'],
-    releaseOrCreateDate: '2023-05-15T08:21:01Z'
+    releaseOrCreateDate: '2023-05-15T08:21:01Z',
+    canDownloadFile: true,
+    restricted: false
   }
 }
