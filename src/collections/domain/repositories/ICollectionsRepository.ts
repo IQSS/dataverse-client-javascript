@@ -35,5 +35,5 @@ export interface ICollectionsRepository {
     collectionIdOrAlias: number | string,
     featuredItemDTOs: CollectionFeaturedItemsDTO
   ): Promise<CollectionFeaturedItem[]>
-  // deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void>
+  deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void>
 }
