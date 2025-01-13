@@ -12,7 +12,7 @@ import {
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
 
 describe('execute', () => {
-  const testCollectionAlias = 'collectionsRepositoryTestCollection'
+  const testCollectionAlias = 'getCollectionsFeaturedItemsTest'
   let testFeaturedItemId: number
 
   beforeEach(async () => {
@@ -59,7 +59,7 @@ describe('execute', () => {
     expect(featuredItemsResponse[0].displayOrder).toBe(1)
     // expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
     expect(featuredItemsResponse[0].imageFileUrl).toBe(
-      'http://localhost:8080/api/access/dataverseFeatureItemImage/1'
+      `http://localhost:8080/api/access/dataverseFeatureItemImage/${featuredItemsResponse[0].id}`
     )
     expect(featuredItemsResponse[0].imageFileName).toBe('featured-item-test-image.png')
   })

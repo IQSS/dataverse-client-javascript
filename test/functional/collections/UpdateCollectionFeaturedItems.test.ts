@@ -19,7 +19,7 @@ import {
 //TODO:ME - After content sanitization is fixed in backend, check if the content is being updated correctly keeping classes, href, rel, target, etc attributes.
 
 describe('execute', () => {
-  const testCollectionAlias = 'collectionsRepositoryTestCollection'
+  const testCollectionAlias = 'updateCollectionFeaturedItemsTest'
 
   beforeEach(async () => {
     ApiConfig.init(
