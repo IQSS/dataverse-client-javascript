@@ -22,6 +22,8 @@ import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from
 import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
+// TODO:ME - Create Delete All Featured Items use case
+
 export interface NewCollectionRequestPayload {
   alias: string
   name: string
@@ -261,8 +263,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionIdOrAlias: number | string,
     featuredItemsDTO: CollectionFeaturedItemsDTO
   ): Promise<CollectionFeaturedItem[]> {
-    const featuredItemsFormData =
-      this.defineUpdateCollectionFeaturedItemsRequestBody(featuredItemsDTO)
+    const featuredItemsFormData = this.toFeaturedItemsFormData(featuredItemsDTO)
 
     return this.doPut(
       `/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`,
@@ -278,23 +279,24 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
-  private defineUpdateCollectionFeaturedItemsRequestBody(
-    featuredItemsDTO: CollectionFeaturedItemsDTO
-  ): FormData {
+  private toFeaturedItemsFormData(featuredItemsDTO: CollectionFeaturedItemsDTO): FormData {
+    // This is not really necessary because we are sending displayOrder property anyways, but I wanted to keep the order of the items in the form data
+    const orderedFeaturedItemsDTO = featuredItemsDTO.sort((a, b) => a.displayOrder - b.displayOrder)
+
     const formData = new FormData()
 
-    featuredItemsDTO.forEach((item) => {
+    orderedFeaturedItemsDTO.forEach((item) => {
       const { id, content, displayOrder, file, keepFile } = item
+      const fileName = file ? file.name : ''
 
-      // TODO: We need to configure this project to use strict typescript rules or at least strictNullChecks: true
-      // id is inferred here as number but it should be a number | undefined, same for file
-      // This config change should be done in a separate issue because it will require changes in some other ts files
-
-      formData.append(`items[${item.displayOrder}][id]`, id ? id.toString() : '0')
-      formData.append(`items[${item.displayOrder}][displayOrder]`, displayOrder.toString())
-      formData.append(`items[${item.displayOrder}][content]`, content)
-      formData.append(`items[${item.displayOrder}][file]`, file ? file : 'false')
-      formData.append(`items[${item.displayOrder}][keepFile]`, keepFile.toString())
+      formData.append('id', id ? id.toString() : '0')
+      formData.append('content', content)
+      formData.append('displayOrder', displayOrder.toString())
+      formData.append('keepFile', keepFile.toString())
+      formData.append('fileName', fileName)
+      if (file) {
+        formData.append('file', file)
+      }
     })
 
     return formData

@@ -43,7 +43,10 @@ export async function createCollectionFeaturedItemViaApi(
           'X-Dataverse-Key': process.env.TEST_API_KEY
         }
       })
-      .then((response) => response.data.data)
+      .then((response) => {
+        // console.log({ singleFeatItemCreated: JSON.stringify(response.data.data) })
+        return response.data.data
+      })
   } catch (error) {
     console.log(error)
     throw new Error(`Error while creating collection featured item in ${collectionAlias}`)
@@ -53,13 +56,33 @@ export async function createCollectionFeaturedItemViaApi(
 export async function deleteCollectionFeaturedItemViaApi(featuredItemId: number): Promise<void> {
   try {
     return await axios.delete(
-      `${TestConstants.TEST_API_URL}/dataverseFeaturedItems/${featuredItemId}`,
+      `${TestConstants.TEST_API_URL}/dataverseFeaturedItems/${featuredItemId.toString()}`,
       {
         headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
       }
     )
+    // .then((resp) => {
+    //   console.log({ deletedResp: JSON.stringify(resp.data) })
+    // })
   } catch (error) {
     throw new Error(`Error while deleting collection featured item with id ${featuredItemId}`)
+  }
+}
+
+export async function deleteAllCollectionFeaturedItemsViaApi(collectionAlias: string) {
+  try {
+    return await axios.delete(
+      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/featuredItems`,
+      {
+        headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
+      }
+    )
+    // .then((resp) => {
+    //   console.log({ deletedAllResp: JSON.stringify(resp.data) })
+    // })
+  } catch (error) {
+    console.log(error)
+    throw new Error(`Error while deleting all featured items from collection: ${collectionAlias}`)
   }
 }
 

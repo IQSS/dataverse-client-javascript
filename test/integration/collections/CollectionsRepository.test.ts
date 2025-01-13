@@ -1,6 +1,7 @@
 import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
+  CollectionFeaturedItemsDTO,
   CollectionItemType,
   CollectionPreview,
   CollectionSearchCriteria,
@@ -31,6 +32,8 @@ import {
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
 import {
   createCollectionFeaturedItemViaApi,
+  createImageFile,
+  deleteAllCollectionFeaturedItemsViaApi,
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 
@@ -762,7 +765,6 @@ describe('CollectionsRepository', () => {
 
     test('should return featured items array given a valid collection alias when collection has featured items', async () => {
       const featuredItemsResponse = await sut.getCollectionFeaturedItems(testCollectionAlias)
-      console.log({ featuredItemsResponse })
 
       expect(featuredItemsResponse.length).toBe(1)
       expect(featuredItemsResponse[0].id).toBe(testFeaturedItemId)
@@ -785,4 +787,106 @@ describe('CollectionsRepository', () => {
       )
     })
   })
+
+  describe('updateCollectionFeaturedItems', () => {
+    afterAll(async () => {
+      try {
+        await deleteAllCollectionFeaturedItemsViaApi(testCollectionAlias)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting all featured items from collection: ${testCollectionAlias}`
+        )
+      }
+    })
+
+    it('should update collection featured items sending all new items', async () => {
+      const newFeaturedItems: CollectionFeaturedItemsDTO = [
+        {
+          content: '<p class="rte-paragraph">Test content 1</p>',
+          displayOrder: 0,
+          file: undefined,
+          keepFile: false
+        },
+        {
+          content: '<p class="rte-paragraph">Test content 2</p>',
+          displayOrder: 1,
+          file: undefined,
+          keepFile: false
+        },
+        {
+          content: '<p class="rte-paragraph">Test content 3</p>',
+          displayOrder: 2,
+          file: createImageFile('featured-item-test-image-3.png'),
+          keepFile: false
+        }
+      ]
+
+      const response = await sut.updateCollectionFeaturedItems(
+        testCollectionAlias,
+        newFeaturedItems
+      )
+
+      expect(response).toHaveLength(3)
+
+      expect(response[0].content).toEqual(newFeaturedItems[0].content)
+      expect(response[0].displayOrder).toEqual(newFeaturedItems[0].displayOrder)
+      expect(response[0].imageFileName).toEqual(undefined)
+      expect(response[0].imageFileUrl).toEqual(undefined)
+
+      expect(response[1].content).toEqual(newFeaturedItems[1].content)
+      expect(response[1].displayOrder).toEqual(newFeaturedItems[1].displayOrder)
+      expect(response[1].imageFileName).toEqual(undefined)
+      expect(response[1].imageFileUrl).toEqual(undefined)
+
+      expect(response[2].content).toEqual(newFeaturedItems[2].content)
+      expect(response[2].displayOrder).toEqual(newFeaturedItems[2].displayOrder)
+      expect(response[2].imageFileName).toEqual('featured-item-test-image-3.png')
+      expect(response[2].imageFileUrl).toContain(
+        'http://localhost:8080/api/access/dataverseFeatureItemImage/'
+      )
+    })
+  })
+
+  // describe('deleteAllCollectionFeaturedItems', () => {
+
+  //   beforeAll(async () => {
+  //     try {
+  //       await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+  //         content: '<p class="rte-paragraph">Test content</p>',
+  //         displayOrder: 1,
+  //         withFile: true,
+  //         fileName: 'featured-item-test-image.png'
+  //       })
+  //       await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+  //         content: '<p class="rte-paragraph">Test content 2</p>',
+  //         displayOrder: 2,
+  //         withFile: false
+  //       })
+  //       await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+  //         content: '<p class="rte-paragraph">Test content 3</p>',
+  //         displayOrder: 3,
+  //         withFile: false
+  //       })
+
+  //     } catch (error) {
+  //       throw new Error(
+  //         `Tests afterAll(): Error while deleting all featured items from collection: ${testCollectionAlias}`
+  //       )
+  //     }
+  //   })
+
+  //   it('should delete all collection featured items', async () => {
+  //     const featuredItemsResponseFirst = await sut.getCollectionFeaturedItems(testCollectionAlias)
+
+  //     console.log({ featuredItemsResponseFirst })
+
+  //     await deleteAllCollectionFeaturedItemsViaApi(testCollectionAlias)
+
+  //     const featuredItemsResponse = await sut.getCollectionFeaturedItems(testCollectionAlias)
+
+  //     console.log({ featuredItemsResponse })
+
+  //     expect(featuredItemsResponse).toStrictEqual([])
+  //   })
+  // })
 })
