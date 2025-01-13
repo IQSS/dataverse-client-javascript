@@ -14,4 +14,5 @@ export interface DatasetPreviewPayload {
   publicationStatuses: string[]
   identifier_of_dataverse: string
   name_of_dataverse: string
+  image_url?: string
 }
