@@ -3,7 +3,7 @@ import { File, Blob } from '@web-std/file'
 import { CollectionFeaturedItem } from '../../../src/collections/domain/models/CollectionFeaturedItem'
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
 import { TestConstants } from '../TestConstants'
-import { CollectionFeaturedItemPayload } from '../../../src/collections/infra/repositories/transformers/CollectionFeaturedItemPayload'
+import { CollectionFeaturedItemsDTO } from '../../../src'
 
 interface CreateCollectionFeaturedItemData {
   content: string
@@ -105,21 +105,21 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
   ]
 }
 
-export const createCollectionFeaturedItemsPayload = (): CollectionFeaturedItemPayload[] => {
+export const createCollectionFeaturedItemsDTO = (): CollectionFeaturedItemsDTO => {
   return [
     {
       id: 1,
       content: 'This is a featured item',
       displayOrder: 1,
-      imageFileName: 'test-image.png',
-      imageFileUrl: 'http://localhost:8080/api/access/dataverseFeatureItemImage/1'
+      file: createImageFile(),
+      keepFile: false
     },
     {
       id: 2,
       content: 'This is another featured item',
       displayOrder: 2,
-      imageFileName: null,
-      imageFileUrl: null
+      file: undefined,
+      keepFile: false
     }
   ]
 }

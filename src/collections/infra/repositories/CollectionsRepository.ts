@@ -301,4 +301,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     return formData
   }
+
+  // public async deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void> {
+  //   return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`)
+  //     .then(() => undefined)
+  //     .catch((error) => {
+  //       throw error
+  //     })
+  // }
 }
