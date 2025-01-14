@@ -57,7 +57,7 @@ describe('execute', () => {
     expect(featuredItemsResponse.length).toBe(1)
     expect(featuredItemsResponse[0].id).toBe(testFeaturedItemId)
     expect(featuredItemsResponse[0].displayOrder).toBe(1)
-    // expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
+    expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
     expect(featuredItemsResponse[0].imageFileUrl).toBe(
       `http://localhost:8080/api/access/dataverseFeatureItemImage/${featuredItemsResponse[0].id}`
     )
@@ -75,7 +75,7 @@ describe('execute', () => {
     expect(featuredItemsResponse.length).toBe(2)
     expect(featuredItemsResponse[1].id).toBe(featuredItemCreated.id)
     expect(featuredItemsResponse[1].displayOrder).toBe(2)
-    // expect(featuredItemsResponse[1].content).toBe('<p class="rte-paragraph">Test content</p>')
+    expect(featuredItemsResponse[1].content).toBe('<p class="rte-paragraph">Test content</p>')
     expect(featuredItemsResponse[1].imageFileUrl).toBeUndefined()
     expect(featuredItemsResponse[1].imageFileName).toBeUndefined()
 

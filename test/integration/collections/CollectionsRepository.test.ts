@@ -924,7 +924,7 @@ describe('CollectionsRepository', () => {
       expect(featuredItemsResponse.length).toBe(1)
       expect(featuredItemsResponse[0].id).toBe(testFeaturedItemId)
       expect(featuredItemsResponse[0].displayOrder).toBe(1)
-      // expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
+      expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
       expect(featuredItemsResponse[0].imageFileUrl).toBe(
         `http://localhost:8080/api/access/dataverseFeatureItemImage/${featuredItemsResponse[0].id}`
       )
@@ -983,17 +983,17 @@ describe('CollectionsRepository', () => {
 
       expect(response).toHaveLength(3)
 
-      // expect(response[0].content).toEqual(newFeaturedItems[0].content)
+      expect(response[0].content).toEqual(newFeaturedItems[0].content)
       expect(response[0].displayOrder).toEqual(newFeaturedItems[0].displayOrder)
       expect(response[0].imageFileName).toEqual(undefined)
       expect(response[0].imageFileUrl).toEqual(undefined)
 
-      // expect(response[1].content).toEqual(newFeaturedItems[1].content)
+      expect(response[1].content).toEqual(newFeaturedItems[1].content)
       expect(response[1].displayOrder).toEqual(newFeaturedItems[1].displayOrder)
       expect(response[1].imageFileName).toEqual(undefined)
       expect(response[1].imageFileUrl).toEqual(undefined)
 
-      // expect(response[2].content).toEqual(newFeaturedItems[2].content)
+      expect(response[2].content).toEqual(newFeaturedItems[2].content)
       expect(response[2].displayOrder).toEqual(newFeaturedItems[2].displayOrder)
       expect(response[2].imageFileName).toEqual('featured-item-test-image-3.png')
       expect(response[2].imageFileUrl).toBe(

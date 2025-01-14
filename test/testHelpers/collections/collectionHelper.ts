@@ -207,3 +207,25 @@ export const createCollectionFacetRequestPayload = (): CollectionFacetPayload =>
     displayName: 'testDisplayName'
   }
 }
+
+export const CONTENT_FIELD_WITH_ALL_TAGS =
+  '<h1 class="rte-heading">A title</h1><p class="rte-paragraph">Esto es una oracion que contiene texto en <strong class="rte-bold">negrita</strong>, <em class="rte-italic">italica</em>, <u class="rte-underline">subrayada</u>, <s class="rte-strike">tachado</s>, <code class="rte-code">de tipo code</code>, este es <a target="_blank" rel="noopener noreferrer nofollow" class="rte-link" href="https://youtube.com">un link que apunta a youtube</a>.</p><p class="rte-paragraph">Una lista desordenada:</p><ul class="rte-bullet-list"><li><p class="rte-paragraph">Item</p></li><li><p class="rte-paragraph">Item</p></li></ul><p class="rte-paragraph">Una lista ordenada:</p><ol class="rte-ordered-list"><li><p class="rte-paragraph">Item 1</p></li><li><p class="rte-paragraph">Item 2</p></li></ol><blockquote class="rte-blockquote"><p class="rte-paragraph">Este es un blockquote.</p></blockquote><p class="rte-paragraph">Esto que viene es un bloque de codigo.</p><pre class="rte-code-block"><code>      &lt;Controller name={`featuredItems.${itemIndex}.content`} control={control} rules={rules} render={({ field: { onChange, ref, value }, fieldState: { invalid, error } }) =&gt; { console.log({ value }) return ( &lt;Col&gt; &lt;RichTextEditor initialValue={value as string} editorContentAriaLabelledBy={`featuredItems.${itemIndex}.content`} onChange={onChange} invalid={invalid} ariaRequired ref={ref} /&gt; {invalid &amp;&amp; &lt;div className={styles["error-msg"]}&gt;{error?.message}&lt;/div&gt;} &lt;/Col&gt; ) }} /&gt;</code></pre>'
+
+export const EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS =
+  '<h1 class="rte-heading">A title</h1>\n' +
+  '<p class="rte-paragraph">Esto es una oracion que contiene texto en <strong class="rte-bold">negrita</strong>, <em class="rte-italic">italica</em>, <u class="rte-underline">subrayada</u>, <s class="rte-strike">tachado</s>, <code class="rte-code">de tipo code</code>, este es <a target="_blank" rel="noopener noreferrer nofollow" class="rte-link" href="https://youtube.com">un link que apunta a youtube</a>.</p>\n' +
+  '<p class="rte-paragraph">Una lista desordenada:</p>\n' +
+  '<ul class="rte-bullet-list">\n' +
+  ' <li><p class="rte-paragraph">Item</p></li>\n' +
+  ' <li><p class="rte-paragraph">Item</p></li>\n' +
+  '</ul>\n' +
+  '<p class="rte-paragraph">Una lista ordenada:</p>\n' +
+  '<ol class="rte-ordered-list">\n' +
+  ' <li><p class="rte-paragraph">Item 1</p></li>\n' +
+  ' <li><p class="rte-paragraph">Item 2</p></li>\n' +
+  '</ol>\n' +
+  '<blockquote class="rte-blockquote">\n' +
+  ' <p class="rte-paragraph">Este es un blockquote.</p>\n' +
+  '</blockquote>\n' +
+  '<p class="rte-paragraph">Esto que viene es un bloque de codigo.</p>\n' +
+  '<pre class="rte-code-block"><code>      &lt;Controller name={`featuredItems.${itemIndex}.content`} control={control} rules={rules} render={({ field: { onChange, ref, value }, fieldState: { invalid, error } }) =&gt; { console.log({ value }) return ( &lt;Col&gt; &lt;RichTextEditor initialValue={value as string} editorContentAriaLabelledBy={`featuredItems.${itemIndex}.content`} onChange={onChange} invalid={invalid} ariaRequired ref={ref} /&gt; {invalid &amp;&amp; &lt;div className={styles["error-msg"]}&gt;{error?.message}&lt;/div&gt;} &lt;/Col&gt; ) }} /&gt;</code></pre>'
