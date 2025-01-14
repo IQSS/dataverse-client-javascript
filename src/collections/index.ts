@@ -8,6 +8,7 @@ import { UpdateCollection } from './domain/useCases/UpdateCollection'
 import { GetCollectionFeaturedItems } from './domain/useCases/GetCollectionFeaturedItems'
 import { CollectionsRepository } from './infra/repositories/CollectionsRepository'
 import { UpdateCollectionFeaturedItems } from './domain/useCases/UpdateCollectionFeaturedItems'
+import { DeleteCollectionFeaturedItems } from './domain/useCases/DeleteCollectionFeaturedItems'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -20,6 +21,7 @@ const publishCollection = new PublishCollection(collectionsRepository)
 const updateCollection = new UpdateCollection(collectionsRepository)
 const getCollectionFeaturedItems = new GetCollectionFeaturedItems(collectionsRepository)
 const updateCollectionFeaturedItems = new UpdateCollectionFeaturedItems(collectionsRepository)
+const deleteCollectionFeaturedItems = new DeleteCollectionFeaturedItems(collectionsRepository)
 
 export {
   getCollection,
@@ -30,7 +32,8 @@ export {
   publishCollection,
   updateCollection,
   getCollectionFeaturedItems,
-  updateCollectionFeaturedItems
+  updateCollectionFeaturedItems,
+  deleteCollectionFeaturedItems
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'
