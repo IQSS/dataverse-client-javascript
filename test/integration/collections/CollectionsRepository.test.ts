@@ -37,7 +37,7 @@ import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Colle
 import {
   createCollectionFeaturedItemViaApi,
   createImageFile,
-  deleteAllCollectionFeaturedItemsViaApi,
+  deleteCollectionFeaturedItemsViaApi,
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 
@@ -946,7 +946,7 @@ describe('CollectionsRepository', () => {
   describe('updateCollectionFeaturedItems', () => {
     afterAll(async () => {
       try {
-        await deleteAllCollectionFeaturedItemsViaApi(testCollectionAlias)
+        await deleteCollectionFeaturedItemsViaApi(testCollectionAlias)
       } catch (error) {
         throw new Error(
           `Tests afterAll(): Error while deleting all featured items from collection: ${testCollectionAlias}`
@@ -1002,46 +1002,56 @@ describe('CollectionsRepository', () => {
     })
   })
 
-  // describe('deleteAllCollectionFeaturedItems', () => {
+  describe('deleteCollectionFeaturedItems', () => {
+    beforeAll(async () => {
+      try {
+        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content</p>',
+          displayOrder: 1,
+          withFile: true,
+          fileName: 'featured-item-test-image.png'
+        })
+        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content 2</p>',
+          displayOrder: 2,
+          withFile: false
+        })
+        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content 3</p>',
+          displayOrder: 3,
+          withFile: false
+        })
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while creating test featured items for collection: ${testCollectionAlias}`
+        )
+      }
+    })
 
-  //   beforeAll(async () => {
-  //     try {
-  //       await createCollectionFeaturedItemViaApi(testCollectionAlias, {
-  //         content: '<p class="rte-paragraph">Test content</p>',
-  //         displayOrder: 1,
-  //         withFile: true,
-  //         fileName: 'featured-item-test-image.png'
-  //       })
-  //       await createCollectionFeaturedItemViaApi(testCollectionAlias, {
-  //         content: '<p class="rte-paragraph">Test content 2</p>',
-  //         displayOrder: 2,
-  //         withFile: false
-  //       })
-  //       await createCollectionFeaturedItemViaApi(testCollectionAlias, {
-  //         content: '<p class="rte-paragraph">Test content 3</p>',
-  //         displayOrder: 3,
-  //         withFile: false
-  //       })
+    afterAll(async () => {
+      try {
+        await deleteCollectionFeaturedItemsViaApi(testCollectionAlias)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting test collection featured items: ${testCollectionAlias}`
+        )
+      }
+    })
 
-  //     } catch (error) {
-  //       throw new Error(
-  //         `Tests afterAll(): Error while deleting all featured items from collection: ${testCollectionAlias}`
-  //       )
-  //     }
-  //   })
+    it('should delete all collection featured items', async () => {
+      const featuredItemsResponseBeforeDeletion = await sut.getCollectionFeaturedItems(
+        testCollectionAlias
+      )
 
-  //   it('should delete all collection featured items', async () => {
-  //     const featuredItemsResponseFirst = await sut.getCollectionFeaturedItems(testCollectionAlias)
+      expect(featuredItemsResponseBeforeDeletion).toHaveLength(3)
 
-  //     console.log({ featuredItemsResponseFirst })
+      await sut.deleteCollectionFeaturedItems(testCollectionAlias)
 
-  //     await deleteAllCollectionFeaturedItemsViaApi(testCollectionAlias)
+      const featuredItemsResponseAfterDeletion = await sut.getCollectionFeaturedItems(
+        testCollectionAlias
+      )
 
-  //     const featuredItemsResponse = await sut.getCollectionFeaturedItems(testCollectionAlias)
-
-  //     console.log({ featuredItemsResponse })
-
-  //     expect(featuredItemsResponse).toStrictEqual([])
-  //   })
-  // })
+      expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
+    })
+  })
 })

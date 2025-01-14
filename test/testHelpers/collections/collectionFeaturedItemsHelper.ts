@@ -69,7 +69,7 @@ export async function deleteCollectionFeaturedItemViaApi(featuredItemId: number)
   }
 }
 
-export async function deleteAllCollectionFeaturedItemsViaApi(collectionAlias: string) {
+export async function deleteCollectionFeaturedItemsViaApi(collectionAlias: string) {
   try {
     return await axios.delete(
       `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/featuredItems`,
