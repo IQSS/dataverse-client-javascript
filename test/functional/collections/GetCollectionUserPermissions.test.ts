@@ -51,7 +51,7 @@ describe('execute', () => {
       await getCollectionUserPermissions.execute(TestConstants.TEST_DUMMY_COLLECTION_ID)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      readError = error
+      readError = error as ReadError
     } finally {
       expect(readError).toBeInstanceOf(ReadError)
       expect(readError?.message).toEqual(

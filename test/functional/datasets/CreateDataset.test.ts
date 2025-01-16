@@ -99,7 +99,7 @@ describe('execute', () => {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      fieldValidationError = error
+      fieldValidationError = error as FieldValidationError
     } finally {
       expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
       expect(fieldValidationError?.citationBlockName).toEqual('citation')
@@ -149,7 +149,7 @@ describe('execute', () => {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      fieldValidationError = error
+      fieldValidationError = error as FieldValidationError
     } finally {
       expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
       expect(fieldValidationError?.citationBlockName).toEqual('citation')
@@ -201,7 +201,7 @@ describe('execute', () => {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      fieldValidationError = error
+      fieldValidationError = error as FieldValidationError
     } finally {
       expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
       expect(fieldValidationError?.citationBlockName).toEqual('citation')

@@ -31,7 +31,7 @@ describe('execute', () => {
       await getCollectionMetadataBlocks.execute('notFoundCollectionAlias')
       throw new Error('Use case should throw an error')
     } catch (error) {
-      readError = error
+      readError = error as ReadError
     } finally {
       expect(readError).toBeInstanceOf(ReadError)
       expect(readError?.message).toEqual(
