@@ -34,7 +34,7 @@ describe('execute', () => {
       await createCollection.execute(testNewCollection, TestConstants.TEST_DUMMY_COLLECTION_ID)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      writeError = error
+      writeError = error as WriteError
     } finally {
       expect(writeError).toBeInstanceOf(WriteError)
       expect(writeError?.message).toEqual(
