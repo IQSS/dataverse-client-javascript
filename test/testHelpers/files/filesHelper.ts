@@ -211,3 +211,19 @@ async function createBlobWithSize(size: number): Promise<Blob> {
   const arrayBuffer = new ArrayBuffer(size)
   return new Blob([arrayBuffer])
 }
+
+export const updateFileTabularTags = async (
+  fileId: number,
+  tabularTags: string[]
+): Promise<AxiosResponse> => {
+  return await axios.post(
+    `${TestConstants.TEST_API_URL}/files/${fileId}/metadata/tabularTags`,
+    { tabularTags },
+    {
+      headers: {
+        'Content-type': 'application/json',
+        'X-Dataverse-Key': process.env.TEST_API_KEY
+      }
+    }
+  )
+}
