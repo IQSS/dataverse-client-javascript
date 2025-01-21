@@ -16,6 +16,14 @@ export interface DatasetPayload {
   alternativePersistentId?: string
   publicationDate?: string
   citationDate?: string
+  fileAccessRequest: boolean
+  termsOfAccess?: string
+  dataAccessPlace?: string
+  originalArchive?: string
+  availabilityStatus?: string
+  contactForAccess?: string
+  sizeOfCollection?: string
+  studyCompletion?: string
   files: FilePayload[]
   isPartOf: OwnerNodePayload
 }
