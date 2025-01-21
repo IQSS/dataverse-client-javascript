@@ -312,7 +312,6 @@ const transformPayloadToDatasetMetadataFieldValue = (
   if (typeClass === 'anonymized') {
     return ANONYMIZED_FIELD_VALUE
   }
-
   if (typeof metadataFieldValuePayload === 'string') {
     if (keepRawFields) {
       return metadataFieldValuePayload
@@ -350,5 +349,8 @@ const transformPayloadToDatasetMetadataSubfieldValue = (
 }
 
 export const transformHtmlToMarkdown = (source: string): string => {
+  turndownService.escape = (text) => {
+    return text.replace(/\\_/g, '_')
+  }
   return turndownService.turndown(source)
 }
