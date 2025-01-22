@@ -22,8 +22,6 @@ import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from
 import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
-// TODO:ME - Create Delete All Featured Items use case
-
 export interface NewCollectionRequestPayload {
   alias: string
   name: string

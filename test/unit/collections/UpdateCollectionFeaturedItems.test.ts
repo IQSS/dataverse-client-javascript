@@ -16,7 +16,6 @@ describe('execute', () => {
     collectionRepositoryStub.updateCollectionFeaturedItems = jest
       .fn()
       .mockResolvedValue(testFeaturedItems)
-
     const testGetCollectionFeaturedItems = new UpdateCollectionFeaturedItems(
       collectionRepositoryStub
     )

@@ -44,7 +44,6 @@ export async function createCollectionFeaturedItemViaApi(
         }
       })
       .then((response) => {
-        // console.log({ singleFeatItemCreated: JSON.stringify(response.data.data) })
         return response.data.data
       })
   } catch (error) {
@@ -61,9 +60,6 @@ export async function deleteCollectionFeaturedItemViaApi(featuredItemId: number)
         headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
       }
     )
-    // .then((resp) => {
-    //   console.log({ deletedResp: JSON.stringify(resp.data) })
-    // })
   } catch (error) {
     throw new Error(`Error while deleting collection featured item with id ${featuredItemId}`)
   }
@@ -77,9 +73,6 @@ export async function deleteCollectionFeaturedItemsViaApi(collectionAlias: strin
         headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
       }
     )
-    // .then((resp) => {
-    //   console.log({ deletedAllResp: JSON.stringify(resp.data) })
-    // })
   } catch (error) {
     console.log(error)
     throw new Error(`Error while deleting all featured items from collection: ${collectionAlias}`)

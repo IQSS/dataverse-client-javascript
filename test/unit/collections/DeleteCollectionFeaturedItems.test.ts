@@ -6,7 +6,6 @@ describe('execute', () => {
   test('should return undefined on repository success', async () => {
     const collectionRepositoryStub: ICollectionsRepository = {} as ICollectionsRepository
     collectionRepositoryStub.deleteCollectionFeaturedItems = jest.fn().mockResolvedValue(undefined)
-
     const testDeleteCollectionFeaturedItems = new DeleteCollectionFeaturedItems(
       collectionRepositoryStub
     )
