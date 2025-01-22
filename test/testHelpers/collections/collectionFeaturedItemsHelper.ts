@@ -37,7 +37,7 @@ export async function createCollectionFeaturedItemViaApi(
     }
 
     return await axios
-      .post(`${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/featuredItem`, formData, {
+      .post(`${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/featuredItems`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'X-Dataverse-Key': process.env.TEST_API_KEY
