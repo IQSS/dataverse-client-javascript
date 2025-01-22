@@ -1370,7 +1370,7 @@ _See [use case](../src/info/domain/useCases/GetZipDownloadLimit.ts) implementati
 
 #### Send Feedback to Object Contacts
 
-Returns a [Contact](../src/contactInfo/domain/models/Contact.ts) object, which contains contact return information, showing toEmail, fromEmail, subject, body.
+Returns a [Contact](../src/contactInfo/domain/models/Contact.ts) object, which contains contact return information, showing fromEmail, subject, body.
 
 ##### Example call:
 
@@ -1379,9 +1379,25 @@ import { submitContactInfo } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-submitContactInfo.execute((contact: ContactDTO)).then( => {
-/* ... */
-})
+const contactDTO: ContactDTO = {
+  targedId: 1
+  subject: 'Data Question',
+  body: 'Please help me understand your data. Thank you!',
+  fromEmail: 'test@gmail.com'
+}
+
+submitContactInfo.execute(contactDTO)
 
 /* ... */
 ```
+
+_See [use case](../src/info/domain/useCases/submitContactInfo.ts) implementation_.
+
+The above example would submit feedback to all contacts of a object where the object targetId = 1.
+
+In ContactDTO, it takes the following information:
+
+- **targetId**: the numeric identifier of the collection, dataset, or datafile. Persistent ids and collection aliases are not supported. (Optional)
+- **subject**: the email subject line
+- **body**: the email body to send
+- **fromEmail**: the email to list in the reply-to field.

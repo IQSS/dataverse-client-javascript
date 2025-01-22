@@ -1,10 +1,11 @@
 import { WriteError, Contact, ContactDTO } from '../../../src'
 import { SubmitContactInfo } from '../../../src/contactInfo/domain/useCases/SubmitContactInfo'
 import { IContactRepository } from '../../../src/contactInfo/domain/repositories/IContactRepository'
+import { TestConstants } from '../../testHelpers/TestConstants'
 
 describe('execute submit information to contacts', () => {
   test('should return a Contact when repository call is successful', async () => {
-    const fromEmail = '1314@gmail.com'
+    const fromEmail = 'example@gmail.com'
 
     const contactDTO: ContactDTO = {
       targetId: 6,
@@ -14,8 +15,7 @@ describe('execute submit information to contacts', () => {
     }
 
     const collectionAlias = 'collection-1'
-    const collectionEmail = 'pi@example.edu,student@example.edu'
-    const baseUrl = 'http://localhost:8080/dataverse/'
+    const baseUrl = TestConstants.TEST_API_URL + '/dataverse/'
     const bodyMessage =
       'You have just been sent the following message from ' +
       fromEmail +
@@ -42,7 +42,6 @@ describe('execute submit information to contacts', () => {
     const expectedResponse: Contact[] = [
       {
         fromEmail: contactDTO.fromEmail,
-        toEmail: collectionEmail,
         subject: 'Root contact: ' + contactDTO.subject,
         body: bodyMessage
       }
@@ -57,7 +56,37 @@ describe('execute submit information to contacts', () => {
     expect(contactRepositoryStub.submitContactInfo).toHaveBeenCalledWith(contactDTO)
   })
 
-  test('should return error result on error response', async () => {
+  test('should return a Contact when targetId is not provided', async () => {
+    const fromEmail = 'test@gmail.com'
+
+    const contactDTO: ContactDTO = {
+      subject: 'Data Question',
+      body: 'Please help me understand your data. Thank you!',
+      fromEmail: fromEmail
+    }
+
+    const bodyMessage =
+      'Root Support,\n\nThe following message was sent from  ' +
+      fromEmail +
+      '.\n\n---\n\nPlease help me understand your data. Thank you!\n\n---\n\nMessage sent from Support contact form.'
+    const expectedResponse: Contact[] = [
+      {
+        fromEmail: contactDTO.fromEmail,
+        subject: 'Root Support Request: ' + contactDTO.subject,
+        body: bodyMessage
+      }
+    ]
+
+    const contactRepositoryStub = <IContactRepository>{}
+
+    contactRepositoryStub.submitContactInfo = jest.fn().mockResolvedValue(expectedResponse)
+    const sut = new SubmitContactInfo(contactRepositoryStub)
+    const actual = await sut.execute(contactDTO)
+    expect(actual).toEqual(expectedResponse)
+    expect(contactRepositoryStub.submitContactInfo).toHaveBeenCalledWith(contactDTO)
+  })
+
+  test('should return error result once there is a invalid targetId', async () => {
     const contactDTO: ContactDTO = {
       targetId: 0,
       subject: '',

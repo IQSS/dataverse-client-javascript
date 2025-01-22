@@ -1,5 +1,5 @@
 import { ContactRepository } from '../../../src/contactInfo/infra/repositories/ContactRepository'
-import { ApiConfig, ContactDTO, WriteError } from '../../../src'
+import { ApiConfig, Contact, ContactDTO, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
 
@@ -16,7 +16,7 @@ describe('submitContactInfo', () => {
     targetId: 1,
     subject: 'Data Question',
     body: 'Please help me understand your data. Thank you!',
-    fromEmail: '1314@gmail.com'
+    fromEmail: 'example@gmail.com'
   }
 
   const sut: ContactRepository = new ContactRepository()
@@ -28,7 +28,23 @@ describe('submitContactInfo', () => {
     expect(contactInfo[0].fromEmail).toEqual(testContactDTO.fromEmail)
     expect(contactInfo[0].subject).toEqual(expect.any(String))
     expect(contactInfo[0].body).toEqual(expect.any(String))
-    expect(contactInfo[0].toEmail).toEqual(expect.any(String))
+  })
+
+  test('should return a Contact when targetId is not provided', async () => {
+    const contactDTOWithoutTargetId: Partial<ContactDTO> = {
+      subject: 'General Inquiry',
+      body: 'I have a general question.',
+      fromEmail: 'example@gmail.com'
+    }
+
+    const contactInfo: Contact[] = await sut.submitContactInfo(
+      contactDTOWithoutTargetId as ContactDTO
+    )
+
+    expect(contactInfo).toBeDefined()
+    expect(contactInfo[0].fromEmail).toEqual(contactDTOWithoutTargetId.fromEmail)
+    expect(contactInfo[0].subject).toEqual(expect.any(String))
+    expect(contactInfo[0].body).toEqual(expect.any(String))
   })
 
   test('should return error if the target id is unexisted', async () => {
