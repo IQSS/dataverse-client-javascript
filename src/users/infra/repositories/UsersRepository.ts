@@ -7,6 +7,7 @@ import {
   transformGetApiTokenResponseToApiTokenInfo,
   transformRecreateApiTokenResponseToApiTokenInfo
 } from './transformers/apiTokenInfoTransformers'
+import { UserDTO } from '../../domain/dtos/UserDTO'
 
 export class UsersRepository extends ApiRepository implements IUsersRepository {
   private readonly usersResourceName: string = 'users'
@@ -37,6 +38,14 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
 
   public async deleteCurrentApiToken(): Promise<void> {
     return this.doDelete(`/${this.usersResourceName}/token`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async registerUser(userDTO: UserDTO): Promise<void> {
+    return this.doPost(`/${this.usersResourceName}/register`, userDTO)
       .then(() => undefined)
       .catch((error) => {
         throw error

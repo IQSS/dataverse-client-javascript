@@ -9,7 +9,10 @@ import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories
 import { transformHtmlToMarkdown } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
 import { CollectionFacet } from '../../../domain/models/CollectionFacet'
 import { CollectionFacetPayload } from './CollectionFacetPayload'
-import { CollectionItemSubset } from '../../../domain/models/CollectionItemSubset'
+import {
+  CollectionItemsFacet,
+  CollectionItemSubset
+} from '../../../domain/models/CollectionItemSubset'
 import { DatasetPreview } from '../../../../datasets'
 import { FilePreview } from '../../../../files'
 import { DatasetPreviewPayload } from '../../../../datasets/infra/repositories/transformers/DatasetPreviewPayload'
@@ -21,6 +24,7 @@ import { CollectionPreviewPayload } from './CollectionPreviewPayload'
 import { CollectionPreview } from '../../../domain/models/CollectionPreview'
 import { CollectionContact } from '../../../domain/models/CollectionContact'
 import { CollectionType } from '../../../domain/models/CollectionType'
+import { CollectionItemsFacetPayload } from './CollectionItemsFacetsPayload'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -79,7 +83,10 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
 ): CollectionItemSubset => {
   const responseDataPayload = response.data.data
   const itemsPayload = responseDataPayload.items
+  const facetsPayload = responseDataPayload.facets as CollectionItemsFacetPayload
+
   const items: (DatasetPreview | FilePreview | CollectionPreview)[] = []
+
   itemsPayload.forEach(function (
     itemPayload: CollectionPreviewPayload | DatasetPreviewPayload | FilePreviewPayload
   ) {
@@ -97,8 +104,21 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
       )
     }
   })
+
+  const facets: CollectionItemsFacet[] = Object.entries(facetsPayload[0]).map(
+    ([key, facetData]) => ({
+      name: key,
+      friendlyName: facetData.friendly,
+      labels: facetData.labels.map((label: Record<string, number>) => {
+        const [name, count] = Object.entries(label)[0]
+        return { name, count }
+      })
+    })
+  )
+
   return {
-    items: items,
+    items,
+    facets,
     totalItemCount: responseDataPayload.total_count
   }
 }

@@ -20,16 +20,24 @@ import {
   ROOT_COLLECTION_ALIAS
 } from '../../testHelpers/collections/collectionHelper'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
-import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
-import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
+import { updateFileTabularTags, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
+import {
+  deletePublishedDatasetViaApi,
+  deleteUnpublishedDatasetViaApi,
+  publishDatasetViaApi
+} from '../../testHelpers/datasets/datasetHelper'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 import { CollectionType } from '../../../src/collections/domain/models/CollectionType'
+import {
+  OrderType,
+  SortType
+} from '../../../src/collections/domain/models/CollectionSearchCriteria'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
   const sut: CollectionsRepository = new CollectionsRepository()
   let testCollectionId: number
-
+  const currentYear = new Date().getFullYear()
   beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
@@ -288,11 +296,72 @@ describe('CollectionsRepository', () => {
       const actualCollectionPreview = actual.items[2] as CollectionPreview
 
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
-      const expectedDatasetCitationFragment =
-        'Admin, Dataverse; Owner, Dataverse, 2024, "Dataset created using the createDataset use case'
+      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-1.txt'
       const expectedCollectionsName = 'Scientific Research'
+
+      //prettier-ignore
+      const expectedFacetsAll = [
+        {
+          name: 'dvCategory', friendlyName: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }]
+        },
+        {
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Unpublished', count: 3 },{ name: 'Draft', count: 2 }]
+        },
+        {
+          name: 'authorName_ss', friendlyName: 'Author Name', labels: [{ name: 'Admin, Dataverse', count: 1 },{ name: 'Owner, Dataverse', count: 1 }]
+        },
+        {
+          name: 'subject_ss', friendlyName: 'Subject', labels: [{ name: 'Medicine, Health and Life Sciences', count: 1 }]
+        },
+        {
+          name: 'fileTypeGroupFacet', friendlyName: 'File Type', labels: [{ name: 'Text', count: 1 }]
+        },
+        {
+          name: 'fileAccess', friendlyName: 'Access', labels: [{ name: 'Public', count: 1 }]
+        }
+      ]
+      //prettier-ignore
+      const expectedFacetsFromCollectionOnly = [
+        {
+          name: 'dvCategory', friendlyName: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }]
+        },
+        {
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Unpublished', count: 1 }]
+        }
+      ]
+      //prettier-ignore
+      const expectedFacetsFromDatasetOnly = [
+        {
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Draft', count: 1 },{ name: 'Unpublished', count: 1 }]
+        },
+        {
+          name: 'authorName_ss', friendlyName: 'Author Name', labels: [{ name: 'Admin, Dataverse', count: 1 },{ name: 'Owner, Dataverse', count: 1 }]
+        },
+        {
+          name: 'subject_ss', friendlyName: 'Subject', labels: [{ name: 'Medicine, Health and Life Sciences', count: 1 }]
+        }
+      ]
+      //prettier-ignore
+      const expectedFacetsFromFileOnly = [
+        {
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Draft', count: 1 },{ name: 'Unpublished', count: 1 }]
+        },
+        { name: 'fileTypeGroupFacet', friendlyName: 'File Type', labels: [{ name: 'Text', count: 1 }] },
+        { name: 'fileAccess', friendlyName: 'Access', labels: [{ name: 'Public', count: 1 }] }
+      ]
+      //prettier-ignore
+      const expectedFacetsFromCollectionAndFile = [
+        {
+          name: 'dvCategory', friendlyName: 'Dataverse Category', labels: [{ name: 'Laboratory', count: 1 }]
+        },
+        {
+          name: 'publicationStatus', friendlyName: 'Publication Status', labels: [{ name: 'Unpublished', count: 2 },{ name: 'Draft', count: 1 }]
+        },
+        { name: 'fileTypeGroupFacet', friendlyName: 'File Type', labels: [{ name: 'Text', count: 1 }] },
+        { name: 'fileAccess', friendlyName: 'Access', labels: [{ name: 'Public', count: 1 }] }
+      ]
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
@@ -312,6 +381,8 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.url).not.toBeUndefined()
       expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
       expect(actualFilePreview.type).toBe(CollectionItemType.FILE)
+      expect(actualFilePreview.restricted).toBe(false)
+      expect(actualFilePreview.canDownloadFile).toBe(true)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
       expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
@@ -346,6 +417,8 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
 
       expect(actual.totalItemCount).toBe(3)
+
+      expect(actual.facets).toEqual(expectedFacetsAll)
 
       // Test limit and offset
       actual = await sut.getCollectionItems(testCollectionAlias, 1, 1)
@@ -413,6 +486,7 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect(actual.facets).toEqual(expectedFacetsFromCollectionOnly)
 
       // Test type dataset
       const collectionSearchCriteriaForDatasetType = new CollectionSearchCriteria().withItemTypes([
@@ -427,6 +501,7 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+      expect(actual.facets).toEqual(expectedFacetsFromDatasetOnly)
 
       // Test type file
       const collectionSearchCriteriaForFileType = new CollectionSearchCriteria().withItemTypes([
@@ -441,6 +516,7 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect(actual.facets).toEqual(expectedFacetsFromFileOnly)
 
       // Test multiple types
       const collectionSearchCriteriaForMultiTypes = new CollectionSearchCriteria().withItemTypes([
@@ -457,6 +533,123 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(2)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect(actual.facets).toEqual(expectedFacetsFromCollectionAndFile)
+
+      // Test Sort by name ascending
+      const collectionSearchCriteriaNameAscending = new CollectionSearchCriteria()
+        .withSort(SortType.NAME)
+        .withOrder(OrderType.ASC)
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaNameAscending
+      )
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
+      expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
+      expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
+
+      // Test Sort by name descending
+      const collectionSearchCriteriaNameDescending = new CollectionSearchCriteria()
+        .withSort(SortType.NAME)
+        .withOrder(OrderType.DESC)
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaNameDescending
+      )
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as FilePreview).type).toBe(CollectionItemType.FILE)
+      expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
+      expect((actual.items[2] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
+
+      // Test Sort by date ascending
+      const collectionSearchCriteriaDateAscending = new CollectionSearchCriteria()
+        .withSort(SortType.DATE)
+        .withOrder(OrderType.ASC)
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaDateAscending
+      )
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
+      expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
+      expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
+
+      // Test Sort by date descending
+      const collectionSearchCriteriaDateDescending = new CollectionSearchCriteria()
+        .withSort(SortType.DATE)
+        .withOrder(OrderType.DESC)
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaDateDescending
+      )
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as FilePreview).type).toBe(CollectionItemType.FILE)
+      expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
+      expect((actual.items[2] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
+
+      // Test with Filter query related to the collection
+      const collectionSearchCriteriaFilterQueryCollection =
+        new CollectionSearchCriteria().withFilterQueries(['dvCategory:Laboratory'])
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaFilterQueryCollection
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect(actual.facets).toEqual(expectedFacetsFromCollectionOnly)
+
+      // Test with Filter query related to the dataset
+      const collectionSearchCriteriaFilterQueryDataset =
+        new CollectionSearchCriteria().withFilterQueries([
+          'subject_ss:Medicine, Health and Life Sciences'
+        ])
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaFilterQueryDataset
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+      expect(actual.facets).toEqual(expectedFacetsFromDatasetOnly)
+
+      // Test with Filter query related to the file
+      const collectionSearchCriteriaFilterQuerieCollAndFile =
+        new CollectionSearchCriteria().withFilterQueries(['fileAccess:Public'])
+
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        collectionSearchCriteriaFilterQuerieCollAndFile
+      )
+
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect(actual.facets).toEqual(expectedFacetsFromFileOnly)
     })
 
     test('should return error when collection does not exist', async () => {
@@ -467,6 +660,156 @@ describe('CollectionsRepository', () => {
       await expect(
         sut.getCollectionItems(TestConstants.TEST_DUMMY_COLLECTION_ALIAS)
       ).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('getCollectionItems for published tabular file', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testTextFile4Name = 'test-file-4.tab'
+    const testSubCollectionAlias = 'collectionsRepositoryTestSubCollection'
+
+    beforeAll(async () => {
+      await sut.publishCollection(testCollectionId).catch(() => {
+        throw new Error(`Tests beforeAll(): Error while publishing collection ${testCollectionId}`)
+      })
+
+      const collectionPayload = await createCollectionViaApi(
+        testSubCollectionAlias,
+        testCollectionAlias
+      ).catch(() => {
+        throw new Error(
+          `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
+        )
+      })
+
+      await sut.publishCollection(collectionPayload.id).catch(() => {
+        throw new Error(`Tests beforeAll(): Error while publishing collection ${testCollectionId}`)
+      })
+
+      try {
+        testDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          testSubCollectionAlias
+        )
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
+      }
+      const uploadFileViaApiResult = await uploadFileViaApi(
+        testDatasetIds.numericId,
+        testTextFile4Name,
+        {
+          categories: ['tabular data']
+        }
+      ).catch(() => {
+        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile4Name}`)
+      })
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+
+      await updateFileTabularTags(uploadFileViaApiResult.data.data.files[0].dataFile.id, [
+        'Survey',
+        'Genomics'
+      ]).catch(() => {
+        throw new Error(
+          `Tests beforeAll(): Error while updating file tabular tags ${uploadFileViaApiResult.data.data.files[0].dataFile.id}`
+        )
+      })
+
+      await publishDatasetViaApi(testDatasetIds.numericId).catch(() => {
+        throw new Error(
+          `Tests beforeAll(): Error while publishing dataset ${testDatasetIds.numericId}`
+        )
+      })
+    })
+
+    afterAll(async () => {
+      try {
+        await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.persistentId}`
+        )
+      }
+      try {
+        await deleteCollectionViaApi(testSubCollectionAlias)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
+        )
+      }
+    })
+
+    test('should return collection items given a valid collection alias', async () => {
+      // Give enough time to Solr for indexing
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+
+      const actual = await sut.getCollectionItems(testCollectionAlias)
+      const actualFilePreview = actual.items[1] as FilePreview
+      const actualDatasetPreview = actual.items[0] as DatasetPreview
+      const actualCollectionPreview = actual.items[2] as CollectionPreview
+
+      const expectedFileMd5 = '77c7f03a7d7772907b43f0b322cef723'
+
+      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case`
+      const expectedDatasetDescription = 'Dataset created using the createDataset use case'
+      const expectedFileName = 'test-file-4.tab'
+      const expectedCollectionsName = 'Scientific Research'
+
+      expect(actualFilePreview.checksum?.type).toBe('MD5')
+      expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
+      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
+      expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
+      expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
+      expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
+      expect(actualFilePreview.description).toBe('')
+      expect(actualFilePreview.fileContentType).toBe('text/tab-separated-values')
+      expect(actualFilePreview.fileId).not.toBeUndefined()
+      expect(actualFilePreview.fileType).toBe('Tab-Delimited')
+      expect(actualFilePreview.md5).toBe(expectedFileMd5)
+      expect(actualFilePreview.name).toBe(expectedFileName)
+      expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Published)
+      expect(actualFilePreview.sizeInBytes).toBe(137)
+      expect(actualFilePreview.url).not.toBeUndefined()
+      expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
+      expect(actualFilePreview.type).toBe(CollectionItemType.FILE)
+      expect(actualFilePreview.restricted).toBe(false)
+      expect(actualFilePreview.canDownloadFile).toBe(true)
+      expect(actualFilePreview.categories).toEqual(['tabular data'])
+      expect(actualFilePreview.tabularTags).toEqual(['Genomics', 'Survey'])
+      expect(actualFilePreview.observations).toBe(10)
+      expect(actualFilePreview.variables).toBe(3)
+
+      expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
+      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
+      expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
+      expect(actualDatasetPreview.persistentId).not.toBeUndefined()
+      expect(actualDatasetPreview.persistentId).not.toBeUndefined()
+      expect(actualDatasetPreview.publicationStatuses[0]).toBe(PublicationStatus.Published)
+      expect(actualDatasetPreview.versionId).not.toBeUndefined()
+      expect(actualDatasetPreview.versionInfo.createTime).not.toBeUndefined()
+      expect(actualDatasetPreview.versionInfo.lastUpdateTime).not.toBeUndefined()
+      expect(actualDatasetPreview.versionInfo.majorNumber).toBe(1)
+      expect(actualDatasetPreview.versionInfo.minorNumber).toBe(0)
+      expect(actualDatasetPreview.versionInfo.state).toBe('RELEASED')
+      expect(actualDatasetPreview.parentCollectionAlias).toBe(
+        'collectionsRepositoryTestSubCollection'
+      )
+      expect(actualDatasetPreview.parentCollectionName).toBe(expectedCollectionsName)
+      expect(actualDatasetPreview.type).toBe(CollectionItemType.DATASET)
+
+      expect(actualCollectionPreview.name).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.alias).toBe(testSubCollectionAlias)
+      expect(actualCollectionPreview.description).toBe('We do all the science.')
+      expect(actualCollectionPreview.imageUrl).toBe(undefined)
+      expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
+      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Published)
+      expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
+      expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
+      expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
+      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
+
+      expect(actual.totalItemCount).toBe(3)
     })
   })
 

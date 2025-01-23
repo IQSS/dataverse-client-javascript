@@ -8,7 +8,7 @@ export abstract class ApiRepository {
   public async doGet(
     apiEndpoint: string,
     authRequired = false,
-    queryParams: object = {}
+    queryParams: object | URLSearchParams = {}
   ): Promise<AxiosResponse> {
     return await axios
       .get(buildRequestUrl(apiEndpoint), buildRequestConfig(authRequired, queryParams))
