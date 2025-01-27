@@ -6,6 +6,7 @@ export interface Dataset {
   versionId: number
   versionInfo: DatasetVersionInfo
   license?: DatasetLicense
+  termsOfUse: TermsOfUse
   alternativePersistentId?: string
   publicationDate?: string
   citationDate?: string
@@ -33,6 +34,17 @@ export interface DatasetLicense {
   name: string
   uri: string
   iconUri?: string
+}
+
+export interface TermsOfUse {
+  fileAccessRequest: boolean
+  termsOfAccess?: string
+  dataAccessPlace?: string
+  originalArchive?: string
+  availabilityStatus?: string
+  contactForAccess?: string
+  sizeOfCollection?: string
+  studyCompletion?: string
 }
 
 export type DatasetMetadataBlocks = [CitationMetadataBlock, ...DatasetMetadataBlock[]]

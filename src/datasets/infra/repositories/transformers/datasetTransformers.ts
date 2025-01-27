@@ -233,6 +233,16 @@ export const transformVersionPayloadToDataset = (
       lastUpdateTime: new Date(versionPayload.lastUpdateTime),
       releaseTime: new Date(versionPayload.releaseTime)
     },
+    termsOfUse: {
+      fileAccessRequest: versionPayload.fileAccessRequest,
+      termsOfAccess: versionPayload.termsOfAccess,
+      dataAccessPlace: versionPayload.dataAccessPlace,
+      originalArchive: versionPayload.originalArchive,
+      availabilityStatus: versionPayload.availabilityStatus,
+      contactForAccess: versionPayload.contactForAccess,
+      sizeOfCollection: versionPayload.sizeOfCollection,
+      studyCompletion: versionPayload.studyCompletion
+    },
     metadataBlocks: transformPayloadToDatasetMetadataBlocks(
       versionPayload.metadataBlocks,
       keepRawFields
