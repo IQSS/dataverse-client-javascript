@@ -54,7 +54,7 @@ describe('logout', () => {
   test('should return error result on error response', async () => {
     jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-    let error: WriteError = undefined
+    let error: WriteError | undefined = undefined
     await sut.logout().catch((e) => (error = e))
 
     expect(axios.post).toHaveBeenCalledWith(

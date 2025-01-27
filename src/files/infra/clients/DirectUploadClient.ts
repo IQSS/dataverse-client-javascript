@@ -73,7 +73,8 @@ export class DirectUploadClient implements IDirectUploadClient {
       if (axios.isCancel(error)) {
         throw new FileUploadCancelError(file.name, datasetId)
       }
-      throw new FileUploadError(file.name, datasetId, error.message)
+      const errorMessage = error instanceof Error ? error.message : 'Upload singlepart file failed'
+      throw new FileUploadError(file.name, datasetId, errorMessage)
     }
   }
 
@@ -114,7 +115,7 @@ export class DirectUploadClient implements IDirectUploadClient {
         eTags[`${index + 1}`] = eTag
       } catch (error) {
         if (axios.isCancel(error)) {
-          await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint)
+          await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint as string)
           throw new FileUploadCancelError(file.name, datasetId)
         }
         if (retries < maxRetries) {
@@ -122,8 +123,12 @@ export class DirectUploadClient implements IDirectUploadClient {
           await new Promise((resolve) => setTimeout(resolve, backoffDelay))
           await uploadPart(destinationUrl, index, retries + 1)
         } else {
-          await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint)
-          throw new FilePartUploadError(file.name, datasetId, error.message, index + 1)
+          await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint as string)
+
+          const errorMessage =
+            error instanceof Error ? error.message : 'Upload part of multipart file failed'
+
+          throw new FilePartUploadError(file.name, datasetId, errorMessage, index + 1)
         }
       }
     }
@@ -165,7 +170,7 @@ export class DirectUploadClient implements IDirectUploadClient {
   ): Promise<void> {
     return await axios
       .put(
-        buildRequestUrl(destination.completeEndpoint),
+        buildRequestUrl(destination.completeEndpoint as string),
         eTags,
         buildRequestConfig(
           true,
@@ -177,7 +182,7 @@ export class DirectUploadClient implements IDirectUploadClient {
       .then(() => undefined)
       .catch(async (error) => {
         if (axios.isCancel(error)) {
-          await this.abortMultipartUpload(fileName, datasetId, destination.abortEndpoint)
+          await this.abortMultipartUpload(fileName, datasetId, destination.abortEndpoint as string)
           throw new FileUploadCancelError(fileName, datasetId)
         }
         throw new MultipartCompletionError(fileName, datasetId, error.message)

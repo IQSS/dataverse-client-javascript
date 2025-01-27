@@ -8,6 +8,7 @@ import { MetadataFieldValidator } from './MetadataFieldValidator'
 import { DatasetMetadataChildFieldValueDTO } from '../../dtos/DatasetDTO'
 import { MultipleMetadataFieldValidator } from './MultipleMetadataFieldValidator'
 import {
+  MetadataFieldInfo,
   MetadataFieldType,
   MetadataFieldWatermark
 } from '../../../../metadataBlocks/domain/models/MetadataBlock'
@@ -62,7 +63,7 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
     datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo
   ) {
     if (
-      !datasetMetadataFieldAndValueInfo.metadataFieldInfo.controlledVocabularyValues.includes(
+      !datasetMetadataFieldAndValueInfo.metadataFieldInfo.controlledVocabularyValues?.includes(
         datasetMetadataFieldAndValueInfo.metadataFieldValue as string
       )
     ) {
@@ -120,13 +121,21 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
     datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo
   ) {
     const metadataFieldInfo = datasetMetadataFieldAndValueInfo.metadataFieldInfo
-    const childMetadataFieldKeys = Object.keys(metadataFieldInfo.childMetadataFields)
+
+    const childMetadataFieldKeys = Object.keys(
+      metadataFieldInfo.childMetadataFields as Record<string, MetadataFieldInfo>
+    )
+
     const metadataFieldValidator = new MetadataFieldValidator(
       this,
       new MultipleMetadataFieldValidator(this)
     )
+
     for (const childMetadataFieldKey of childMetadataFieldKeys) {
-      const childMetadataFieldInfo = metadataFieldInfo.childMetadataFields[childMetadataFieldKey]
+      const childMetadataFieldInfo = (
+        metadataFieldInfo.childMetadataFields as Record<string, MetadataFieldInfo>
+      )[childMetadataFieldKey]
+
       metadataFieldValidator.validate({
         metadataFieldInfo: childMetadataFieldInfo,
         metadataFieldKey: childMetadataFieldKey,

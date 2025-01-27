@@ -494,8 +494,8 @@ describe('DatasetsRepository', () => {
         '1.0',
         DatasetNotNumberedVersion.DRAFT
       )
-      expect(actual.metadataChanges[0]).not.toBeUndefined()
-      expect(actual.metadataChanges[0].blockName).toEqual('Citation Metadata')
+      expect(actual.metadataChanges?.[0]).not.toBeUndefined()
+      expect(actual.metadataChanges?.[0].blockName).toEqual('Citation Metadata')
     })
 
     test('should return added file diff between two dataset versions', async () => {

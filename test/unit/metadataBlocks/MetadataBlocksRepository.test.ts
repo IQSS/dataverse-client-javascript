@@ -63,7 +63,7 @@ describe('MetadataBlocksRepository', () => {
       }
       jest.spyOn(axios, 'get').mockRejectedValue(testErrorResponse)
 
-      let error: ReadError = undefined
+      let error: ReadError | undefined = undefined
       await sut
         .getCollectionMetadataBlocks(TestConstants.TEST_DUMMY_COLLECTION_ID, true)
         .catch((e) => (error = e))
@@ -104,7 +104,7 @@ describe('MetadataBlocksRepository', () => {
       }
       jest.spyOn(axios, 'get').mockRejectedValue(testErrorResponse)
 
-      let error: ReadError = undefined
+      let error: ReadError | undefined = undefined
       await sut.getMetadataBlockByName(testMetadataBlockName).catch((e) => (error = e))
 
       expect(axios.get).toHaveBeenCalledWith(

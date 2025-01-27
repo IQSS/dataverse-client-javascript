@@ -68,9 +68,9 @@ export const transformDatasetModelToUpdateDatasetRequestPayload = (
   datasetMetadataBlocksValues.forEach(function (
     newDatasetMetadataBlockValues: DatasetMetadataBlockValuesDTO
   ) {
-    const metadataBlock: MetadataBlock = metadataBlocks.find(
+    const metadataBlock = metadataBlocks.find(
       (metadataBlock) => metadataBlock.name == newDatasetMetadataBlockValues.name
-    )
+    ) as MetadataBlock
     const metadataBlockFieldsPayload: MetadataFieldRequestPayload[] = []
     const metadataBlockFields = metadataBlock.metadataFields
     const datasetMetadataFields = newDatasetMetadataBlockValues.fields
@@ -119,7 +119,7 @@ export const transformMetadataBlockModelsToRequestPayload = (
   ) {
     const metadataBlock: MetadataBlock = metadataBlocks.find(
       (metadataBlock) => metadataBlock.name == newDatasetMetadataBlockValues.name
-    )
+    ) as MetadataBlock
     metadataBlocksRequestPayload[newDatasetMetadataBlockValues.name] = {
       fields: transformMetadataFieldModelsToRequestPayload(
         newDatasetMetadataBlockValues.fields,
@@ -195,8 +195,9 @@ export const transformMetadataChildFieldValueToRequestPayload = (
 ): Record<string, MetadataFieldRequestPayload> => {
   const metadataChildFieldRequestPayload: Record<string, MetadataFieldRequestPayload> = {}
   for (const metadataChildFieldKey of Object.keys(datasetMetadataChildFieldValue)) {
-    const childMetadataFieldInfo: MetadataFieldInfo =
-      metadataBlockFieldInfo.childMetadataFields[metadataChildFieldKey]
+    const childMetadataFieldInfo: MetadataFieldInfo = (
+      metadataBlockFieldInfo.childMetadataFields as Record<string, MetadataFieldInfo>
+    )[metadataChildFieldKey]
     const value: string = datasetMetadataChildFieldValue[metadataChildFieldKey] as unknown as string
     metadataChildFieldRequestPayload[metadataChildFieldKey] = {
       value: value,
@@ -252,7 +253,9 @@ export const transformVersionPayloadToDataset = (
     })
   }
   if ('license' in versionPayload) {
-    datasetModel.license = transformPayloadToDatasetLicense(versionPayload.license)
+    datasetModel.license = transformPayloadToDatasetLicense(
+      versionPayload.license as LicensePayload
+    )
   }
   if ('alternativePersistentId' in versionPayload) {
     datasetModel.alternativePersistentId = versionPayload.alternativePersistentId

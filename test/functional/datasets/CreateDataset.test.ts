@@ -1,4 +1,4 @@
-import { createDataset, CreatedDatasetIdentifiers } from '../../../src/datasets'
+import { createDataset, DatasetDTO } from '../../../src/datasets'
 import { ApiConfig } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -48,16 +48,16 @@ describe('execute', () => {
       ]
     }
     expect.assertions(3)
-    let createdDatasetIdentifiers: CreatedDatasetIdentifiers
+
     try {
-      createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
-    } catch (error) {
-      throw new Error('Dataset should be created')
-    } finally {
+      const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
+
       expect(createdDatasetIdentifiers).not.toBeNull()
       expect(createdDatasetIdentifiers.numericId).not.toBeNull()
       expect(createdDatasetIdentifiers.persistentId).not.toBeNull()
       await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
+    } catch (error) {
+      throw new Error('Dataset should be created')
     }
   })
 
@@ -94,25 +94,25 @@ describe('execute', () => {
       ]
     }
     expect.assertions(5)
-    let fieldValidationError: FieldValidationError
+    let fieldValidationError: FieldValidationError | undefined = undefined
     try {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      fieldValidationError = error
+      fieldValidationError = error as FieldValidationError
     } finally {
       expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
-      expect(fieldValidationError.citationBlockName).toEqual('citation')
-      expect(fieldValidationError.metadataFieldName).toEqual('title')
-      expect(fieldValidationError.parentMetadataFieldName).toEqual(undefined)
-      expect(fieldValidationError.message).toEqual(
+      expect(fieldValidationError?.citationBlockName).toEqual('citation')
+      expect(fieldValidationError?.metadataFieldName).toEqual('title')
+      expect(fieldValidationError?.parentMetadataFieldName).toEqual(undefined)
+      expect(fieldValidationError?.message).toEqual(
         'There was an error when validating the field title from metadata block citation. Reason was: The field should not be empty.'
       )
     }
   })
 
   test('should throw an error when a second level required field is missing', async () => {
-    const testNewDataset = {
+    const testNewDataset: DatasetDTO = {
       metadataBlockValues: [
         {
           name: 'citation',
@@ -144,19 +144,19 @@ describe('execute', () => {
       ]
     }
     expect.assertions(6)
-    let fieldValidationError: FieldValidationError
+    let fieldValidationError: FieldValidationError | undefined = undefined
     try {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      fieldValidationError = error
+      fieldValidationError = error as FieldValidationError
     } finally {
       expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
-      expect(fieldValidationError.citationBlockName).toEqual('citation')
-      expect(fieldValidationError.metadataFieldName).toEqual('authorName')
-      expect(fieldValidationError.parentMetadataFieldName).toEqual('author')
-      expect(fieldValidationError.fieldPosition).toEqual(0)
-      expect(fieldValidationError.message).toEqual(
+      expect(fieldValidationError?.citationBlockName).toEqual('citation')
+      expect(fieldValidationError?.metadataFieldName).toEqual('authorName')
+      expect(fieldValidationError?.parentMetadataFieldName).toEqual('author')
+      expect(fieldValidationError?.fieldPosition).toEqual(0)
+      expect(fieldValidationError?.message).toEqual(
         'There was an error when validating the field authorName from metadata block citation with parent field author in position 0. Reason was: The field should not be empty.'
       )
     }
@@ -196,19 +196,19 @@ describe('execute', () => {
       ]
     }
     expect.assertions(6)
-    let fieldValidationError: FieldValidationError
+    let fieldValidationError: FieldValidationError | undefined = undefined
     try {
       await createDataset.execute(testNewDataset)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      fieldValidationError = error
+      fieldValidationError = error as FieldValidationError
     } finally {
       expect(fieldValidationError).toBeInstanceOf(FieldValidationError)
-      expect(fieldValidationError.citationBlockName).toEqual('citation')
-      expect(fieldValidationError.metadataFieldName).toEqual('subject')
-      expect(fieldValidationError.parentMetadataFieldName).toEqual(undefined)
-      expect(fieldValidationError.fieldPosition).toEqual(1)
-      expect(fieldValidationError.message).toEqual(
+      expect(fieldValidationError?.citationBlockName).toEqual('citation')
+      expect(fieldValidationError?.metadataFieldName).toEqual('subject')
+      expect(fieldValidationError?.parentMetadataFieldName).toEqual(undefined)
+      expect(fieldValidationError?.fieldPosition).toEqual(1)
+      expect(fieldValidationError?.message).toEqual(
         'There was an error when validating the field subject from metadata block citation in position 1. Reason was: The field does not have a valid controlled vocabulary value.'
       )
     }

@@ -35,11 +35,13 @@ describe('validate', () => {
       throw new Error('Validation should fail')
     } catch (error) {
       expect(error).toBeInstanceOf(FieldValidationError)
-      expect(error.citationBlockName).toEqual('citation')
-      expect(error.metadataFieldName).toEqual(expectedMetadataFieldName)
-      expect(error.parentMetadataFieldName).toEqual(expectedParentMetadataFieldName)
-      expect(error.fieldPosition).toEqual(expectedPosition)
-      expect(error.message).toEqual(expectedErrorMessage)
+      expect((error as FieldValidationError)?.citationBlockName).toEqual('citation')
+      expect((error as FieldValidationError)?.metadataFieldName).toEqual(expectedMetadataFieldName)
+      expect((error as FieldValidationError)?.parentMetadataFieldName).toEqual(
+        expectedParentMetadataFieldName
+      )
+      expect((error as FieldValidationError)?.fieldPosition).toEqual(expectedPosition)
+      expect((error as FieldValidationError)?.message).toEqual(expectedErrorMessage)
     }
   }
 

@@ -22,7 +22,7 @@ describe('execute', () => {
     dataverseInfoRepositoryStub.getZipDownloadLimit = jest.fn().mockRejectedValue(new ReadError())
     const sut = new GetZipDownloadLimit(dataverseInfoRepositoryStub)
 
-    let actualError: ReadError
+    let actualError: ReadError | undefined = undefined
     await sut.execute().catch((e) => (actualError = e))
 
     expect(actualError).toBeInstanceOf(ReadError)
