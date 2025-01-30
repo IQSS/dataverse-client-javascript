@@ -60,7 +60,15 @@ export const createDatasetModel = (
       availabilityStatus: 'Availability status',
       contactForAccess: 'Contact for access',
       sizeOfCollection: 'Size of collection',
-      studyCompletion: 'Study completion'
+      studyCompletion: 'Study completion',
+      termsOfUse: 'Terms of use',
+      confidentialDeclaration: 'Confidential declaration',
+      specialPermissions: 'Special permissions',
+      restrictions: 'Restrictions',
+      citationRequirements: 'Citation requirements',
+      depositorRequirements: 'Depositor requirements',
+      conditions: 'Conditions',
+      disclaimer: 'Disclaimer'
     },
     publicationDate: DATASET_PUBLICATION_DATE_STR,
     metadataBlocks: [
@@ -129,6 +137,14 @@ export const createDatasetVersionPayload = (
     contactForAccess: 'Contact for access',
     sizeOfCollection: 'Size of collection',
     studyCompletion: 'Study completion',
+    termsOfUse: 'Terms of use',
+    confidentialDeclaration: 'Confidential declaration',
+    specialPermissions: 'Special permissions',
+    restrictions: 'Restrictions',
+    citationRequirements: 'Citation requirements',
+    depositorRequirements: 'Depositor requirements',
+    conditions: 'Conditions',
+    disclaimer: 'Disclaimer',
     metadataBlocks: {
       citation: {
         name: 'citation',
