@@ -227,3 +227,11 @@ export const updateFileTabularTags = async (
     }
   )
 }
+
+export const getFileMetadata = async (fileId: number): Promise<AxiosResponse> => {
+  return await axios.get(`${TestConstants.TEST_API_URL}/files/${fileId}/metadata`, {
+    headers: {
+      'X-Dataverse-Key': process.env.TEST_API_KEY
+    }
+  })
+}

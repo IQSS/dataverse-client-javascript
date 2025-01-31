@@ -18,6 +18,7 @@ import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
 import { transformUploadDestinationsResponseToUploadDestination } from './transformers/fileUploadDestinationsTransformers'
 import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
+import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
 export interface GetFilesQueryParams {
@@ -304,6 +305,25 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
 
   public async restrictFile(fileId: number | string, restrict: boolean): Promise<undefined> {
     return this.doPut(this.buildApiEndpoint(this.filesResourceName, 'restrict', fileId), restrict)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateFileMetadata(
+    fileId: string | number,
+    updateFileMetadata: UpdateFileMetadataDTO
+  ): Promise<void> {
+    const formData = new FormData()
+    formData.append('jsonData', JSON.stringify(updateFileMetadata))
+
+    return this.doPost(
+      this.buildApiEndpoint(this.filesResourceName, `${fileId}/metadata`),
+      formData,
+      {},
+      ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
+    )
       .then(() => undefined)
       .catch((error) => {
         throw error

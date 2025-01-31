@@ -41,6 +41,7 @@ import {
   deleteCollectionViaApi,
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
+import { getFileMetadata } from '../../testHelpers/files/filesHelper'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -852,6 +853,49 @@ describe('FilesRepository', () => {
       )
 
       await expect(setFileToRestricted(nonExistentFiledId)).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('updateFileMetadata', () => {
+    test('should update file metadata when file exists', async () => {
+      const getDatasetFiles = await sut.getDatasetFiles(
+        testDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const fileid = getDatasetFiles.files[0].id
+      console.log('updateFileMetadata fileid', fileid)
+      const testFileMetadata = {
+        description: 'My description bbb.',
+        categories: ['Data'],
+        restrict: false
+      }
+
+      const actual = await sut.updateFileMetadata(fileid, testFileMetadata)
+      const getFileMetadataResult = await getFileMetadata(fileid).catch(() => {
+        throw new Error(`Error while getting file metadata ${fileid}`)
+      })
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      expect(actual).toBeUndefined()
+      expect(getFileMetadataResult.data.description).toBe(testFileMetadata.description)
+      expect(getFileMetadataResult.data.categories).toEqual(testFileMetadata.categories)
+      expect(getFileMetadataResult.data.restricted).toBe(testFileMetadata.restrict)
+    })
+
+    test('should return error when file does not exist', async () => {
+      const nonExistentFiledId = 4000
+      const testFileMetadata = {
+        description: 'My description bbb.',
+        categories: ['Data'],
+        restrict: false
+      }
+      const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
+
+      await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
+        errorExpected
+      )
     })
   })
 })
