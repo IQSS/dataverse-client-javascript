@@ -856,18 +856,6 @@ describe('FilesRepository', () => {
   })
 
   describe('updateFileMetadata', () => {
-    test('should update file metadata when file exists', async () => {
-      const testFileMetadata = {
-        description: 'My description bbb.',
-        categories: ['Data'],
-        restrict: false
-      }
-
-      const actual = await sut.updateFileMetadata(testFileId, testFileMetadata)
-
-      expect(actual).toBeUndefined()
-    })
-
     test('should return error when file does not exist', async () => {
       const nonExistentFiledId = 4000
       const testFileMetadata = {
@@ -880,6 +868,28 @@ describe('FilesRepository', () => {
       await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
         errorExpected
       )
+    })
+
+    test('should update file metadata when file exists', async () => {
+      const getDatasetFilesResponse = await sut.getDatasetFiles(
+        testDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      console.log('fileInfo', getDatasetFilesResponse)
+
+      const fileId = getDatasetFilesResponse.files[0].id
+      const testFileMetadata = {
+        description: 'My description bbb.',
+        categories: ['Data'],
+        restrict: false
+      }
+
+      const actual = await sut.updateFileMetadata(fileId, testFileMetadata)
+
+      expect(actual).toBeUndefined()
     })
   })
 })
