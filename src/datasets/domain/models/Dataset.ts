@@ -46,7 +46,7 @@ export interface TermsOfUse {
   sizeOfCollection?: string
   studyCompletion?: string
   termsOfUse?: string
-  confidentialDeclaration?: string
+  confidentialityDeclaration?: string
   specialPermissions?: string
   restrictions?: string
   citationRequirements?: string

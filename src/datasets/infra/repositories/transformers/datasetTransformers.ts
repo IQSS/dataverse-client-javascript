@@ -244,9 +244,9 @@ export const transformVersionPayloadToDataset = (
       sizeOfCollection: transformPayloadText(keepRawFields, versionPayload.sizeOfCollection),
       studyCompletion: transformPayloadText(keepRawFields, versionPayload.studyCompletion),
       termsOfUse: transformPayloadText(keepRawFields, versionPayload.termsOfUse),
-      confidentialDeclaration: transformPayloadText(
+      confidentialityDeclaration: transformPayloadText(
         keepRawFields,
-        versionPayload.confidentialDeclaration
+        versionPayload.confidentialityDeclaration
       ),
       specialPermissions: transformPayloadText(keepRawFields, versionPayload.specialPermissions),
       restrictions: transformPayloadText(keepRawFields, versionPayload.restrictions),
