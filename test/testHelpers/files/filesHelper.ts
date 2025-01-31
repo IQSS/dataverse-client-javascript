@@ -235,3 +235,11 @@ export const getFileMetadata = async (fileId: number): Promise<AxiosResponse> =>
     }
   })
 }
+
+export const createFileMetadataWithCategories = (): FileMetadata => {
+  return {
+    categories: ['category1', 'category2'],
+    description: 'description',
+    directoryLabel: 'directoryLabel'
+  }
+}

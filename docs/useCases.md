@@ -1237,6 +1237,39 @@ The following error might arise from the `AddUploadedFileToDataset` use case:
 
 - AddUploadedFileToDatasetError: This error indicates that there was an error while adding the uploaded file to the dataset.
 
+#### Updating File Metadata Use Cases
+
+This use case is designed to update or edit metadata information for a specific file by a numeric identifier or persistemt identifier.
+
+##### Update File Metadata
+
+###### Example call:
+
+````typescript
+import { updateFileMetadata } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId: number | string = 123
+const updateFileMetadataDTO = {
+  description: 'My description bbb.',
+  categories: ['Data'],
+  restrict: false
+}
+
+await updateFileMetadata.execute(fileId, updateFileMetadataDTO).then((fileId) => {
+  console.log(`File updated successfully with file ID: ${fileId}`)
+})
+
+_See [use case](../src/files/domain/useCases/UpdateFileMetadata.ts) implementation_.
+
+This use case supports the following optional parameters for updateFileMetadataDTO:
+
+- **description**: (string)
+- **prevFreeform**: (string)
+- **categories**: (string[])
+- **dataFileTags**: (string[])
+- **restrict**: (boolean)
 #### Delete a File
 
 Deletes a File.
@@ -1253,7 +1286,7 @@ const fileId = 12345
 deleteFile.execute(fileId)
 
 /* ... */
-```
+````
 
 _See [use case](../src/files/domain/useCases/DeleteFile.ts) implementation_.
 
