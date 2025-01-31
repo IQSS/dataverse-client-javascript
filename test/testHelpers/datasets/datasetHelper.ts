@@ -138,7 +138,7 @@ export const createDatasetVersionPayload = (
     sizeOfCollection: 'Size of collection',
     studyCompletion: 'Study completion',
     termsOfUse: 'Terms of use',
-    confidentialityDeclaration: 'Confidential declaration',
+    confidentialityDeclaration: 'Confidentiality declaration',
     specialPermissions: 'Special permissions',
     restrictions: 'Restrictions',
     citationRequirements: 'Citation requirements',
