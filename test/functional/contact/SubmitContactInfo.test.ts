@@ -59,7 +59,7 @@ describe('submitContactInfo', () => {
       body: '',
       fromEmail: 'example@gmail.com'
     }
-    const expectedError = new WriteError(`[400] Feedback target object not found`)
+    const expectedError = new WriteError(`[400] Feedback target object not found.`)
     await expect(submitContactInfo.execute(contactDTO)).rejects.toThrow(expectedError)
   })
 })

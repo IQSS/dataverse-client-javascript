@@ -94,7 +94,7 @@ describe('execute submit information to contacts', () => {
       fromEmail: ''
     }
     const contactRepositoryStub = <IContactRepository>{}
-    const error = new WriteError(`[400] Feedback target object not found`)
+    const error = new WriteError(`[400] Feedback target object not found.`)
     contactRepositoryStub.submitContactInfo = jest.fn().mockRejectedValue(error)
     const sut = new SubmitContactInfo(contactRepositoryStub)
     await expect(sut.execute(contactDTO)).rejects.toThrow(error)
