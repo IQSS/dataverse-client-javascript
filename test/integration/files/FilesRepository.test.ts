@@ -576,6 +576,42 @@ describe('FilesRepository', () => {
     })
   })
 
+  describe('updateFileMetadata', () => {
+    test('should return error when file does not exist', async () => {
+      const nonExistentFiledId = 4000
+      const testFileMetadata = {
+        description: 'My description bbb.',
+        categories: ['Data'],
+        restrict: false
+      }
+      const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
+
+      await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
+        errorExpected
+      )
+    })
+
+    test('should update file metadata when file exists', async () => {
+      const getDatasetFilesResponse = await sut.getDatasetFiles(
+        testDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      const fileId = getDatasetFilesResponse.files[0].id
+      const testFileMetadata = {
+        description: 'My description bbb.',
+        categories: ['Data'],
+        restrict: false
+      }
+
+      const actual = await sut.updateFileMetadata(fileId, testFileMetadata)
+
+      expect(actual).toBeUndefined()
+    })
+  })
+
   describe('getFileUploadDestination', () => {
     const testCollectionAlias = 'getFileUploadDestinationsTestCollection'
     let testDataset2Ids: CreatedDatasetIdentifiers
