@@ -534,6 +534,41 @@ describe('FilesRepository', () => {
     })
   })
 
+  describe('updateFileMetadata', () => {
+    test('should return error when file does not exist', async () => {
+      const testFileMetadata = {
+        description: 'My description bbb.',
+        categories: ['Data'],
+        restrict: false
+      }
+      const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
+
+      await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
+        errorExpected
+      )
+    })
+
+    test('should update file metadata when file exists', async () => {
+      const getDatasetFilesResponse = await sut.getDatasetFiles(
+        testDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      const fileId = getDatasetFilesResponse.files[0].id
+      const testFileMetadata = {
+        description: 'My description bbb.',
+        categories: ['Data'],
+        restrict: false
+      }
+
+      const actual = await sut.updateFileMetadata(fileId, testFileMetadata)
+
+      expect(actual).toBeUndefined()
+    })
+  })
+
   describe('getFileCitation', () => {
     test('should return citation when file exists', async () => {
       const actualFileCitation = await sut.getFileCitation(
@@ -573,61 +608,6 @@ describe('FilesRepository', () => {
       await expect(
         sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
       ).rejects.toThrow(errorExpected)
-    })
-  })
-
-  describe('updateFileMetadata', () => {
-    const testCollectionAlias = 'updateFileMetadataTestCollection'
-    let testDataset2Ids: CreatedDatasetIdentifiers
-
-    beforeAll(async () => {
-      await createCollectionViaApi(testCollectionAlias)
-      await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
-      testDataset2Ids = await createDataset.execute(
-        TestConstants.TEST_NEW_DATASET_DTO,
-        testCollectionAlias
-      )
-      await createSinglepartFileBlob()
-      await createMultipartFileBlob()
-    })
-
-    afterAll(async () => {
-      await deleteUnpublishedDatasetViaApi(testDataset2Ids.numericId)
-      await deleteCollectionViaApi(testCollectionAlias)
-    })
-
-    test('should return error when file does not exist', async () => {
-      const nonExistentFiledId = 4000
-      const testFileMetadata = {
-        description: 'My description bbb.',
-        categories: ['Data'],
-        restrict: false
-      }
-      const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
-
-      await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
-        errorExpected
-      )
-    })
-
-    test('should update file metadata when file exists', async () => {
-      const getDatasetFilesResponse = await sut.getDatasetFiles(
-        testDataset2Ids.numericId,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ
-      )
-
-      const fileId = getDatasetFilesResponse.files[0].id
-      const testFileMetadata = {
-        description: 'My description bbb.',
-        categories: ['Data'],
-        restrict: false
-      }
-
-      const actual = await sut.updateFileMetadata(fileId, testFileMetadata)
-
-      expect(actual).toBeUndefined()
     })
   })
 
