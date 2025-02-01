@@ -577,6 +577,25 @@ describe('FilesRepository', () => {
   })
 
   describe('updateFileMetadata', () => {
+    const testCollectionAlias = 'updateFileMetadataTestCollection'
+    let testDataset2Ids: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testCollectionAlias)
+      await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
+      testDataset2Ids = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      await createSinglepartFileBlob()
+      await createMultipartFileBlob()
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(testDataset2Ids.numericId)
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
     test('should return error when file does not exist', async () => {
       const nonExistentFiledId = 4000
       const testFileMetadata = {
@@ -593,7 +612,7 @@ describe('FilesRepository', () => {
 
     test('should update file metadata when file exists', async () => {
       const getDatasetFilesResponse = await sut.getDatasetFiles(
-        testDatasetIds.numericId,
+        testDataset2Ids.numericId,
         latestDatasetVersionId,
         false,
         FileOrderCriteria.NAME_AZ
