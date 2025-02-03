@@ -8,8 +8,8 @@ export const transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems = 
     .map((collectionFeaturedItemPayload) => ({
       id: collectionFeaturedItemPayload.id,
       content: collectionFeaturedItemPayload.content,
-      imageFileUrl: collectionFeaturedItemPayload.imageFileUrl,
-      imageFileName: collectionFeaturedItemPayload.imageFileName,
+      imageFileUrl: collectionFeaturedItemPayload.imageFileUrl || undefined,
+      imageFileName: collectionFeaturedItemPayload.imageFileName || undefined,
       displayOrder: collectionFeaturedItemPayload.displayOrder
     }))
     .sort((a, b) => a.displayOrder - b.displayOrder)
