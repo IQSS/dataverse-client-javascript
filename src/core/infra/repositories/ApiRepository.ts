@@ -48,7 +48,7 @@ export abstract class ApiRepository {
   protected buildApiEndpoint(
     resourceName: string,
     operation: string,
-    resourceId: number | string = undefined
+    resourceId: number | string | undefined = undefined
   ) {
     return typeof resourceId === 'number'
       ? `/${resourceName}/${resourceId}/${operation}`

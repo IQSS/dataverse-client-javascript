@@ -37,9 +37,9 @@ export interface NewCollectionContactRequestPayload {
 }
 
 export interface NewCollectionMetadataBlocksRequestPayload {
-  metadataBlockNames: string[]
-  facetIds: string[]
-  inputLevels: NewCollectionInputLevelRequestPayload[]
+  metadataBlockNames?: string[]
+  facetIds?: string[]
+  inputLevels?: NewCollectionInputLevelRequestPayload[]
 }
 
 export interface NewCollectionInputLevelRequestPayload {
@@ -183,7 +183,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
     )
 
-    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
+    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] | undefined =
       collectionDTO.inputLevels?.map((inputLevel) => ({
         datasetFieldTypeName: inputLevel.datasetFieldName,
         include: inputLevel.include,

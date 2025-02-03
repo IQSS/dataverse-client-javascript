@@ -22,7 +22,7 @@ describe('execute', () => {
     dataverseInfoRepositoryStub.getDataverseVersion = jest.fn().mockRejectedValue(testReadError)
     const sut = new GetDataverseVersion(dataverseInfoRepositoryStub)
 
-    let actualError: ReadError = undefined
+    let actualError: ReadError | undefined = undefined
     await sut.execute().catch((e) => (actualError = e))
 
     expect(actualError).toBe(testReadError)
