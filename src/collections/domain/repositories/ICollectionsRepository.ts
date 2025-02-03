@@ -1,6 +1,8 @@
 import { CollectionDTO } from '../dtos/CollectionDTO'
+import { CollectionFeaturedItemsDTO } from '../dtos/CollectionFeaturedItemsDTO'
 import { Collection } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
+import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
 import { CollectionItemSubset } from '../models/CollectionItemSubset'
 import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
@@ -26,4 +28,12 @@ export interface ICollectionsRepository {
     collectionIdOrAlias: number | string,
     updatedCollection: CollectionDTO
   ): Promise<void>
+  getCollectionFeaturedItems(
+    collectionIdOrAlias: number | string
+  ): Promise<CollectionFeaturedItem[]>
+  updateCollectionFeaturedItems(
+    collectionIdOrAlias: number | string,
+    featuredItemDTOs: CollectionFeaturedItemsDTO
+  ): Promise<CollectionFeaturedItem[]>
+  deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void>
 }
