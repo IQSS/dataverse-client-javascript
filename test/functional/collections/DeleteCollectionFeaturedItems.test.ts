@@ -71,7 +71,7 @@ describe('execute', () => {
     try {
       await deleteCollectionFeaturedItems.execute(invalidCollectionAlias)
     } catch (error) {
-      writeError = error
+      writeError = error as WriteError
     } finally {
       expect(writeError).toBeInstanceOf(WriteError)
       expect((writeError as WriteError).message).toEqual(

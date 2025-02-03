@@ -92,7 +92,7 @@ describe('execute', () => {
     expect(updatedFeaturedItemsResponse[2].displayOrder).toBe(newFeaturedItems[2].displayOrder)
     expect(updatedFeaturedItemsResponse[2].imageFileName).toEqual('featured-item-test-image-3.png')
     expect(updatedFeaturedItemsResponse[2].imageFileUrl).toBe(
-      `http://localhost:8080/api/access/dataverseFeatureItemImage/${updatedFeaturedItemsResponse[2].id}`
+      `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[2].id}`
     )
   })
 
@@ -123,7 +123,7 @@ describe('execute', () => {
     try {
       await updateCollectionFeaturedItems.execute(invalidCollectionAlias, newFeaturedItems)
     } catch (error) {
-      writeError = error
+      writeError = error as WriteError
     } finally {
       expect(writeError).toBeInstanceOf(WriteError)
       expect((writeError as WriteError).message).toEqual(
@@ -146,7 +146,7 @@ describe('execute', () => {
     try {
       await updateCollectionFeaturedItems.execute(testCollectionAlias, newFeaturedItems)
     } catch (error) {
-      writeError = error
+      writeError = error as WriteError
     } finally {
       expect(writeError).toBeInstanceOf(WriteError)
       expect((writeError as WriteError).message).toEqual(
@@ -209,7 +209,7 @@ describe('execute', () => {
       // Should keep the existing file even if a file was not provided because keepFile is true
       expect(updatedFeaturedItemsResponse[0].imageFileName).toEqual(testFeaturedItemFilename)
       expect(updatedFeaturedItemsResponse[0].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeatureItemImage/${updatedFeaturedItemsResponse[0].id}`
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[0].id}`
       )
     })
 
@@ -261,7 +261,7 @@ describe('execute', () => {
         'featured-item-test-image-updated.png'
       )
       expect(updatedFeaturedItemsResponse[0].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeatureItemImage/${updatedFeaturedItemsResponse[0].id}`
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[0].id}`
       )
     })
 
@@ -288,7 +288,7 @@ describe('execute', () => {
       // Should keep the existing file even if a file was provided because keepFile is true
       expect(updatedFeaturedItemsResponse[0].imageFileName).toEqual(testFeaturedItemFilename)
       expect(updatedFeaturedItemsResponse[0].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeatureItemImage/${updatedFeaturedItemsResponse[0].id}`
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[0].id}`
       )
     })
   })

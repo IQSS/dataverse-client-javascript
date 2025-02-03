@@ -86,7 +86,7 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
       content: 'This is a featured item',
       displayOrder: 1,
       imageFileName: 'test-image.png',
-      imageFileUrl: 'http://localhost:8080/api/access/dataverseFeatureItemImage/1'
+      imageFileUrl: 'http://localhost:8080/api/access/dataverseFeaturedItemImage/1'
     },
     {
       id: 2,

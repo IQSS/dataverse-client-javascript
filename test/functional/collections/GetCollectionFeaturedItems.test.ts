@@ -59,7 +59,7 @@ describe('execute', () => {
     expect(featuredItemsResponse[0].displayOrder).toBe(1)
     expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
     expect(featuredItemsResponse[0].imageFileUrl).toBe(
-      `http://localhost:8080/api/access/dataverseFeatureItemImage/${featuredItemsResponse[0].id}`
+      `http://localhost:8080/api/access/dataverseFeaturedItemImage/${featuredItemsResponse[0].id}`
     )
     expect(featuredItemsResponse[0].imageFileName).toBe('featured-item-test-image.png')
   })
@@ -95,7 +95,7 @@ describe('execute', () => {
     try {
       await getCollectionFeaturedItems.execute(invalidCollectionAlias)
     } catch (error) {
-      readError = error
+      readError = error as ReadError
     } finally {
       expect(readError).toBeInstanceOf(ReadError)
       expect((readError as ReadError).message).toEqual(

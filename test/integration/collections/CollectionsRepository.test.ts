@@ -926,7 +926,7 @@ describe('CollectionsRepository', () => {
       expect(featuredItemsResponse[0].displayOrder).toBe(1)
       expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
       expect(featuredItemsResponse[0].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeatureItemImage/${featuredItemsResponse[0].id}`
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${featuredItemsResponse[0].id}`
       )
       expect(featuredItemsResponse[0].imageFileName).toBe('featured-item-test-image.png')
     })
@@ -997,7 +997,7 @@ describe('CollectionsRepository', () => {
       expect(response[2].displayOrder).toEqual(newFeaturedItems[2].displayOrder)
       expect(response[2].imageFileName).toEqual('featured-item-test-image-3.png')
       expect(response[2].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeatureItemImage/${response[2].id}`
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${response[2].id}`
       )
     })
   })
