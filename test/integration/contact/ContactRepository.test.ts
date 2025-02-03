@@ -19,13 +19,29 @@ describe('submitContactInfo', () => {
     fromEmail: 'example@gmail.com'
   }
 
+  const test2ContactDTO: ContactDTO = {
+    identifier: 'root',
+    subject: 'Data Question',
+    body: 'Please help me understand your data. Thank you!',
+    fromEmail: 'example@gmail.com'
+  }
+
   const sut: ContactRepository = new ContactRepository()
 
   test('should return Contact when contact info is successfully submitted', async () => {
-    const contactInfo = await sut.submitContactInfo(testContactDTO)
+    const contactInfo = await sut.submitContactInfo(test2ContactDTO)
 
     expect(contactInfo).toBeDefined()
     expect(contactInfo[0].fromEmail).toEqual(testContactDTO.fromEmail)
+    expect(contactInfo[0].subject).toEqual(expect.any(String))
+    expect(contactInfo[0].body).toEqual(expect.any(String))
+  })
+
+  test('should return Contact when contact info is successfully submitted if accessed by identifier', async () => {
+    const contactInfo = await sut.submitContactInfo(testContactDTO)
+
+    expect(contactInfo).toBeDefined()
+    expect(contactInfo[0].fromEmail).toEqual(test2ContactDTO.fromEmail)
     expect(contactInfo[0].subject).toEqual(expect.any(String))
     expect(contactInfo[0].body).toEqual(expect.any(String))
   })

@@ -1427,6 +1427,7 @@ The above example would submit feedback to all contacts of a object where the ob
 In ContactDTO, it takes the following information:
 
 - **targetId**: the numeric identifier of the collection, dataset, or datafile. Persistent ids and collection aliases are not supported. (Optional)
+- **identifier**: the alias of a collection or the persistence id of a dataset or datafile. (Optional)
 - **subject**: the email subject line
 - **body**: the email body to send
 - **fromEmail**: the email to list in the reply-to field.
