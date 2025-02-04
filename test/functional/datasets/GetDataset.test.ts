@@ -1,8 +1,12 @@
 import { ApiConfig, createDataset, getDataset, ReadError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { DatasetDescription } from '../../../src/datasets/domain/models/Dataset'
-import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
+import {
+  createDatasetVersionPayload,
+  deleteUnpublishedDatasetViaApi
+} from '../../testHelpers/datasets/datasetHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
+import { transformVersionPayloadToDataset } from '../../../src/datasets/infra/repositories/transformers/datasetTransformers'
 
 const testNewDataset = {
   metadataBlockValues: [
@@ -88,6 +92,19 @@ describe('execute', () => {
     ).toBe('Hello **world**')
 
     await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
+  })
+
+  test('should return terms of use fields in markdown format when keepRawFields is false', async () => {
+    const versionPayload = createDatasetVersionPayload()
+    versionPayload.termsOfAccess = 'Hello <b>world</b>'
+    const dataset = transformVersionPayloadToDataset(versionPayload, false)
+    expect(dataset.termsOfUse.termsOfAccess).toBe('Hello **world**')
+  })
+
+  test('should return terms of use fields in html format when keepRawFields is true', async () => {
+    const versionPayload = createDatasetVersionPayload()
+    const dataset = transformVersionPayloadToDataset(versionPayload, true)
+    expect(dataset.termsOfUse.termsOfAccess).toBe(versionPayload.termsOfAccess)
   })
 
   test('should not return metadata fields in markdown format when keepRawFields is true', async () => {
