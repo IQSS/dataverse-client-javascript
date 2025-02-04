@@ -6,6 +6,7 @@ export interface CollectionItemSubset {
   items: (CollectionPreview | DatasetPreview | FilePreview)[]
   facets: CollectionItemsFacet[]
   totalItemCount: number
+  countPerObjectType: CountPerObjectType
 }
 
 export interface CollectionItemsFacet {
@@ -17,4 +18,10 @@ export interface CollectionItemsFacet {
 interface CollectionItemsFacetLabel {
   name: string
   count: number
+}
+
+interface CountPerObjectType {
+  dataverses: number
+  datasets: number
+  files: number
 }

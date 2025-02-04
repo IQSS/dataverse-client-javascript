@@ -373,11 +373,17 @@ describe('CollectionsRepository', () => {
     ]
     const testTotalCount = 2
     const testFacets = createCollectionItemsFacetsModel()
+    const testCountPerObjectType = {
+      dataverses: 0,
+      datasets: 1,
+      files: 1
+    }
 
     const testItemSubset: CollectionItemSubset = {
       items: testItems,
       facets: testFacets,
-      totalItemCount: testTotalCount
+      totalItemCount: testTotalCount,
+      countPerObjectType: testCountPerObjectType
     }
 
     const testItemPreviewsResponse = {
@@ -390,7 +396,12 @@ describe('CollectionsRepository', () => {
             createFilePreviewPayload(),
             createCollectionPreviewPayload()
           ],
-          facets: createCollectionItemsFacetsPayload()
+          facets: createCollectionItemsFacetsPayload(),
+          total_count_per_object_type: {
+            Dataverses: 0,
+            Datasets: 1,
+            Files: 1
+          }
         }
       }
     }
@@ -407,7 +418,8 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
-        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+        [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true'
       })
 
       const expectedRequestConfigApiKey = {
@@ -452,6 +464,7 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
         [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+        [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true',
         [GetCollectionItemsQueryParams.PER_PAGE]: testLimit.toString(),
         [GetCollectionItemsQueryParams.START]: testOffset.toString()
       })
@@ -499,6 +512,7 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
         [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+        [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true',
         [GetCollectionItemsQueryParams.SUBTREE]: testCollectionId
       })
 
@@ -542,7 +556,8 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
-        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+        [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true'
       })
 
       const expectedRequestConfigApiKey = {
