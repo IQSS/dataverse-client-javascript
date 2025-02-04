@@ -59,7 +59,7 @@ describe('MetadataBlocksRepository', () => {
   describe('getAllMetadataBlocks', () => {
     test('should return all metadata blocks', async () => {
       const actual = await sut.getAllMetadataBlocks()
-      expect(actual.length).toBe(6)
+      expect(actual.length).toBe(7)
       expect(actual[0].name).toBe(citationMetadataBlockName)
       expect(actual[0].metadataFields.title.name).toBe('title')
     })

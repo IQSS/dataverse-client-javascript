@@ -18,7 +18,7 @@ describe('execute', () => {
     } catch (error) {
       throw new Error('Should not raise an error')
     } finally {
-      expect(metadataFieldInfos.length).toBe(59)
+      expect(metadataFieldInfos.length).toBe(64)
       expect(metadataFieldInfos[0].name).toBe('authorName')
       expect(metadataFieldInfos[0].displayName).toBe('Author Name')
     }
