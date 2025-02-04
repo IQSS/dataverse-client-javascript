@@ -14,7 +14,7 @@ export class SubmitContactInfo implements UseCase<Contact[]> {
    * Submits contact information and returns a Contact model containing the submitted data.
    *
    * @param {ContactDTO} contactDTO - The contact information to be submitted.
-   * @returns {Promise<Contact[]>} A promise resolving to a ContactDTO.
+   * @returns {Promise<Contact[]>} A promise resolving to a list of contact.
    */
 
   async execute(contactDTO: ContactDTO): Promise<Contact[]> {
