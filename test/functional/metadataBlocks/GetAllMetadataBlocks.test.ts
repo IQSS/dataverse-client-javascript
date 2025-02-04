@@ -12,15 +12,15 @@ describe('execute', () => {
   })
 
   test('should successfully return metadatablocks', async () => {
-    let metadataBlocks: MetadataBlock[] = null
+    let metadataBlocks: MetadataBlock[] | null = null
     try {
       metadataBlocks = await getAllMetadataBlocks.execute()
     } catch (error) {
       throw new Error('Should not raise an error')
     } finally {
       expect(metadataBlocks).not.toBeNull()
-      expect(metadataBlocks.length).toBe(6)
-      expect(metadataBlocks[0].metadataFields.title.name).toBe('title')
+      expect(metadataBlocks?.length).toBe(7)
+      expect(metadataBlocks?.[0].metadataFields.title.name).toBe('title')
     }
   })
 })

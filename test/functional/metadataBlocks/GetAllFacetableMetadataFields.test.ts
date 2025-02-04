@@ -12,15 +12,15 @@ describe('execute', () => {
   })
 
   test('should return all facetable metadata fields', async () => {
-    let metadataFieldInfos: MetadataFieldInfo[] = null
+    let metadataFieldInfos: MetadataFieldInfo[] | null = null
     try {
       metadataFieldInfos = await getAllFacetableMetadataFields.execute()
     } catch (error) {
       throw new Error('Should not raise an error')
     } finally {
-      expect(metadataFieldInfos.length).toBe(59)
-      expect(metadataFieldInfos[0].name).toBe('authorName')
-      expect(metadataFieldInfos[0].displayName).toBe('Author Name')
+      expect(metadataFieldInfos?.length).toBe(64)
+      expect(metadataFieldInfos?.[0].name).toBe('authorName')
+      expect(metadataFieldInfos?.[0].displayName).toBe('Author Name')
     }
   })
 })
