@@ -227,13 +227,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       dataverseType: collectionDTO.type,
       ...(collectionDTO.description && { description: collectionDTO.description }),
       ...(collectionDTO.affiliation && { affiliation: collectionDTO.affiliation }),
-      metadataBlocks: {
-        metadataBlockNames: collectionDTO.metadataBlockNames,
-        facetIds: collectionDTO.facetIds,
-        inputLevels: inputLevelsRequestBody,
-        inheritFacetsFromParent: metadataBlocksRequestBody.inheritFacetsFromParent,
-        inheritMetadataBlocksFromParent: metadataBlocksRequestBody.inheritMetadataBlocksFromParent
-      }
+      metadataBlocks: metadataBlocksRequestBody
     }
   }
 
