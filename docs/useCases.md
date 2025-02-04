@@ -318,7 +318,7 @@ The optional `datasetVersionId` parameter can correspond to a numeric version id
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
-There is an optional fourth parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to Markdown. The default value is `false`.
+There is an optional fourth parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to Markdown. The default value is `true`.
 
 #### Get Dataset By Private URL Token
 
@@ -340,7 +340,7 @@ getPrivateUrlDataset.execute(token).then((dataset: Dataset) => {
 
 _See [use case](../src/datasets/domain/useCases/GetPrivateUrlDataset.ts)_ definition.
 
-There is an optional second parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to Markdown. The default value is `false`.
+There is an optional second parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to Markdown. The default value is `true`.
 
 #### Get Dataset Citation Text
 
