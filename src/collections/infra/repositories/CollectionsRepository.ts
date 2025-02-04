@@ -17,6 +17,10 @@ import {
   SortType
 } from '../../domain/models/CollectionSearchCriteria'
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
+import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedItem'
+import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
+import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
+import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -33,9 +37,9 @@ export interface NewCollectionContactRequestPayload {
 }
 
 export interface NewCollectionMetadataBlocksRequestPayload {
-  metadataBlockNames: string[]
-  facetIds: string[]
-  inputLevels: NewCollectionInputLevelRequestPayload[]
+  metadataBlockNames?: string[]
+  facetIds?: string[]
+  inputLevels?: NewCollectionInputLevelRequestPayload[]
 }
 
 export interface NewCollectionInputLevelRequestPayload {
@@ -181,7 +185,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
     )
 
-    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] =
+    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] | undefined =
       collectionDTO.inputLevels?.map((inputLevel) => ({
         datasetFieldTypeName: inputLevel.datasetFieldName,
         include: inputLevel.include,
@@ -241,5 +245,68 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         queryParams.append(GetCollectionItemsQueryParams.FILTERQUERY, filterQueryToSet)
       })
     }
+  }
+
+  public async getCollectionFeaturedItems(
+    collectionIdOrAlias: number | string
+  ): Promise<CollectionFeaturedItem[]> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`, true)
+      .then((response) =>
+        transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems(response.data.data)
+      )
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateCollectionFeaturedItems(
+    collectionIdOrAlias: number | string,
+    featuredItemsDTO: CollectionFeaturedItemsDTO
+  ): Promise<CollectionFeaturedItem[]> {
+    const featuredItemsFormData = this.toFeaturedItemsFormData(featuredItemsDTO)
+
+    return this.doPut(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`,
+      featuredItemsFormData,
+      undefined,
+      ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
+    )
+      .then((response) =>
+        transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems(response.data.data)
+      )
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  private toFeaturedItemsFormData(featuredItemsDTO: CollectionFeaturedItemsDTO): FormData {
+    // This is not really necessary because we are sending displayOrder property anyways, but I wanted to keep the order of the items in the form data
+    const orderedFeaturedItemsDTO = featuredItemsDTO.sort((a, b) => a.displayOrder - b.displayOrder)
+
+    const formData = new FormData()
+
+    orderedFeaturedItemsDTO.forEach((item) => {
+      const { id, content, displayOrder, file, keepFile } = item
+      const fileName = file ? file.name : ''
+
+      formData.append('id', id ? id.toString() : '0')
+      formData.append('content', content)
+      formData.append('displayOrder', displayOrder.toString())
+      formData.append('keepFile', keepFile.toString())
+      formData.append('fileName', fileName)
+      if (file) {
+        formData.append('file', file)
+      }
+    })
+
+    return formData
+  }
+
+  public async deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void> {
+    return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
   }
 }

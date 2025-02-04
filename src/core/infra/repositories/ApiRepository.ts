@@ -30,9 +30,10 @@ export abstract class ApiRepository {
   public async doPut(
     apiEndpoint: string,
     data: string | object,
-    queryParams: object = {}
+    queryParams: object = {},
+    contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
   ): Promise<AxiosResponse> {
-    return await this.doRequest('put', apiEndpoint, data, queryParams)
+    return await this.doRequest('put', apiEndpoint, data, queryParams, contentType)
   }
 
   public async doDelete(apiEndpoint: string, queryParams: object = {}): Promise<AxiosResponse> {
@@ -47,7 +48,7 @@ export abstract class ApiRepository {
   protected buildApiEndpoint(
     resourceName: string,
     operation: string,
-    resourceId: number | string = undefined
+    resourceId: number | string | undefined = undefined
   ) {
     return typeof resourceId === 'number'
       ? `/${resourceName}/${resourceId}/${operation}`

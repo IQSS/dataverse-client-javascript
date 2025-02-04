@@ -29,15 +29,15 @@ describe('execute', () => {
   test('should throw an error when the parent collection does not exist', async () => {
     const testNewCollection = createCollectionDTO()
     expect.assertions(2)
-    let writeError: WriteError
+    let writeError: WriteError | undefined = undefined
     try {
       await createCollection.execute(testNewCollection, TestConstants.TEST_DUMMY_COLLECTION_ID)
       throw new Error('Use case should throw an error')
     } catch (error) {
-      writeError = error
+      writeError = error as WriteError
     } finally {
       expect(writeError).toBeInstanceOf(WriteError)
-      expect(writeError.message).toEqual(
+      expect(writeError?.message).toEqual(
         `There was an error when writing the resource. Reason was: [404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
       )
     }

@@ -52,6 +52,16 @@ export const createDatasetModel = (
       lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
       releaseTime: new Date(DATASET_RELEASE_TIME_STR)
     },
+    termsOfUse: {
+      fileAccessRequest: true,
+      termsOfAccess: 'Terms of access',
+      dataAccessPlace: 'Data access place',
+      originalArchive: 'Original archive',
+      availabilityStatus: 'Availability status',
+      contactForAccess: 'Contact for access',
+      sizeOfCollection: 'Size of collection',
+      studyCompletion: 'Study completion'
+    },
     publicationDate: DATASET_PUBLICATION_DATE_STR,
     metadataBlocks: [
       {
@@ -111,6 +121,14 @@ export const createDatasetVersionPayload = (
     releaseTime: DATASET_RELEASE_TIME_STR,
     createTime: DATASET_CREATE_TIME_STR,
     publicationDate: DATASET_PUBLICATION_DATE_STR,
+    fileAccessRequest: true,
+    termsOfAccess: 'Terms of access',
+    dataAccessPlace: 'Data access place',
+    originalArchive: 'Original archive',
+    availabilityStatus: 'Availability status',
+    contactForAccess: 'Contact for access',
+    sizeOfCollection: 'Size of collection',
+    studyCompletion: 'Study completion',
     metadataBlocks: {
       citation: {
         name: 'citation',

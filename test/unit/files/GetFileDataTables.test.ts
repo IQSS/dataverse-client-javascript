@@ -25,7 +25,7 @@ describe('execute', () => {
     filesRepositoryStub.getFileDataTables = jest.fn().mockRejectedValue(testReadError)
     const sut = new GetFileDataTables(filesRepositoryStub)
 
-    let actualError: ReadError = undefined
+    let actualError: ReadError | undefined = undefined
     await sut.execute(testFileId).catch((e: ReadError) => (actualError = e))
 
     expect(actualError).toBe(testReadError)

@@ -67,7 +67,7 @@ describe('getCurrentAuthenticatedUser', () => {
   test('should return error result on error response', async () => {
     jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-    let error: ReadError = undefined
+    let error: ReadError | undefined = undefined
     await sut.getCurrentAuthenticatedUser().catch((e) => (error = e))
 
     expect(axios.get).toHaveBeenCalledWith(

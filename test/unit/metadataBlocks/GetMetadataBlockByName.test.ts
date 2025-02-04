@@ -29,7 +29,7 @@ describe('execute', () => {
       .mockRejectedValue(new ReadError())
     const sut = new GetMetadataBlockByName(metadataBlocksRepositoryStub)
 
-    let actualError: ReadError
+    let actualError: ReadError | undefined = undefined
     await sut.execute(testMetadataBlockName).catch((e) => (actualError = e))
 
     expect(actualError).toBeInstanceOf(ReadError)
