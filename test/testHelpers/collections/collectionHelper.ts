@@ -160,7 +160,9 @@ export const createCollectionDTO = (alias = 'test-collection'): CollectionDTO =>
         required: true,
         include: true
       }
-    ]
+    ],
+    inheritFacetsFromParent: false,
+    inheritMetadataBlocksFromParent: false
   }
 }
 

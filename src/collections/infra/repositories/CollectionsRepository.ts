@@ -190,18 +190,31 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     const metadataBlocksRequestBody: NewCollectionMetadataBlocksRequestPayload = {}
 
-    if (collectionDTO.metadataBlockNames && collectionDTO.inputLevels) {
+    if (collectionDTO.inheritMetadataBlocksFromParent) {
+      metadataBlocksRequestBody['inheritMetadataBlocksFromParent'] = true
+    } else {
       metadataBlocksRequestBody['metadataBlockNames'] = collectionDTO.metadataBlockNames
       metadataBlocksRequestBody['inputLevels'] = inputLevelsRequestBody
-    } else {
-      metadataBlocksRequestBody['inheritMetadataBlocksFromParent'] = true
     }
 
-    if (collectionDTO.facetIds) {
-      metadataBlocksRequestBody['facetIds'] = collectionDTO.facetIds
-    } else {
+    if (collectionDTO.inheritFacetsFromParent) {
       metadataBlocksRequestBody['inheritFacetsFromParent'] = true
+    } else {
+      metadataBlocksRequestBody['facetIds'] = collectionDTO.facetIds
     }
+
+    // if (collectionDTO.metadataBlockNames && collectionDTO.inputLevels) {
+    //   metadataBlocksRequestBody['metadataBlockNames'] = collectionDTO.metadataBlockNames
+    //   metadataBlocksRequestBody['inputLevels'] = inputLevelsRequestBody
+    // } else {
+    //   metadataBlocksRequestBody['inheritMetadataBlocksFromParent'] = true
+    // }
+
+    // if (collectionDTO.facetIds) {
+    //   metadataBlocksRequestBody['facetIds'] = collectionDTO.facetIds
+    // } else {
+    //   metadataBlocksRequestBody['inheritFacetsFromParent'] = true
+    // }
 
     return {
       alias: collectionDTO.alias,
@@ -210,7 +223,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       dataverseType: collectionDTO.type,
       ...(collectionDTO.description && { description: collectionDTO.description }),
       ...(collectionDTO.affiliation && { affiliation: collectionDTO.affiliation }),
-      metadataBlocks: metadataBlocksRequestBody
+      metadataBlocks: {
+        metadataBlockNames: collectionDTO.metadataBlockNames,
+        facetIds: collectionDTO.facetIds,
+        inputLevels: inputLevelsRequestBody,
+        inheritFacetsFromParent: metadataBlocksRequestBody.inheritFacetsFromParent,
+        inheritMetadataBlocksFromParent: metadataBlocksRequestBody.inheritMetadataBlocksFromParent
+      }
     }
   }
 
