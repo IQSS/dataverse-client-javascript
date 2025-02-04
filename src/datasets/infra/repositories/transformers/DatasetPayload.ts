@@ -24,6 +24,14 @@ export interface DatasetPayload {
   contactForAccess?: string
   sizeOfCollection?: string
   studyCompletion?: string
+  termsOfUse?: string
+  confidentialityDeclaration?: string
+  specialPermissions?: string
+  restrictions?: string
+  citationRequirements?: string
+  depositorRequirements?: string
+  conditions?: string
+  disclaimer?: string
   files: FilePayload[]
   isPartOf: OwnerNodePayload
 }

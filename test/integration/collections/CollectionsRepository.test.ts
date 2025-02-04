@@ -2,6 +2,7 @@ import { CollectionsRepository } from '../../../src/collections/infra/repositori
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   // CollectionDTO,
+  CollectionFeaturedItemsDTO,
   CollectionItemType,
   CollectionPreview,
   CollectionSearchCriteria,
@@ -33,6 +34,13 @@ import {
   OrderType,
   SortType
 } from '../../../src/collections/domain/models/CollectionSearchCriteria'
+import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
+import {
+  createCollectionFeaturedItemViaApi,
+  createImageFile,
+  deleteCollectionFeaturedItemsViaApi,
+  deleteCollectionFeaturedItemViaApi
+} from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -1102,4 +1110,188 @@ describe('CollectionsRepository', () => {
   //     ).rejects.toThrow(expectedError)
   //   })
   // })
+  //   test('should return error when collection does not exist', async () => {
+  //     const expectedError = new WriteError(
+  //       `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
+  //     )
+  //     const testCollectionAlias = 'updateCollection-not-found-test'
+  //     await expect(
+  //       sut.updateCollection(
+  //         TestConstants.TEST_DUMMY_COLLECTION_ID,
+  //         createCollectionDTO(testCollectionAlias)
+  //       )
+  //     ).rejects.toThrow(expectedError)
+  //   })
+  // })
+
+  describe('getCollectionFeaturedItems', () => {
+    let testFeaturedItemId: number
+
+    beforeAll(async () => {
+      try {
+        const featuredItemCreated = await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content</p>',
+          displayOrder: 1,
+          withFile: true,
+          fileName: 'featured-item-test-image.png'
+        })
+
+        testFeaturedItemId = featuredItemCreated.id
+      } catch (error) {
+        throw new Error(`Error while creating collection featured item in ${testCollectionAlias}`)
+      }
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteCollectionFeaturedItemViaApi(testFeaturedItemId)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting featured item with id ${testFeaturedItemId}`
+        )
+      }
+    })
+
+    test('should return empty featured items array given a valid collection alias when collection has no featured items', async () => {
+      const featuredItemsResponse = await sut.getCollectionFeaturedItems(ROOT_COLLECTION_ID)
+
+      expect(featuredItemsResponse).toStrictEqual([])
+    })
+
+    test('should return featured items array given a valid collection alias when collection has featured items', async () => {
+      const featuredItemsResponse = await sut.getCollectionFeaturedItems(testCollectionAlias)
+
+      expect(featuredItemsResponse.length).toBe(1)
+      expect(featuredItemsResponse[0].id).toBe(testFeaturedItemId)
+      expect(featuredItemsResponse[0].displayOrder).toBe(1)
+      expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
+      expect(featuredItemsResponse[0].imageFileUrl).toBe(
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${featuredItemsResponse[0].id}`
+      )
+      expect(featuredItemsResponse[0].imageFileName).toBe('featured-item-test-image.png')
+    })
+
+    test('should return error when collection does not exist', async () => {
+      const invalidCollectionAlias = 'invalid-collection-alias'
+      const expectedError = new ReadError(
+        `[404] Can't find dataverse with identifier='${invalidCollectionAlias}'`
+      )
+
+      await expect(sut.getCollectionFeaturedItems(invalidCollectionAlias)).rejects.toThrow(
+        expectedError
+      )
+    })
+  })
+
+  describe('updateCollectionFeaturedItems', () => {
+    afterAll(async () => {
+      try {
+        await deleteCollectionFeaturedItemsViaApi(testCollectionAlias)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting all featured items from collection: ${testCollectionAlias}`
+        )
+      }
+    })
+
+    it('should update collection featured items sending all new items', async () => {
+      const newFeaturedItems: CollectionFeaturedItemsDTO = [
+        {
+          content: '<p class="rte-paragraph">Test content 1</p>',
+          displayOrder: 0,
+          file: undefined,
+          keepFile: false
+        },
+        {
+          content: '<p class="rte-paragraph">Test content 2</p>',
+          displayOrder: 1,
+          file: undefined,
+          keepFile: false
+        },
+        {
+          content: '<p class="rte-paragraph">Test content 3</p>',
+          displayOrder: 2,
+          file: createImageFile('featured-item-test-image-3.png'),
+          keepFile: false
+        }
+      ]
+
+      const response = await sut.updateCollectionFeaturedItems(
+        testCollectionAlias,
+        newFeaturedItems
+      )
+
+      expect(response).toHaveLength(3)
+
+      expect(response[0].content).toEqual(newFeaturedItems[0].content)
+      expect(response[0].displayOrder).toEqual(newFeaturedItems[0].displayOrder)
+      expect(response[0].imageFileName).toEqual(undefined)
+      expect(response[0].imageFileUrl).toEqual(undefined)
+
+      expect(response[1].content).toEqual(newFeaturedItems[1].content)
+      expect(response[1].displayOrder).toEqual(newFeaturedItems[1].displayOrder)
+      expect(response[1].imageFileName).toEqual(undefined)
+      expect(response[1].imageFileUrl).toEqual(undefined)
+
+      expect(response[2].content).toEqual(newFeaturedItems[2].content)
+      expect(response[2].displayOrder).toEqual(newFeaturedItems[2].displayOrder)
+      expect(response[2].imageFileName).toEqual('featured-item-test-image-3.png')
+      expect(response[2].imageFileUrl).toBe(
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${response[2].id}`
+      )
+    })
+  })
+
+  describe('deleteCollectionFeaturedItems', () => {
+    beforeAll(async () => {
+      try {
+        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content</p>',
+          displayOrder: 1,
+          withFile: true,
+          fileName: 'featured-item-test-image.png'
+        })
+        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content 2</p>',
+          displayOrder: 2,
+          withFile: false
+        })
+        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content 3</p>',
+          displayOrder: 3,
+          withFile: false
+        })
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while creating test featured items for collection: ${testCollectionAlias}`
+        )
+      }
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteCollectionFeaturedItemsViaApi(testCollectionAlias)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting test collection featured items: ${testCollectionAlias}`
+        )
+      }
+    })
+
+    it('should delete all collection featured items', async () => {
+      const featuredItemsResponseBeforeDeletion = await sut.getCollectionFeaturedItems(
+        testCollectionAlias
+      )
+
+      expect(featuredItemsResponseBeforeDeletion).toHaveLength(3)
+
+      await sut.deleteCollectionFeaturedItems(testCollectionAlias)
+
+      const featuredItemsResponseAfterDeletion = await sut.getCollectionFeaturedItems(
+        testCollectionAlias
+      )
+
+      expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
+    })
+  })
 })

@@ -19,7 +19,7 @@ describe('getAllFacetableMetadataFields', () => {
   test('should return all facetable metadata fields', async () => {
     const actual = await sut.getAllFacetableMetadataFields()
 
-    expect(actual.length).toBe(59)
+    expect(actual.length).toBe(64)
     expect(actual[0].name).toBe('authorName')
     expect(actual[0].displayName).toBe('Author Name')
   })

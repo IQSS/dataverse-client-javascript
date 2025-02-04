@@ -16,6 +16,11 @@ export const buildRequestConfig = (
     ...(abortSignal && { signal: abortSignal })
   }
 
+  // When using multipart/form-data for axios to work properly its better to avoid setting the content-type and let the browser manage it
+  if (contentType === ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA) {
+    requestConfig.headers['Content-Type'] = undefined
+  }
+
   if (!authRequired) {
     return requestConfig
   }

@@ -19,7 +19,7 @@ describe('execute', () => {
       throw new Error('Should not raise an error')
     } finally {
       expect(metadataBlocks).not.toBeNull()
-      expect(metadataBlocks?.length).toBe(6)
+      expect(metadataBlocks?.length).toBe(7)
       expect(metadataBlocks?.[0].metadataFields.title.name).toBe('title')
     }
   })
