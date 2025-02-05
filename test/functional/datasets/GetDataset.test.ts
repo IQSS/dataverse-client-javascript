@@ -76,7 +76,17 @@ describe('execute', () => {
 
     await expect(getDataset.execute(nonExistentTestDatasetId)).rejects.toThrow(expectedError)
   })
-
+  test('should not return custom terms if license is set', async () => {
+    const versionPayload = createDatasetVersionPayload()
+    versionPayload.license = {
+      name: 'CC0',
+      uri: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      iconUri: 'https://creativecommons.org/publicdomain/zero/1.0/'
+    }
+    const dataset = transformVersionPayloadToDataset(versionPayload, false)
+    expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe('Terms of access')
+    expect(dataset.termsOfUse.customTerms).toBe(undefined)
+  })
   test('should return metadata fields in markdown format when keepRawFields is false', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
 
@@ -98,13 +108,15 @@ describe('execute', () => {
     const versionPayload = createDatasetVersionPayload()
     versionPayload.termsOfAccess = 'Hello <b>world</b>'
     const dataset = transformVersionPayloadToDataset(versionPayload, false)
-    expect(dataset.termsOfUse.termsOfAccess).toBe('Hello **world**')
+    expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe('Hello **world**')
   })
 
   test('should return terms of use fields in html format when keepRawFields is true', async () => {
     const versionPayload = createDatasetVersionPayload()
     const dataset = transformVersionPayloadToDataset(versionPayload, true)
-    expect(dataset.termsOfUse.termsOfAccess).toBe(versionPayload.termsOfAccess)
+    expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe(
+      versionPayload.termsOfAccess
+    )
   })
 
   test('should not return metadata fields in markdown format when keepRawFields is true', async () => {
