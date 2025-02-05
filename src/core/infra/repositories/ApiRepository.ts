@@ -47,14 +47,16 @@ export abstract class ApiRepository {
 
   protected buildApiEndpoint(
     resourceName: string,
-    operation: string,
-    resourceId: number | string | undefined = undefined
+    operation?: string,
+    resourceId?: number | string
   ) {
+    const operationSegment = operation ? `/${operation}` : ''
+
     return typeof resourceId === 'number'
-      ? `/${resourceName}/${resourceId}/${operation}`
+      ? `/${resourceName}/${resourceId}${operationSegment}`
       : typeof resourceId === 'string'
-      ? `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`
-      : `/${resourceName}/${operation}`
+      ? `/${resourceName}/:persistentId${operationSegment}?persistentId=${resourceId}`
+      : `/${resourceName}${operationSegment}`
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
