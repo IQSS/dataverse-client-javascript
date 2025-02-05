@@ -1,7 +1,7 @@
 import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
-  // CollectionDTO,
+  CollectionDTO,
   CollectionFeaturedItemsDTO,
   CollectionItemType,
   CollectionPreview,
@@ -10,7 +10,7 @@ import {
   DatasetPreview,
   FilePreview,
   ReadError,
-  // WriteError,
+  WriteError,
   createDataset
 } from '../../../src'
 import { ApiConfig } from '../../../src'
@@ -146,140 +146,106 @@ describe('CollectionsRepository', () => {
       expect(createdCollection.name).toBe(newCollectionDTO.name)
     })
   })
-  // describe('createCollection', () => {
-  //   const testCreateCollectionAlias1 = 'createCollection-test-1'
-  //   const testCreateCollectionAlias2 = 'createCollection-test-2'
-  //   const testCreateCollectionAlias3 = 'createCollection-test-3'
+  describe('createCollection', () => {
+    const testCreateCollectionAlias1 = 'createCollection-test-1'
+    const testCreateCollectionAlias2 = 'createCollection-test-2'
+    const testCreateCollectionAlias3 = 'createCollection-test-3'
+    const testCreateCollectionAlias4 = 'createCollection-test-4'
+    const testCreateCollectionAlias5 = 'createCollection-test-5'
 
-  //   afterAll(async () => {
-  //     await deleteCollectionViaApi(testCreateCollectionAlias1)
-  //     await deleteCollectionViaApi(testCreateCollectionAlias2)
-  //     await deleteCollectionViaApi(testCreateCollectionAlias3)
-  //   })
+    afterAll(async () => {
+      await deleteCollectionViaApi(testCreateCollectionAlias1)
+      await deleteCollectionViaApi(testCreateCollectionAlias2)
+      await deleteCollectionViaApi(testCreateCollectionAlias3)
+      await deleteCollectionViaApi(testCreateCollectionAlias4)
+      await deleteCollectionViaApi(testCreateCollectionAlias5)
+    })
 
-  //   test('should create collection in root when no parent collection is set', async () => {
-  //     const newCollectionDTO = createCollectionDTO(testCreateCollectionAlias1)
-  //     const actualId = await sut.createCollection(newCollectionDTO)
-  //     expect(typeof actualId).toBe('number')
+    test('should create collection in root when no parent collection is set', async () => {
+      const newCollectionDTO = createCollectionDTO(testCreateCollectionAlias1)
+      const actualId = await sut.createCollection(newCollectionDTO)
+      expect(typeof actualId).toBe('number')
 
-  //     const createdCollection = await sut.getCollection(actualId)
-  //     expect(createdCollection.id).toBe(actualId)
-  //     expect(createdCollection.alias).toBe(newCollectionDTO.alias)
-  //     expect(createdCollection.name).toBe(newCollectionDTO.name)
-  //     expect(createdCollection.affiliation).toBe(newCollectionDTO.affiliation)
-  //     expect(createdCollection.isPartOf.type).toBe('DATAVERSE')
-  //     expect(createdCollection.isPartOf.displayName).toBe('Root')
-  //     expect(createdCollection.isPartOf.identifier).toBe('root')
-  //     expect(createdCollection.isPartOf.isReleased).toBe(true)
+      const createdCollection = await sut.getCollection(actualId)
+      expect(createdCollection.id).toBe(actualId)
+      expect(createdCollection.alias).toBe(newCollectionDTO.alias)
+      expect(createdCollection.name).toBe(newCollectionDTO.name)
+      expect(createdCollection.affiliation).toBe(newCollectionDTO.affiliation)
+      expect(createdCollection.isPartOf.type).toBe('DATAVERSE')
+      expect(createdCollection.isPartOf.displayName).toBe('Root')
+      expect(createdCollection.isPartOf.identifier).toBe('root')
+      expect(createdCollection.isPartOf.isReleased).toBe(true)
 
-  //     expect(createdCollection.inputLevels?.length).toBe(1)
-  //     const inputLevel = createdCollection.inputLevels?.[0]
-  //     expect(inputLevel?.datasetFieldName).toBe('geographicCoverage')
-  //     expect(inputLevel?.include).toBe(true)
-  //     expect(inputLevel?.required).toBe(true)
-  //   })
+      expect(createdCollection.inputLevels?.length).toBe(1)
+      const inputLevel = createdCollection.inputLevels?.[0]
+      expect(inputLevel?.datasetFieldName).toBe('geographicCoverage')
+      expect(inputLevel?.include).toBe(true)
+      expect(inputLevel?.required).toBe(true)
+    })
 
-  //   test('should create collection in parent collection when parent collection is set', async () => {
-  //     const actualId = await sut.createCollection(
-  //       createCollectionDTO(testCreateCollectionAlias2),
-  //       testCollectionId
-  //     )
-  //     expect(typeof actualId).toBe('number')
+    test('should create collection in parent collection when parent collection is set', async () => {
+      const actualId = await sut.createCollection(
+        createCollectionDTO(testCreateCollectionAlias2),
+        testCollectionId
+      )
+      expect(typeof actualId).toBe('number')
 
-  //     const collectionCreated = await sut.getCollection(actualId)
+      const collectionCreated = await sut.getCollection(actualId)
 
-  //     expect(collectionCreated.isMetadataBlockRoot).toBe(true)
-  //     expect(collectionCreated.isFacetRoot).toBe(true)
-  //   })
+      expect(collectionCreated.isMetadataBlockRoot).toBe(true)
+      expect(collectionCreated.isFacetRoot).toBe(true)
+    })
 
-  //   test('should create collection without input levels', async () => {
-  //     const newCollectionDTO = createCollectionDTO(testCreateCollectionAlias3)
-  //     newCollectionDTO.inputLevels = undefined
-  //     const actualId = await sut.createCollection(newCollectionDTO, testCollectionId)
-  //     expect(typeof actualId).toBe('number')
+    test('should create a collection to inherit metadata blocks from parent collection', async () => {
+      const childCollectionDTO = createCollectionDTO(testCreateCollectionAlias3)
+      childCollectionDTO.inheritMetadataBlocksFromParent = true
 
-  //     const collectionCreated = await sut.getCollection(actualId)
+      const childCollectionId = await sut.createCollection(childCollectionDTO)
 
-  //     expect(collectionCreated.isMetadataBlockRoot).toBe(false)
-  //     expect(collectionCreated.isFacetRoot).toBe(true)
-  //   })
+      const childCollection = await sut.getCollection(childCollectionId)
 
-  //   test('should create a collection to inherit metadata blocks from parent collection', async () => {
-  //     const parentCollectionAlias = 'inherit-metablocks-parent'
-  //     const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
-  //     const parentCollectionId = await sut.createCollection(parentCollectionDTO)
+      expect(childCollection.isMetadataBlockRoot).toBe(false)
+      expect(childCollection.isFacetRoot).toBe(true)
+    })
 
-  //     const childCollectionAlias = 'inherit-metablocks-child'
-  //     const childCollectionDTO = createCollectionDTO(childCollectionAlias)
-  //     childCollectionDTO.metadataBlockNames = undefined
-  //     childCollectionDTO.inputLevels = undefined
+    test('should create a collection to inherit facets from parent collection', async () => {
+      const childCollectionDTO = createCollectionDTO(testCreateCollectionAlias4)
+      childCollectionDTO.inheritFacetsFromParent = true
 
-  //     const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
+      const childCollectionId = await sut.createCollection(childCollectionDTO)
 
-  //     const childCollection = await sut.getCollection(childCollectionId)
+      const childCollection = await sut.getCollection(childCollectionId)
 
-  //     expect(childCollection.isMetadataBlockRoot).toBe(false)
-  //     expect(childCollection.isFacetRoot).toBe(true)
+      expect(childCollection.isMetadataBlockRoot).toBe(true)
+      expect(childCollection.isFacetRoot).toBe(false)
+    })
 
-  //     await deleteCollectionViaApi(childCollectionAlias)
-  //     await deleteCollectionViaApi(parentCollectionAlias)
-  //   })
+    test('should create a collection to inherit metadata blocks and facets from parent collection', async () => {
+      const childCollectionDTO = createCollectionDTO(testCreateCollectionAlias5)
+      childCollectionDTO.inheritMetadataBlocksFromParent = true
+      childCollectionDTO.inheritFacetsFromParent = true
 
-  //   test('should create a collection to inherit facets from parent collection', async () => {
-  //     const parentCollectionAlias = 'inherit-facets-parent'
-  //     const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
-  //     const parentCollectionId = await sut.createCollection(parentCollectionDTO)
+      const childCollectionId = await sut.createCollection(childCollectionDTO)
 
-  //     const childCollectionAlias = 'inherit-facets-child'
-  //     const childCollectionDTO = createCollectionDTO(childCollectionAlias)
-  //     childCollectionDTO.facetIds = undefined
+      const childCollection = await sut.getCollection(childCollectionId)
 
-  //     const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
+      expect(childCollection.isMetadataBlockRoot).toBe(false)
+      expect(childCollection.isFacetRoot).toBe(false)
+    })
 
-  //     const childCollection = await sut.getCollection(childCollectionId)
-
-  //     expect(childCollection.isMetadataBlockRoot).toBe(true)
-  //     expect(childCollection.isFacetRoot).toBe(false)
-
-  //     await deleteCollectionViaApi(childCollectionAlias)
-  //     await deleteCollectionViaApi(parentCollectionAlias)
-  //   })
-
-  //   test('should create a collection to inherit metadata blocks and facets from parent collection', async () => {
-  //     const parentCollectionAlias = 'inherit-metablocks-facets-parent'
-  //     const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
-  //     const parentCollectionId = await sut.createCollection(parentCollectionDTO)
-
-  //     const childCollectionAlias = 'inherit-metablocks-facets-child'
-  //     const childCollectionDTO = createCollectionDTO(childCollectionAlias)
-  //     childCollectionDTO.metadataBlockNames = undefined
-  //     childCollectionDTO.inputLevels = undefined
-  //     childCollectionDTO.facetIds = undefined
-
-  //     const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
-
-  //     const childCollection = await sut.getCollection(childCollectionId)
-
-  //     expect(childCollection.isMetadataBlockRoot).toBe(false)
-  //     expect(childCollection.isFacetRoot).toBe(false)
-
-  //     await deleteCollectionViaApi(childCollectionAlias)
-  //     await deleteCollectionViaApi(parentCollectionAlias)
-  //   })
-
-  //   test('should return error when parent collection does not exist', async () => {
-  //     const expectedError = new WriteError(
-  //       `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
-  //     )
-  //     const testCreateCollectionAlias3 = 'createCollection-test-3'
-  //     await expect(
-  //       sut.createCollection(
-  //         createCollectionDTO(testCreateCollectionAlias3),
-  //         TestConstants.TEST_DUMMY_COLLECTION_ID
-  //       )
-  //     ).rejects.toThrow(expectedError)
-  //   })
-  // })
+    test('should return error when parent collection does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
+      )
+      const testCreateCollectionAlias3 = 'createCollection-test-3'
+      await expect(
+        sut.createCollection(
+          createCollectionDTO(testCreateCollectionAlias3),
+          TestConstants.TEST_DUMMY_COLLECTION_ID
+        )
+      ).rejects.toThrow(expectedError)
+    })
+  })
 
   describe('getCollectionFacets', () => {
     test('should return collection facets given a valid collection alias', async () => {
@@ -895,234 +861,188 @@ describe('CollectionsRepository', () => {
     })
   })
 
-  // describe('updateCollection', () => {
-  //   const testUpdatedCollectionAlias = 'updateCollection-test-updatedAlias'
+  describe('updateCollection', () => {
+    const testUpdatedCollectionAlias = 'updateCollection-test-updatedAlias'
 
-  //   afterAll(async () => {
-  //     await deleteCollectionViaApi(testUpdatedCollectionAlias)
-  //   })
+    afterAll(async () => {
+      await deleteCollectionViaApi(testUpdatedCollectionAlias)
+    })
 
-  //   test('should update the collection', async () => {
-  //     // First we create a test collection using a CollectionDTO and createCollection method
-  //     const collectionDTO = createCollectionDTO('updatedCollection-test-originalAlias')
-  //     const testUpdateCollectionId = await sut.createCollection(collectionDTO)
-  //     const createdCollection = await sut.getCollection(testUpdateCollectionId)
-  //     expect(createdCollection.id).toBe(testUpdateCollectionId)
-  //     expect(createdCollection.alias).toBe(collectionDTO.alias)
-  //     expect(createdCollection.name).toBe(collectionDTO.name)
-  //     expect(createdCollection.affiliation).toBe(collectionDTO.affiliation)
-  //     expect(createdCollection.inputLevels?.length).toBe(1)
-  //     const inputLevel = createdCollection.inputLevels?.[0]
-  //     expect(inputLevel?.datasetFieldName).toBe('geographicCoverage')
-  //     expect(inputLevel?.include).toBe(true)
-  //     expect(inputLevel?.required).toBe(true)
+    test('should update the collection', async () => {
+      // First we create a test collection using a CollectionDTO and createCollection method
+      const collectionDTO = createCollectionDTO('updatedCollection-test-originalAlias')
+      const testUpdateCollectionId = await sut.createCollection(collectionDTO)
+      const createdCollection = await sut.getCollection(testUpdateCollectionId)
+      expect(createdCollection.id).toBe(testUpdateCollectionId)
+      expect(createdCollection.alias).toBe(collectionDTO.alias)
+      expect(createdCollection.name).toBe(collectionDTO.name)
+      expect(createdCollection.affiliation).toBe(collectionDTO.affiliation)
+      expect(createdCollection.inputLevels?.length).toBe(1)
+      const inputLevel = createdCollection.inputLevels?.[0]
+      expect(inputLevel?.datasetFieldName).toBe('geographicCoverage')
+      expect(inputLevel?.include).toBe(true)
+      expect(inputLevel?.required).toBe(true)
 
-  //     // Now we update CollectionDTO and verify updates are correctly persisted after calling updateCollection method
-  //     collectionDTO.alias = testUpdatedCollectionAlias
-  //     const updatedCollectionName = 'updatedCollectionName'
-  //     collectionDTO.name = updatedCollectionName
-  //     const updatedCollectionAffiliation = 'updatedCollectionAffiliation'
-  //     collectionDTO.affiliation = updatedCollectionAffiliation
-  //     const updatedInputLevels = [
-  //       {
-  //         datasetFieldName: 'country',
-  //         required: false,
-  //         include: true
-  //       }
-  //     ]
-  //     collectionDTO.inputLevels = updatedInputLevels
-  //     await sut.updateCollection(testUpdateCollectionId, collectionDTO)
-  //     const updatedCollection = await sut.getCollection(testUpdateCollectionId)
-  //     expect(updatedCollection.id).toBe(testUpdateCollectionId)
-  //     expect(updatedCollection.alias).toBe(testUpdatedCollectionAlias)
-  //     expect(updatedCollection.name).toBe(updatedCollectionName)
-  //     expect(updatedCollection.affiliation).toBe(updatedCollectionAffiliation)
-  //     expect(updatedCollection.inputLevels?.length).toBe(1)
-  //     const updatedInputLevel = updatedCollection.inputLevels?.[0]
-  //     expect(updatedInputLevel?.datasetFieldName).toBe('country')
-  //     expect(updatedInputLevel?.include).toBe(true)
-  //     expect(updatedInputLevel?.required).toBe(false)
-  //   })
+      // Now we update CollectionDTO and verify updates are correctly persisted after calling updateCollection method
+      collectionDTO.alias = testUpdatedCollectionAlias
+      const updatedCollectionName = 'updatedCollectionName'
+      collectionDTO.name = updatedCollectionName
+      const updatedCollectionAffiliation = 'updatedCollectionAffiliation'
+      collectionDTO.affiliation = updatedCollectionAffiliation
+      const updatedInputLevels = [
+        {
+          datasetFieldName: 'country',
+          required: false,
+          include: true
+        }
+      ]
+      collectionDTO.inputLevels = updatedInputLevels
+      await sut.updateCollection(testUpdateCollectionId, collectionDTO)
+      const updatedCollection = await sut.getCollection(testUpdateCollectionId)
+      expect(updatedCollection.id).toBe(testUpdateCollectionId)
+      expect(updatedCollection.alias).toBe(testUpdatedCollectionAlias)
+      expect(updatedCollection.name).toBe(updatedCollectionName)
+      expect(updatedCollection.affiliation).toBe(updatedCollectionAffiliation)
+      expect(updatedCollection.inputLevels?.length).toBe(1)
+      const updatedInputLevel = updatedCollection.inputLevels?.[0]
+      expect(updatedInputLevel?.datasetFieldName).toBe('country')
+      expect(updatedInputLevel?.include).toBe(true)
+      expect(updatedInputLevel?.required).toBe(false)
+    })
 
-  //   test('should update the collection to inherit metadata blocks from parent collection', async () => {
-  //     const parentCollectionAlias = 'inherit-metablocks-parent-update'
-  //     const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
-  //     const parentCollectionId = await sut.createCollection(parentCollectionDTO)
+    test('should update the collection to inherit metadata blocks from parent collection', async () => {
+      const parentCollectionAlias = 'inherit-metablocks-parent-update'
+      const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
+      const parentCollectionId = await sut.createCollection(parentCollectionDTO)
 
-  //     const childCollectionAlias = 'inherit-metablocks-child-update'
-  //     const childCollectionDTO = createCollectionDTO(childCollectionAlias)
+      const childCollectionAlias = 'inherit-metablocks-child-update'
+      const childCollectionDTO = createCollectionDTO(childCollectionAlias)
 
-  //     const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
+      const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
 
-  //     const childCollection = await sut.getCollection(childCollectionId)
+      const childCollection = await sut.getCollection(childCollectionId)
 
-  //     expect(childCollection.isMetadataBlockRoot).toBe(true)
-  //     expect(childCollection.isFacetRoot).toBe(true)
+      expect(childCollection.isMetadataBlockRoot).toBe(true)
+      expect(childCollection.isFacetRoot).toBe(true)
 
-  //     const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
-  //     updatedChildCollectionDTO.metadataBlockNames = undefined
-  //     updatedChildCollectionDTO.inputLevels = undefined
+      const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
+      updatedChildCollectionDTO.inheritMetadataBlocksFromParent = true
 
-  //     await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
+      await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
 
-  //     const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
+      const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
 
-  //     expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(false)
-  //     expect(childCollectionAfterUpdate.isFacetRoot).toBe(true)
+      expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(false)
+      expect(childCollectionAfterUpdate.isFacetRoot).toBe(true)
 
-  //     await deleteCollectionViaApi(childCollectionAlias)
-  //     await deleteCollectionViaApi(parentCollectionAlias)
-  //   })
+      await deleteCollectionViaApi(childCollectionAlias)
+      await deleteCollectionViaApi(parentCollectionAlias)
+    })
 
-  //   test('should update the collection to inherit facets from parent collection', async () => {
-  //     const parentCollectionAlias = 'inherit-facets-parent-update'
-  //     const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
-  //     const parentCollectionId = await sut.createCollection(parentCollectionDTO)
+    test('should update the collection to inherit facets from parent collection', async () => {
+      const parentCollectionAlias = 'inherit-facets-parent-update'
+      const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
+      const parentCollectionId = await sut.createCollection(parentCollectionDTO)
 
-  //     const childCollectionAlias = 'inherit-facets-child-update'
-  //     const childCollectionDTO = createCollectionDTO(childCollectionAlias)
+      const childCollectionAlias = 'inherit-facets-child-update'
+      const childCollectionDTO = createCollectionDTO(childCollectionAlias)
 
-  //     const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
+      const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
 
-  //     const childCollection = await sut.getCollection(childCollectionId)
+      const childCollection = await sut.getCollection(childCollectionId)
 
-  //     expect(childCollection.isMetadataBlockRoot).toBe(true)
-  //     expect(childCollection.isFacetRoot).toBe(true)
+      expect(childCollection.isMetadataBlockRoot).toBe(true)
+      expect(childCollection.isFacetRoot).toBe(true)
 
-  //     const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
-  //     updatedChildCollectionDTO.facetIds = undefined
+      const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
+      updatedChildCollectionDTO.inheritFacetsFromParent = true
 
-  //     await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
+      await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
 
-  //     const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
+      const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
 
-  //     expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(true)
-  //     expect(childCollectionAfterUpdate.isFacetRoot).toBe(false)
+      expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(true)
+      expect(childCollectionAfterUpdate.isFacetRoot).toBe(false)
 
-  //     await deleteCollectionViaApi(childCollectionAlias)
-  //     await deleteCollectionViaApi(parentCollectionAlias)
-  //   })
+      await deleteCollectionViaApi(childCollectionAlias)
+      await deleteCollectionViaApi(parentCollectionAlias)
+    })
 
-  //   test('should update the collection to inherit metadata blocks and facets from parent collection', async () => {
-  //     const parentCollectionAlias = 'inherit-metablocks-facets-parent-update'
-  //     const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
-  //     const parentCollectionId = await sut.createCollection(parentCollectionDTO)
+    test('should update the collection to inherit metadata blocks and facets from parent collection', async () => {
+      const parentCollectionAlias = 'inherit-metablocks-facets-parent-update'
+      const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
+      const parentCollectionId = await sut.createCollection(parentCollectionDTO)
 
-  //     const childCollectionAlias = 'inherit-metablocks-facets-child-update'
-  //     const childCollectionDTO = createCollectionDTO(childCollectionAlias)
+      const childCollectionAlias = 'inherit-metablocks-facets-child-update'
+      const childCollectionDTO = createCollectionDTO(childCollectionAlias)
 
-  //     const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
+      const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
 
-  //     const childCollection = await sut.getCollection(childCollectionId)
+      const childCollection = await sut.getCollection(childCollectionId)
 
-  //     expect(childCollection.isMetadataBlockRoot).toBe(true)
-  //     expect(childCollection.isFacetRoot).toBe(true)
+      expect(childCollection.isMetadataBlockRoot).toBe(true)
+      expect(childCollection.isFacetRoot).toBe(true)
 
-  //     const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
-  //     updatedChildCollectionDTO.metadataBlockNames = undefined
-  //     updatedChildCollectionDTO.inputLevels = undefined
-  //     updatedChildCollectionDTO.facetIds = undefined
+      const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
+      updatedChildCollectionDTO.inheritFacetsFromParent = true
+      updatedChildCollectionDTO.inheritMetadataBlocksFromParent = true
 
-  //     await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
+      await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
 
-  //     const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
+      const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
 
-  //     expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(false)
-  //     expect(childCollectionAfterUpdate.isFacetRoot).toBe(false)
+      expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(false)
+      expect(childCollectionAfterUpdate.isFacetRoot).toBe(false)
 
-  //     await deleteCollectionViaApi(childCollectionAlias)
-  //     await deleteCollectionViaApi(parentCollectionAlias)
-  //   })
+      await deleteCollectionViaApi(childCollectionAlias)
+      await deleteCollectionViaApi(parentCollectionAlias)
+    })
 
-  //   // TODO:ME - Cuidado, lo que pasa al enviar inheritFromFacets en root collection
-  //   // Quizas conviene aceptar estas dos flags desde el use case y en el front enviar siempre los facets ids, meta block names en input levels si se esta editando la coleccion root
-  //   /*
-  //     console.log
-  //   {
-  //     rootCollection: '{"id":1,"alias":"root","name":"Root","isReleased":true,"type":"UNCATEGORIZED","isMetadataBlockRoot":true,"isFacetRoot":true,"description":"The root dataverse.","contacts":[{"email":"root@mailinator.com","displayOrder":0}]}'
-  //   }
+    test('should not update root collection facets and keep isMetadataBlockRoot and isFacetRoot in true if facet ids are sent as undefined', async () => {
+      const rootCollection = await sut.getCollection()
 
-  //     at test/integration/collections/CollectionsRepository.test.ts:1032:15
+      const rootCollectionFacets = await sut.getCollectionFacets(rootCollection.alias)
 
-  // console.log
-  //   {
-  //     collectionFacets: '[{"id":2,"name":"authorName","displayName":"Author Name"},{"id":1,"name":"subject","displayName":"Subject"},{"id":4,"name":"keywordValue","displayName":"Keyword Term"},{"id":3,"name":"dateOfDeposit","displayName":"Deposit Date"}]'
-  //   }
+      const updatedRootCollectionDTO: CollectionDTO = {
+        alias: rootCollection.alias,
+        name: rootCollection.name,
+        contacts: [rootCollection.contacts?.[0].email as string],
+        type: rootCollection.type,
+        description: rootCollection.description,
+        affiliation: rootCollection.affiliation,
+        metadataBlockNames: undefined,
+        facetIds: undefined,
+        inputLevels: undefined,
+        inheritFacetsFromParent: false,
+        inheritMetadataBlocksFromParent: false
+      }
 
-  //     at test/integration/collections/CollectionsRepository.test.ts:1036:15
+      await sut.updateCollection(rootCollection.id, updatedRootCollectionDTO)
 
-  // console.log
-  //   {
-  //     rootCollectionAfterUpdate: '{"id":1,"alias":"root","name":"Root","isReleased":true,"type":"UNCATEGORIZED","isMetadataBlockRoot":false,"isFacetRoot":false,"description":"The root dataverse.","contacts":[{"email":"root@mailinator.com","displayOrder":0}]}'
-  //   }
+      const rootCollectionAfterUpdate = await sut.getCollection()
 
-  //     at test/integration/collections/CollectionsRepository.test.ts:1054:15
+      const rootCollectionFacetsAfterUpdate = await sut.getCollectionFacets(rootCollection.alias)
 
-  // console.log
-  //   { collectionFacetsAfterUpdate: '[]' }
-  //   */
+      expect(rootCollectionFacets).toStrictEqual(rootCollectionFacetsAfterUpdate)
+      expect(rootCollection.isMetadataBlockRoot).toBe(true)
+      expect(rootCollection.isFacetRoot).toBe(true)
+      expect(rootCollectionAfterUpdate.isMetadataBlockRoot).toBe(true)
+      expect(rootCollectionAfterUpdate.isFacetRoot).toBe(true)
+    })
 
-  //   test('should not update root collection metadata blocks/input levels and/or facets and keep isMetadataBlockRoot and isFacetRoot in true', async () => {
-  //     const rootCollection = await sut.getCollection()
-
-  //     console.log({ rootCollection: JSON.stringify(rootCollection) })
-
-  //     const collectionFacets = await sut.getCollectionFacets(rootCollection.alias)
-
-  //     console.log({ collectionFacets: JSON.stringify(collectionFacets) })
-
-  //     const updatedRootCollectionDTO: CollectionDTO = {
-  //       alias: rootCollection.alias,
-  //       name: rootCollection.name,
-  //       contacts: [rootCollection.contacts?.[0].email as string],
-  //       type: rootCollection.type,
-  //       description: rootCollection.description,
-  //       affiliation: rootCollection.affiliation,
-  //       metadataBlockNames: undefined,
-  //       facetIds: undefined,
-  //       inputLevels: undefined
-  //     }
-
-  //     await sut.updateCollection(rootCollection.id, updatedRootCollectionDTO)
-
-  //     const rootCollectionAfterUpdate = await sut.getCollection()
-
-  //     console.log({ rootCollectionAfterUpdate: JSON.stringify(rootCollectionAfterUpdate) })
-
-  //     const collectionFacetsAfterUpdate = await sut.getCollectionFacets(rootCollection.alias)
-
-  //     console.log({ collectionFacetsAfterUpdate: JSON.stringify(collectionFacetsAfterUpdate) })
-
-  //     expect(rootCollection.isMetadataBlockRoot).toBe(true)
-  //     expect(rootCollection.isFacetRoot).toBe(true)
-  //   })
-
-  //   test('should return error when collection does not exist', async () => {
-  //     const expectedError = new WriteError(
-  //       `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
-  //     )
-  //     const testCollectionAlias = 'updateCollection-not-found-test'
-  //     await expect(
-  //       sut.updateCollection(
-  //         TestConstants.TEST_DUMMY_COLLECTION_ID,
-  //         createCollectionDTO(testCollectionAlias)
-  //       )
-  //     ).rejects.toThrow(expectedError)
-  //   })
-  // })
-  //   test('should return error when collection does not exist', async () => {
-  //     const expectedError = new WriteError(
-  //       `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
-  //     )
-  //     const testCollectionAlias = 'updateCollection-not-found-test'
-  //     await expect(
-  //       sut.updateCollection(
-  //         TestConstants.TEST_DUMMY_COLLECTION_ID,
-  //         createCollectionDTO(testCollectionAlias)
-  //       )
-  //     ).rejects.toThrow(expectedError)
-  //   })
-  // })
+    test('should return error when collection does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
+      )
+      const testCollectionAlias = 'updateCollection-not-found-test'
+      await expect(
+        sut.updateCollection(
+          TestConstants.TEST_DUMMY_COLLECTION_ID,
+          createCollectionDTO(testCollectionAlias)
+        )
+      ).rejects.toThrow(expectedError)
+    })
+  })
 
   describe('getCollectionFeaturedItems', () => {
     let testFeaturedItemId: number
