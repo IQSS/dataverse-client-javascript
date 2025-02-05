@@ -59,4 +59,6 @@ export interface IFilesRepository {
     datasetId: number | string,
     uploadedFileDTOs: UploadedFileDTO[]
   ): Promise<undefined>
+
+  deleteFile(fileId: number | string): Promise<undefined>
 }
