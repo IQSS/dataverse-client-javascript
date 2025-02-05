@@ -192,33 +192,17 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         required: inputLevel.required
       }))
 
-    const metadataBlocksRequestBody: NewCollectionMetadataBlocksRequestPayload = {}
-
-    if (collectionDTO.inheritMetadataBlocksFromParent) {
-      metadataBlocksRequestBody['inheritMetadataBlocksFromParent'] = true
-    } else {
-      metadataBlocksRequestBody['metadataBlockNames'] = collectionDTO.metadataBlockNames
-      metadataBlocksRequestBody['inputLevels'] = inputLevelsRequestBody
+    const metadataBlocksRequestBody: NewCollectionMetadataBlocksRequestPayload = {
+      ...(!collectionDTO.inheritMetadataBlocksFromParent && {
+        metadataBlockNames: collectionDTO.metadataBlockNames,
+        inputLevels: inputLevelsRequestBody
+      }),
+      ...(!collectionDTO.inheritFacetsFromParent && {
+        facetIds: collectionDTO.facetIds
+      }),
+      inheritMetadataBlocksFromParent: collectionDTO.inheritMetadataBlocksFromParent,
+      inheritFacetsFromParent: collectionDTO.inheritFacetsFromParent
     }
-
-    if (collectionDTO.inheritFacetsFromParent) {
-      metadataBlocksRequestBody['inheritFacetsFromParent'] = true
-    } else {
-      metadataBlocksRequestBody['facetIds'] = collectionDTO.facetIds
-    }
-
-    // if (collectionDTO.metadataBlockNames && collectionDTO.inputLevels) {
-    //   metadataBlocksRequestBody['metadataBlockNames'] = collectionDTO.metadataBlockNames
-    //   metadataBlocksRequestBody['inputLevels'] = inputLevelsRequestBody
-    // } else {
-    //   metadataBlocksRequestBody['inheritMetadataBlocksFromParent'] = true
-    // }
-
-    // if (collectionDTO.facetIds) {
-    //   metadataBlocksRequestBody['facetIds'] = collectionDTO.facetIds
-    // } else {
-    //   metadataBlocksRequestBody['inheritFacetsFromParent'] = true
-    // }
 
     return {
       alias: collectionDTO.alias,
