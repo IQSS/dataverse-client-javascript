@@ -235,14 +235,19 @@ export const transformVersionPayloadToDataset = (
       releaseTime: new Date(versionPayload.releaseTime)
     },
     termsOfUse: {
-      fileAccessRequest: versionPayload.fileAccessRequest,
-      termsOfAccess: versionPayload.termsOfAccess,
-      dataAccessPlace: versionPayload.dataAccessPlace,
-      originalArchive: versionPayload.originalArchive,
-      availabilityStatus: versionPayload.availabilityStatus,
-      contactForAccess: versionPayload.contactForAccess,
-      sizeOfCollection: versionPayload.sizeOfCollection,
-      studyCompletion: versionPayload.studyCompletion
+      termsOfAccess: {
+        fileAccessRequest: versionPayload.fileAccessRequest,
+        termsOfAccessForRestrictedFiles: transformPayloadText(
+          keepRawFields,
+          versionPayload.termsOfAccess
+        ),
+        dataAccessPlace: transformPayloadText(keepRawFields, versionPayload.dataAccessPlace),
+        originalArchive: transformPayloadText(keepRawFields, versionPayload.originalArchive),
+        availabilityStatus: transformPayloadText(keepRawFields, versionPayload.availabilityStatus),
+        contactForAccess: transformPayloadText(keepRawFields, versionPayload.contactForAccess),
+        sizeOfCollection: transformPayloadText(keepRawFields, versionPayload.sizeOfCollection),
+        studyCompletion: transformPayloadText(keepRawFields, versionPayload.studyCompletion)
+      }
     },
     metadataBlocks: transformPayloadToDatasetMetadataBlocks(
       versionPayload.metadataBlocks,
@@ -256,6 +261,26 @@ export const transformVersionPayloadToDataset = (
     datasetModel.license = transformPayloadToDatasetLicense(
       versionPayload.license as LicensePayload
     )
+  } else {
+    datasetModel.termsOfUse.customTerms = {
+      termsOfUse: transformPayloadText(keepRawFields, versionPayload.termsOfUse) as string,
+      confidentialityDeclaration: transformPayloadText(
+        keepRawFields,
+        versionPayload.confidentialityDeclaration
+      ),
+      specialPermissions: transformPayloadText(keepRawFields, versionPayload.specialPermissions),
+      restrictions: transformPayloadText(keepRawFields, versionPayload.restrictions),
+      citationRequirements: transformPayloadText(
+        keepRawFields,
+        versionPayload.citationRequirements
+      ),
+      depositorRequirements: transformPayloadText(
+        keepRawFields,
+        versionPayload.depositorRequirements
+      ),
+      conditions: transformPayloadText(keepRawFields, versionPayload.conditions),
+      disclaimer: transformPayloadText(keepRawFields, versionPayload.disclaimer)
+    }
   }
   if ('alternativePersistentId' in versionPayload) {
     datasetModel.alternativePersistentId = versionPayload.alternativePersistentId
@@ -279,6 +304,16 @@ const transformPayloadToDatasetLicense = (licensePayload: LicensePayload): Datas
     datasetLicense.iconUri = licensePayload.iconUri
   }
   return datasetLicense
+}
+
+const transformPayloadText = (
+  keepRawFields: boolean,
+  text: string | undefined
+): string | undefined => {
+  if (!text) {
+    return undefined
+  }
+  return keepRawFields ? text : transformHtmlToMarkdown(text)
 }
 
 const transformPayloadToDatasetMetadataBlocks = (

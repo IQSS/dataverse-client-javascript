@@ -90,6 +90,19 @@ describe('execute', () => {
     await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
   })
 
+  test('should return terms of use fields in markdown format when keepRawFields is false', async () => {
+    const versionPayload = createDatasetVersionPayload()
+    versionPayload.termsOfAccess = 'Hello <b>world</b>'
+    const dataset = transformVersionPayloadToDataset(versionPayload, false)
+    expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe('Hello **world**')
+  })
+
+  test('should return terms of use fields in html format when keepRawFields is true', async () => {
+    const versionPayload = createDatasetVersionPayload()
+    const dataset = transformVersionPayloadToDataset(versionPayload, true)
+    expect(dataset.termsOfUse.termsOfAccess.contactForAccess).toBe(versionPayload.contactForAccess)
+  })
+
   test('should not return metadata fields in markdown format when keepRawFields is true', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
 

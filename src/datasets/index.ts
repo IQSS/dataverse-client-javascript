@@ -73,7 +73,8 @@ export {
   DatasetMetadataBlocks,
   DatasetMetadataFields,
   DatasetMetadataSubField,
-  DatasetMetadataFieldValue
+  DatasetMetadataFieldValue,
+  TermsOfUse
 } from './domain/models/Dataset'
 export { DatasetPreview } from './domain/models/DatasetPreview'
 export { DatasetVersionDiff } from './domain/models/DatasetVersionDiff'

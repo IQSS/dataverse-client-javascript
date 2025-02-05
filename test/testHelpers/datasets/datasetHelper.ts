@@ -53,14 +53,16 @@ export const createDatasetModel = (
       releaseTime: new Date(DATASET_RELEASE_TIME_STR)
     },
     termsOfUse: {
-      fileAccessRequest: true,
-      termsOfAccess: 'Terms of access',
-      dataAccessPlace: 'Data access place',
-      originalArchive: 'Original archive',
-      availabilityStatus: 'Availability status',
-      contactForAccess: 'Contact for access',
-      sizeOfCollection: 'Size of collection',
-      studyCompletion: 'Study completion'
+      termsOfAccess: {
+        fileAccessRequest: true,
+        termsOfAccessForRestrictedFiles: 'Terms of access',
+        dataAccessPlace: 'Data access place',
+        originalArchive: 'Original archive',
+        availabilityStatus: 'Availability status',
+        contactForAccess: 'Contact for access',
+        sizeOfCollection: 'Size of collection',
+        studyCompletion: 'Study completion'
+      }
     },
     publicationDate: DATASET_PUBLICATION_DATE_STR,
     metadataBlocks: [
@@ -97,6 +99,17 @@ export const createDatasetModel = (
   }
   if (license !== undefined) {
     datasetModel.license = license
+  } else {
+    datasetModel.termsOfUse.customTerms = {
+      termsOfUse: 'Terms of use',
+      confidentialityDeclaration: 'Confidentiality declaration',
+      specialPermissions: 'Special permissions',
+      restrictions: 'Restrictions',
+      citationRequirements: 'Citation requirements',
+      depositorRequirements: 'Depositor requirements',
+      conditions: 'Conditions',
+      disclaimer: 'Disclaimer'
+    }
   }
   if (addOptionalParameters) {
     datasetModel.alternativePersistentId = 'doi:10.5072/FK2/HC6KTB'
@@ -129,6 +142,14 @@ export const createDatasetVersionPayload = (
     contactForAccess: 'Contact for access',
     sizeOfCollection: 'Size of collection',
     studyCompletion: 'Study completion',
+    termsOfUse: 'Terms of use',
+    confidentialityDeclaration: 'Confidentiality declaration',
+    specialPermissions: 'Special permissions',
+    restrictions: 'Restrictions',
+    citationRequirements: 'Citation requirements',
+    depositorRequirements: 'Depositor requirements',
+    conditions: 'Conditions',
+    disclaimer: 'Disclaimer',
     metadataBlocks: {
       citation: {
         name: 'citation',
