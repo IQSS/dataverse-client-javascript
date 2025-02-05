@@ -99,17 +99,6 @@ export const createDatasetModel = (
   }
   if (license !== undefined) {
     datasetModel.license = license
-  } else {
-    datasetModel.termsOfUse.customTerms = {
-      termsOfUse: 'Terms of use',
-      confidentialityDeclaration: 'Confidentiality declaration',
-      specialPermissions: 'Special permissions',
-      restrictions: 'Restrictions',
-      citationRequirements: 'Citation requirements',
-      depositorRequirements: 'Depositor requirements',
-      conditions: 'Conditions',
-      disclaimer: 'Disclaimer'
-    }
   }
   if (addOptionalParameters) {
     datasetModel.alternativePersistentId = 'doi:10.5072/FK2/HC6KTB'

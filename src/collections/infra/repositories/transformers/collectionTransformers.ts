@@ -25,6 +25,7 @@ import { CollectionPreview } from '../../../domain/models/CollectionPreview'
 import { CollectionContact } from '../../../domain/models/CollectionContact'
 import { CollectionType } from '../../../domain/models/CollectionType'
 import { CollectionItemsFacetPayload } from './CollectionItemsFacetsPayload'
+import { CollectionItemsCountPerObjectTypePayload } from './CollectionItemsCountPerObjectTypePayload'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -84,6 +85,9 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
   const responseDataPayload = response.data.data
   const itemsPayload = responseDataPayload.items
   const facetsPayload = responseDataPayload.facets as CollectionItemsFacetPayload
+  const countPerObjectTypePayload = responseDataPayload[
+    'total_count_per_object_type'
+  ] as CollectionItemsCountPerObjectTypePayload
 
   const items: (DatasetPreview | FilePreview | CollectionPreview)[] = []
 
@@ -116,10 +120,17 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
     })
   )
 
+  const countPerObjectType = {
+    dataverses: countPerObjectTypePayload['Dataverses'],
+    datasets: countPerObjectTypePayload['Datasets'],
+    files: countPerObjectTypePayload['Files']
+  }
+
   return {
     items,
     facets,
-    totalItemCount: responseDataPayload.total_count
+    totalItemCount: responseDataPayload.total_count,
+    countPerObjectType
   }
 }
 

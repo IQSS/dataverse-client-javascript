@@ -57,7 +57,8 @@ export enum GetCollectionItemsQueryParams {
   PER_PAGE = 'per_page',
   START = 'start',
   TYPE = 'type',
-  FILTERQUERY = 'fq'
+  FILTERQUERY = 'fq',
+  SHOW_TYPE_COUNTS = 'show_type_counts'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -135,7 +136,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       [GetCollectionItemsQueryParams.QUERY]: '*',
       [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
       [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
-      [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
+      [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
+      [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true'
     })
 
     if (collectionId) {

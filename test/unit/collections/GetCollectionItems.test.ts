@@ -18,11 +18,17 @@ describe('execute', () => {
   ]
   const testTotalCount = 3
   const testFacets = createCollectionItemsFacetsModel()
+  const testCountPerObjectType = {
+    dataverses: 1,
+    datasets: 1,
+    files: 1
+  }
 
   const testItemSubset: CollectionItemSubset = {
     items: testItems,
     facets: testFacets,
-    totalItemCount: testTotalCount
+    totalItemCount: testTotalCount,
+    countPerObjectType: testCountPerObjectType
   }
 
   beforeEach(() => {
