@@ -40,6 +40,8 @@ export interface NewCollectionMetadataBlocksRequestPayload {
   metadataBlockNames?: string[]
   facetIds?: string[]
   inputLevels?: NewCollectionInputLevelRequestPayload[]
+  inheritMetadataBlocksFromParent?: boolean
+  inheritFacetsFromParent?: boolean
 }
 
 export interface NewCollectionInputLevelRequestPayload {
@@ -192,6 +194,18 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         required: inputLevel.required
       }))
 
+    const metadataBlocksRequestBody: NewCollectionMetadataBlocksRequestPayload = {
+      ...(!collectionDTO.inheritMetadataBlocksFromParent && {
+        metadataBlockNames: collectionDTO.metadataBlockNames,
+        inputLevels: inputLevelsRequestBody
+      }),
+      ...(!collectionDTO.inheritFacetsFromParent && {
+        facetIds: collectionDTO.facetIds
+      }),
+      inheritMetadataBlocksFromParent: collectionDTO.inheritMetadataBlocksFromParent,
+      inheritFacetsFromParent: collectionDTO.inheritFacetsFromParent
+    }
+
     return {
       alias: collectionDTO.alias,
       name: collectionDTO.name,
@@ -199,11 +213,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       dataverseType: collectionDTO.type,
       ...(collectionDTO.description && { description: collectionDTO.description }),
       ...(collectionDTO.affiliation && { affiliation: collectionDTO.affiliation }),
-      metadataBlocks: {
-        metadataBlockNames: collectionDTO.metadataBlockNames,
-        facetIds: collectionDTO.facetIds,
-        inputLevels: inputLevelsRequestBody
-      }
+      metadataBlocks: metadataBlocksRequestBody
     }
   }
 
