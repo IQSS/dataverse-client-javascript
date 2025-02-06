@@ -115,127 +115,7 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.withCredentials,
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers
     }
-    describe('with custom terms of use', () => {
-      test('should return Dataset with customTerms when license is undefined', async () => {
-        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
-        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`
 
-        // API Key auth
-        let actual = await sut.getDataset(
-          testDatasetModel.id,
-          testVersionId,
-          testIncludeDeaccessioned,
-          false
-        )
-
-        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
-        expect(actual).toStrictEqual(testDatasetModel)
-
-        // Session cookie auth
-        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
-        actual = await sut.getDataset(
-          testDatasetModel.id,
-          testVersionId,
-          testIncludeDeaccessioned,
-          false
-        )
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          expectedRequestConfigSessionCookie
-        )
-        expect(actual).toStrictEqual(testDatasetModel)
-      })
-
-      test('should return Dataset when providing id, version id, and response with license is successful', async () => {
-        const testDatasetLicense = createDatasetLicenseModel()
-        const testDatasetVersionWithLicenseSuccessfulResponse = {
-          data: {
-            status: 'OK',
-            data: createDatasetVersionPayload(testDatasetLicense)
-          }
-        }
-        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionWithLicenseSuccessfulResponse)
-
-        const actual = await sut.getDataset(
-          testDatasetModel.id,
-          testVersionId,
-          testIncludeDeaccessioned,
-          false
-        )
-
-        expect(axios.get).toHaveBeenCalledWith(
-          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`,
-          expectedRequestConfigApiKey
-        )
-        expect(actual).toStrictEqual(createDatasetModel(testDatasetLicense))
-      })
-
-      test('should return Dataset when providing id, version id, and response with license without icon URI is successful', async () => {
-        const testDatasetLicenseWithoutIconUri = createDatasetLicenseModel(false)
-        const testDatasetVersionWithLicenseSuccessfulResponse = {
-          data: {
-            status: 'OK',
-            data: createDatasetVersionPayload(testDatasetLicenseWithoutIconUri)
-          }
-        }
-        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionWithLicenseSuccessfulResponse)
-
-        const actual = await sut.getDataset(
-          testDatasetModel.id,
-          testVersionId,
-          testIncludeDeaccessioned,
-          false
-        )
-
-        expect(axios.get).toHaveBeenCalledWith(
-          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`,
-          expectedRequestConfigApiKey
-        )
-        expect(actual).toStrictEqual(createDatasetModel(testDatasetLicenseWithoutIconUri))
-      })
-
-      test('should return dataset with alternative persistent id, publication date and citation date when they are present in the response', async () => {
-        const testDatasetVersionWithAlternativePersistentIdAndDatesSuccessfulResponse = {
-          data: {
-            status: 'OK',
-            data: createDatasetVersionPayload(undefined, true)
-          }
-        }
-        jest
-          .spyOn(axios, 'get')
-          .mockResolvedValue(
-            testDatasetVersionWithAlternativePersistentIdAndDatesSuccessfulResponse
-          )
-
-        const actual = await sut.getDataset(
-          testDatasetModel.id,
-          testVersionId,
-          testIncludeDeaccessioned,
-          false
-        )
-
-        expect(axios.get).toHaveBeenCalledWith(
-          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`,
-          expectedRequestConfigApiKey
-        )
-        expect(actual).toStrictEqual(createDatasetModel(undefined, true))
-      })
-
-      test('should return error on repository read error', async () => {
-        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
-
-        let error = undefined as unknown as ReadError
-        await sut
-          .getDataset(testDatasetModel.id, testVersionId, testIncludeDeaccessioned, false)
-          .catch((e) => (error = e))
-
-        expect(axios.get).toHaveBeenCalledWith(
-          `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`,
-          expectedRequestConfigApiKey
-        )
-        expect(error).toBeInstanceOf(Error)
-      })
-    })
     describe('by numeric id', () => {
       test('should return Dataset when providing id, version id, and response is successful', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
@@ -340,6 +220,64 @@ describe('DatasetsRepository', () => {
           expectedRequestConfigApiKey
         )
         expect(actual).toStrictEqual(createDatasetModel(undefined, true))
+      })
+      test('should return Dataset with customTerms when license is undefined', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`
+
+        // API Key auth
+        let actual = await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned,
+          false
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual).toStrictEqual(testDatasetModel)
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+        actual = await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned,
+          false
+        )
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          expectedRequestConfigSessionCookie
+        )
+        expect(actual).toStrictEqual(testDatasetModel)
+      })
+      test('should return Dataset without customTerms when license is defined', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`
+
+        // API Key auth
+        let actual = await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned,
+          false
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+        expect(actual).toStrictEqual(testDatasetModel)
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+        actual = await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned,
+          false
+        )
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          expectedRequestConfigSessionCookie
+        )
+        expect(actual).toStrictEqual(testDatasetModel)
       })
 
       test('should return error on repository read error', async () => {

@@ -294,7 +294,13 @@ export const transformVersionPayloadToDataset = (
   return datasetModel
 }
 
-const transformPayloadToDatasetLicense = (licensePayload: LicensePayload): DatasetLicense => {
+const transformPayloadToDatasetLicense = (
+  licensePayload: LicensePayload
+): DatasetLicense | undefined => {
+  if (!licensePayload) {
+    return undefined
+  }
+
   const datasetLicense: DatasetLicense = {
     name: licensePayload.name,
     uri: licensePayload.uri
@@ -303,6 +309,7 @@ const transformPayloadToDatasetLicense = (licensePayload: LicensePayload): Datas
   if ('iconUri' in licensePayload) {
     datasetLicense.iconUri = licensePayload.iconUri
   }
+
   return datasetLicense
 }
 

@@ -142,14 +142,6 @@ export const createDatasetVersionPayload = (
     contactForAccess: 'Contact for access',
     sizeOfCollection: 'Size of collection',
     studyCompletion: 'Study completion',
-    termsOfUse: 'Terms of use',
-    confidentialityDeclaration: 'Confidentiality declaration',
-    specialPermissions: 'Special permissions',
-    restrictions: 'Restrictions',
-    citationRequirements: 'Citation requirements',
-    depositorRequirements: 'Depositor requirements',
-    conditions: 'Conditions',
-    disclaimer: 'Disclaimer',
     metadataBlocks: {
       citation: {
         name: 'citation',
@@ -245,6 +237,15 @@ export const createDatasetVersionPayload = (
   }
   if (license !== undefined) {
     datasetPayload.license = license
+  } else {
+    datasetPayload.termsOfUse = 'Terms of use'
+    datasetPayload.confidentialityDeclaration = 'Confidentiality declaration'
+    datasetPayload.specialPermissions = 'Special permissions'
+    datasetPayload.restrictions = 'Restrictions'
+    datasetPayload.citationRequirements = 'Citation requirements'
+    datasetPayload.depositorRequirements = 'Depositor requirements'
+    datasetPayload.conditions = 'Conditions'
+    datasetPayload.disclaimer = 'Disclaimer'
   }
   if (addOptionalProperties) {
     datasetPayload.alternativePersistentId = 'doi:10.5072/FK2/HC6KTB'

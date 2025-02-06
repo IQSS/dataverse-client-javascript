@@ -87,6 +87,12 @@ describe('execute', () => {
     expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe('Terms of access')
     expect(dataset.termsOfUse.customTerms).toBe(undefined)
   })
+  test('should  return custom terms if license is undefined', async () => {
+    const versionPayload = createDatasetVersionPayload()
+    const dataset = transformVersionPayloadToDataset(versionPayload, false)
+    expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe('Terms of access')
+    expect(dataset.termsOfUse.customTerms?.termsOfUse).toBe('Terms of use')
+  })
   test('should return metadata fields in markdown format when keepRawFields is false', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
 
