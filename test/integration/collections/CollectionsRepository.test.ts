@@ -1,6 +1,7 @@
 import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
+  CollectionDTO,
   CollectionFeaturedItemsDTO,
   CollectionItemType,
   CollectionPreview,
@@ -149,11 +150,15 @@ describe('CollectionsRepository', () => {
     const testCreateCollectionAlias1 = 'createCollection-test-1'
     const testCreateCollectionAlias2 = 'createCollection-test-2'
     const testCreateCollectionAlias3 = 'createCollection-test-3'
+    const testCreateCollectionAlias4 = 'createCollection-test-4'
+    const testCreateCollectionAlias5 = 'createCollection-test-5'
 
     afterAll(async () => {
       await deleteCollectionViaApi(testCreateCollectionAlias1)
       await deleteCollectionViaApi(testCreateCollectionAlias2)
       await deleteCollectionViaApi(testCreateCollectionAlias3)
+      await deleteCollectionViaApi(testCreateCollectionAlias4)
+      await deleteCollectionViaApi(testCreateCollectionAlias5)
     })
 
     test('should create collection in root when no parent collection is set', async () => {
@@ -184,13 +189,48 @@ describe('CollectionsRepository', () => {
         testCollectionId
       )
       expect(typeof actualId).toBe('number')
+
+      const collectionCreated = await sut.getCollection(actualId)
+
+      expect(collectionCreated.isMetadataBlockRoot).toBe(true)
+      expect(collectionCreated.isFacetRoot).toBe(true)
     })
 
-    test('should create collection without input levels', async () => {
-      const newCollectionDTO = createCollectionDTO(testCreateCollectionAlias3)
-      newCollectionDTO.inputLevels = undefined
-      const actualId = await sut.createCollection(newCollectionDTO, testCollectionId)
-      expect(typeof actualId).toBe('number')
+    test('should create a collection to inherit metadata blocks from parent collection', async () => {
+      const childCollectionDTO = createCollectionDTO(testCreateCollectionAlias3)
+      childCollectionDTO.inheritMetadataBlocksFromParent = true
+
+      const childCollectionId = await sut.createCollection(childCollectionDTO)
+
+      const childCollection = await sut.getCollection(childCollectionId)
+
+      expect(childCollection.isMetadataBlockRoot).toBe(false)
+      expect(childCollection.isFacetRoot).toBe(true)
+    })
+
+    test('should create a collection to inherit facets from parent collection', async () => {
+      const childCollectionDTO = createCollectionDTO(testCreateCollectionAlias4)
+      childCollectionDTO.inheritFacetsFromParent = true
+
+      const childCollectionId = await sut.createCollection(childCollectionDTO)
+
+      const childCollection = await sut.getCollection(childCollectionId)
+
+      expect(childCollection.isMetadataBlockRoot).toBe(true)
+      expect(childCollection.isFacetRoot).toBe(false)
+    })
+
+    test('should create a collection to inherit metadata blocks and facets from parent collection', async () => {
+      const childCollectionDTO = createCollectionDTO(testCreateCollectionAlias5)
+      childCollectionDTO.inheritMetadataBlocksFromParent = true
+      childCollectionDTO.inheritFacetsFromParent = true
+
+      const childCollectionId = await sut.createCollection(childCollectionDTO)
+
+      const childCollection = await sut.getCollection(childCollectionId)
+
+      expect(childCollection.isMetadataBlockRoot).toBe(false)
+      expect(childCollection.isFacetRoot).toBe(false)
     })
 
     test('should return error when parent collection does not exist', async () => {
@@ -916,6 +956,126 @@ describe('CollectionsRepository', () => {
       expect(updatedInputLevel?.datasetFieldName).toBe('country')
       expect(updatedInputLevel?.include).toBe(true)
       expect(updatedInputLevel?.required).toBe(false)
+    })
+
+    test('should update the collection to inherit metadata blocks from parent collection', async () => {
+      const parentCollectionAlias = 'inherit-metablocks-parent-update'
+      const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
+      const parentCollectionId = await sut.createCollection(parentCollectionDTO)
+
+      const childCollectionAlias = 'inherit-metablocks-child-update'
+      const childCollectionDTO = createCollectionDTO(childCollectionAlias)
+
+      const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
+
+      const childCollection = await sut.getCollection(childCollectionId)
+
+      expect(childCollection.isMetadataBlockRoot).toBe(true)
+      expect(childCollection.isFacetRoot).toBe(true)
+
+      const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
+      updatedChildCollectionDTO.inheritMetadataBlocksFromParent = true
+
+      await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
+
+      const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
+
+      expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(false)
+      expect(childCollectionAfterUpdate.isFacetRoot).toBe(true)
+
+      await deleteCollectionViaApi(childCollectionAlias)
+      await deleteCollectionViaApi(parentCollectionAlias)
+    })
+
+    test('should update the collection to inherit facets from parent collection', async () => {
+      const parentCollectionAlias = 'inherit-facets-parent-update'
+      const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
+      const parentCollectionId = await sut.createCollection(parentCollectionDTO)
+
+      const childCollectionAlias = 'inherit-facets-child-update'
+      const childCollectionDTO = createCollectionDTO(childCollectionAlias)
+
+      const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
+
+      const childCollection = await sut.getCollection(childCollectionId)
+
+      expect(childCollection.isMetadataBlockRoot).toBe(true)
+      expect(childCollection.isFacetRoot).toBe(true)
+
+      const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
+      updatedChildCollectionDTO.inheritFacetsFromParent = true
+
+      await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
+
+      const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
+
+      expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(true)
+      expect(childCollectionAfterUpdate.isFacetRoot).toBe(false)
+
+      await deleteCollectionViaApi(childCollectionAlias)
+      await deleteCollectionViaApi(parentCollectionAlias)
+    })
+
+    test('should update the collection to inherit metadata blocks and facets from parent collection', async () => {
+      const parentCollectionAlias = 'inherit-metablocks-facets-parent-update'
+      const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
+      const parentCollectionId = await sut.createCollection(parentCollectionDTO)
+
+      const childCollectionAlias = 'inherit-metablocks-facets-child-update'
+      const childCollectionDTO = createCollectionDTO(childCollectionAlias)
+
+      const childCollectionId = await sut.createCollection(childCollectionDTO, parentCollectionId)
+
+      const childCollection = await sut.getCollection(childCollectionId)
+
+      expect(childCollection.isMetadataBlockRoot).toBe(true)
+      expect(childCollection.isFacetRoot).toBe(true)
+
+      const updatedChildCollectionDTO = createCollectionDTO(childCollectionAlias)
+      updatedChildCollectionDTO.inheritFacetsFromParent = true
+      updatedChildCollectionDTO.inheritMetadataBlocksFromParent = true
+
+      await sut.updateCollection(childCollectionId, updatedChildCollectionDTO)
+
+      const childCollectionAfterUpdate = await sut.getCollection(childCollectionId)
+
+      expect(childCollectionAfterUpdate.isMetadataBlockRoot).toBe(false)
+      expect(childCollectionAfterUpdate.isFacetRoot).toBe(false)
+
+      await deleteCollectionViaApi(childCollectionAlias)
+      await deleteCollectionViaApi(parentCollectionAlias)
+    })
+
+    test('should not update root collection facets and keep isMetadataBlockRoot and isFacetRoot in true if facet ids are sent as undefined', async () => {
+      const rootCollection = await sut.getCollection()
+
+      const rootCollectionFacets = await sut.getCollectionFacets(rootCollection.alias)
+
+      const updatedRootCollectionDTO: CollectionDTO = {
+        alias: rootCollection.alias,
+        name: rootCollection.name,
+        contacts: [rootCollection.contacts?.[0].email as string],
+        type: rootCollection.type,
+        description: rootCollection.description,
+        affiliation: rootCollection.affiliation,
+        metadataBlockNames: undefined,
+        facetIds: undefined,
+        inputLevels: undefined,
+        inheritFacetsFromParent: false,
+        inheritMetadataBlocksFromParent: false
+      }
+
+      await sut.updateCollection(rootCollection.id, updatedRootCollectionDTO)
+
+      const rootCollectionAfterUpdate = await sut.getCollection()
+
+      const rootCollectionFacetsAfterUpdate = await sut.getCollectionFacets(rootCollection.alias)
+
+      expect(rootCollectionFacets).toStrictEqual(rootCollectionFacetsAfterUpdate)
+      expect(rootCollection.isMetadataBlockRoot).toBe(true)
+      expect(rootCollection.isFacetRoot).toBe(true)
+      expect(rootCollectionAfterUpdate.isMetadataBlockRoot).toBe(true)
+      expect(rootCollectionAfterUpdate.isFacetRoot).toBe(true)
     })
 
     test('should return error when collection does not exist', async () => {

@@ -162,7 +162,9 @@ export const createCollectionDTO = (alias = 'test-collection'): CollectionDTO =>
         required: true,
         include: true
       }
-    ]
+    ],
+    inheritFacetsFromParent: false,
+    inheritMetadataBlocksFromParent: false
   }
 }
 
@@ -180,14 +182,16 @@ export const createNewCollectionRequestPayload = (): NewCollectionRequestPayload
     affiliation: 'test affiliation',
     metadataBlocks: {
       metadataBlockNames: ['citation', 'geospatial'],
-      facetIds: ['authorName', 'authorAffiliation'],
       inputLevels: [
         {
           datasetFieldTypeName: 'geographicCoverage',
           include: true,
           required: true
         }
-      ]
+      ],
+      facetIds: ['authorName', 'authorAffiliation'],
+      inheritMetadataBlocksFromParent: false,
+      inheritFacetsFromParent: false
     }
   }
 }
