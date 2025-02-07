@@ -10,7 +10,7 @@ import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from 
 import { DatasetLock } from '../../domain/models/DatasetLock'
 import { CreatedDatasetIdentifiers } from '../../domain/models/CreatedDatasetIdentifiers'
 import { DatasetPreviewSubset } from '../../domain/models/DatasetPreviewSubset'
-import { DatasetDTO } from '../../domain/dtos/DatasetDTO'
+import { DatasetDTO, DatasetDeaccessionDTO } from '../../domain/dtos/DatasetDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 import { transformDatasetModelToNewDatasetRequestPayload } from './transformers/datasetTransformers'
 import { transformDatasetLocksResponseToDatasetLocks } from './transformers/datasetLocksTransformers'
@@ -208,6 +208,25 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       this.buildApiEndpoint(this.datasetsResourceName, `editMetadata`, datasetId),
       transformDatasetModelToUpdateDatasetRequestPayload(dataset, datasetMetadataBlocks),
       { replace: true }
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deaccessionDataset(
+    datasetId: string | number,
+    datasetVersionId: string,
+    deaccessionDTO: DatasetDeaccessionDTO
+  ): Promise<void> {
+    return this.doPost(
+      this.buildApiEndpoint(
+        this.datasetsResourceName,
+        `versions/${datasetVersionId}/deaccession`,
+        datasetId
+      ),
+      deaccessionDTO
     )
       .then(() => undefined)
       .catch((error) => {

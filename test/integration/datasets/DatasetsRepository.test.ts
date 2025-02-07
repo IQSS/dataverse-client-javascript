@@ -17,7 +17,8 @@ import {
   VersionUpdateType,
   createDataset,
   CreatedDatasetIdentifiers,
-  DatasetDTO
+  DatasetDTO,
+  DatasetDeaccessionDTO
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -864,6 +865,60 @@ describe('DatasetsRepository', () => {
       await expect(
         sut.publishDataset(nonExistentTestDatasetId, VersionUpdateType.MAJOR)
       ).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('deaccessionDataset', () => {
+    test('should deaccession a dataset', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const deaccessionDTO: DatasetDeaccessionDTO = {
+        deaccessionReason: 'Deaccessioning the dataset for testing purposes'
+      }
+
+      const actual = await sut.deaccessionDataset(testDatasetIds.numericId, '1.0', deaccessionDTO)
+
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error when dataset is deaccessioned', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const deaccessionDTO: DatasetDeaccessionDTO = {
+        deaccessionReason: 'Deaccessioning the dataset for testing purposes'
+      }
+
+      const actual = await sut.deaccessionDataset(testDatasetIds.numericId, '1.0', deaccessionDTO)
+
+      expect(actual).toBeUndefined()
+
+      await expect(
+        sut.deaccessionDataset(testDatasetIds.numericId, '1.0', deaccessionDTO)
+      ).rejects.toBeInstanceOf(WriteError)
+    })
+
+    test('should return error when dataset is not published', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      const deaccessionDTO: DatasetDeaccessionDTO = {
+        deaccessionReason: 'Deaccessioning the dataset for testing purposes'
+      }
+
+      await expect(
+        sut.deaccessionDataset(testDatasetIds.numericId, ':latest-published', deaccessionDTO)
+      ).rejects.toBeInstanceOf(WriteError)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(
+        sut.deaccessionDataset(nonExistentTestDatasetId, '1.0', {
+          deaccessionReason: 'Deaccessioning the dataset for testing purposes'
+        })
+      ).rejects.toBeInstanceOf(WriteError)
     })
   })
 })

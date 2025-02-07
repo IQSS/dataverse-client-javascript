@@ -10,6 +10,11 @@ export interface DatasetMetadataBlockValuesDTO {
   fields: DatasetMetadataFieldsDTO
 }
 
+export interface DatasetDeaccessionDTO {
+  deaccessionReason: string
+  deaccessionForwardURL?: string
+}
+
 export type DatasetMetadataFieldsDTO = Record<string, DatasetMetadataFieldValueDTO>
 
 export type DatasetMetadataFieldValueDTO =

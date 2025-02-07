@@ -36,6 +36,7 @@ The different use cases currently available in the package are classified below,
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
     - [Publish a Dataset](#publish-a-dataset)
+    - [Deaccession a Dataset](#deaccession-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -752,6 +753,36 @@ The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/d
 - `VersionUpdateType.MINOR`
 - `VersionUpdateType.MAJOR`
 - `VersionUpdateType.UPDATE_CURRENT`
+
+#### Deaccesion a Dataset
+
+Deaccesion a Dataset, given its identifier, version, and deaccessionDatasetDTO to perform.
+
+##### Example call:
+
+```typescript
+import { deaccessionDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const version = ':latestPublished'
+const deaccessionDatasetDTO = {
+  deaccessionReason: 'Description of the deaccession reason.',
+  deaccessionForwardURL: 'https://demo.dataverse.org'
+}
+
+deaccessionDataset.execute(datasetId, version, deaccessionDatasetDTO)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/DeaccesionDataset.ts) implementation_.
+The `datasetId` parameter can be a string for persistent identifiers, or a number for numeric identifiers.
+The `version` parameter should be a string or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+In `deaccessionDatasetDTO`, deaccessionForwardURL is optional.
+
+You cannot deaccession a dataset more than once. If you call this endpoint twice for the same dataset version, you will get a not found error on the second call, since the dataset you are looking for will no longer be published since it is already deaccessioned.
 
 ## Files
 
