@@ -10,7 +10,8 @@ import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode'
 import TurndownService from 'turndown'
 import {
   DatasetDTO,
-  DatasetMetadataFieldValueDTO
+  DatasetMetadataFieldValueDTO,
+  DatasetDeaccessionDTO
 } from '../../../src/datasets/domain/dtos/DatasetDTO'
 import { MetadataBlock, MetadataFieldType } from '../../../src'
 import {
@@ -786,5 +787,11 @@ export const createUpdateDatasetRequestPayload = (): UpdateDatasetRequestPayload
         typeName: 'alternativeRequiredTitle'
       }
     ]
+  }
+}
+
+export const createDatasetDeaccessionDTO = (): DatasetDeaccessionDTO => {
+  return {
+    deaccessionReason: 'Test reason.'
   }
 }

@@ -121,7 +121,7 @@ describe('execute', () => {
       )
     ).rejects.toBeInstanceOf(WriteError)
 
-    await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
+    await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
   })
 
   test('should deaccession a dataset when it is deaccessioned once', async () => {
@@ -152,6 +152,6 @@ describe('execute', () => {
       deaccessionDataset.execute(createdDatasetIdentifiers.numericId, '1.0', testDeaccessionDataset)
     ).rejects.toThrow(Error)
 
-    await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
+    await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
   })
 })
