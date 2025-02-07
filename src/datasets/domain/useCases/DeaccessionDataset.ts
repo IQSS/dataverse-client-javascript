@@ -13,14 +13,13 @@ export class DeaccessionDataset implements UseCase<void> {
   /**
    * Deaccession a dataset, given a dataset id, a dataset version id, and a DatasetDeaccessionDTO object.
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
-   * @param {string | DatasetNotNumberedVersion} [datasetVersionId=DatasetNotNumberedVersion.LATEST] - The dataset version identifier, which can be a version-specific numeric string (for example, 1.0) or a DatasetNotNumberedVersion enum value. If this parameter is not set, the default value is: DatasetNotNumberedVersion.LATEST
-   * @param {DatasetDeaccessionDTO} [DatasetDeaccessionDTO] - The DatasetDeaccessionDTO object that contains the deaccession reason and an optional deaccession forward URL.
+   * @param {string | DatasetNotNumberedVersion} [datasetVersionId] - The dataset version identifier, which can be a version-specific numeric string (for example, 1.0) or a DatasetNotNumberedVersion enum value.
    * @returns A promise that resolves when the dataset is deaccessioned
    * @throws An error if the dataset could not be deaccessioned
    */
   async execute(
     datasetId: number | string,
-    datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
+    datasetVersionId: string | DatasetNotNumberedVersion,
     DatasetDeaccessionDTO: DatasetDeaccessionDTO
   ): Promise<void> {
     return await this.datasetsRepository.deaccessionDataset(

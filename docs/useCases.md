@@ -779,8 +779,7 @@ deaccessionDataset.execute(datasetId, version, deaccessionDatasetDTO)
 
 _See [use case](../src/datasets/domain/useCases/DeaccesionDataset.ts) implementation_.
 The `datasetId` parameter can be a string for persistent identifiers, or a number for numeric identifiers.
-The `version` parameter should be a string or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
-In `deaccessionDatasetDTO`, deaccessionForwardURL is optional.
+The `version` parameter should be a string or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value.
 
 You cannot deaccession a dataset more than once. If you call this endpoint twice for the same dataset version, you will get a not found error on the second call, since the dataset you are looking for will no longer be published since it is already deaccessioned.
 

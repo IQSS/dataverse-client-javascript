@@ -120,6 +120,8 @@ describe('execute', () => {
         testDeaccessionDataset
       )
     ).rejects.toBeInstanceOf(WriteError)
+
+    await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
   })
 
   test('should deaccession a dataset when it is deaccessioned once', async () => {
