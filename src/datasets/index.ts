@@ -86,8 +86,8 @@ export {
   DatasetMetadataFieldsDTO,
   DatasetMetadataFieldValueDTO,
   DatasetMetadataBlockValuesDTO,
-  DatasetMetadataChildFieldValueDTO,
-  DatasetDeaccessionDTO
+  DatasetMetadataChildFieldValueDTO
 } from './domain/dtos/DatasetDTO'
+export { DatasetDeaccessionDTO } from './domain/dtos/DatasetDeaccessionDTO'
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers'
 export { VersionUpdateType } from './domain/models/Dataset'

@@ -10,9 +10,9 @@ import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode'
 import TurndownService from 'turndown'
 import {
   DatasetDTO,
-  DatasetMetadataFieldValueDTO,
-  DatasetDeaccessionDTO
+  DatasetMetadataFieldValueDTO
 } from '../../../src/datasets/domain/dtos/DatasetDTO'
+import { DatasetDeaccessionDTO } from '../../../src/datasets/domain/dtos/DatasetDeaccessionDTO'
 import { MetadataBlock, MetadataFieldType } from '../../../src'
 import {
   NewDatasetRequestPayload,

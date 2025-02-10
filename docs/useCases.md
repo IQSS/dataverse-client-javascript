@@ -754,9 +754,9 @@ The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/d
 - `VersionUpdateType.MAJOR`
 - `VersionUpdateType.UPDATE_CURRENT`
 
-#### Deaccesion a Dataset
+#### Deaccession a Dataset
 
-Deaccesion a Dataset, given its identifier, version, and deaccessionDatasetDTO to perform.
+Deaccession a Dataset, given its identifier, version, and deaccessionDatasetDTO to perform.
 
 ##### Example call:
 
@@ -777,7 +777,7 @@ deaccessionDataset.execute(datasetId, version, deaccessionDatasetDTO)
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/DeaccesionDataset.ts) implementation_.
+_See [use case](../src/datasets/domain/useCases/DeaccessionDataset.ts) implementation_.
 The `datasetId` parameter can be a string for persistent identifiers, or a number for numeric identifiers.
 The `version` parameter should be a string or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value.
 

@@ -1,6 +1,6 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
-import { DatasetDeaccessionDTO } from '../dtos/DatasetDTO'
+import { DatasetDeaccessionDTO } from '../dtos/DatasetDeaccessionDTO'
 import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion'
 
 export class DeaccessionDataset implements UseCase<void> {

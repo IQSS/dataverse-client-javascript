@@ -881,6 +881,10 @@ describe('DatasetsRepository', () => {
       const actual = await sut.deaccessionDataset(testDatasetIds.numericId, '1.0', deaccessionDTO)
 
       expect(actual).toBeUndefined()
+
+      const dataset = await sut.getDataset(testDatasetIds.numericId, '1.0', true, false)
+
+      expect(dataset.versionInfo.state).toBe('DEACCESSIONED')
     })
 
     test('should return error when dataset is deaccessioned', async () => {

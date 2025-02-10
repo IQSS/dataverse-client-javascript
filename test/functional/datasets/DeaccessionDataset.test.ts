@@ -72,7 +72,7 @@ describe('execute', () => {
 
     expect(response).toBeUndefined()
 
-    const testDeaccessionDataset: DatasetDeaccessionDTO = {
+    const testDeaccessionDatasetDTO: DatasetDeaccessionDTO = {
       deaccessionReason: 'Description of the deaccession reason.',
       deaccessionForwardURL: 'https://demo.dataverse.org'
     }
@@ -80,7 +80,7 @@ describe('execute', () => {
     const actual = await deaccessionDataset.execute(
       createdDatasetIdentifiers.numericId,
       '1.0',
-      testDeaccessionDataset
+      testDeaccessionDatasetDTO
     )
 
     expect(actual).toBeUndefined()
@@ -91,7 +91,7 @@ describe('execute', () => {
   test('should throw an error when the dataset id is incorrect', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testDataset)
 
-    const testDeaccessionDataset: DatasetDeaccessionDTO = {
+    const testDeaccessionDatasetDTO: DatasetDeaccessionDTO = {
       deaccessionReason: 'Description of the deaccession reason.',
       deaccessionForwardURL: 'https://demo.dataverse.org'
     }
@@ -100,7 +100,7 @@ describe('execute', () => {
       deaccessionDataset.execute(
         createdDatasetIdentifiers.numericId,
         ':latest-published',
-        testDeaccessionDataset
+        testDeaccessionDatasetDTO
       )
     ).rejects.toThrow(Error)
 
@@ -109,7 +109,7 @@ describe('execute', () => {
 
   test('should not deaccession a dataset when it is not published', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testDataset)
-    const testDeaccessionDataset: DatasetDeaccessionDTO = {
+    const testDeaccessionDatasetDTO: DatasetDeaccessionDTO = {
       deaccessionReason: 'Description of the deaccession reason.'
     }
 
@@ -117,14 +117,14 @@ describe('execute', () => {
       deaccessionDataset.execute(
         createdDatasetIdentifiers.numericId,
         ':latest-published',
-        testDeaccessionDataset
+        testDeaccessionDatasetDTO
       )
     ).rejects.toBeInstanceOf(WriteError)
 
     await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
   })
 
-  test('should deaccession a dataset when it is deaccessioned once', async () => {
+  test('should not deaccession a dataset when it is deaccessioned once', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testDataset)
 
     const response = await publishDataset.execute(
@@ -135,7 +135,7 @@ describe('execute', () => {
 
     expect(response).toBeUndefined()
 
-    const testDeaccessionDataset: DatasetDeaccessionDTO = {
+    const testDeaccessionDatasetDTO: DatasetDeaccessionDTO = {
       deaccessionReason: 'Description of the deaccession reason.',
       deaccessionForwardURL: 'https://demo.dataverse.org'
     }
@@ -143,13 +143,17 @@ describe('execute', () => {
     const actual = await deaccessionDataset.execute(
       createdDatasetIdentifiers.numericId,
       '1.0',
-      testDeaccessionDataset
+      testDeaccessionDatasetDTO
     )
 
     expect(actual).toBeUndefined()
 
     await expect(
-      deaccessionDataset.execute(createdDatasetIdentifiers.numericId, '1.0', testDeaccessionDataset)
+      deaccessionDataset.execute(
+        createdDatasetIdentifiers.numericId,
+        '1.0',
+        testDeaccessionDatasetDTO
+      )
     ).rejects.toThrow(Error)
 
     await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)

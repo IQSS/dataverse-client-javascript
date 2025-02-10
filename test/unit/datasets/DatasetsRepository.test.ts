@@ -910,15 +910,15 @@ describe('DatasetsRepository', () => {
     const expectedApiKeyRequestConfig = {
       ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
     }
-    const testDeaccessionDataset = createDatasetDeaccessionDTO()
-    const testDeaccessionDatasetJSON = JSON.stringify(testDeaccessionDataset)
+    const testDeaccessionDatasetDTO = createDatasetDeaccessionDTO()
+    const testDeaccessionDatasetJSON = JSON.stringify(testDeaccessionDatasetDTO)
     test('should return nothing when providing id, version update type and response is successful', async () => {
       jest.spyOn(axios, 'post').mockResolvedValue(undefined)
 
       let actual = await sut.deaccessionDataset(
         testDatasetModel.id,
         version,
-        testDeaccessionDataset
+        testDeaccessionDatasetDTO
       )
 
       expect(axios.post).toHaveBeenCalledWith(
@@ -930,7 +930,7 @@ describe('DatasetsRepository', () => {
 
       ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
 
-      actual = await sut.deaccessionDataset(testDatasetModel.id, version, testDeaccessionDataset)
+      actual = await sut.deaccessionDataset(testDatasetModel.id, version, testDeaccessionDatasetDTO)
 
       expect(axios.post).toHaveBeenCalledWith(
         expectedApiEndpoint,
@@ -945,7 +945,7 @@ describe('DatasetsRepository', () => {
 
       let error: WriteError | undefined = undefined
       await sut
-        .deaccessionDataset(testDatasetModel.id, version, testDeaccessionDataset)
+        .deaccessionDataset(testDatasetModel.id, version, testDeaccessionDatasetDTO)
         .catch((e) => (error = e))
 
       expect(axios.post).toHaveBeenCalledWith(
