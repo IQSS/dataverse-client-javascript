@@ -1224,6 +1224,8 @@ deleteFile.execute(fileId)
 
 _See [use case](../src/files/domain/useCases/DeleteFile.ts) implementation_.
 
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
 ## Metadata Blocks
 
 ### Metadata Blocks read use cases

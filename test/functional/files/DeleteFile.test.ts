@@ -58,13 +58,13 @@ describe('execute', () => {
   test('should successfully delete a file', async () => {
     try {
       const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
-      console.log({ datasetFiles })
+
       await deleteFile.execute(datasetFiles.files[0].id)
     } catch (error) {
       throw new Error('File should be deleted')
     } finally {
       const datasetFileCounts = await getDatasetFileCounts.execute(testDatasetIds.numericId)
-      console.log({ datasetFileCounts })
+
       expect(datasetFileCounts.total).toEqual(0)
     }
   })
