@@ -235,15 +235,35 @@ export const transformVersionPayloadToDataset = (
       releaseTime: new Date(versionPayload.releaseTime)
     },
     termsOfUse: {
-      fileAccessRequest: versionPayload.fileAccessRequest,
-      termsOfAccess: transformPayloadText(keepRawFields, versionPayload.termsOfAccess),
-      dataAccessPlace: transformPayloadText(keepRawFields, versionPayload.dataAccessPlace),
-      originalArchive: transformPayloadText(keepRawFields, versionPayload.originalArchive),
-      availabilityStatus: transformPayloadText(keepRawFields, versionPayload.availabilityStatus),
-      contactForAccess: transformPayloadText(keepRawFields, versionPayload.contactForAccess),
-      sizeOfCollection: transformPayloadText(keepRawFields, versionPayload.sizeOfCollection),
-      studyCompletion: transformPayloadText(keepRawFields, versionPayload.studyCompletion),
-      termsOfUse: transformPayloadText(keepRawFields, versionPayload.termsOfUse),
+      termsOfAccess: {
+        fileAccessRequest: versionPayload.fileAccessRequest,
+        termsOfAccessForRestrictedFiles: transformPayloadText(
+          keepRawFields,
+          versionPayload.termsOfAccess
+        ),
+        dataAccessPlace: transformPayloadText(keepRawFields, versionPayload.dataAccessPlace),
+        originalArchive: transformPayloadText(keepRawFields, versionPayload.originalArchive),
+        availabilityStatus: transformPayloadText(keepRawFields, versionPayload.availabilityStatus),
+        contactForAccess: transformPayloadText(keepRawFields, versionPayload.contactForAccess),
+        sizeOfCollection: transformPayloadText(keepRawFields, versionPayload.sizeOfCollection),
+        studyCompletion: transformPayloadText(keepRawFields, versionPayload.studyCompletion)
+      }
+    },
+    metadataBlocks: transformPayloadToDatasetMetadataBlocks(
+      versionPayload.metadataBlocks,
+      keepRawFields
+    ),
+    ...(versionPayload.isPartOf && {
+      isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf)
+    })
+  }
+  if ('license' in versionPayload) {
+    datasetModel.license = transformPayloadToDatasetLicense(
+      versionPayload.license as LicensePayload
+    )
+  } else {
+    datasetModel.termsOfUse.customTerms = {
+      termsOfUse: transformPayloadText(keepRawFields, versionPayload.termsOfUse) as string,
       confidentialityDeclaration: transformPayloadText(
         keepRawFields,
         versionPayload.confidentialityDeclaration
@@ -260,19 +280,7 @@ export const transformVersionPayloadToDataset = (
       ),
       conditions: transformPayloadText(keepRawFields, versionPayload.conditions),
       disclaimer: transformPayloadText(keepRawFields, versionPayload.disclaimer)
-    },
-    metadataBlocks: transformPayloadToDatasetMetadataBlocks(
-      versionPayload.metadataBlocks,
-      keepRawFields
-    ),
-    ...(versionPayload.isPartOf && {
-      isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf)
-    })
-  }
-  if ('license' in versionPayload) {
-    datasetModel.license = transformPayloadToDatasetLicense(
-      versionPayload.license as LicensePayload
-    )
+    }
   }
   if ('alternativePersistentId' in versionPayload) {
     datasetModel.alternativePersistentId = versionPayload.alternativePersistentId
@@ -286,7 +294,13 @@ export const transformVersionPayloadToDataset = (
   return datasetModel
 }
 
-const transformPayloadToDatasetLicense = (licensePayload: LicensePayload): DatasetLicense => {
+const transformPayloadToDatasetLicense = (
+  licensePayload: LicensePayload
+): DatasetLicense | undefined => {
+  if (!licensePayload) {
+    return undefined
+  }
+
   const datasetLicense: DatasetLicense = {
     name: licensePayload.name,
     uri: licensePayload.uri
@@ -295,6 +309,7 @@ const transformPayloadToDatasetLicense = (licensePayload: LicensePayload): Datas
   if ('iconUri' in licensePayload) {
     datasetLicense.iconUri = licensePayload.iconUri
   }
+
   return datasetLicense
 }
 

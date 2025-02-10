@@ -36,9 +36,19 @@ export interface DatasetLicense {
   iconUri?: string
 }
 
-export interface TermsOfUse {
+export interface CustomTerms {
+  termsOfUse: string
+  confidentialityDeclaration?: string
+  specialPermissions?: string
+  restrictions?: string
+  citationRequirements?: string
+  depositorRequirements?: string
+  conditions?: string
+  disclaimer?: string
+}
+export interface TermsOfAccess {
   fileAccessRequest: boolean
-  termsOfAccess?: string
+  termsOfAccessForRestrictedFiles?: string
   dataAccessPlace?: string
   originalArchive?: string
   availabilityStatus?: string
@@ -55,6 +65,10 @@ export interface TermsOfUse {
   disclaimer?: string
 }
 
+export interface TermsOfUse {
+  termsOfAccess: TermsOfAccess
+  customTerms?: CustomTerms
+}
 export type DatasetMetadataBlocks = [CitationMetadataBlock, ...DatasetMetadataBlock[]]
 
 export interface DatasetMetadataBlock {
