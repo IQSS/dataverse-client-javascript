@@ -293,4 +293,12 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       queryParams.searchText = fileSearchCriteria.searchText
     }
   }
+
+  public async deleteFile(fileId: number | string): Promise<undefined> {
+    return this.doDelete(this.buildApiEndpoint(this.filesResourceName, undefined, fileId))
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }

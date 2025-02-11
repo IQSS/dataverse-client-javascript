@@ -49,6 +49,7 @@ The different use cases currently available in the package are classified below,
     - [List Files in a Dataset](#list-files-in-a-dataset)
   - [Files write use cases](#files-write-use-cases)
     - [File Uploading Use Cases](#file-uploading-use-cases)
+    - [Delete a File](#delete-a-file)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
@@ -1202,6 +1203,34 @@ The following errors might arise from the `UploadFile` use case:
 The following error might arise from the `AddUploadedFileToDataset` use case:
 
 - AddUploadedFileToDatasetError: This error indicates that there was an error while adding the uploaded file to the dataset.
+
+#### Delete a File
+
+Deletes a File.
+
+##### Example call:
+
+```typescript
+import { deleteFile } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 12345
+
+deleteFile.execute(fileId)
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/DeleteFile.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+Note that the behavior of deleting files depends on if the dataset has ever been published or not.
+
+- If the dataset has never been published, the file will be deleted forever.
+- If the dataset has published, the file is deleted from the draft (and future published versions).
+- If the dataset has published, the deleted file can still be downloaded because it was part of a published version.
 
 ## Metadata Blocks
 

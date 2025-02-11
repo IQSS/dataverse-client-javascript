@@ -28,7 +28,7 @@ import {
 } from '../../../src/datasets'
 import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
-import { FileDownloadSizeMode } from '../../../src'
+import { FileDownloadSizeMode, WriteError } from '../../../src'
 import {
   deaccessionDatasetViaApi,
   publishDatasetViaApi,
@@ -644,6 +644,85 @@ describe('FilesRepository', () => {
       await expect(
         sut.getFileUploadDestination(testDatasetIds.numericId, singlepartFile)
       ).rejects.toThrow(errorExpected)
+    })
+  })
+
+  describe('deleteFile', () => {
+    let deleFileTestDatasetIds: CreatedDatasetIdentifiers
+    const testTextFile1Name = 'test-file-1.txt'
+
+    beforeEach(async () => {
+      try {
+        deleFileTestDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeEach(): Error while creating test dataset')
+      }
+      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+      })
+    })
+
+    test('should successfully delete a file', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      await sut.deleteFile(datasetFiles.files[0].id)
+
+      const datasetFileCounts = await sut.getDatasetFileCounts(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false
+      )
+      expect(datasetFileCounts.total).toEqual(0)
+
+      await deleteUnpublishedDatasetViaApi(deleFileTestDatasetIds.numericId)
+    })
+
+    test('should delete a file from the draft dataset but not from the published dataset', async () => {
+      await publishDatasetViaApi(deleFileTestDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
+
+      await waitForNoLocks(deleFileTestDatasetIds.numericId, 10).catch(() => {
+        throw new Error('Error while waiting for no locks')
+      })
+
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      await sut.deleteFile(datasetFiles.files[0].id)
+
+      const datasetFileCounts = await sut.getDatasetFileCounts(
+        deleFileTestDatasetIds.numericId,
+        DatasetNotNumberedVersion.DRAFT,
+        false
+      )
+
+      expect(datasetFileCounts.total).toEqual(0)
+
+      const publishedDatasetFileCounts = await sut.getDatasetFileCounts(
+        deleFileTestDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST_PUBLISHED,
+        false
+      )
+
+      expect(publishedDatasetFileCounts.total).toBeGreaterThan(0)
+
+      await deletePublishedDatasetViaApi(deleFileTestDatasetIds.persistentId).catch(() => {
+        throw new Error('Error while deleting published test Dataset')
+      })
+    })
+
+    test('should return error when file does not exist', async () => {
+      const expectedError = new WriteError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+      await expect(sut.deleteFile(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
   })
 })
