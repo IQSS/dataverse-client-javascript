@@ -5,7 +5,7 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 
 describe('execute submit information to contacts', () => {
   test('should return a Contact when repository call is successful', async () => {
-    const fromEmail = 'example@gmail.com'
+    const fromEmail = 'example@dataverse.org'
 
     const contactDTO: ContactDTO = {
       targetId: 6,

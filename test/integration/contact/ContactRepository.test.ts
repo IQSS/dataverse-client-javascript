@@ -16,14 +16,14 @@ describe('submitContactInfo', () => {
     targetId: 1,
     subject: 'Data Question',
     body: 'Please help me understand your data. Thank you!',
-    fromEmail: 'example@gmail.com'
+    fromEmail: 'example@dataverse.org'
   }
 
   const test2ContactDTO: ContactDTO = {
     identifier: 'root',
     subject: 'Data Question',
     body: 'Please help me understand your data. Thank you!',
-    fromEmail: 'example@gmail.com'
+    fromEmail: 'example@dataverse.org'
   }
 
   const sut: ContactRepository = new ContactRepository()
@@ -50,7 +50,7 @@ describe('submitContactInfo', () => {
     const contactDTOWithoutTargetId: Partial<ContactDTO> = {
       subject: 'General Inquiry',
       body: 'I have a general question.',
-      fromEmail: 'example@gmail.com'
+      fromEmail: 'example@dataverse.org'
     }
 
     const contactInfo: Contact[] = await sut.submitContactInfo(

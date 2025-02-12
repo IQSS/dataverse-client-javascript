@@ -11,12 +11,12 @@ describe('submitContactInfo', () => {
     )
   })
 
-  test('should return Contact result successfully', async () => {
+  test('should return Contact result successfully with targetId', async () => {
     const contactDTO: ContactDTO = {
       targetId: 1,
       subject: 'Data Question',
       body: 'Please help me understand your data. Thank you!',
-      fromEmail: 'example@gmail.com'
+      fromEmail: 'example@dataverse.org'
     }
 
     let contactInfo: Contact[] = []
@@ -26,7 +26,7 @@ describe('submitContactInfo', () => {
       throw new Error('Contact info should be submitted')
     } finally {
       expect(contactInfo).toBeDefined()
-      expect(contactInfo[0].fromEmail).toEqual('example@gmail.com')
+      expect(contactInfo[0].fromEmail).toEqual('example@dataverse.org')
       expect(contactInfo[0].subject).toEqual(expect.any(String))
       expect(contactInfo[0].body).toEqual(expect.any(String))
     }
@@ -36,7 +36,7 @@ describe('submitContactInfo', () => {
     const contactDTO: ContactDTO = {
       subject: 'General Inquiry',
       body: 'I have a general question.',
-      fromEmail: 'example@gmail.com'
+      fromEmail: 'example@dataverse.org'
     }
 
     let contactInfo: Contact[] = []
@@ -46,18 +46,18 @@ describe('submitContactInfo', () => {
       throw new Error('Contact info should be submitted even if target id is missing')
     } finally {
       expect(contactInfo).toBeDefined()
-      expect(contactInfo[0].fromEmail).toEqual('example@gmail.com')
+      expect(contactInfo[0].fromEmail).toEqual('example@dataverse.org')
       expect(contactInfo[0].subject).toEqual(expect.any(String))
       expect(contactInfo[0].body).toEqual(expect.any(String))
     }
   })
 
-  test('should return Contact when contact info is successfully submitted', async () => {
+  test('should return Contact when contact info is successfully submitted with identifier', async () => {
     const test2ContactDTO: ContactDTO = {
       identifier: 'root',
       subject: 'Data Question',
       body: 'Please help me understand your data. Thank you!',
-      fromEmail: 'example@gmail.com'
+      fromEmail: 'example@dataverse.org'
     }
     const contactInfo = await submitContactInfo.execute(test2ContactDTO)
 
@@ -72,7 +72,7 @@ describe('submitContactInfo', () => {
       targetId: 0,
       subject: '',
       body: '',
-      fromEmail: 'example@gmail.com'
+      fromEmail: 'example@dataverse.org'
     }
     const expectedError = new WriteError(`[400] Feedback target object not found.`)
     await expect(submitContactInfo.execute(contactDTO)).rejects.toThrow(expectedError)
