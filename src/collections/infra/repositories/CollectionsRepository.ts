@@ -102,11 +102,20 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
+
   public async publishCollection(collectionIdOrAlias: string | number): Promise<void> {
     return this.doPost(
       `/${this.collectionsResourceName}/${collectionIdOrAlias}/actions/:publish`,
       {}
     )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deleteCollection(collectionIdOrAlias: number | string): Promise<void> {
+    return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}`)
       .then(() => undefined)
       .catch((error) => {
         throw error

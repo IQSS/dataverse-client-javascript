@@ -14,6 +14,7 @@ export interface ICollectionsRepository {
     parentCollectionId: number | string
   ): Promise<number>
   publishCollection(collectionIdOrAlias: number | string): Promise<void>
+  deleteCollection(collectionIdOrAlias: number | string): Promise<void>
   getCollectionFacets(collectionIdOrAlias: number | string): Promise<CollectionFacet[]>
   getCollectionUserPermissions(
     collectionIdOrAlias: number | string
