@@ -47,6 +47,7 @@ describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
   let testCollectionId: number
   const currentYear = new Date().getFullYear()
+
   beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
@@ -146,6 +147,7 @@ describe('CollectionsRepository', () => {
       expect(createdCollection.name).toBe(newCollectionDTO.name)
     })
   })
+
   describe('createCollection', () => {
     const testCreateCollectionAlias1 = 'createCollection-test-1'
     const testCreateCollectionAlias2 = 'createCollection-test-2'
@@ -244,6 +246,35 @@ describe('CollectionsRepository', () => {
           TestConstants.TEST_DUMMY_COLLECTION_ID
         )
       ).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('deleteCollection', () => {
+    test('should delete collection successfully', async () => {
+      const collectionAlias = 'deleteCollection-test'
+      const collectionDTO = createCollectionDTO(collectionAlias)
+      await sut.createCollection(collectionDTO)
+
+      const createdCollection = await sut.getCollection(collectionAlias)
+
+      expect(createdCollection.alias).toBe(collectionAlias)
+
+      const deleteResult = await sut.deleteCollection(collectionAlias)
+      const expectedError = new ReadError(
+        `[404] Can't find dataverse with identifier='${collectionAlias}'`
+      )
+
+      expect(deleteResult).toBeUndefined()
+      await expect(sut.getCollection(collectionAlias)).rejects.toThrow(expectedError)
+    })
+
+    test('should return error when collection does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
+      )
+      await expect(sut.deleteCollection(TestConstants.TEST_DUMMY_COLLECTION_ID)).rejects.toThrow(
+        expectedError
+      )
     })
   })
 
