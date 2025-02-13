@@ -14,5 +14,13 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           labels-to-exclude: |
-            Size
-            Original Size
+            Size: 3
+            Size: 10
+            Size: 20
+            Size: 33
+            Size: 80
+            Original Size: 3
+            Original Size: 10
+            Original Size: 20
+            Original Size: 33
+            Original Size: 80
