@@ -46,7 +46,8 @@ describe('BearerTokenMechanism', () => {
     const expectedRequestConfigBearerToken = {
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_BEARER_TOKEN.headers,
       params: {
-        returnOwners: true
+        returnOwners: true,
+        returnChildCount: true
       }
     }
 

@@ -47,7 +47,8 @@ export const createCollectionModel = (): Collection => {
       }
     ],
     isMetadataBlockRoot: true,
-    isFacetRoot: true
+    isFacetRoot: true,
+    childCount: 0
   }
   return collectionModel
 }
@@ -76,7 +77,8 @@ export const createCollectionPayload = (): CollectionPayload => {
       }
     ],
     isMetadataBlockRoot: true,
-    isFacetRoot: true
+    isFacetRoot: true,
+    childCount: 0
   }
   return collectionPayload
 }

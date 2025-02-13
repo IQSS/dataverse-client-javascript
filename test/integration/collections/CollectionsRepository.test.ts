@@ -128,6 +128,34 @@ describe('CollectionsRepository', () => {
         )
       })
     })
+
+    test('should return childCount correctly', async () => {
+      const parentCollectionAlias = 'childCountTestCollection'
+      const childCollectionAlias = 'childCountTestChildCollection'
+
+      await createCollectionViaApi(parentCollectionAlias, ROOT_COLLECTION_ALIAS)
+      await createCollectionViaApi(childCollectionAlias, parentCollectionAlias)
+      const { numericId: childDatasetNumericId } = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        parentCollectionAlias
+      )
+
+      const actual = await sut.getCollection(parentCollectionAlias)
+
+      expect(actual.childCount).toBe(2)
+
+      await deleteCollectionViaApi(childCollectionAlias)
+
+      const actualAfterDeletion = await sut.getCollection(parentCollectionAlias)
+
+      expect(actualAfterDeletion.childCount).toBe(1)
+
+      await deleteUnpublishedDatasetViaApi(childDatasetNumericId)
+
+      const actualAfterDatasetDeletion = await sut.getCollection(parentCollectionAlias)
+
+      expect(actualAfterDatasetDeletion.childCount).toBe(0)
+    })
   })
 
   describe('publishCollection', () => {

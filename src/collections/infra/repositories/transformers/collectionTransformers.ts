@@ -53,6 +53,7 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     type: collectionPayload.dataverseType as CollectionType,
     isMetadataBlockRoot: collectionPayload.isMetadataBlockRoot,
     isFacetRoot: collectionPayload.isFacetRoot,
+    childCount: collectionPayload.childCount,
     ...(collectionPayload.description && {
       description: transformHtmlToMarkdown(collectionPayload.description)
     }),

@@ -70,7 +70,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<Collection> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, true, {
-      returnOwners: true
+      returnOwners: true,
+      returnChildCount: true
     })
       .then((response) => transformCollectionResponseToCollection(response))
       .catch((error) => {
