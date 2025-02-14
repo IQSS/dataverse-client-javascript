@@ -4,6 +4,7 @@ import { DatasetPreviewSubset } from '../models/DatasetPreviewSubset'
 import { DatasetUserPermissions } from '../models/DatasetUserPermissions'
 import { CreatedDatasetIdentifiers } from '../models/CreatedDatasetIdentifiers'
 import { DatasetDTO } from '../dtos/DatasetDTO'
+import { DatasetDeaccessionDTO } from '../dtos/DatasetDeaccessionDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 
@@ -44,5 +45,10 @@ export interface IDatasetsRepository {
     datasetId: number | string,
     dataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[]
+  ): Promise<void>
+  deaccessionDataset(
+    datasetId: number | string,
+    datasetVersionId: string,
+    deaccessionDTO: DatasetDeaccessionDTO
   ): Promise<void>
 }
