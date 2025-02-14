@@ -68,6 +68,8 @@ The different use cases currently available in the package are classified below,
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
   - [Get ZIP Download Limit](#get-zip-download-limit)
+- [Contact](#Contact)
+  - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
 
 ## Collections
 
@@ -1499,3 +1501,40 @@ getZipDownloadLimit.execute().then((downloadLimit: number) => {
 ```
 
 _See [use case](../src/info/domain/useCases/GetZipDownloadLimit.ts) implementation_.
+
+## Contact
+
+#### Send Feedback to Object Contacts
+
+Returns a [Contact](../src/contactInfo/domain/models/Contact.ts) object, which contains contact return information, showing fromEmail, subject, body.
+
+##### Example call:
+
+```typescript
+import { submitContactInfo } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const contactDTO: ContactDTO = {
+  targedId: 1
+  subject: 'Data Question',
+  body: 'Please help me understand your data. Thank you!',
+  fromEmail: 'test@gmail.com'
+}
+
+submitContactInfo.execute(contactDTO)
+
+/* ... */
+```
+
+_See [use case](../src/info/domain/useCases/submitContactInfo.ts) implementation_.
+
+The above example would submit feedback to all contacts of a object where the object targetId = 1.
+
+In ContactDTO, it takes the following information:
+
+- **targetId**: the numeric identifier of the collection, dataset, or datafile. Persistent ids and collection aliases are not supported. (Optional)
+- **identifier**: the alias of a collection or the persistence id of a dataset or datafile. (Optional)
+- **subject**: the email subject line.
+- **body**: the email body to send.
+- **fromEmail**: the email to list in the reply-to field.
