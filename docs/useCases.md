@@ -1278,7 +1278,7 @@ import { restrictFile } from '@iqss/dataverse-client-javascript'
 
 const fileId = 12345
 
-restrictFile.execute(fileId)
+restrictFile.execute(fileId, true)
 
 /* ... */
 ```

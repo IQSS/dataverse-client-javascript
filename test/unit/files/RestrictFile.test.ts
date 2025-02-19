@@ -9,7 +9,7 @@ describe('execute', () => {
 
     const sut = new RestrictFile(filesRepositoryStub)
 
-    const actual = await sut.execute(1)
+    const actual = await sut.execute(1, true)
 
     expect(actual).toEqual(undefined)
   })
@@ -20,6 +20,6 @@ describe('execute', () => {
 
     const sut = new RestrictFile(filesRepositoryStub)
 
-    await expect(sut.execute(1)).rejects.toThrow(WriteError)
+    await expect(sut.execute(1, true)).rejects.toThrow(WriteError)
   })
 })

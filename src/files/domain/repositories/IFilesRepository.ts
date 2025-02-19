@@ -62,5 +62,5 @@ export interface IFilesRepository {
 
   deleteFile(fileId: number | string): Promise<undefined>
 
-  restrictFile(fileId: number | string): Promise<undefined>
+  restrictFile(fileId: number | string, restrict: boolean): Promise<undefined>
 }
