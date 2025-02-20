@@ -398,8 +398,8 @@ describe('CollectionsRepository', () => {
       await new Promise((resolve) => setTimeout(resolve, 5000))
 
       let actual = await sut.getCollectionItems(testCollectionAlias)
-      const actualFilePreview = actual.items[1] as FilePreview
-      const actualDatasetPreview = actual.items[0] as DatasetPreview
+      const actualFilePreview = actual.items[0] as FilePreview
+      const actualDatasetPreview = actual.items[1] as DatasetPreview
       const actualCollectionPreview = actual.items[2] as CollectionPreview
 
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
@@ -532,7 +532,7 @@ describe('CollectionsRepository', () => {
 
       // Test limit and offset
       actual = await sut.getCollectionItems(testCollectionAlias, 1, 1)
-      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect((actual.items[0] as DatasetPreview).persistentId).toBe(testDatasetIds.persistentId)
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(3)
 
@@ -742,8 +742,8 @@ describe('CollectionsRepository', () => {
       )
       expect(actual.items.length).toBe(3)
       expect(actual.totalItemCount).toBe(3)
-      expect((actual.items[0] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
-      expect((actual.items[1] as FilePreview).type).toBe(CollectionItemType.FILE)
+      expect((actual.items[0] as FilePreview).type).toBe(CollectionItemType.FILE)
+      expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[2] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect(actual.countPerObjectType.dataverses).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)

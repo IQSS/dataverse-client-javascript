@@ -61,8 +61,8 @@ describe('execute', () => {
     try {
       const actual = await getCollectionItems.execute(testCollectionAlias)
 
-      const actualFilePreview = actual.items[1] as FilePreview
-      const actualDatasetPreview = actual.items[0] as DatasetPreview
+      const actualFilePreview = actual.items[0] as FilePreview
+      const actualDatasetPreview = actual.items[1] as DatasetPreview
 
       expect(actualFilePreview.name).toBe('test-file-1.txt')
       expect(actualDatasetPreview.title).toBe('Dataset created using the createDataset use case')
