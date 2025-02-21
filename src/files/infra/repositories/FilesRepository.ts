@@ -322,7 +322,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
 
     return this.doPost(
       this.buildApiEndpoint(this.filesResourceName, 'replace', fileId),
-      requestBody,
+      formData,
       {},
       ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
     )
