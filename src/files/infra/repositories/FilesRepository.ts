@@ -51,6 +51,7 @@ export interface UploadedFileRequestBody {
   directoryLabel?: string
   categories?: string[]
   restrict?: boolean
+  forceReplace?: boolean
 }
 
 export interface ChecksumRequestBody {
@@ -311,6 +312,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       },
       mimeType: uploadedFileDTO.mimeType,
       storageIdentifier: uploadedFileDTO.storageId,
+      forceReplace: uploadedFileDTO.forceReplace,
       ...(uploadedFileDTO.description && { description: uploadedFileDTO.description }),
       ...(uploadedFileDTO.categories && { categories: uploadedFileDTO.categories }),
       ...(uploadedFileDTO.restrict && { restrict: uploadedFileDTO.restrict }),
