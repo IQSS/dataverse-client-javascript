@@ -12,7 +12,9 @@ export class UploadFile implements UseCase<string> {
    * Uploads a file to remote storage and returns the storage identifier.
    *
    * This use case is based on the Direct Upload API, particularly the first part of the flow, "Requesting Direct Upload of a DataFile".
-   * To fulfill the flow, you will need to call the AddUploadedFileToDataset Use Case to add the uploaded file to the dataset.
+   * To fulfill the flow, you could:
+   *  - Call the AddUploadedFilesToDataset Use Case to add the uploaded file to the dataset.
+   *  - Call the ReplaceFile Use Case to replace an existing file with the uploaded one.
    * (https://guides.dataverse.org/en/latest/developers/s3-direct-upload-api.html#requesting-direct-upload-of-a-datafile)
    *
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers) or a number (for numeric identifiers).
