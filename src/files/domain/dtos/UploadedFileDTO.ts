@@ -8,4 +8,5 @@ export interface UploadedFileDTO {
   checksumValue: string
   checksumType: string
   mimeType: string
+  forceReplace?: boolean // Only used in the ReplaceFile use case, whether to allow the mimetype to change
 }

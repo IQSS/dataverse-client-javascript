@@ -301,4 +301,34 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
         throw error
       })
   }
+
+  public async replaceFile(fileId: number, uploadedFileDTO: UploadedFileDTO): Promise<undefined> {
+    const requestBody: UploadedFileRequestBody = {
+      fileName: uploadedFileDTO.fileName,
+      checksum: {
+        '@value': uploadedFileDTO.checksumValue,
+        '@type': uploadedFileDTO.checksumType.toUpperCase()
+      },
+      mimeType: uploadedFileDTO.mimeType,
+      storageIdentifier: uploadedFileDTO.storageId,
+      ...(uploadedFileDTO.description && { description: uploadedFileDTO.description }),
+      ...(uploadedFileDTO.categories && { categories: uploadedFileDTO.categories }),
+      ...(uploadedFileDTO.restrict && { restrict: uploadedFileDTO.restrict }),
+      ...(uploadedFileDTO.directoryLabel && { directoryLabel: uploadedFileDTO.directoryLabel })
+    }
+
+    const formData = new FormData()
+    formData.append('jsonData', JSON.stringify(requestBody))
+
+    return this.doPost(
+      this.buildApiEndpoint(this.filesResourceName, 'replace', fileId),
+      requestBody,
+      {},
+      ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }
