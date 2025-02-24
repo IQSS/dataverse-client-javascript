@@ -77,10 +77,8 @@ export abstract class ApiRepository {
     let requestData = data
 
     if (contentType === ApiConstants.CONTENT_TYPE_APPLICATION_JSON) {
-      if (typeof data === 'object') {
+      if (typeof data === 'object' || typeof data === 'boolean') {
         requestData = JSON.stringify(data)
-      } else if (typeof data === 'boolean') {
-        requestData = data.toString()
       }
     }
 
