@@ -301,4 +301,12 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
         throw error
       })
   }
+
+  public async restrictFile(fileId: number | string, restrict: boolean): Promise<undefined> {
+    return this.doPut(this.buildApiEndpoint(this.filesResourceName, 'restrict', fileId), restrict)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }
