@@ -12,6 +12,7 @@ import {
   DatasetDTO,
   DatasetMetadataFieldValueDTO
 } from '../../../src/datasets/domain/dtos/DatasetDTO'
+import { DatasetDeaccessionDTO } from '../../../src/datasets/domain/dtos/DatasetDeaccessionDTO'
 import { MetadataBlock, MetadataFieldType } from '../../../src'
 import {
   NewDatasetRequestPayload,
@@ -792,5 +793,11 @@ export const createUpdateDatasetRequestPayload = (): UpdateDatasetRequestPayload
         typeName: 'alternativeRequiredTitle'
       }
     ]
+  }
+}
+
+export const createDatasetDeaccessionDTO = (): DatasetDeaccessionDTO => {
+  return {
+    deaccessionReason: 'Test reason.'
   }
 }

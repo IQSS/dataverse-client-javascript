@@ -24,6 +24,7 @@ import {
 } from '../../testHelpers/datasets/datasetPreviewHelper'
 import {
   createDatasetDTO,
+  createDatasetDeaccessionDTO,
   createDatasetMetadataBlockModel,
   createNewDatasetRequestPayload
 } from '../../testHelpers/datasets/datasetHelper'
@@ -955,6 +956,59 @@ describe('DatasetsRepository', () => {
       expect(axios.put).toHaveBeenCalledWith(
         expectedApiEndpoint,
         expectedNewDatasetRequestPayloadJson,
+        expectedApiKeyRequestConfig
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('deaccsionDataset', () => {
+    const version = '1.0'
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${version}/deaccession`
+    const expectedApiKeyRequestConfig = {
+      ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+    }
+    const testDeaccessionDatasetDTO = createDatasetDeaccessionDTO()
+    const testDeaccessionDatasetJSON = JSON.stringify(testDeaccessionDatasetDTO)
+    test('should return nothing when providing id, version update type and response is successful', async () => {
+      jest.spyOn(axios, 'post').mockResolvedValue(undefined)
+
+      let actual = await sut.deaccessionDataset(
+        testDatasetModel.id,
+        version,
+        testDeaccessionDatasetDTO
+      )
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        testDeaccessionDatasetJSON,
+        expectedApiKeyRequestConfig
+      )
+      expect(actual).toBeUndefined()
+
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+      actual = await sut.deaccessionDataset(testDatasetModel.id, version, testDeaccessionDatasetDTO)
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        testDeaccessionDatasetJSON,
+        expectedApiKeyRequestConfig
+      )
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: WriteError | undefined = undefined
+      await sut
+        .deaccessionDataset(testDatasetModel.id, version, testDeaccessionDatasetDTO)
+        .catch((e) => (error = e))
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        testDeaccessionDatasetJSON,
         expectedApiKeyRequestConfig
       )
       expect(error).toBeInstanceOf(Error)

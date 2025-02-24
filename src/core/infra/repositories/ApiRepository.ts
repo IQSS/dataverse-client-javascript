@@ -20,7 +20,7 @@ export abstract class ApiRepository {
 
   public async doPost(
     apiEndpoint: string,
-    data: string | object,
+    data: string | object | boolean,
     queryParams: object = {},
     contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
   ): Promise<AxiosResponse> {
@@ -29,7 +29,7 @@ export abstract class ApiRepository {
 
   public async doPut(
     apiEndpoint: string,
-    data: string | object,
+    data: string | object | boolean,
     queryParams: object = {},
     contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
   ): Promise<AxiosResponse> {
@@ -47,14 +47,16 @@ export abstract class ApiRepository {
 
   protected buildApiEndpoint(
     resourceName: string,
-    operation: string,
-    resourceId: number | string | undefined = undefined
+    operation?: string,
+    resourceId?: number | string
   ) {
+    const operationSegment = operation ? `/${operation}` : ''
+
     return typeof resourceId === 'number'
-      ? `/${resourceName}/${resourceId}/${operation}`
+      ? `/${resourceName}/${resourceId}${operationSegment}`
       : typeof resourceId === 'string'
-      ? `/${resourceName}/:persistentId/${operation}?persistentId=${resourceId}`
-      : `/${resourceName}/${operation}`
+      ? `/${resourceName}/:persistentId${operationSegment}?persistentId=${resourceId}`
+      : `/${resourceName}${operationSegment}`
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -68,12 +70,18 @@ export abstract class ApiRepository {
   private async doRequest(
     method: 'post' | 'put',
     apiEndpoint: string,
-    data: string | object,
+    data: string | object | boolean,
     queryParams: object = {},
     contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
   ): Promise<AxiosResponse> {
-    const requestData =
-      contentType == ApiConstants.CONTENT_TYPE_APPLICATION_JSON ? JSON.stringify(data) : data
+    let requestData = data
+
+    if (contentType === ApiConstants.CONTENT_TYPE_APPLICATION_JSON) {
+      if (typeof data === 'object' || typeof data === 'boolean') {
+        requestData = JSON.stringify(data)
+      }
+    }
+
     const requestUrl = buildRequestUrl(apiEndpoint)
     const requestConfig = buildRequestConfig(true, queryParams, contentType)
 

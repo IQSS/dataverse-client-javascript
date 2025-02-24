@@ -28,7 +28,7 @@ import {
 } from '../../../src/datasets'
 import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
-import { FileDownloadSizeMode } from '../../../src'
+import { FileDownloadSizeMode, WriteError } from '../../../src'
 import {
   deaccessionDatasetViaApi,
   publishDatasetViaApi,
@@ -644,6 +644,214 @@ describe('FilesRepository', () => {
       await expect(
         sut.getFileUploadDestination(testDatasetIds.numericId, singlepartFile)
       ).rejects.toThrow(errorExpected)
+    })
+  })
+
+  describe('deleteFile', () => {
+    let deleFileTestDatasetIds: CreatedDatasetIdentifiers
+    const testTextFile1Name = 'test-file-1.txt'
+
+    beforeEach(async () => {
+      try {
+        deleFileTestDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeEach(): Error while creating test dataset')
+      }
+      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+      })
+    })
+
+    test('should successfully delete a file', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      await sut.deleteFile(datasetFiles.files[0].id)
+
+      const datasetFileCounts = await sut.getDatasetFileCounts(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false
+      )
+      expect(datasetFileCounts.total).toEqual(0)
+
+      await deleteUnpublishedDatasetViaApi(deleFileTestDatasetIds.numericId)
+    })
+
+    test('should delete a file from the draft dataset but not from the published dataset', async () => {
+      await publishDatasetViaApi(deleFileTestDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
+
+      await waitForNoLocks(deleFileTestDatasetIds.numericId, 10).catch(() => {
+        throw new Error('Error while waiting for no locks')
+      })
+
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      await sut.deleteFile(datasetFiles.files[0].id)
+
+      const datasetFileCounts = await sut.getDatasetFileCounts(
+        deleFileTestDatasetIds.numericId,
+        DatasetNotNumberedVersion.DRAFT,
+        false
+      )
+
+      expect(datasetFileCounts.total).toEqual(0)
+
+      const publishedDatasetFileCounts = await sut.getDatasetFileCounts(
+        deleFileTestDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST_PUBLISHED,
+        false
+      )
+
+      expect(publishedDatasetFileCounts.total).toBeGreaterThan(0)
+
+      await deletePublishedDatasetViaApi(deleFileTestDatasetIds.persistentId).catch(() => {
+        throw new Error('Error while deleting published test Dataset')
+      })
+    })
+
+    test('should return error when file does not exist', async () => {
+      const expectedError = new WriteError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+      await expect(sut.deleteFile(nonExistentFiledId)).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('restrictFile', () => {
+    let restrictFileDatasetIds: CreatedDatasetIdentifiers
+    const testTextFile1Name = 'test-file-1.txt'
+
+    const setFileToRestricted = async (fileId: number) => {
+      await sut.restrictFile(fileId, true)
+    }
+
+    const setFileToUnrestricted = async (fileId: number) => {
+      await sut.restrictFile(fileId, false)
+    }
+
+    beforeEach(async () => {
+      try {
+        restrictFileDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeEach(): Error while creating test dataset')
+      }
+      await uploadFileViaApi(restrictFileDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+      })
+    })
+
+    afterEach(async () => {
+      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
+    })
+
+    test('should successfully restrict a file', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFiles.files[0].restricted).toEqual(false)
+
+      await setFileToRestricted(datasetFiles.files[0].id)
+
+      const datasetFilesAfterRestrict = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFilesAfterRestrict.files[0].restricted).toEqual(true)
+
+      // Unrestrict the file Just in case to avoid conflicts with other tests
+      await setFileToUnrestricted(datasetFiles.files[0].id)
+    })
+
+    test('should successfully unrestrict a file', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFiles.files[0].restricted).toEqual(false)
+
+      await setFileToRestricted(datasetFiles.files[0].id)
+
+      const datasetFilesAfterRestrict = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFilesAfterRestrict.files[0].restricted).toEqual(true)
+
+      await setFileToUnrestricted(datasetFiles.files[0].id)
+
+      const datasetFilesAfterUnrestrict = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFilesAfterUnrestrict.files[0].restricted).toEqual(false)
+    })
+
+    test('should return error when file was already restricted', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      await setFileToRestricted(datasetFiles.files[0].id)
+
+      const expectedError = new WriteError(
+        `[400] Problem trying to update restriction status on ${testTextFile1Name}: File ${testTextFile1Name} is already restricted`
+      )
+
+      await expect(setFileToRestricted(datasetFiles.files[0].id)).rejects.toThrow(expectedError)
+
+      // Unrestrict the file Just in case to avoid conflicts with other tests
+      await setFileToUnrestricted(datasetFiles.files[0].id)
+    })
+
+    test('should return error when files was already unrestricted', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      const expectedError = new WriteError(
+        `[400] Problem trying to update restriction status on ${testTextFile1Name}: File ${testTextFile1Name} is already unrestricted`
+      )
+
+      await expect(setFileToUnrestricted(datasetFiles.files[0].id)).rejects.toThrow(expectedError)
+    })
+
+    test('should return error when file does not exist', async () => {
+      const expectedError = new WriteError(
+        `[400] Could not find datafile with id ${nonExistentFiledId}`
+      )
+
+      await expect(setFileToRestricted(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
   })
 })

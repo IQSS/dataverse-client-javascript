@@ -37,6 +37,7 @@ The different use cases currently available in the package are classified below,
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
     - [Publish a Dataset](#publish-a-dataset)
+    - [Deaccession a Dataset](#deaccession-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -50,6 +51,8 @@ The different use cases currently available in the package are classified below,
     - [List Files in a Dataset](#list-files-in-a-dataset)
   - [Files write use cases](#files-write-use-cases)
     - [File Uploading Use Cases](#file-uploading-use-cases)
+    - [Delete a File](#delete-a-file)
+    - [Restrict or Unrestrict a File](#restrict-or-unrestrict-a-file)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
@@ -68,6 +71,8 @@ The different use cases currently available in the package are classified below,
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
   - [Get ZIP Download Limit](#get-zip-download-limit)
+- [Contact](#Contact)
+  - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
 
 ## Collections
 
@@ -772,6 +777,35 @@ The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/d
 - `VersionUpdateType.MAJOR`
 - `VersionUpdateType.UPDATE_CURRENT`
 
+#### Deaccession a Dataset
+
+Deaccession a Dataset, given its identifier, version, and deaccessionDatasetDTO to perform.
+
+##### Example call:
+
+```typescript
+import { deaccessionDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const version = ':latestPublished'
+const deaccessionDatasetDTO = {
+  deaccessionReason: 'Description of the deaccession reason.',
+  deaccessionForwardURL: 'https://demo.dataverse.org'
+}
+
+deaccessionDataset.execute(datasetId, version, deaccessionDatasetDTO)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/DeaccessionDataset.ts) implementation_.
+The `datasetId` parameter can be a string for persistent identifiers, or a number for numeric identifiers.
+The `version` parameter should be a string or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value.
+
+You cannot deaccession a dataset more than once. If you call this endpoint twice for the same dataset version, you will get a not found error on the second call, since the dataset you are looking for will no longer be published since it is already deaccessioned.
+
 ## Files
 
 ### Files read use cases
@@ -1222,6 +1256,56 @@ The following error might arise from the `AddUploadedFileToDataset` use case:
 
 - AddUploadedFileToDatasetError: This error indicates that there was an error while adding the uploaded file to the dataset.
 
+#### Delete a File
+
+Deletes a File.
+
+##### Example call:
+
+```typescript
+import { deleteFile } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 12345
+
+deleteFile.execute(fileId)
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/DeleteFile.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+Note that the behavior of deleting files depends on if the dataset has ever been published or not.
+
+- If the dataset has never been published, the file will be deleted forever.
+- If the dataset has published, the file is deleted from the draft (and future published versions).
+- If the dataset has published, the deleted file can still be downloaded because it was part of a published version.
+
+#### Restrict or Unrestrict a File
+
+Restrict or unrestrict an existing file.
+
+##### Example call:
+
+```typescript
+import { restrictFile } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 12345
+
+restrictFile.execute(fileId, true)
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/RestrictFile.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
 ## Metadata Blocks
 
 ### Metadata Blocks read use cases
@@ -1489,3 +1573,40 @@ getZipDownloadLimit.execute().then((downloadLimit: number) => {
 ```
 
 _See [use case](../src/info/domain/useCases/GetZipDownloadLimit.ts) implementation_.
+
+## Contact
+
+#### Send Feedback to Object Contacts
+
+Returns a [Contact](../src/contactInfo/domain/models/Contact.ts) object, which contains contact return information, showing fromEmail, subject, body.
+
+##### Example call:
+
+```typescript
+import { submitContactInfo } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const contactDTO: ContactDTO = {
+  targedId: 1
+  subject: 'Data Question',
+  body: 'Please help me understand your data. Thank you!',
+  fromEmail: 'test@gmail.com'
+}
+
+submitContactInfo.execute(contactDTO)
+
+/* ... */
+```
+
+_See [use case](../src/info/domain/useCases/submitContactInfo.ts) implementation_.
+
+The above example would submit feedback to all contacts of a object where the object targetId = 1.
+
+In ContactDTO, it takes the following information:
+
+- **targetId**: the numeric identifier of the collection, dataset, or datafile. Persistent ids and collection aliases are not supported. (Optional)
+- **identifier**: the alias of a collection or the persistence id of a dataset or datafile. (Optional)
+- **subject**: the email subject line.
+- **body**: the email body to send.
+- **fromEmail**: the email to list in the reply-to field.

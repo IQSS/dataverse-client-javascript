@@ -30,7 +30,7 @@ import {
   createFileCountsPayload
 } from '../../testHelpers/files/fileCountsHelper'
 import { createFilesTotalDownloadSizePayload } from '../../testHelpers/files/filesTotalDownloadSizeHelper'
-import { FileDownloadSizeMode } from '../../../src'
+import { FileDownloadSizeMode, WriteError } from '../../../src'
 import {
   createMultipartFileUploadDestinationModel,
   createMultipartFileUploadDestinationPayload,
@@ -1157,6 +1157,74 @@ describe('FilesRepository', () => {
       await expect(
         sut.getFileCitation(testFile.id, DatasetNotNumberedVersion.LATEST, testIncludeDeaccessioned)
       ).rejects.toThrow(ReadError)
+    })
+  })
+
+  describe('deleteFile', () => {
+    describe('by numeric id', () => {
+      test('should return undefined on success', async () => {
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/${testFile.id}`
+
+        jest.spyOn(axios, 'delete').mockResolvedValue(undefined)
+
+        // API Key auth
+        const actual = await sut.deleteFile(testFile.id)
+        expect(actual).toBeUndefined()
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+        const actual2 = await sut.deleteFile(testFile.id)
+        expect(actual2).toBeUndefined()
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'delete').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        await expect(sut.deleteFile(testFile.id)).rejects.toThrow(WriteError)
+      })
+    })
+
+    describe('by persistent id', () => {
+      test('should return undefined on success', async () => {
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/files/:persistentId?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`
+
+        jest.spyOn(axios, 'delete').mockResolvedValue(undefined)
+
+        // API Key auth
+        const actual = await sut.deleteFile(TestConstants.TEST_DUMMY_PERSISTENT_ID)
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toBeUndefined()
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        const actual2 = await sut.deleteFile(TestConstants.TEST_DUMMY_PERSISTENT_ID)
+        expect(actual2).toBeUndefined()
+
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'delete').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        await expect(sut.deleteFile(TestConstants.TEST_DUMMY_PERSISTENT_ID)).rejects.toThrow(
+          WriteError
+        )
+      })
     })
   })
 })

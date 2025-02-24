@@ -1,0 +1,23 @@
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { ContactDTO } from '../dtos/ContactDTO'
+import { Contact } from '../models/Contact'
+import { IContactRepository } from '../repositories/IContactRepository'
+
+export class SubmitContactInfo implements UseCase<Contact[]> {
+  private contactRepository: IContactRepository
+
+  constructor(contactRepository: IContactRepository) {
+    this.contactRepository = contactRepository
+  }
+
+  /**
+   * Submits contact information and returns a Contact model containing the submitted data.
+   *
+   * @param {ContactDTO} contactDTO - The contact information to be submitted.
+   * @returns {Promise<Contact[]>} A promise resolving to a list of contact.
+   */
+
+  async execute(contactDTO: ContactDTO): Promise<Contact[]> {
+    return await this.contactRepository.submitContactInfo(contactDTO)
+  }
+}

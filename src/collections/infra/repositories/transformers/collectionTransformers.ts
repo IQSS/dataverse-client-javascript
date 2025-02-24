@@ -6,7 +6,6 @@ import {
   CollectionPayload
 } from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
-import { transformHtmlToMarkdown } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
 import { CollectionFacet } from '../../../domain/models/CollectionFacet'
 import { CollectionFacetPayload } from './CollectionFacetPayload'
 import {
@@ -53,10 +52,8 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     type: collectionPayload.dataverseType as CollectionType,
     isMetadataBlockRoot: collectionPayload.isMetadataBlockRoot,
     isFacetRoot: collectionPayload.isFacetRoot,
+    description: collectionPayload.description,
     childCount: collectionPayload.childCount,
-    ...(collectionPayload.description && {
-      description: transformHtmlToMarkdown(collectionPayload.description)
-    }),
     ...(collectionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
     }),

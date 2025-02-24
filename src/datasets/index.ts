@@ -16,6 +16,7 @@ import { MultipleMetadataFieldValidator } from './domain/useCases/validators/Mul
 import { PublishDataset } from './domain/useCases/PublishDataset'
 import { UpdateDataset } from './domain/useCases/UpdateDataset'
 import { GetDatasetVersionDiff } from './domain/useCases/GetDatasetVersionDiff'
+import { DeaccessionDataset } from './domain/useCases/DeaccessionDataset'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -46,6 +47,7 @@ const updateDataset = new UpdateDataset(
   metadataBlocksRepository,
   datasetResourceValidator
 )
+const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
 
 export {
   getDataset,
@@ -59,7 +61,8 @@ export {
   getDatasetVersionDiff,
   publishDataset,
   createDataset,
-  updateDataset
+  updateDataset,
+  deaccessionDataset
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -86,5 +89,6 @@ export {
   DatasetMetadataBlockValuesDTO,
   DatasetMetadataChildFieldValueDTO
 } from './domain/dtos/DatasetDTO'
+export { DatasetDeaccessionDTO } from './domain/dtos/DatasetDeaccessionDTO'
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers'
 export { VersionUpdateType } from './domain/models/Dataset'
