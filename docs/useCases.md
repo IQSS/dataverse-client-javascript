@@ -1245,7 +1245,7 @@ This use case is designed to update or edit metadata information for a specific 
 
 ###### Example call:
 
-````typescript
+```typescript
 import { updateFileMetadata } from '@iqss/dataverse-client-javascript'
 
 /* ... */
@@ -1260,6 +1260,7 @@ const updateFileMetadataDTO = {
 await updateFileMetadata.execute(fileId, updateFileMetadataDTO).then((fileId) => {
   console.log(`File updated successfully with file ID: ${fileId}`)
 })
+```
 
 _See [use case](../src/files/domain/useCases/UpdateFileMetadata.ts) implementation_.
 
@@ -1270,6 +1271,7 @@ This use case supports the following optional parameters for updateFileMetadataD
 - **categories**: (string[])
 - **dataFileTags**: (string[])
 - **restrict**: (boolean)
+
 #### Delete a File
 
 Deletes a File.
@@ -1286,7 +1288,7 @@ const fileId = 12345
 deleteFile.execute(fileId)
 
 /* ... */
-````
+```
 
 _See [use case](../src/files/domain/useCases/DeleteFile.ts) implementation_.
 
