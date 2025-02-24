@@ -747,16 +747,10 @@ describe('FilesRepository', () => {
       await uploadFileViaApi(restrictFileDatasetIds.numericId, testTextFile1Name).catch(() => {
         throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
       })
-
-      await publishDatasetViaApi(restrictFileDatasetIds.numericId).catch(() => {
-        throw new Error('Error while publishing test Dataset')
-      })
-
-      await waitForNoLocks(restrictFileDatasetIds.numericId, 10)
     })
 
     afterEach(async () => {
-      await deletePublishedDatasetViaApi(restrictFileDatasetIds.persistentId)
+      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
     })
 
     test('should successfully restrict a file', async () => {
