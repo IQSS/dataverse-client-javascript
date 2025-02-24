@@ -19,6 +19,7 @@ The different use cases currently available in the package are classified below,
     - [Create a Collection](#create-a-collection)
     - [Update a Collection](#update-a-collection)
     - [Publish a Collection](#publish-a-collection)
+    - [Delete a Collection](#delete-a-collection)
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
 - [Datasets](#Datasets)
@@ -319,6 +320,24 @@ publishCollection.execute(collectionIdOrAlias)
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 _See [use case](../src/collections/domain/useCases/PublishCollection.ts)_ definition.
+
+### Delete a Collection
+
+```typescript
+import { deleteCollection } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+
+deleteCollection.execute(collectionIdOrAlias)
+
+/* ... */
+```
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+_See [use case](../src/collections/domain/useCases/DeleteCollection.ts)_ definition.
 
 #### Update Collection Featured Items
 

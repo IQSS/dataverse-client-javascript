@@ -13,6 +13,7 @@ export interface CollectionPayload {
   dataverseType: string
   isMetadataBlockRoot: boolean
   isFacetRoot: boolean
+  childCount: number
 }
 
 export interface CollectionInputLevelPayload {

@@ -53,6 +53,7 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     isMetadataBlockRoot: collectionPayload.isMetadataBlockRoot,
     isFacetRoot: collectionPayload.isFacetRoot,
     description: collectionPayload.description,
+    childCount: collectionPayload.childCount,
     ...(collectionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
     }),
