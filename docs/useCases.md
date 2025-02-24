@@ -19,6 +19,7 @@ The different use cases currently available in the package are classified below,
     - [Create a Collection](#create-a-collection)
     - [Update a Collection](#update-a-collection)
     - [Publish a Collection](#publish-a-collection)
+    - [Delete a Collection](#delete-a-collection)
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
 - [Datasets](#Datasets)
@@ -52,6 +53,7 @@ The different use cases currently available in the package are classified below,
     - [File Uploading Use Cases](#file-uploading-use-cases)
     - [Delete a File](#delete-a-file)
     - [Replace a File](#replace-a-file)
+    - [Restrict or Unrestrict a File](#restrict-or-unrestrict-a-file)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
@@ -319,6 +321,24 @@ publishCollection.execute(collectionIdOrAlias)
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 _See [use case](../src/collections/domain/useCases/PublishCollection.ts)_ definition.
+
+### Delete a Collection
+
+```typescript
+import { deleteCollection } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+
+deleteCollection.execute(collectionIdOrAlias)
+
+/* ... */
+```
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+_See [use case](../src/collections/domain/useCases/DeleteCollection.ts)_ definition.
 
 #### Update Collection Featured Items
 
@@ -1295,6 +1315,28 @@ _See [use case](../src/files/domain/useCases/ReplaceFile.ts) implementation_.
 The `fileId` parameter should be a number, the numeric identifier.
 
 The `uploadedFileDTO` parameter is a [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded files. Some of these properties should be calculated from the uploaded File Blob objects and the resulting storage identifiers from the Upload File use case.
+
+#### Restrict or Unrestrict a File
+
+Restrict or unrestrict an existing file.
+
+##### Example call:
+
+```typescript
+import { restrictFile } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 12345
+
+restrictFile.execute(fileId, true)
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/RestrictFile.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 ## Metadata Blocks
 

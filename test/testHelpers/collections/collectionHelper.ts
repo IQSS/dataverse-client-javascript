@@ -16,8 +16,7 @@ const COLLECTION_ALIAS_STR = 'secondCollection'
 const COLLECTION_NAME_STR = 'Laboratory Research'
 const COLLECTION_AFFILIATION_STR = 'Laboratory Research Corporation'
 
-const COLLECTION_DESCRIPTION_HTML = 'This is an <b>example</b> collection used for testing.'
-const COLLECTION_DESCRIPTION_MARKDOWN = 'This is an **example** collection used for testing.'
+const COLLECTION_DESCRIPTION = 'This is an <b>example</b> collection used for testing.'
 
 const DATAVERSE_API_REQUEST_HEADERS = {
   headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
@@ -30,7 +29,7 @@ export const createCollectionModel = (): Collection => {
     name: COLLECTION_NAME_STR,
     isReleased: COLLECTION_IS_RELEASED,
     affiliation: COLLECTION_AFFILIATION_STR,
-    description: COLLECTION_DESCRIPTION_MARKDOWN,
+    description: COLLECTION_DESCRIPTION,
     isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
     inputLevels: [
       {
@@ -47,7 +46,8 @@ export const createCollectionModel = (): Collection => {
       }
     ],
     isMetadataBlockRoot: true,
-    isFacetRoot: true
+    isFacetRoot: true,
+    childCount: 0
   }
   return collectionModel
 }
@@ -59,7 +59,7 @@ export const createCollectionPayload = (): CollectionPayload => {
     name: COLLECTION_NAME_STR,
     isReleased: COLLECTION_IS_RELEASED,
     affiliation: COLLECTION_AFFILIATION_STR,
-    description: COLLECTION_DESCRIPTION_HTML,
+    description: COLLECTION_DESCRIPTION,
     isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' },
     inputLevels: [
       {
@@ -76,7 +76,8 @@ export const createCollectionPayload = (): CollectionPayload => {
       }
     ],
     isMetadataBlockRoot: true,
-    isFacetRoot: true
+    isFacetRoot: true,
+    childCount: 0
   }
   return collectionPayload
 }

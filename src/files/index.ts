@@ -13,6 +13,7 @@ import { DirectUploadClient } from './infra/clients/DirectUploadClient'
 import { AddUploadedFilesToDataset } from './domain/useCases/AddUploadedFilesToDataset'
 import { DeleteFile } from './domain/useCases/DeleteFile'
 import { ReplaceFile } from './domain/useCases/ReplaceFile'
+import { RestrictFile } from './domain/useCases/RestrictFile'
 
 const filesRepository = new FilesRepository()
 const directUploadClient = new DirectUploadClient(filesRepository)
@@ -30,6 +31,7 @@ const uploadFile = new UploadFile(directUploadClient)
 const addUploadedFilesToDataset = new AddUploadedFilesToDataset(filesRepository)
 const deleteFile = new DeleteFile(filesRepository)
 const replaceFile = new ReplaceFile(filesRepository)
+const restrictFile = new RestrictFile(filesRepository)
 
 export {
   getDatasetFiles,
@@ -44,7 +46,8 @@ export {
   uploadFile,
   addUploadedFilesToDataset,
   deleteFile,
-  replaceFile
+  replaceFile,
+  restrictFile
 }
 
 export { FileModel as File, FileEmbargo, FileChecksum } from './domain/models/FileModel'

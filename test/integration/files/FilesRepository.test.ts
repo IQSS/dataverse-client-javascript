@@ -725,4 +725,133 @@ describe('FilesRepository', () => {
       await expect(sut.deleteFile(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
   })
+
+  describe('restrictFile', () => {
+    let restrictFileDatasetIds: CreatedDatasetIdentifiers
+    const testTextFile1Name = 'test-file-1.txt'
+
+    const setFileToRestricted = async (fileId: number) => {
+      await sut.restrictFile(fileId, true)
+    }
+
+    const setFileToUnrestricted = async (fileId: number) => {
+      await sut.restrictFile(fileId, false)
+    }
+
+    beforeEach(async () => {
+      try {
+        restrictFileDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeEach(): Error while creating test dataset')
+      }
+      await uploadFileViaApi(restrictFileDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+      })
+    })
+
+    afterEach(async () => {
+      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
+    })
+
+    test('should successfully restrict a file', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFiles.files[0].restricted).toEqual(false)
+
+      await setFileToRestricted(datasetFiles.files[0].id)
+
+      const datasetFilesAfterRestrict = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFilesAfterRestrict.files[0].restricted).toEqual(true)
+
+      // Unrestrict the file Just in case to avoid conflicts with other tests
+      await setFileToUnrestricted(datasetFiles.files[0].id)
+    })
+
+    test('should successfully unrestrict a file', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFiles.files[0].restricted).toEqual(false)
+
+      await setFileToRestricted(datasetFiles.files[0].id)
+
+      const datasetFilesAfterRestrict = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFilesAfterRestrict.files[0].restricted).toEqual(true)
+
+      await setFileToUnrestricted(datasetFiles.files[0].id)
+
+      const datasetFilesAfterUnrestrict = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      expect(datasetFilesAfterUnrestrict.files[0].restricted).toEqual(false)
+    })
+
+    test('should return error when file was already restricted', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      await setFileToRestricted(datasetFiles.files[0].id)
+
+      const expectedError = new WriteError(
+        `[400] Problem trying to update restriction status on ${testTextFile1Name}: File ${testTextFile1Name} is already restricted`
+      )
+
+      await expect(setFileToRestricted(datasetFiles.files[0].id)).rejects.toThrow(expectedError)
+
+      // Unrestrict the file Just in case to avoid conflicts with other tests
+      await setFileToUnrestricted(datasetFiles.files[0].id)
+    })
+
+    test('should return error when files was already unrestricted', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      const expectedError = new WriteError(
+        `[400] Problem trying to update restriction status on ${testTextFile1Name}: File ${testTextFile1Name} is already unrestricted`
+      )
+
+      await expect(setFileToUnrestricted(datasetFiles.files[0].id)).rejects.toThrow(expectedError)
+    })
+
+    test('should return error when file does not exist', async () => {
+      const expectedError = new WriteError(
+        `[400] Could not find datafile with id ${nonExistentFiledId}`
+      )
+
+      await expect(setFileToRestricted(nonExistentFiledId)).rejects.toThrow(expectedError)
+    })
+  })
 })

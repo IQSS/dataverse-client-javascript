@@ -66,7 +66,8 @@ describe('CollectionsRepository', () => {
   describe('getCollection', () => {
     const expectedRequestConfigApiKey = {
       params: {
-        returnOwners: true
+        returnOwners: true,
+        returnChildCount: true
       },
       headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
     }
@@ -567,6 +568,89 @@ describe('CollectionsRepository', () => {
 
       expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
       expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('deleteCollection', () => {
+    const deleteTestCollectionAlias = 'deleteCollection-unit-test'
+    const deleteTestCollectionId = 123
+
+    describe('by numeric id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${deleteTestCollectionId}`
+
+      test('should delete a collection when providing a valid id', async () => {
+        jest.spyOn(axios, 'delete').mockResolvedValue({ data: { status: 'OK' } })
+
+        // API Key auth
+        await sut.deleteCollection(deleteTestCollectionId)
+
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        await sut.deleteCollection(deleteTestCollectionId)
+
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'delete').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        let error = undefined as unknown as WriteError
+        await sut.deleteCollection(deleteTestCollectionId).catch((e) => (error = e))
+
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(error).toBeInstanceOf(WriteError)
+      })
+    })
+
+    describe('by alias id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/${deleteTestCollectionAlias}`
+
+      test('should delete a collection when providing a valid alias', async () => {
+        jest.spyOn(axios, 'delete').mockResolvedValue({ data: { status: 'OK' } })
+
+        // API Key auth
+        await sut.deleteCollection(deleteTestCollectionAlias)
+
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        await sut.deleteCollection(deleteTestCollectionAlias)
+
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'delete').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        let error = undefined as unknown as WriteError
+        await sut.deleteCollection(deleteTestCollectionAlias).catch((e) => (error = e))
+
+        expect(axios.delete).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(error).toBeInstanceOf(WriteError)
+      })
     })
   })
 })

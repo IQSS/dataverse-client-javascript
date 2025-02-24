@@ -70,7 +70,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<Collection> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, true, {
-      returnOwners: true
+      returnOwners: true,
+      returnChildCount: true
     })
       .then((response) => transformCollectionResponseToCollection(response))
       .catch((error) => {
@@ -102,11 +103,20 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
+
   public async publishCollection(collectionIdOrAlias: string | number): Promise<void> {
     return this.doPost(
       `/${this.collectionsResourceName}/${collectionIdOrAlias}/actions/:publish`,
       {}
     )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deleteCollection(collectionIdOrAlias: number | string): Promise<void> {
+    return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}`)
       .then(() => undefined)
       .catch((error) => {
         throw error

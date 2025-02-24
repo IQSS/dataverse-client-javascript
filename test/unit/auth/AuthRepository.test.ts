@@ -35,7 +35,7 @@ describe('logout', () => {
 
     expect(axios.post).toHaveBeenCalledWith(
       expectedApiEndpoint,
-      JSON.stringify(''),
+      '',
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
     )
 
@@ -46,7 +46,7 @@ describe('logout', () => {
 
     expect(axios.post).toHaveBeenCalledWith(
       expectedApiEndpoint,
-      JSON.stringify(''),
+      '',
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
     )
   })
@@ -59,7 +59,7 @@ describe('logout', () => {
 
     expect(axios.post).toHaveBeenCalledWith(
       `${TestConstants.TEST_API_URL}/logout`,
-      JSON.stringify(''),
+      '',
       TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
     )
     expect(error).toBeInstanceOf(Error)
