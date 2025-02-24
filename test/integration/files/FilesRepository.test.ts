@@ -534,41 +534,6 @@ describe('FilesRepository', () => {
     })
   })
 
-  describe('updateFileMetadata', () => {
-    test('should return error when file does not exist', async () => {
-      const testFileMetadata = {
-        description: 'My description bbb.',
-        categories: ['Data'],
-        restrict: false
-      }
-      const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
-
-      await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
-        errorExpected
-      )
-    })
-
-    test('should update file metadata when file exists', async () => {
-      const getDatasetFilesResponse = await sut.getDatasetFiles(
-        testDatasetIds.numericId,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ
-      )
-
-      const fileId = getDatasetFilesResponse.files[0].id
-      const testFileMetadata = {
-        description: 'My description bbb.',
-        categories: ['Data'],
-        restrict: false
-      }
-
-      const actual = await sut.updateFileMetadata(fileId, testFileMetadata)
-
-      expect(actual).toBeUndefined()
-    })
-  })
-
   describe('getFileCitation', () => {
     test('should return citation when file exists', async () => {
       const actualFileCitation = await sut.getFileCitation(
@@ -679,6 +644,43 @@ describe('FilesRepository', () => {
       await expect(
         sut.getFileUploadDestination(testDatasetIds.numericId, singlepartFile)
       ).rejects.toThrow(errorExpected)
+    })
+  })
+
+  describe('updateFileMetadata', () => {
+    test('should update file metadata when file exists', async () => {
+      const testFileMetadata = {
+        description: 'My description test.',
+        categories: ['Data'],
+        restrict: false
+      }
+
+      const actual = await sut.updateFileMetadata(testFileId, testFileMetadata)
+
+      expect(actual).toBeUndefined()
+
+      const fileInfo: FileModel = (await sut.getFile(
+        testFileId,
+        DatasetNotNumberedVersion.LATEST,
+        false
+      )) as FileModel
+
+      expect(fileInfo.description).toBe(testFileMetadata.description)
+      expect(fileInfo.categories).toEqual(testFileMetadata.categories)
+      expect(fileInfo.restricted).toBe(testFileMetadata.restrict)
+    })
+
+    test('should return error when file does not exist', async () => {
+      const testFileMetadata = {
+        description: 'My description test.',
+        categories: ['Data'],
+        restrict: false
+      }
+      const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
+
+      await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
+        errorExpected
+      )
     })
   })
 
@@ -887,44 +889,6 @@ describe('FilesRepository', () => {
       )
 
       await expect(setFileToRestricted(nonExistentFiledId)).rejects.toThrow(expectedError)
-    })
-  })
-
-  describe('updateFileMetadata', () => {
-    test('should return error when file does not exist', async () => {
-      const nonExistentFiledId = 4000
-      const testFileMetadata = {
-        description: 'My description bbb.',
-        categories: ['Data'],
-        restrict: false
-      }
-      const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
-
-      await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
-        errorExpected
-      )
-    })
-
-    test('should update file metadata when file exists', async () => {
-      const getDatasetFilesResponse = await sut.getDatasetFiles(
-        testDatasetIds.numericId,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ
-      )
-
-      console.log('fileInfo', getDatasetFilesResponse)
-
-      const fileId = getDatasetFilesResponse.files[0].id
-      const testFileMetadata = {
-        description: 'My description bbb.',
-        categories: ['Data'],
-        restrict: false
-      }
-
-      const actual = await sut.updateFileMetadata(fileId, testFileMetadata)
-
-      expect(actual).toBeUndefined()
     })
   })
 })
