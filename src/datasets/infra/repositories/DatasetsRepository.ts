@@ -18,6 +18,7 @@ import { transformDatasetLocksResponseToDatasetLocks } from './transformers/data
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
 import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
+import { DatasetVersionSummary } from '../../domain/models/DatasetVersionSummary'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -162,6 +163,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error
       })
   }
+
   public async createDataset(
     newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
@@ -230,6 +232,17 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       deaccessionDTO
     )
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetVersions(datasetId: string | number): Promise<DatasetVersionSummary[]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'versions/compareSummary', datasetId),
+      true
+    )
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })
