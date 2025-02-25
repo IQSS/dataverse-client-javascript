@@ -15,15 +15,13 @@ import {
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
-
+import axios from 'axios'
 import {
-  calculateBlobChecksum,
   createMultipartFileBlob,
-  createSinglepartFileBlob,
-  singlepartFileExistsInBucket
+  createSinglepartFileBlob
 } from '../../testHelpers/files/filesHelper'
 import { FileUploadCancelError } from '../../../src/files/infra/clients/errors/FileUploadCancelError'
-import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
+import * as crypto from 'crypto'
 
 describe('Direct Upload', () => {
   const testCollectionAlias = 'directUploadTestCollection'
@@ -115,7 +113,7 @@ describe('Direct Upload', () => {
       fileName: singlepartFile.name,
       storageId: actualStorageId,
       checksumType: checksumAlgorithm,
-      checksumValue: calculateBlobChecksum(fileBuffer, checksumAlgorithm),
+      checksumValue: calculateBlobChecksum(fileBuffer),
       mimeType: singlepartFile.type
     }
 
@@ -172,7 +170,7 @@ describe('Direct Upload', () => {
       fileName: multipartFile.name,
       storageId: actualStorageId,
       checksumType: checksumAlgorithm,
-      checksumValue: calculateBlobChecksum(fileBuffer, checksumAlgorithm),
+      checksumValue: calculateBlobChecksum(fileBuffer),
       mimeType: multipartFile.type
     }
 
@@ -214,4 +212,30 @@ describe('Direct Upload', () => {
       )
     ).rejects.toThrow(FileUploadCancelError)
   })
+
+  const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {
+    const filesRepository = new FilesRepository()
+    const destination = await filesRepository.getFileUploadDestination(testDatasetId, file)
+    destination.urls.forEach((destinationUrl, index) => {
+      destination.urls[index] = destinationUrl.replace('localstack', 'localhost')
+    })
+    return destination
+  }
+
+  const singlepartFileExistsInBucket = async (fileUrl: string): Promise<boolean> => {
+    return axios
+      .get(fileUrl)
+      .then(() => {
+        return true
+      })
+      .catch(() => {
+        return false
+      })
+  }
+
+  const calculateBlobChecksum = (blob: Buffer): string => {
+    const hash = crypto.createHash(checksumAlgorithm)
+    hash.update(blob)
+    return hash.digest('hex')
+  }
 })
