@@ -1,12 +1,12 @@
-export interface DatasetVersionSummary {
+export interface DatasetVersionInfo {
   id: number
   versionNumber: string
-  summary?: Summary | SummaryStringValues
+  summary?: DatasetVersionSummary | SummaryStringValues
   contributors: string
   publishedOn?: string
 }
 
-export type Summary = {
+export type DatasetVersionSummary = {
   [key: string]: SummaryUpdates | SummaryUpdatesWithFields | FilesSummaryUpdates | boolean
 }
 

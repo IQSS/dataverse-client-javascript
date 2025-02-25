@@ -44,9 +44,9 @@ import {
   uploadFileViaApi
 } from '../../testHelpers/files/filesHelper'
 import {
-  Summary,
+  DatasetVersionSummary,
   SummaryStringValues
-} from '../../../src/datasets/domain/models/DatasetVersionSummary'
+} from '../../../src/datasets/domain/models/DatasetVersionInfo'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
@@ -1026,7 +1026,7 @@ describe('DatasetsRepository', () => {
       expect(actual.length).toEqual(2)
 
       expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toMatchObject<Summary>({
+      expect(actual[0].summary).toMatchObject<DatasetVersionSummary>({
         'Citation Metadata': {
           Title: {
             added: 0,
@@ -1094,7 +1094,7 @@ describe('DatasetsRepository', () => {
       expect(actual.length).toEqual(2)
 
       expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toMatchObject<Summary>({
+      expect(actual[0].summary).toMatchObject<DatasetVersionSummary>({
         files: {
           added: 1,
           removed: 0,

@@ -7,7 +7,7 @@ import { DatasetDTO } from '../dtos/DatasetDTO'
 import { DatasetDeaccessionDTO } from '../dtos/DatasetDeaccessionDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
-import { DatasetVersionSummary } from '../models/DatasetVersionSummary'
+import { DatasetVersionInfo } from '../models/DatasetVersionInfo'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -52,5 +52,5 @@ export interface IDatasetsRepository {
     datasetVersionId: string,
     deaccessionDTO: DatasetDeaccessionDTO
   ): Promise<void>
-  getDatasetVersions(datasetId: number | string): Promise<DatasetVersionSummary[]>
+  getDatasetVersions(datasetId: number | string): Promise<DatasetVersionInfo[]>
 }
