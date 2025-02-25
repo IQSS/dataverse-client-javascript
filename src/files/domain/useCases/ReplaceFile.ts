@@ -17,7 +17,7 @@ export class ReplaceFile implements UseCase<void> {
    *
    * Note: This use case can be used independently of the UploadFile use case, e.g., supporting scenarios in which the files already exist in S3 or have been uploaded via some out-of-band method.
    *
-   * @param {number} [fileId] - The File identifier.
+   * @param {number | string} [fileId] - The File identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {UploadedFileDTO} [uploadedFileDTO] - File DTO associated with the uploaded file.
    * @returns {Promise<void>} A promise that resolves when the file has been successfully replaced.
    * @throws {WriteError} - If there are errors while writing data.
