@@ -147,18 +147,6 @@ export async function setStorageDriverViaApi(
   }
 }
 
-export async function publishCollectionViaApi(collectionAlias: string): Promise<void> {
-  try {
-    return await axios.post(
-      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/actions/:publish`,
-      {},
-      DATAVERSE_API_REQUEST_HEADERS
-    )
-  } catch (error) {
-    throw new Error(`Error while publishing test collection ${collectionAlias}`)
-  }
-}
-
 export const createCollectionDTO = (alias = 'test-collection'): CollectionDTO => {
   return {
     alias: alias,
