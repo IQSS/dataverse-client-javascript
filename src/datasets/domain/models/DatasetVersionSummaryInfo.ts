@@ -1,4 +1,4 @@
-export interface DatasetVersionInfo {
+export interface DatasetVersionSummaryInfo {
   id: number
   versionNumber: string
   summary?: DatasetVersionSummary | SummaryStringValues

@@ -46,7 +46,7 @@ import {
 import {
   DatasetVersionSummary,
   SummaryStringValues
-} from '../../../src/datasets/domain/models/DatasetVersionInfo'
+} from '../../../src/datasets/domain/models/DatasetVersionSummaryInfo'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
