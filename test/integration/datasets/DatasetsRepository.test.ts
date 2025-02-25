@@ -7,7 +7,8 @@ import {
   deleteUnpublishedDatasetViaApi,
   waitForDatasetsIndexedInSolr,
   deletePublishedDatasetViaApi,
-  deaccessionDatasetViaApi
+  deaccessionDatasetViaApi,
+  createDatasetLicenseModel
 } from '../../testHelpers/datasets/datasetHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
@@ -18,7 +19,8 @@ import {
   createDataset,
   CreatedDatasetIdentifiers,
   DatasetDTO,
-  DatasetDeaccessionDTO
+  DatasetDeaccessionDTO,
+  publishDataset
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -31,9 +33,23 @@ import {
 import {
   createCollectionViaApi,
   deleteCollectionViaApi,
-  ROOT_COLLECTION_ALIAS
+  publishCollectionViaApi,
+  ROOT_COLLECTION_ALIAS,
+  setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
-import { testTextFile1Name, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
+import {
+  calculateBlobChecksum,
+  createSinglepartFileBlob,
+  testTextFile1Name,
+  uploadFileViaApi
+} from '../../testHelpers/files/filesHelper'
+import {
+  Summary,
+  SummaryStringValues
+} from '../../../src/datasets/domain/models/DatasetVersionSummary'
+import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
+import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
+import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
 
 const TEST_DIFF_DATASET_DTO: DatasetDTO = {
   license: {
@@ -78,6 +94,9 @@ describe('DatasetsRepository', () => {
 
   const sut: DatasetsRepository = new DatasetsRepository()
   const nonExistentTestDatasetId = 100
+
+  const filesRepositorySut = new FilesRepository()
+  const directUploadSut: DirectUploadClient = new DirectUploadClient(filesRepositorySut)
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -923,6 +942,181 @@ describe('DatasetsRepository', () => {
           deaccessionReason: 'Deaccessioning the dataset for testing purposes'
         })
       ).rejects.toBeInstanceOf(WriteError)
+    })
+  })
+
+  describe('getDatasetVersions', () => {
+    const testDatasetVersionsCollectionAlias = 'testDatasetVersionsCollection'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testDatasetVersionsCollectionAlias)
+      await publishCollectionViaApi(testDatasetVersionsCollectionAlias)
+      await setStorageDriverViaApi(testDatasetVersionsCollectionAlias, 'LocalStack')
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(testDatasetVersionsCollectionAlias)
+    })
+
+    test('should return dataset versions when dataset exists', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+
+      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+
+      expect(actual.length).toBeGreaterThan(0)
+      expect(actual[0].versionNumber).toBe('DRAFT')
+      expect(actual[0].summary).toBe(SummaryStringValues.firstDraft)
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should return dataset versions correctly after first publish', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+
+      expect(actual.length).toBeGreaterThan(0)
+      expect(actual[0].versionNumber).toBe('1.0')
+      expect(actual[0].summary).toBe(SummaryStringValues.firstPublished)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return dataset versions correctly after 1st publish and metadata fields update', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+
+      await sut.updateDataset(
+        testDatasetIds.numericId,
+        {
+          license: createDatasetLicenseModel(true),
+          metadataBlockValues: [
+            {
+              name: 'citation',
+              fields: {
+                title: 'Updated Dataset Title'
+              }
+            }
+          ]
+        },
+        [citationMetadataBlock]
+      )
+
+      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+
+      expect(actual.length).toEqual(2)
+
+      expect(actual[0].versionNumber).toBe('DRAFT')
+      expect(actual[0].summary).toMatchObject<Summary>({
+        'Citation Metadata': {
+          Title: {
+            added: 0,
+            deleted: 0,
+            changed: 1
+          }
+        },
+        files: {
+          added: 0,
+          removed: 0,
+          replaced: 0,
+          changedFileMetaData: 0,
+          changedVariableMetadata: 0
+        },
+        termsAccessChanged: false
+      })
+
+      expect(actual[1].versionNumber).toBe('1.0')
+      expect(actual[1].summary).toBe(SummaryStringValues.firstPublished)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return correct files summary', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const singlepartFile = await createSinglepartFileBlob()
+
+      const destination = await createTestFileUploadDestination(
+        singlepartFile,
+        testDatasetIds.numericId
+      )
+
+      const actualStorageId = await directUploadSut.uploadFile(
+        testDatasetIds.numericId,
+        singlepartFile,
+        jest.fn(),
+        new AbortController(),
+        destination
+      )
+
+      const fileArrayBuffer = await singlepartFile.arrayBuffer()
+      const fileBuffer = Buffer.from(fileArrayBuffer)
+
+      const uploadedFileDTO = {
+        fileName: singlepartFile.name,
+        storageId: actualStorageId,
+        checksumType: 'md5',
+        checksumValue: calculateBlobChecksum(fileBuffer, 'md5'),
+        mimeType: singlepartFile.type
+      }
+
+      await filesRepositorySut.addUploadedFilesToDataset(testDatasetIds.numericId, [
+        uploadedFileDTO
+      ])
+
+      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+
+      expect(actual.length).toEqual(2)
+
+      expect(actual[0].versionNumber).toBe('DRAFT')
+      expect(actual[0].summary).toMatchObject<Summary>({
+        files: {
+          added: 1,
+          removed: 0,
+          replaced: 0,
+          changedFileMetaData: 0,
+          changedVariableMetadata: 0
+        },
+        termsAccessChanged: false
+      })
+
+      expect(actual[1].versionNumber).toBe('1.0')
+      expect(actual[1].summary).toBe(SummaryStringValues.firstPublished)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new ReadError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(sut.getDatasetVersions(nonExistentTestDatasetId)).rejects.toThrow(expectedError)
     })
   })
 })

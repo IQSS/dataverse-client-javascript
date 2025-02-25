@@ -6,6 +6,7 @@ import { readFile } from 'fs/promises'
 import { FilesSubset } from '../../../src/files/domain/models/FilesSubset'
 import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode'
 import { FilePayload } from '../../../src/files/infra/repositories/transformers/FilePayload'
+import * as crypto from 'crypto'
 
 interface FileMetadata {
   categories?: string[]
@@ -226,4 +227,21 @@ export const updateFileTabularTags = async (
       }
     }
   )
+}
+
+export const calculateBlobChecksum = (blob: Buffer, checksumAlgorithm: string): string => {
+  const hash = crypto.createHash(checksumAlgorithm)
+  hash.update(blob)
+  return hash.digest('hex')
+}
+
+export const singlepartFileExistsInBucket = async (fileUrl: string): Promise<boolean> => {
+  return axios
+    .get(fileUrl)
+    .then(() => {
+      return true
+    })
+    .catch(() => {
+      return false
+    })
 }
