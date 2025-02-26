@@ -52,5 +52,5 @@ export interface IDatasetsRepository {
     datasetVersionId: string,
     deaccessionDTO: DatasetDeaccessionDTO
   ): Promise<void>
-  getDatasetVersions(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]>
+  getDatasetVersionsSummaries(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]>
 }

@@ -2,7 +2,7 @@ import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { DatasetVersionSummaryInfo } from '../models/DatasetVersionSummaryInfo'
 import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
 
-export class GetDatasetVersions implements UseCase<DatasetVersionSummaryInfo[]> {
+export class GetDatasetVersionsSummaries implements UseCase<DatasetVersionSummaryInfo[]> {
   private datasetsRepository: IDatasetsRepository
 
   constructor(datasetsRepository: IDatasetsRepository) {
@@ -16,6 +16,6 @@ export class GetDatasetVersions implements UseCase<DatasetVersionSummaryInfo[]> 
    * @returns {Promise<DatasetVersionSummaryInfo[]>} - An array of DatasetVersionSummaryInfo.
    */
   async execute(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]> {
-    return await this.datasetsRepository.getDatasetVersions(datasetId)
+    return await this.datasetsRepository.getDatasetVersionsSummaries(datasetId)
   }
 }

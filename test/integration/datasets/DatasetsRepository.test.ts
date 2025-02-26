@@ -945,7 +945,7 @@ describe('DatasetsRepository', () => {
     })
   })
 
-  describe('getDatasetVersions', () => {
+  describe('getDatasetVersionsSummaries', () => {
     const testDatasetVersionsCollectionAlias = 'testDatasetVersionsCollection'
 
     beforeAll(async () => {
@@ -964,7 +964,7 @@ describe('DatasetsRepository', () => {
         testDatasetVersionsCollectionAlias
       )
 
-      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+      const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
       expect(actual.length).toBeGreaterThan(0)
       expect(actual[0].versionNumber).toBe('DRAFT')
@@ -982,7 +982,7 @@ describe('DatasetsRepository', () => {
 
       await waitForNoLocks(testDatasetIds.numericId, 10)
 
-      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+      const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
       expect(actual.length).toBeGreaterThan(0)
       expect(actual[0].versionNumber).toBe('1.0')
@@ -1021,7 +1021,7 @@ describe('DatasetsRepository', () => {
         [citationMetadataBlock]
       )
 
-      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+      const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
       expect(actual.length).toEqual(2)
 
@@ -1089,7 +1089,7 @@ describe('DatasetsRepository', () => {
         uploadedFileDTO
       ])
 
-      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+      const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
       expect(actual.length).toEqual(2)
 
@@ -1116,7 +1116,9 @@ describe('DatasetsRepository', () => {
         `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
       )
 
-      await expect(sut.getDatasetVersions(nonExistentTestDatasetId)).rejects.toThrow(expectedError)
+      await expect(sut.getDatasetVersionsSummaries(nonExistentTestDatasetId)).rejects.toThrow(
+        expectedError
+      )
     })
   })
 })

@@ -237,7 +237,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async getDatasetVersions(
+  public async getDatasetVersionsSummaries(
     datasetId: string | number
   ): Promise<DatasetVersionSummaryInfo[]> {
     return this.doGet(
