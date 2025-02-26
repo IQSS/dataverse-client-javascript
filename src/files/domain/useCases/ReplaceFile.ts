@@ -22,7 +22,7 @@ export class ReplaceFile implements UseCase<void> {
    * @returns {Promise<void>} A promise that resolves when the file has been successfully replaced.
    * @throws {WriteError} - If there are errors while writing data.
    */
-  async execute(fileId: number, uploadedFileDTO: UploadedFileDTO): Promise<void> {
+  async execute(fileId: number | string, uploadedFileDTO: UploadedFileDTO): Promise<void> {
     await this.filesRepository.replaceFile(fileId, uploadedFileDTO)
   }
 }

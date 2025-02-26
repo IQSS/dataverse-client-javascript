@@ -303,7 +303,10 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       })
   }
 
-  public async replaceFile(fileId: number, uploadedFileDTO: UploadedFileDTO): Promise<undefined> {
+  public async replaceFile(
+    fileId: number | string,
+    uploadedFileDTO: UploadedFileDTO
+  ): Promise<undefined> {
     const requestBody: UploadedFileRequestBody = {
       fileName: uploadedFileDTO.fileName,
       checksum: {
