@@ -162,6 +162,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error
       })
   }
+
   public async createDataset(
     newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],

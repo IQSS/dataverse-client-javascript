@@ -47,6 +47,7 @@ describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
   let testCollectionId: number
   const currentYear = new Date().getFullYear()
+
   beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
@@ -127,6 +128,34 @@ describe('CollectionsRepository', () => {
         )
       })
     })
+
+    test('should return childCount correctly', async () => {
+      const parentCollectionAlias = 'childCountTestCollection'
+      const childCollectionAlias = 'childCountTestChildCollection'
+
+      await createCollectionViaApi(parentCollectionAlias, ROOT_COLLECTION_ALIAS)
+      await createCollectionViaApi(childCollectionAlias, parentCollectionAlias)
+      const { numericId: childDatasetNumericId } = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        parentCollectionAlias
+      )
+
+      const actual = await sut.getCollection(parentCollectionAlias)
+
+      expect(actual.childCount).toBe(2)
+
+      await deleteCollectionViaApi(childCollectionAlias)
+
+      const actualAfterDeletion = await sut.getCollection(parentCollectionAlias)
+
+      expect(actualAfterDeletion.childCount).toBe(1)
+
+      await deleteUnpublishedDatasetViaApi(childDatasetNumericId)
+
+      const actualAfterDatasetDeletion = await sut.getCollection(parentCollectionAlias)
+
+      expect(actualAfterDatasetDeletion.childCount).toBe(0)
+    })
   })
 
   describe('publishCollection', () => {
@@ -146,6 +175,7 @@ describe('CollectionsRepository', () => {
       expect(createdCollection.name).toBe(newCollectionDTO.name)
     })
   })
+
   describe('createCollection', () => {
     const testCreateCollectionAlias1 = 'createCollection-test-1'
     const testCreateCollectionAlias2 = 'createCollection-test-2'
@@ -244,6 +274,35 @@ describe('CollectionsRepository', () => {
           TestConstants.TEST_DUMMY_COLLECTION_ID
         )
       ).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('deleteCollection', () => {
+    test('should delete collection successfully', async () => {
+      const collectionAlias = 'deleteCollection-test'
+      const collectionDTO = createCollectionDTO(collectionAlias)
+      await sut.createCollection(collectionDTO)
+
+      const createdCollection = await sut.getCollection(collectionAlias)
+
+      expect(createdCollection.alias).toBe(collectionAlias)
+
+      const deleteResult = await sut.deleteCollection(collectionAlias)
+      const expectedError = new ReadError(
+        `[404] Can't find dataverse with identifier='${collectionAlias}'`
+      )
+
+      expect(deleteResult).toBeUndefined()
+      await expect(sut.getCollection(collectionAlias)).rejects.toThrow(expectedError)
+    })
+
+    test('should return error when collection does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Can't find dataverse with identifier='${TestConstants.TEST_DUMMY_COLLECTION_ID}'`
+      )
+      await expect(sut.deleteCollection(TestConstants.TEST_DUMMY_COLLECTION_ID)).rejects.toThrow(
+        expectedError
+      )
     })
   })
 
