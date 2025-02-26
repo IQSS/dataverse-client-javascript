@@ -52,6 +52,7 @@ The different use cases currently available in the package are classified below,
   - [Files write use cases](#files-write-use-cases)
     - [File Uploading Use Cases](#file-uploading-use-cases)
     - [Delete a File](#delete-a-file)
+    - [Replace a File](#replace-a-file)
     - [Restrict or Unrestrict a File](#restrict-or-unrestrict-a-file)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
@@ -1283,6 +1284,37 @@ Note that the behavior of deleting files depends on if the dataset has ever been
 - If the dataset has never been published, the file will be deleted forever.
 - If the dataset has published, the file is deleted from the draft (and future published versions).
 - If the dataset has published, the deleted file can still be downloaded because it was part of a published version.
+
+#### Replace a File
+
+Replaces a File. Currently working for already uploaded S3 bucket files.
+
+##### Example call:
+
+```typescript
+import { replaceFile } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 12345
+const uploadedFileDTO: UploadedFileDTO = {
+  fileName: 'the-file-name',
+  storageId: 'localstack1://mybucket:19121faf7e7-2c40322ff54e',
+  checksumType: 'md5',
+  checksumValue: 'ede3d3b685b4e137ba4cb2521329a75e',
+  mimeType: 'text/plain'
+}
+
+replaceFile.execute(fileId, uploadedFileDTO)
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/ReplaceFile.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `uploadedFileDTO` parameter is a [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded files. Some of these properties should be calculated from the uploaded File Blob objects and the resulting storage identifiers from the Upload File use case.
 
 #### Restrict or Unrestrict a File
 

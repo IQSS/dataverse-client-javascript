@@ -186,9 +186,13 @@ const enableFilePIDs = async (): Promise<AxiosResponse> => {
     )
 }
 
-export async function createSinglepartFileBlob(): Promise<File> {
+export async function createSinglepartFileBlob(
+  fileName = 'singlepart-file',
+  fileSizeInBytes = 1000,
+  fileType = 'text/plain'
+): Promise<File> {
   try {
-    return await createFileBlobWithSize(1000, 'singlepart-file')
+    return await createFileBlobWithSize(fileSizeInBytes, fileName, fileType)
   } catch (error) {
     throw new Error(`Error while creating test singlepart file`)
   }
@@ -202,9 +206,13 @@ export async function createMultipartFileBlob(): Promise<File> {
   }
 }
 
-async function createFileBlobWithSize(fileSizeInBytes: number, fileName: string): Promise<File> {
+async function createFileBlobWithSize(
+  fileSizeInBytes: number,
+  fileName: string,
+  fileType = 'text/plain'
+): Promise<File> {
   const blob = await createBlobWithSize(fileSizeInBytes)
-  return new File([blob], fileName, { type: 'text/plain' })
+  return new File([blob], fileName, { type: fileType })
 }
 
 async function createBlobWithSize(size: number): Promise<Blob> {
