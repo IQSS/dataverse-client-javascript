@@ -11,6 +11,7 @@ export class UpdateFileMetadata implements UseCase<void> {
 
   /**
    * Updates the metadata for a particular File.
+   * More detailed information about the file restriction behavior can be found in https://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata
    *
    * @param {number | string} [fileId] - The file identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {UpdateFileMetadataDTO} [updateFileMetadataDTO] - The DTO containing the metadata updates.

@@ -1257,11 +1257,9 @@ The following error might arise from the `AddUploadedFileToDataset` use case:
 
 - AddUploadedFileToDatasetError: This error indicates that there was an error while adding the uploaded file to the dataset.
 
-#### Updating File Metadata Use Cases
+#### Update File Metadata
 
-This use case is designed to update or edit metadata information for a specific file by a numeric identifier or persistemt identifier.
-
-##### Update File Metadata
+Updates Metadata of a File.
 
 ###### Example call:
 
@@ -1284,13 +1282,7 @@ await updateFileMetadata.execute(fileId, updateFileMetadataDTO).then((fileId) =>
 
 _See [use case](../src/files/domain/useCases/UpdateFileMetadata.ts) implementation_.
 
-This use case supports the following optional parameters for updateFileMetadataDTO:
-
-- **description**: (string)
-- **prevFreeform**: (string)
-- **categories**: (string[])
-- **dataFileTags**: (string[])
-- **restrict**: (boolean)
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 #### Delete a File
 
