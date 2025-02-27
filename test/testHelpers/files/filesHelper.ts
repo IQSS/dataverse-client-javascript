@@ -1,3 +1,4 @@
+import * as crypto from 'crypto'
 import { FileModel as FileModel } from '../../../src/files/domain/models/FileModel'
 import { File, Blob } from '@web-std/file'
 import axios, { AxiosResponse } from 'axios'
@@ -6,7 +7,6 @@ import { readFile } from 'fs/promises'
 import { FilesSubset } from '../../../src/files/domain/models/FilesSubset'
 import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode'
 import { FilePayload } from '../../../src/files/infra/repositories/transformers/FilePayload'
-import * as crypto from 'crypto'
 
 interface FileMetadata {
   categories?: string[]
@@ -187,9 +187,13 @@ const enableFilePIDs = async (): Promise<AxiosResponse> => {
     )
 }
 
-export async function createSinglepartFileBlob(): Promise<File> {
+export async function createSinglepartFileBlob(
+  fileName = 'singlepart-file',
+  fileSizeInBytes = 1000,
+  fileType = 'text/plain'
+): Promise<File> {
   try {
-    return await createFileBlobWithSize(1000, 'singlepart-file')
+    return await createFileBlobWithSize(fileSizeInBytes, fileName, fileType)
   } catch (error) {
     throw new Error(`Error while creating test singlepart file`)
   }
@@ -203,9 +207,13 @@ export async function createMultipartFileBlob(): Promise<File> {
   }
 }
 
-async function createFileBlobWithSize(fileSizeInBytes: number, fileName: string): Promise<File> {
+async function createFileBlobWithSize(
+  fileSizeInBytes: number,
+  fileName: string,
+  fileType = 'text/plain'
+): Promise<File> {
   const blob = await createBlobWithSize(fileSizeInBytes)
-  return new File([blob], fileName, { type: 'text/plain' })
+  return new File([blob], fileName, { type: fileType })
 }
 
 async function createBlobWithSize(size: number): Promise<Blob> {
