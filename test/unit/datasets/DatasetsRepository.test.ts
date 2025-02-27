@@ -30,6 +30,7 @@ import {
 } from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
 import { VersionUpdateType } from '../../../src/datasets/domain/models/Dataset'
+import { createDatasetVersionSummaryModel } from '../../testHelpers/datasets/datasetVersionsSummariesHelper'
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository()
@@ -962,7 +963,7 @@ describe('DatasetsRepository', () => {
     })
   })
 
-  describe('deaccsionDataset', () => {
+  describe('deaccessionDataset', () => {
     const version = '1.0'
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${version}/deaccession`
     const expectedApiKeyRequestConfig = {
@@ -1012,6 +1013,101 @@ describe('DatasetsRepository', () => {
         expectedApiKeyRequestConfig
       )
       expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('getDatasetVersionSummaries', () => {
+    const testDatasetVersionSummaries = createDatasetVersionSummaryModel()
+
+    const testDatasetVersionSummariesResponse = {
+      data: {
+        status: 'OK',
+        data: [testDatasetVersionSummaries]
+      }
+    }
+
+    describe('by numeric id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/compareSummary`
+
+      test('should return dataset version summaries when providing id and response is successful', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSummariesResponse)
+
+        // API Key auth
+        let actual = await sut.getDatasetVersionsSummaries(testDatasetModel.id)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        actual = await sut.getDatasetVersionsSummaries(testDatasetModel.id)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        let error = undefined as unknown as ReadError
+        await sut.getDatasetVersionsSummaries(testDatasetModel.id).catch((e) => (error = e))
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(error).toBeInstanceOf(ReadError)
+      })
+    })
+
+    describe('by persistent id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/versions/compareSummary?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`
+
+      test('should return dataset version summaries when providing persistent id and response is successful', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSummariesResponse)
+
+        // API Key auth
+        let actual = await sut.getDatasetVersionsSummaries(TestConstants.TEST_DUMMY_PERSISTENT_ID)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        actual = await sut.getDatasetVersionsSummaries(TestConstants.TEST_DUMMY_PERSISTENT_ID)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        let error = undefined as unknown as ReadError
+        await sut
+          .getDatasetVersionsSummaries(TestConstants.TEST_DUMMY_PERSISTENT_ID)
+          .catch((e) => (error = e))
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(error).toBeInstanceOf(ReadError)
+      })
     })
   })
 })
