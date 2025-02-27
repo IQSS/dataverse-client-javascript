@@ -45,7 +45,7 @@ import {
 } from '../../testHelpers/files/filesHelper'
 import {
   DatasetVersionSummary,
-  SummaryStringValues
+  DatasetVersionSummaryStringValues
 } from '../../../src/datasets/domain/models/DatasetVersionSummaryInfo'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
@@ -968,7 +968,7 @@ describe('DatasetsRepository', () => {
 
       expect(actual.length).toBeGreaterThan(0)
       expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toBe(SummaryStringValues.firstDraft)
+      expect(actual[0].summary).toBe(DatasetVersionSummaryStringValues.firstDraft)
 
       await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
@@ -986,7 +986,7 @@ describe('DatasetsRepository', () => {
 
       expect(actual.length).toBeGreaterThan(0)
       expect(actual[0].versionNumber).toBe('1.0')
-      expect(actual[0].summary).toBe(SummaryStringValues.firstPublished)
+      expect(actual[0].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1045,7 +1045,7 @@ describe('DatasetsRepository', () => {
       })
 
       expect(actual[1].versionNumber).toBe('1.0')
-      expect(actual[1].summary).toBe(SummaryStringValues.firstPublished)
+      expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1106,7 +1106,7 @@ describe('DatasetsRepository', () => {
       })
 
       expect(actual[1].versionNumber).toBe('1.0')
-      expect(actual[1].summary).toBe(SummaryStringValues.firstPublished)
+      expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })

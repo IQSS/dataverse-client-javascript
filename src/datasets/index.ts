@@ -95,3 +95,7 @@ export {
 export { DatasetDeaccessionDTO } from './domain/dtos/DatasetDeaccessionDTO'
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers'
 export { VersionUpdateType } from './domain/models/Dataset'
+export {
+  DatasetVersionSummaryInfo,
+  DatasetVersionSummaryStringValues
+} from './domain/models/DatasetVersionSummaryInfo'

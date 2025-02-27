@@ -1,7 +1,7 @@
 export interface DatasetVersionSummaryInfo {
   id: number
   versionNumber: string
-  summary?: DatasetVersionSummary | SummaryStringValues
+  summary?: DatasetVersionSummary | DatasetVersionSummaryStringValues
   contributors: string
   publishedOn?: string
 }
@@ -10,17 +10,17 @@ export type DatasetVersionSummary = {
   [key: string]: SummaryUpdates | SummaryUpdatesWithFields | FilesSummaryUpdates | boolean
 }
 
-export interface SummaryUpdates {
+interface SummaryUpdates {
   added: number
   deleted: number
   changed: number
 }
 
-export interface SummaryUpdatesWithFields {
+interface SummaryUpdatesWithFields {
   [key: string]: SummaryUpdates
 }
 
-export interface FilesSummaryUpdates {
+interface FilesSummaryUpdates {
   added: number
   removed: number
   replaced: number
@@ -28,14 +28,9 @@ export interface FilesSummaryUpdates {
   changedVariableMetadata: number
 }
 
-export enum SummaryStringValues {
+export enum DatasetVersionSummaryStringValues {
   firstPublished = 'firstPublished',
   firstDraft = 'firstDraft',
   versionDeaccessioned = 'versionDeaccessioned',
   previousVersionDeaccessioned = 'previousVersionDeaccessioned'
-}
-
-export enum SummaryKnownFields {
-  files = 'files',
-  termsAccessChanged = 'termsAccessChanged'
 }
