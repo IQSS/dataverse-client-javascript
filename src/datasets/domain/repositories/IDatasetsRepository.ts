@@ -51,4 +51,5 @@ export interface IDatasetsRepository {
     datasetVersionId: string,
     deaccessionDTO: DatasetDeaccessionDTO
   ): Promise<void>
+  getDatasetDownloadCount(datasetId: number, includeMDC?: boolean): Promise<number>
 }

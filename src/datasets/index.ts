@@ -17,6 +17,7 @@ import { PublishDataset } from './domain/useCases/PublishDataset'
 import { UpdateDataset } from './domain/useCases/UpdateDataset'
 import { GetDatasetVersionDiff } from './domain/useCases/GetDatasetVersionDiff'
 import { DeaccessionDataset } from './domain/useCases/DeaccessionDataset'
+import { GetDatasetDownloadCount } from './domain/useCases/GetDatasetDownloadCount'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -48,6 +49,7 @@ const updateDataset = new UpdateDataset(
   datasetResourceValidator
 )
 const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
+const getDatasetDownloadCount = new GetDatasetDownloadCount(datasetsRepository)
 
 export {
   getDataset,
@@ -62,7 +64,8 @@ export {
   publishDataset,
   createDataset,
   updateDataset,
-  deaccessionDataset
+  deaccessionDataset,
+  getDatasetDownloadCount
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
