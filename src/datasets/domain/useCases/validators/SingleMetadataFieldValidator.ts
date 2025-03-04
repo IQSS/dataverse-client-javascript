@@ -136,6 +136,12 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
         metadataFieldInfo.childMetadataFields as Record<string, MetadataFieldInfo>
       )[childMetadataFieldKey]
 
+      const allowEmptyForConditionallyRequiredField: boolean =
+        this.allowEmptyValueForConditionallyRequiredField(
+          datasetMetadataFieldAndValueInfo,
+          childMetadataFieldKey
+        )
+
       metadataFieldValidator.validate({
         metadataFieldInfo: childMetadataFieldInfo,
         metadataFieldKey: childMetadataFieldKey,
@@ -144,8 +150,58 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
         )[childMetadataFieldKey],
         metadataBlockName: datasetMetadataFieldAndValueInfo.metadataBlockName,
         metadataParentFieldKey: datasetMetadataFieldAndValueInfo.metadataFieldKey,
-        metadataFieldPosition: datasetMetadataFieldAndValueInfo.metadataFieldPosition
+        metadataFieldPosition: datasetMetadataFieldAndValueInfo.metadataFieldPosition,
+        allowEmptyForConditionallyRequiredField
       })
     }
+  }
+
+  /**
+   * This method allows setting empty values for conditionally required child fields.
+   * A child field is conditionally required if it is required and its parent field is not required.
+   * The childfield should be required only if any of its sibling fields has a value, otherwise it should be optional.
+   */
+
+  private allowEmptyValueForConditionallyRequiredField(
+    datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo,
+    childMetadataFieldKey: string
+  ): boolean {
+    let result = false
+    const metadataFieldInfo = datasetMetadataFieldAndValueInfo.metadataFieldInfo
+
+    const childMetadataFieldKeys = Object.keys(
+      metadataFieldInfo.childMetadataFields as Record<string, MetadataFieldInfo>
+    )
+
+    const conditionallyRequiredChildFields: false | string[] =
+      !datasetMetadataFieldAndValueInfo.metadataFieldInfo.isRequired &&
+      childMetadataFieldKeys.filter(
+        (childMetadataFieldKey) =>
+          (metadataFieldInfo.childMetadataFields as Record<string, MetadataFieldInfo>)[
+            childMetadataFieldKey
+          ].isRequired
+      )
+    const hasConditionallyRequiredChildFields = Boolean(conditionallyRequiredChildFields)
+
+    if (
+      hasConditionallyRequiredChildFields &&
+      Object.values(conditionallyRequiredChildFields as string[]).includes(childMetadataFieldKey)
+    ) {
+      // At this point we know we are standing on a child field that is required and the parent field is not required
+
+      // Get the sibling fields and check if any of them has a value
+      const { [childMetadataFieldKey as keyof Record<string, string>]: _, ...siblingFields } =
+        datasetMetadataFieldAndValueInfo.metadataFieldValue as Record<string, string>
+
+      const siblingsValues = Object.values(siblingFields) as string[]
+
+      const isAnySiblingValuePresent = siblingsValues.some(
+        ([, value]) => value !== undefined && value !== ''
+      )
+
+      result = !isAnySiblingValuePresent
+    }
+
+    return result
   }
 }

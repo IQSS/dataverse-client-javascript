@@ -402,7 +402,8 @@ export const createDatasetDTO = (
   timePeriodCoveredStartValue?: DatasetMetadataFieldValueDTO,
   contributorTypeValue?: DatasetMetadataFieldValueDTO,
   license?: DatasetLicense,
-  dateOfCreationValue?: DatasetMetadataFieldValueDTO
+  dateOfCreationValue?: DatasetMetadataFieldValueDTO,
+  contributorNameValue?: string
 ): DatasetDTO => {
   const validTitle = 'test dataset'
   const validAuthorFieldValue = [
@@ -434,14 +435,15 @@ export const createDatasetDTO = (
           ...(dateOfCreationValue && {
             dateOfCreation: dateOfCreationValue
           }),
-          ...(contributorTypeValue && {
-            contributor: [
-              {
-                contributorName: 'Admin, Dataverse',
-                contributorType: contributorTypeValue as string
-              }
-            ]
-          })
+          ...(contributorTypeValue !== undefined &&
+            contributorNameValue !== undefined && {
+              contributor: [
+                {
+                  contributorName: contributorNameValue ?? 'Admin, Dataverse',
+                  contributorType: (contributorTypeValue as string | undefined) ?? 'Project Member'
+                }
+              ]
+            })
         }
       }
     ]

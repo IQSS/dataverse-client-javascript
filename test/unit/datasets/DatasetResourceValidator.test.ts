@@ -213,7 +213,16 @@ describe('validate', () => {
   })
 
   test('should raise a controlled vocabulary error when a controlled vocabulary field has an invalid format', () => {
-    const testDataset = createDatasetDTO(undefined, undefined, undefined, undefined, 'Wrong Value')
+    const testDataset = createDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'Wrong Value',
+      undefined,
+      undefined,
+      'Some Value'
+    )
 
     expect.assertions(6)
     runValidateExpectingFieldValidationError(
@@ -234,5 +243,54 @@ describe('validate', () => {
       'Project Member'
     )
     expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
+  })
+
+  test("should not raise an error when there is a compound field not required with a required childfield that has no value but siblings don't have value either", () => {
+    const testDataset = createDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      '',
+      undefined,
+      undefined,
+      ''
+    )
+    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
+  })
+
+  test('should not raise an error when there is a compound field not required with a required childfield that has value and some of the siblings has value', () => {
+    const testDataset = createDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'Project Member',
+      undefined,
+      undefined,
+      'Foo'
+    )
+    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
+  })
+
+  test('should raise an error when there is a compound field not required with a required childfield that has no value but some of the siblings have', () => {
+    const testDataset = createDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'Project Member',
+      undefined,
+      undefined,
+      ''
+    )
+    expect.assertions(6)
+    runValidateExpectingFieldValidationError(
+      testDataset,
+      'contributorName',
+      'There was an error when validating the field contributorName from metadata block citation with parent field contributor in position 0. Reason was: The field should not be empty.',
+      'contributor',
+      0
+    )
   })
 })

@@ -9,6 +9,7 @@ export interface DatasetMetadataFieldAndValueInfo {
   metadataBlockName: string
   metadataParentFieldKey?: string
   metadataFieldPosition?: number
+  allowEmptyForConditionallyRequiredField?: boolean
 }
 
 export abstract class BaseMetadataFieldValidator {
