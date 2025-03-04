@@ -1024,7 +1024,6 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
       expect(actual.length).toEqual(2)
-
       expect(actual[0].versionNumber).toBe('DRAFT')
       expect(actual[0].summary).toMatchObject<DatasetVersionSummary>({
         'Citation Metadata': {
@@ -1104,7 +1103,6 @@ describe('DatasetsRepository', () => {
         },
         termsAccessChanged: false
       })
-
       expect(actual[1].versionNumber).toBe('1.0')
       expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
