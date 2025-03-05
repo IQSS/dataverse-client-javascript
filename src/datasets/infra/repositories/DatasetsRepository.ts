@@ -19,6 +19,7 @@ import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transf
 import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
+import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -249,6 +250,19 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       queryParams
     )
       .then((response) => response.data.downloadCount)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetVersionsSummaries(
+    datasetId: string | number
+  ): Promise<DatasetVersionSummaryInfo[]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'versions/compareSummary', datasetId),
+      true
+    )
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })

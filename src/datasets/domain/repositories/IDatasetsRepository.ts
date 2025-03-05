@@ -8,6 +8,7 @@ import { DatasetDeaccessionDTO } from '../dtos/DatasetDeaccessionDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 import { DatasetDownloadCount } from '../models/DatasetDownloadCount'
+import { DatasetVersionSummaryInfo } from '../models/DatasetVersionSummaryInfo'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -53,4 +54,5 @@ export interface IDatasetsRepository {
     deaccessionDTO: DatasetDeaccessionDTO
   ): Promise<void>
   getDatasetDownloadCount(datasetId: number, includeMDC?: boolean): Promise<DatasetDownloadCount>
+  getDatasetVersionsSummaries(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]>
 }

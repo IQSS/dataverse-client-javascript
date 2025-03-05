@@ -647,6 +647,43 @@ describe('FilesRepository', () => {
     })
   })
 
+  describe('updateFileMetadata', () => {
+    test('should update file metadata when file exists', async () => {
+      const testFileMetadata = {
+        description: 'My description test.',
+        categories: ['Data'],
+        restrict: false
+      }
+
+      const actual = await sut.updateFileMetadata(testFileId, testFileMetadata)
+
+      expect(actual).toBeUndefined()
+
+      const fileInfo: FileModel = (await sut.getFile(
+        testFileId,
+        DatasetNotNumberedVersion.LATEST,
+        false
+      )) as FileModel
+
+      expect(fileInfo.description).toBe(testFileMetadata.description)
+      expect(fileInfo.categories).toEqual(testFileMetadata.categories)
+      expect(fileInfo.restricted).toBe(testFileMetadata.restrict)
+    })
+
+    test('should return error when file does not exist', async () => {
+      const testFileMetadata = {
+        description: 'My description test.',
+        categories: ['Data'],
+        restrict: false
+      }
+      const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
+
+      await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
+        errorExpected
+      )
+    })
+  })
+
   describe('deleteFile', () => {
     let deleFileTestDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'
