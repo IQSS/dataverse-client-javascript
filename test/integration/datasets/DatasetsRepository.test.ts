@@ -939,7 +939,7 @@ describe('DatasetsRepository', () => {
       await waitForNoLocks(testDatasetIds.numericId, 10)
       const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId)
 
-      expect(actual).toBe(0)
+      expect(actual.downloadCount).toBe(0)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -951,7 +951,7 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId, true)
 
-      expect(actual).toBe(0)
+      expect(actual.downloadCount).toBe(0)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })

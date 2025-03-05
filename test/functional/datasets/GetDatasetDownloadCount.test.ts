@@ -60,9 +60,9 @@ describe('execute', () => {
 
     await publishDataset.execute(createdDatasetIdentifiers.persistentId, VersionUpdateType.MAJOR)
 
-    const downloadCount = await getDatasetDownloadCount.execute(createdDatasetIdentifiers.numericId)
+    const actual = await getDatasetDownloadCount.execute(createdDatasetIdentifiers.numericId)
 
-    expect(downloadCount).toBe(0)
+    expect(actual.downloadCount).toBe(0)
 
     await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
   })
@@ -72,12 +72,9 @@ describe('execute', () => {
 
     await publishDataset.execute(createdDatasetIdentifiers.persistentId, VersionUpdateType.MAJOR)
 
-    const downloadCount = await getDatasetDownloadCount.execute(
-      createdDatasetIdentifiers.numericId,
-      true
-    )
+    const actual = await getDatasetDownloadCount.execute(createdDatasetIdentifiers.numericId, true)
 
-    expect(downloadCount).toBe(0)
+    expect(actual.downloadCount).toBe(0)
 
     await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)
   })
@@ -89,9 +86,9 @@ describe('execute', () => {
   test('should return zero if dataset has no downloads', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testDataset)
 
-    const downloadCount = await getDatasetDownloadCount.execute(createdDatasetIdentifiers.numericId)
+    const actual = await getDatasetDownloadCount.execute(createdDatasetIdentifiers.numericId)
 
-    expect(downloadCount).toBe(0)
+    expect(actual.downloadCount).toBe(0)
 
     await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
   })

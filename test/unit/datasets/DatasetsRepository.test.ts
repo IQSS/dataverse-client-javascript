@@ -30,6 +30,7 @@ import {
 } from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
 import { VersionUpdateType } from '../../../src/datasets/domain/models/Dataset'
+import { DatasetDownloadCount } from '../../../src/datasets/domain/models/DatasetDownloadCount'
 
 describe('DatasetsRepository', () => {
   const sut: DatasetsRepository = new DatasetsRepository()
@@ -1010,6 +1011,38 @@ describe('DatasetsRepository', () => {
         expectedApiEndpoint,
         testDeaccessionDatasetJSON,
         expectedApiKeyRequestConfig
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('getDatasetDownloaCount', () => {
+    const testDatasetDownloadCount: DatasetDownloadCount = {
+      id: testDatasetModel.id,
+      downloadCount: 1,
+      MDCStartDate: '2021-01-01'
+    }
+    test('should return citation when response is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testDatasetDownloadCount)
+
+      const actual = await sut.getDatasetDownloadCount(testDatasetModel.id)
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/download/count`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(actual).toStrictEqual(testDatasetDownloadCount)
+    })
+
+    test('should return error on repository read error', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error = undefined as unknown as ReadError
+      await sut.getDatasetDownloadCount(testDatasetModel.id).catch((e) => (error = e))
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/download/count`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
       )
       expect(error).toBeInstanceOf(Error)
     })

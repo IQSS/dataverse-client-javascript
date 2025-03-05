@@ -18,6 +18,7 @@ import { transformDatasetLocksResponseToDatasetLocks } from './transformers/data
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
 import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
+import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -236,7 +237,10 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async getDatasetDownloadCount(datasetId: number, includeMDC?: boolean): Promise<number> {
+  public async getDatasetDownloadCount(
+    datasetId: number,
+    includeMDC?: boolean
+  ): Promise<DatasetDownloadCount> {
     const queryParams = includeMDC !== undefined ? { includeMDC } : {}
 
     return this.doGet(

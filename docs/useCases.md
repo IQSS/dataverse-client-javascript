@@ -821,14 +821,25 @@ import { getDatasetDownloadCount } from '@iqss/dataverse-client-javascript'
 const datasetId = 1
 const includeMDC = true
 
-getDatasetDownloadCount.execute(datasetId, includeMDC)
+getDatasetDownloadCount
+  .execute(datasetId, includeMDC)
+  .then((datasetDownloadCount: DatasetDownloadCount) => {
+    /* ... */
+  })
 
 /* ... */
 ```
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetDownloadCount.ts) implementation_.
+
 The `datasetId` parameter is a number for numeric identifiers.
-The `includeMDC` parameter is optional. If MDC is enabled the count will be limited to the time before MDC start if the optional `includeMDC` parameter is not included or set to False. Setting `includeMDC` to True will ignore the `:MDCStartDate` setting and return a total count.
+The `includeMDC` parameter is optional.
+
+Note:
+
+- Setting `includeMDC` to True will ignore the `MDCStartDate` setting and return a total count.
+- If MDC isn't enabled, the download count will return a total count, without `MDCStartDate`.
+- If MDC is enabled but the `includeMDC` is false, the count will be limited to the time before `MDCStartDate`
 
 ## Files
 
