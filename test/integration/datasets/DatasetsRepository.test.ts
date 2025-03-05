@@ -925,41 +925,4 @@ describe('DatasetsRepository', () => {
       ).rejects.toBeInstanceOf(WriteError)
     })
   })
-
-  describe('getDatasetDownloadCount', () => {
-    test('should return download count for a dataset', async () => {
-      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      const fileMetadata = {
-        description: 'test description',
-        directoryLabel: 'directoryLabel',
-        categories: ['category1', 'category2']
-      }
-      await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name, fileMetadata)
-      await publishDatasetViaApi(testDatasetIds.numericId)
-      await waitForNoLocks(testDatasetIds.numericId, 10)
-      const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId)
-
-      expect(actual).toBe(0)
-
-      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-    })
-
-    test('should return download count including MDC data', async () => {
-      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      await publishDatasetViaApi(testDatasetIds.numericId)
-      await waitForNoLocks(testDatasetIds.numericId, 10)
-
-      const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId, true)
-
-      expect(actual).toBe(0)
-
-      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-    })
-
-    test('should return error when dataset does not exist', async () => {
-      await expect(sut.getDatasetDownloadCount(nonExistentTestDatasetId)).rejects.toBeInstanceOf(
-        ReadError
-      )
-    })
-  })
 })

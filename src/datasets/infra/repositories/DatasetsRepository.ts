@@ -235,18 +235,4 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error
       })
   }
-
-  public async getDatasetDownloadCount(datasetId: number, includeMDC?: boolean): Promise<number> {
-    const queryParams = includeMDC !== undefined ? { includeMDC } : {}
-
-    return this.doGet(
-      this.buildApiEndpoint(this.datasetsResourceName, `${datasetId}/download/count`),
-      true,
-      queryParams
-    )
-      .then((response) => response.data.downloadCount)
-      .catch((error) => {
-        throw error
-      })
-  }
 }

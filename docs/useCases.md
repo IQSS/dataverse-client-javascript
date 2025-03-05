@@ -807,29 +807,6 @@ The `version` parameter should be a string or a [DatasetNotNumberedVersion](../s
 
 You cannot deaccession a dataset more than once. If you call this endpoint twice for the same dataset version, you will get a not found error on the second call, since the dataset you are looking for will no longer be published since it is already deaccessioned.
 
-#### Get Download Count of a Dataset
-
-Total number of downloads requested for a dataset, given a dataset numeric identifier,
-
-##### Example call:
-
-```typescript
-import { getDatasetDownloadCount } from '@iqss/dataverse-client-javascript'
-
-/* ... */
-
-const datasetId = 1
-const includeMDC = true
-
-getDatasetDownloadCount.execute(datasetId, includeMDC)
-
-/* ... */
-```
-
-_See [use case](../src/datasets/domain/useCases/GetDatasetDownloadCount.ts) implementation_.
-The `datasetId` parameter is a number for numeric identifiers.
-The `includeMDC` parameter is optional. If MDC is enabled the count will be limited to the time before MDC start if the optional `includeMDC` parameter is not included or set to False. Setting `includeMDC` to True will ignore the `:MDCStartDate` setting and return a total count.
-
 ## Files
 
 ### Files read use cases
