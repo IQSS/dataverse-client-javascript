@@ -237,6 +237,22 @@ export const updateFileTabularTags = async (
   )
 }
 
+export const getFileMetadata = async (fileId: number): Promise<AxiosResponse> => {
+  return await axios.get(`${TestConstants.TEST_API_URL}/files/${fileId}/metadata`, {
+    headers: {
+      'X-Dataverse-Key': process.env.TEST_API_KEY
+    }
+  })
+}
+
+export const createFileMetadataWithCategories = (): FileMetadata => {
+  return {
+    categories: ['category1', 'category2'],
+    description: 'description',
+    directoryLabel: 'directoryLabel'
+  }
+}
+
 export const calculateBlobChecksum = (blob: Buffer, checksumAlgorithm: string): string => {
   const hash = crypto.createHash(checksumAlgorithm)
   hash.update(blob)

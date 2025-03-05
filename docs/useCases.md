@@ -1284,6 +1284,33 @@ The following error might arise from the `AddUploadedFileToDataset` use case:
 
 - AddUploadedFileToDatasetError: This error indicates that there was an error while adding the uploaded file to the dataset.
 
+#### Update File Metadata
+
+Updates Metadata of a File.
+
+###### Example call:
+
+```typescript
+import { updateFileMetadata } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId: number | string = 123
+const updateFileMetadataDTO = {
+  description: 'My description bbb.',
+  categories: ['Data'],
+  restrict: false
+}
+
+await updateFileMetadata.execute(fileId, updateFileMetadataDTO).then((fileId) => {
+  console.log(`File updated successfully with file ID: ${fileId}`)
+})
+```
+
+_See [use case](../src/files/domain/useCases/UpdateFileMetadata.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
 #### Delete a File
 
 Deletes a File.
