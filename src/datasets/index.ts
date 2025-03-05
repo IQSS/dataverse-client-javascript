@@ -17,6 +17,7 @@ import { PublishDataset } from './domain/useCases/PublishDataset'
 import { UpdateDataset } from './domain/useCases/UpdateDataset'
 import { GetDatasetVersionDiff } from './domain/useCases/GetDatasetVersionDiff'
 import { DeaccessionDataset } from './domain/useCases/DeaccessionDataset'
+import { GetDatasetVersionsSummaries } from './domain/useCases/GetDatasetVersionsSummaries'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -48,6 +49,7 @@ const updateDataset = new UpdateDataset(
   datasetResourceValidator
 )
 const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
+const getDatasetVersionsSummaries = new GetDatasetVersionsSummaries(datasetsRepository)
 
 export {
   getDataset,
@@ -62,7 +64,8 @@ export {
   publishDataset,
   createDataset,
   updateDataset,
-  deaccessionDataset
+  deaccessionDataset,
+  getDatasetVersionsSummaries
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -92,3 +95,7 @@ export {
 export { DatasetDeaccessionDTO } from './domain/dtos/DatasetDeaccessionDTO'
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers'
 export { VersionUpdateType } from './domain/models/Dataset'
+export {
+  DatasetVersionSummaryInfo,
+  DatasetVersionSummaryStringValues
+} from './domain/models/DatasetVersionSummaryInfo'
