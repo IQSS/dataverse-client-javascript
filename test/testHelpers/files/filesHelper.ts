@@ -251,6 +251,7 @@ export const createFileMetadataWithCategories = (): FileMetadata => {
     description: 'description',
     directoryLabel: 'directoryLabel'
   }
+}
 
 export const calculateBlobChecksum = (blob: Buffer, checksumAlgorithm: string): string => {
   const hash = crypto.createHash(checksumAlgorithm)
