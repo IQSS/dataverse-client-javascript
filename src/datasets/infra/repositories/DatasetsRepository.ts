@@ -249,7 +249,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true,
       queryParams
     )
-      .then((response) => response.data.downloadCount)
+      .then((response) => response.data)
       .catch((error) => {
         throw error
       })

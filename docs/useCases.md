@@ -862,8 +862,6 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetDownloadCount.ts) impl
 The `datasetId` parameter is a number for numeric identifiers.
 The `includeMDC` parameter is optional.
 
-Note:
-
 - Setting `includeMDC` to True will ignore the `MDCStartDate` setting and return a total count.
 - If MDC isn't enabled, the download count will return a total count, without `MDCStartDate`.
 - If MDC is enabled but the `includeMDC` is false, the count will be limited to the time before `MDCStartDate`

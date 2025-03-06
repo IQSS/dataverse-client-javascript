@@ -1030,7 +1030,7 @@ describe('DatasetsRepository', () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/download/count`,
-        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
       )
       expect(actual).toStrictEqual(testDatasetDownloadCount)
     })
@@ -1043,7 +1043,7 @@ describe('DatasetsRepository', () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/download/count`,
-        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
       )
       expect(error).toBeInstanceOf(Error)
     })
