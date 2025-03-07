@@ -1024,7 +1024,7 @@ describe('DatasetsRepository', () => {
       MDCStartDate: '2021-01-01'
     }
     test('should return citation when response is successful', async () => {
-      jest.spyOn(axios, 'get').mockResolvedValue(testDatasetDownloadCount)
+      jest.spyOn(axios, 'get').mockResolvedValue({ data: testDatasetDownloadCount })
 
       const actual = await sut.getDatasetDownloadCount(testDatasetModel.id)
 
