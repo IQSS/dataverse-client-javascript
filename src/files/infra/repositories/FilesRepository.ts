@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IFilesRepository } from '../../domain/repositories/IFilesRepository'
 import { FileModel as FileModel } from '../../domain/models/FileModel'
@@ -20,7 +21,6 @@ import { transformUploadDestinationsResponseToUploadDestination } from './transf
 import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
-import { AxiosResponse } from 'axios'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean

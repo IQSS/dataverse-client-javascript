@@ -332,8 +332,6 @@ describe('Direct Upload', () => {
 
     const replaceResponse = await filesRepositorySut.replaceFile(currentFileId, newUploadedFileDTO)
 
-    console.log({ replaceResponse })
-
     // 4 - Verify that the new file is in the dataset and the old file is not
     datasetFiles = await filesRepositorySut.getDatasetFiles(
       testDataset3Ids.numericId,
