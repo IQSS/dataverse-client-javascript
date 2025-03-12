@@ -1372,7 +1372,7 @@ The `fileId` parameter can be a string, for persistent identifiers, or a number,
 
 The `uploadedFileDTO` parameter is a [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded files. Some of these properties should be calculated from the uploaded File Blob objects and the resulting storage identifiers from the Upload File use case.
 
-The use case returns a number, which is the identifier of the new file
+The use case returns a number, which is the identifier of the new file.
 
 #### Restrict or Unrestrict a File
 
