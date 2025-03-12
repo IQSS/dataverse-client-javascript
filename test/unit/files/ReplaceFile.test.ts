@@ -12,15 +12,15 @@ describe('execute', () => {
     mimeType: 'test/type'
   }
 
-  test('should return undefined on client success', async () => {
+  test('should return file id on client success', async () => {
     const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
-    filesRepositoryStub.replaceFile = jest.fn().mockResolvedValue(undefined)
+    filesRepositoryStub.replaceFile = jest.fn().mockResolvedValue(1)
 
     const sut = new ReplaceFile(filesRepositoryStub)
 
     const actual = await sut.execute(1, testUploadedFileDTO)
 
-    expect(actual).toEqual(undefined)
+    expect(actual).toEqual(1)
   })
 
   test('should return error on client error', async () => {

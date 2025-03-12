@@ -330,7 +330,9 @@ describe('Direct Upload', () => {
       mimeType: newSinglepartFile.type
     }
 
-    await filesRepositorySut.replaceFile(currentFileId, newUploadedFileDTO)
+    const replaceResponse = await filesRepositorySut.replaceFile(currentFileId, newUploadedFileDTO)
+
+    console.log({ replaceResponse })
 
     // 4 - Verify that the new file is in the dataset and the old file is not
     datasetFiles = await filesRepositorySut.getDatasetFiles(
@@ -341,6 +343,7 @@ describe('Direct Upload', () => {
     )
 
     expect(datasetFiles.totalFilesCount).toBe(1)
+    expect(replaceResponse).toBe(currentFileId + 1)
     expect(datasetFiles.files[0].name).toBe('new-singlepart-file')
     expect(datasetFiles.files[0].sizeBytes).toBe(newSinglepartFile.size)
     expect(datasetFiles.files[0].storageIdentifier).toContain('localstack1://mybucket:')

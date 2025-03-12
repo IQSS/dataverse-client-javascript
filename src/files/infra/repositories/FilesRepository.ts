@@ -20,6 +20,7 @@ import { transformUploadDestinationsResponseToUploadDestination } from './transf
 import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
+import { AxiosResponse } from 'axios'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -58,6 +59,10 @@ export interface UploadedFileRequestBody {
 export interface ChecksumRequestBody {
   '@value': string
   '@type': string
+}
+
+type ReplaceFileResponseMinimal = {
+  files: { dataFile: { id: number } }[]
 }
 
 export class FilesRepository extends ApiRepository implements IFilesRepository {
@@ -307,7 +312,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   public async replaceFile(
     fileId: number | string,
     uploadedFileDTO: UploadedFileDTO
-  ): Promise<undefined> {
+  ): Promise<number> {
     const requestBody: UploadedFileRequestBody = {
       fileName: uploadedFileDTO.fileName,
       checksum: {
@@ -332,7 +337,10 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       {},
       ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
     )
-      .then(() => undefined)
+      .then((response: AxiosResponse<{ data: ReplaceFileResponseMinimal }>) => {
+        const fileNumber = response.data.data.files[0].dataFile.id
+        return fileNumber
+      })
       .catch((error) => {
         throw error
       })
