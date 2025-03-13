@@ -10,7 +10,6 @@ export interface FilePayload {
     version: number
     description?: string
     restricted: boolean
-    directoryLabel?: string
     datasetVersionId?: number
     categories?: string[]
     contentType: string
@@ -37,6 +36,7 @@ export interface FilePayload {
   }
   version: number
   restricted: boolean
+  directoryLabel?: string
   label: string
   datasetVersionId: number
 }
