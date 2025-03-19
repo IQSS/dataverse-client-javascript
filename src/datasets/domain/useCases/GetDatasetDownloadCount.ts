@@ -16,7 +16,7 @@ export class GetDatasetDownloadCount implements UseCase<DatasetDownloadCount> {
    * @param {boolean} [includeMDC(optional)] - Indicates whether to consider include counts from MDC start date or not. The default value is false
    * @returns {Promise<DatasetDownloadCount>}
    */
-  async execute(datasetId: number, includeMDC?: boolean): Promise<DatasetDownloadCount> {
+  async execute(datasetId: number | string, includeMDC?: boolean): Promise<DatasetDownloadCount> {
     return await this.datasetsRepository.getDatasetDownloadCount(datasetId, includeMDC)
   }
 }
