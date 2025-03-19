@@ -1106,7 +1106,9 @@ describe('DatasetsRepository', () => {
       expect(actual[1].versionNumber).toBe('1.0')
       expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
-      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      // await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      console.log('od', testDatasetIds.numericId)
+      console.log('X-Dataverse-Key', process.env.TEST_API_KEY)
     })
   })
 

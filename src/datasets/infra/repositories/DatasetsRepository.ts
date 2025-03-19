@@ -239,13 +239,13 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetDownloadCount(
-    datasetId: number,
+    datasetId: number | string,
     includeMDC?: boolean
   ): Promise<DatasetDownloadCount> {
     const queryParams = includeMDC !== undefined ? { includeMDC } : {}
 
     return this.doGet(
-      this.buildApiEndpoint(this.datasetsResourceName, `${datasetId}/download/count`),
+      this.buildApiEndpoint(this.datasetsResourceName, `download/count`, datasetId),
       true,
       queryParams
     )
