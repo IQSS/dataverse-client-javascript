@@ -1106,9 +1106,7 @@ describe('DatasetsRepository', () => {
       expect(actual[1].versionNumber).toBe('1.0')
       expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
-      // await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-      console.log('od', testDatasetIds.numericId)
-      console.log('X-Dataverse-Key', process.env.TEST_API_KEY)
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
   })
 
@@ -1128,6 +1126,16 @@ describe('DatasetsRepository', () => {
       await waitForNoLocks(testDatasetIds.numericId, 10)
 
       const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId, true)
+
+      expect(actual.downloadCount).toBe(0)
+    })
+
+    test('should return download count including MDC data with persistent ID', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const actual = await sut.getDatasetDownloadCount(testDatasetIds.persistentId, true)
 
       expect(actual.downloadCount).toBe(0)
     })

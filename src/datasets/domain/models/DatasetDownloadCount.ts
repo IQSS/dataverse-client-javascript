@@ -1,5 +1,5 @@
 export interface DatasetDownloadCount {
-  id: number
+  id: number | string
   downloadCount: number
   MDCStartDate?: string
 }
