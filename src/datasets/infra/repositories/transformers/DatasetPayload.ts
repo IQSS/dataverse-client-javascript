@@ -5,6 +5,7 @@ export interface DatasetPayload {
   datasetId: number
   datasetPersistentId: string
   id: number
+  internalVersionNumber: number
   versionNumber: number
   versionMinorNumber: number
   versionState: string

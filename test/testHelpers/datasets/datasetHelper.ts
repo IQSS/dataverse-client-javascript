@@ -45,6 +45,7 @@ export const createDatasetModel = (
     id: 1,
     persistentId: 'doi:10.5072/FK2/HC6KTB',
     versionId: 19,
+    internalVersionNumber: 1,
     versionInfo: {
       majorNumber: 1,
       minorNumber: 0,
@@ -128,6 +129,7 @@ export const createDatasetVersionPayload = (
     id: 19,
     datasetId: 1,
     datasetPersistentId: 'doi:10.5072/FK2/HC6KTB',
+    internalVersionNumber: 1,
     versionNumber: 1,
     versionMinorNumber: 0,
     versionState: 'RELEASED',

@@ -5,6 +5,7 @@ export interface Dataset {
   persistentId: string
   versionId: number
   versionInfo: DatasetVersionInfo
+  internalVersionNumber: number
   license?: DatasetLicense
   termsOfUse: TermsOfUse
   alternativePersistentId?: string

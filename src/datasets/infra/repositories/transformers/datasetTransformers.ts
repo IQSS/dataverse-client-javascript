@@ -226,6 +226,7 @@ export const transformVersionPayloadToDataset = (
     id: versionPayload.datasetId,
     versionId: versionPayload.id,
     persistentId: versionPayload.datasetPersistentId,
+    internalVersionNumber: versionPayload.internalVersionNumber,
     versionInfo: {
       majorNumber: versionPayload.versionNumber,
       minorNumber: versionPayload.versionMinorNumber,
