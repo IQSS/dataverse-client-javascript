@@ -26,7 +26,8 @@ import { MetadataBlocksRepository } from '../../../src/metadataBlocks/infra/repo
 import {
   Author,
   DatasetContact,
-  DatasetDescription
+  DatasetDescription,
+  Publication
 } from '../../../src/datasets/domain/models/Dataset'
 import {
   createCollectionViaApi,
@@ -784,7 +785,16 @@ describe('DatasetsRepository', () => {
                   dsDescriptionValue: 'This is the description of the dataset.'
                 }
               ],
-              subject: ['Medicine, Health and Life Sciences']
+              subject: ['Medicine, Health and Life Sciences'],
+              publication: [
+                {
+                  publicationRelationType: 'Cites',
+                  publicationCitation: 'Some related publication citation',
+                  publicationIDType: 'cstr',
+                  publicationIDNumber: 'some identifier'
+                }
+              ],
+              notesText: 'This is a note for the dataset.'
             }
           }
         ]
@@ -794,6 +804,7 @@ describe('DatasetsRepository', () => {
       const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
         'citation'
       )
+
       const createdDataset = await sut.createDataset(
         testDataset,
         [citationMetadataBlock],
@@ -812,9 +823,35 @@ describe('DatasetsRepository', () => {
           .dsDescriptionValue
       ).toBe('This is the description of the dataset.')
 
+      expect(actualCreatedDataset.metadataBlocks[0].fields.notesText as string).toBe(
+        'This is a note for the dataset.'
+      )
+      expect(
+        actualCreatedDataset.metadataBlocks[0].fields.publication as Publication[]
+      ).toStrictEqual([
+        {
+          publicationRelationType: 'Cites',
+          publicationCitation: 'Some related publication citation',
+          publicationIDType: 'cstr',
+          publicationIDNumber: 'some identifier'
+        }
+      ])
+
       const updatedDsDescription = 'This is the updated description of the dataset.'
+      const updatedNotesText = ''
+      const updatedPublication = [
+        {
+          publicationRelationType: '',
+          publicationCitation: 'Some updated related publication citation',
+          publicationIDType: '',
+          publicationIDNumber: ''
+        }
+      ]
+
       testDataset.metadataBlockValues[0].fields.dsDescription[0].dsDescriptionValue =
         updatedDsDescription
+      testDataset.metadataBlockValues[0].fields.notesText = updatedNotesText
+      testDataset.metadataBlockValues[0].fields.publication = updatedPublication
 
       await sut.updateDataset(createdDataset.numericId, testDataset, [citationMetadataBlock])
 
@@ -855,6 +892,12 @@ describe('DatasetsRepository', () => {
         (actualUpdatedDataset.metadataBlocks[0].fields.dsDescription[0] as DatasetDescription)
           .dsDescriptionValue
       ).toBe(updatedDsDescription)
+      expect(actualUpdatedDataset.metadataBlocks[0].fields.notesText as string).toBe(undefined)
+      expect(actualUpdatedDataset.metadataBlocks[0].fields.publication).toStrictEqual([
+        {
+          publicationCitation: 'Some updated related publication citation'
+        }
+      ])
     })
 
     test('should return error when dataset does not exist', async () => {
