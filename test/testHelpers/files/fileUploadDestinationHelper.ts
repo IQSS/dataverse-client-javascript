@@ -1,4 +1,5 @@
 import { FileUploadDestination } from '../../../src/files/domain/models/FileUploadDestination'
+import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import {
   FileMultipartUploadDestinationPayload,
   FileSingleUploadDestinationPayload,
@@ -41,4 +42,13 @@ export const createMultipartFileUploadDestinationModel = (): FileUploadDestinati
   return transformMultipartUploadDestinationsPayloadToMultipartUploadDestinationModel(
     multipartFileUploadDestinationPayload
   )
+}
+
+export const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {
+  const filesRepository = new FilesRepository()
+  const destination = await filesRepository.getFileUploadDestination(testDatasetId, file)
+  destination.urls.forEach((destinationUrl, index) => {
+    destination.urls[index] = destinationUrl.replace('localstack', 'localhost')
+  })
+  return destination
 }

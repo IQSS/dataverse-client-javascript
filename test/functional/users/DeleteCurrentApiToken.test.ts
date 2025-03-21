@@ -24,7 +24,6 @@ describe('execute', () => {
     const testApiToken = await createApiTokenViaApi('deleteCurrentApiTokenFTUser')
     ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, testApiToken)
     await deleteCurrentApiToken.execute()
-    // Since the token has been deleted, the next call using it should return a WriteError
     await expect(deleteCurrentApiToken.execute()).rejects.toBeInstanceOf(WriteError)
   })
 })

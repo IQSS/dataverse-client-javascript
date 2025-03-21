@@ -1,8 +1,9 @@
-import { FileModel as FileModel } from '../../../src/files/domain/models/FileModel'
-import { File, Blob } from '@web-std/file'
+import * as crypto from 'crypto'
 import axios, { AxiosResponse } from 'axios'
-import { TestConstants } from '../TestConstants'
+import { File, Blob } from '@web-std/file'
 import { readFile } from 'fs/promises'
+import { FileModel as FileModel } from '../../../src/files/domain/models/FileModel'
+import { TestConstants } from '../TestConstants'
 import { FilesSubset } from '../../../src/files/domain/models/FilesSubset'
 import { DvObjectType } from '../../../src/core/domain/models/DvObjectOwnerNode'
 import { FilePayload } from '../../../src/files/infra/repositories/transformers/FilePayload'
@@ -80,6 +81,7 @@ export const createFilePayload = (): FilePayload => {
     restricted: false,
     version: 1,
     datasetVersionId: 2,
+    directoryLabel: 'directoryLabel',
     dataFile: {
       id: 1,
       version: 1,
@@ -115,7 +117,6 @@ export const createFilePayload = (): FilePayload => {
         isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
       },
       description: 'description',
-      directoryLabel: 'directoryLabel',
       datasetVersionId: 1,
       originalFormat: 'originalFormat',
       originalSize: 127426,
@@ -234,4 +235,37 @@ export const updateFileTabularTags = async (
       }
     }
   )
+}
+
+export const getFileMetadata = async (fileId: number): Promise<AxiosResponse> => {
+  return await axios.get(`${TestConstants.TEST_API_URL}/files/${fileId}/metadata`, {
+    headers: {
+      'X-Dataverse-Key': process.env.TEST_API_KEY
+    }
+  })
+}
+
+export const createFileMetadataWithCategories = (): FileMetadata => {
+  return {
+    categories: ['category1', 'category2'],
+    description: 'description',
+    directoryLabel: 'directoryLabel'
+  }
+}
+
+export const calculateBlobChecksum = (blob: Buffer, checksumAlgorithm: string): string => {
+  const hash = crypto.createHash(checksumAlgorithm)
+  hash.update(blob)
+  return hash.digest('hex')
+}
+
+export const singlepartFileExistsInBucket = async (fileUrl: string): Promise<boolean> => {
+  return axios
+    .get(fileUrl)
+    .then(() => {
+      return true
+    })
+    .catch(() => {
+      return false
+    })
 }

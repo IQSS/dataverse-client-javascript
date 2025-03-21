@@ -2,7 +2,7 @@ import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { UploadedFileDTO } from '../dtos/UploadedFileDTO'
 import { IFilesRepository } from '../repositories/IFilesRepository'
 
-export class ReplaceFile implements UseCase<void> {
+export class ReplaceFile implements UseCase<number> {
   private filesRepository: IFilesRepository
 
   constructor(filesRepository: IFilesRepository) {
@@ -19,10 +19,10 @@ export class ReplaceFile implements UseCase<void> {
    *
    * @param {number | string} [fileId] - The File identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {UploadedFileDTO} [uploadedFileDTO] - File DTO associated with the uploaded file.
-   * @returns {Promise<void>} A promise that resolves when the file has been successfully replaced.
+   * @returns {Promise<number>} A promise that resolves when the file has been successfully replaced and returns the new file identifier.
    * @throws {WriteError} - If there are errors while writing data.
    */
-  async execute(fileId: number | string, uploadedFileDTO: UploadedFileDTO): Promise<void> {
-    await this.filesRepository.replaceFile(fileId, uploadedFileDTO)
+  async execute(fileId: number | string, uploadedFileDTO: UploadedFileDTO): Promise<number> {
+    return await this.filesRepository.replaceFile(fileId, uploadedFileDTO)
   }
 }

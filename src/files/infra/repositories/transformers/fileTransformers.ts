@@ -44,8 +44,8 @@ const transformFilePayloadToFile = (filePayload: FilePayload): FileModel => {
     ...(filePayload.dataFile.description && { description: filePayload.dataFile.description }),
     restricted: filePayload.restricted,
     latestRestricted: filePayload.dataFile.restricted,
-    ...(filePayload.dataFile.directoryLabel && {
-      directoryLabel: filePayload.dataFile.directoryLabel
+    ...(filePayload.directoryLabel && {
+      directoryLabel: filePayload.directoryLabel
     }),
     ...(filePayload.dataFile.datasetVersionId && {
       datasetVersionId: filePayload.dataFile.datasetVersionId

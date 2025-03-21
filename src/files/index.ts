@@ -14,6 +14,7 @@ import { AddUploadedFilesToDataset } from './domain/useCases/AddUploadedFilesToD
 import { DeleteFile } from './domain/useCases/DeleteFile'
 import { ReplaceFile } from './domain/useCases/ReplaceFile'
 import { RestrictFile } from './domain/useCases/RestrictFile'
+import { UpdateFileMetadata } from './domain/useCases/UpdateFileMetadata'
 
 const filesRepository = new FilesRepository()
 const directUploadClient = new DirectUploadClient(filesRepository)
@@ -32,6 +33,7 @@ const addUploadedFilesToDataset = new AddUploadedFilesToDataset(filesRepository)
 const deleteFile = new DeleteFile(filesRepository)
 const replaceFile = new ReplaceFile(filesRepository)
 const restrictFile = new RestrictFile(filesRepository)
+const updateFileMetadata = new UpdateFileMetadata(filesRepository)
 
 export {
   getDatasetFiles,
@@ -46,8 +48,9 @@ export {
   uploadFile,
   addUploadedFilesToDataset,
   deleteFile,
-  replaceFile,
-  restrictFile
+  restrictFile,
+  updateFileMetadata,
+  replaceFile
 }
 
 export { FileModel as File, FileEmbargo, FileChecksum } from './domain/models/FileModel'
@@ -77,3 +80,4 @@ export { FileDownloadSizeMode } from './domain/models/FileDownloadSizeMode'
 export { FilesSubset } from './domain/models/FilesSubset'
 export { FilePreview, FilePreviewChecksum } from './domain/models/FilePreview'
 export { UploadedFileDTO } from './domain/dtos/UploadedFileDTO'
+export { UpdateFileMetadataDTO } from './domain/dtos/UpdateFileMetadataDTO'
