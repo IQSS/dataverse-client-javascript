@@ -81,6 +81,7 @@ export const createFilePayload = (): FilePayload => {
     restricted: false,
     version: 1,
     datasetVersionId: 2,
+    directoryLabel: 'directoryLabel',
     dataFile: {
       id: 1,
       version: 1,
@@ -116,7 +117,6 @@ export const createFilePayload = (): FilePayload => {
         isPartOf: { type: DvObjectType.DATAVERSE, identifier: 'root', displayName: 'Root' }
       },
       description: 'description',
-      directoryLabel: 'directoryLabel',
       datasetVersionId: 1,
       originalFormat: 'originalFormat',
       originalSize: 127426,

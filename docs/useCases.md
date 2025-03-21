@@ -1359,7 +1359,9 @@ const uploadedFileDTO: UploadedFileDTO = {
   mimeType: 'text/plain'
 }
 
-replaceFile.execute(fileId, uploadedFileDTO)
+replaceFile.execute(fileId, uploadedFileDTO).then((newFileId: number) => {
+  /* ... */
+})
 
 /* ... */
 ```
@@ -1369,6 +1371,8 @@ _See [use case](../src/files/domain/useCases/ReplaceFile.ts) implementation_.
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 The `uploadedFileDTO` parameter is a [UploadedFileDTO](../src/files/domain/dtos/UploadedFileDTO.ts) and includes properties related to the uploaded files. Some of these properties should be calculated from the uploaded File Blob objects and the resulting storage identifiers from the Upload File use case.
+
+The use case returns a number, which is the identifier of the new file.
 
 #### Restrict or Unrestrict a File
 
