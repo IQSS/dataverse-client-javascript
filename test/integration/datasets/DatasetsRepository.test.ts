@@ -1108,8 +1108,43 @@ describe('DatasetsRepository', () => {
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
+  })
+
+  describe('getDatasetDownloadCount', () => {
+    test('should return download count for a dataset', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+      const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId)
+
+      expect(actual.downloadCount).toBe(0)
+    })
+
+    test('should return download count including MDC data', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId, true)
+
+      expect(actual.downloadCount).toBe(0)
+    })
+
+    test('should return download count including MDC data with persistent ID', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const actual = await sut.getDatasetDownloadCount(testDatasetIds.persistentId, true)
+
+      expect(actual.downloadCount).toBe(0)
+    })
 
     test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetDownloadCount(nonExistentTestDatasetId)).rejects.toBeInstanceOf(
+        ReadError
+      )
+
       const expectedError = new ReadError(
         `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
       )
