@@ -222,6 +222,7 @@ describe('DatasetsRepository', () => {
           false
         )
         expect(actual.id).toBe(testDatasetIds.numericId)
+        expect(actual.internalVersionNumber).toBe(1)
       })
 
       test('should return dataset when it is deaccessioned and includeDeaccessioned param is set', async () => {
@@ -881,6 +882,7 @@ describe('DatasetsRepository', () => {
         false
       )
 
+      expect(actualUpdatedDataset.internalVersionNumber).toBe(2)
       expect(actualUpdatedDataset.metadataBlocks[0].fields.title).toBe(
         'Dataset created using the createDataset use case'
       )
@@ -917,6 +919,98 @@ describe('DatasetsRepository', () => {
           publicationCitation: 'Some updated related publication citation'
         }
       ])
+    })
+
+    test('should throw error if trying to update an outdated internal version dataset', async () => {
+      const testDataset = {
+        metadataBlockValues: [
+          {
+            name: 'citation',
+            fields: {
+              title: 'Dataset created using the createDataset use case',
+              author: [
+                {
+                  authorName: 'Admin, Dataverse',
+                  authorAffiliation: 'Dataverse.org'
+                },
+                {
+                  authorName: 'Owner, Dataverse',
+                  authorAffiliation: 'Dataversedemo.org'
+                }
+              ],
+              datasetContact: [
+                {
+                  datasetContactEmail: 'finch@mailinator.com',
+                  datasetContactName: 'Finch, Fiona'
+                }
+              ],
+              dsDescription: [
+                {
+                  dsDescriptionValue: 'This is the description of the dataset.'
+                }
+              ],
+              subject: ['Medicine, Health and Life Sciences']
+            }
+          }
+        ]
+      }
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+
+      const createdDataset = await sut.createDataset(
+        testDataset,
+        [citationMetadataBlock],
+        ROOT_COLLECTION_ALIAS
+      )
+
+      const actualCreatedDataset = await sut.getDataset(
+        createdDataset.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+      const actualCreatedDatasetInternalVersionNumber = actualCreatedDataset.internalVersionNumber
+
+      expect(actualCreatedDataset.internalVersionNumber).toBe(1)
+
+      // Now update the dataset and then update again with the same internal version number
+      const updatedDsDescription = 'This is the updated description of the dataset.'
+      testDataset.metadataBlockValues[0].fields.dsDescription[0].dsDescriptionValue =
+        updatedDsDescription
+
+      // First update sending the correct internal version number
+      await sut.updateDataset(
+        createdDataset.numericId,
+        testDataset,
+        [citationMetadataBlock],
+        actualCreatedDatasetInternalVersionNumber
+      )
+
+      const afterFirstUpdateDataset = await sut.getDataset(
+        createdDataset.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(afterFirstUpdateDataset.internalVersionNumber).toBe(2)
+
+      //Now try to update again with the previous internal version number
+      const expectedError = new WriteError(
+        `[400] Dataset internal version number ${actualCreatedDatasetInternalVersionNumber} is outdated`
+      )
+
+      await expect(
+        sut.updateDataset(
+          createdDataset.numericId,
+          testDataset,
+          [citationMetadataBlock],
+          actualCreatedDatasetInternalVersionNumber
+        )
+      ).rejects.toThrow(expectedError)
     })
 
     test('should return error when dataset does not exist', async () => {
