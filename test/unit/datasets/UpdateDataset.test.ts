@@ -42,7 +42,8 @@ describe('execute', () => {
     expect(datasetsRepositoryStub.updateDataset).toHaveBeenCalledWith(
       1,
       testDataset,
-      testMetadataBlocks
+      testMetadataBlocks,
+      undefined
     )
   })
 
@@ -102,7 +103,8 @@ describe('execute', () => {
     expect(datasetsRepositoryStub.updateDataset).toHaveBeenCalledWith(
       1,
       testDataset,
-      testMetadataBlocks
+      testMetadataBlocks,
+      undefined
     )
   })
 
