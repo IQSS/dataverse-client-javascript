@@ -610,8 +610,8 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionOnly)
       expect(actual.countPerObjectType.dataverses).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(0)
+      expect(actual.countPerObjectType.datasets).toBe(1)
+      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test type dataset
       const collectionSearchCriteriaForDatasetType = new CollectionSearchCriteria().withItemTypes([
@@ -627,9 +627,9 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect(actual.facets).toEqual(expectedFacetsFromDatasetOnly)
-      expect(actual.countPerObjectType.dataverses).toBe(0)
+      expect(actual.countPerObjectType.dataverses).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
+      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test type file
       const collectionSearchCriteriaForFileType = new CollectionSearchCriteria().withItemTypes([
@@ -645,8 +645,8 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect(actual.facets).toEqual(expectedFacetsFromFileOnly)
-      expect(actual.countPerObjectType.dataverses).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(0)
+      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
       // Test multiple types
@@ -666,7 +666,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionAndFile)
       expect(actual.countPerObjectType.dataverses).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(0)
+      expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
       // Test Sort by name ascending
