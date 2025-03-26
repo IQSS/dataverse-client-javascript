@@ -5,6 +5,7 @@ export interface Dataset {
   persistentId: string
   versionId: number
   versionInfo: DatasetVersionInfo
+  internalVersionNumber: number
   license?: DatasetLicense
   termsOfUse: TermsOfUse
   alternativePersistentId?: string
@@ -165,7 +166,7 @@ interface TopicClassification extends DatasetMetadataSubField {
   topicClassVocabURI?: string
 }
 
-interface Publication extends DatasetMetadataSubField {
+export interface Publication extends DatasetMetadataSubField {
   publicationCitation?: string
   publicationIDType?: string
   publicationIDNumber?: string

@@ -23,7 +23,10 @@ export class MetadataFieldValidator extends BaseMetadataFieldValidator {
       this.isEmptyString(metadataFieldValue) ||
       this.isEmptyArray(metadataFieldValue)
     ) {
-      if (metadataFieldInfo.isRequired) {
+      if (
+        metadataFieldInfo.isRequired &&
+        !datasetMetadataFieldAndValueInfo.allowEmptyForConditionallyRequiredField
+      ) {
         throw new EmptyFieldError(
           datasetMetadataFieldAndValueInfo.metadataFieldKey,
           datasetMetadataFieldAndValueInfo.metadataBlockName,
