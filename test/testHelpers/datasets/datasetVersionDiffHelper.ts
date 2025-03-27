@@ -1,3 +1,4 @@
+import { DatasetVersionState } from '../../../src'
 import {
   DatasetVersionDiff,
   VersionSummary,
@@ -11,7 +12,8 @@ import {
 export const createDatasetVersionDiff = (): DatasetVersionDiff => {
   const versionSummary: VersionSummary = {
     versionNumber: '1.0',
-    lastUpdatedDate: '2023-05-15T08:21:03Z'
+    lastUpdatedDate: '2023-05-15T08:21:03Z',
+    versionState: DatasetVersionState.RELEASED
   }
 
   const metadataBlockDiff: MetadataBlockDiff = {
