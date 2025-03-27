@@ -35,7 +35,8 @@ export interface IDatasetsRepository {
   getDatasetVersionDiff(
     datasetId: number | string,
     newVersionId: string,
-    oldVersionId: string
+    oldVersionId: string,
+    includeDeaccessioned: boolean
   ): Promise<DatasetVersionDiff>
   createDataset(
     newDataset: DatasetDTO,

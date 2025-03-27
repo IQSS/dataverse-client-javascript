@@ -491,6 +491,7 @@ describe('DatasetsRepository', () => {
       expect(typeof actualDatasetCitation).toBe('string')
     })
   })
+
   describe('getDatasetVersionDiff', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
@@ -514,7 +515,8 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getDatasetVersionDiff(
         testDatasetIds.numericId,
         '1.0',
-        DatasetNotNumberedVersion.DRAFT
+        DatasetNotNumberedVersion.DRAFT,
+        false
       )
       expect(actual.metadataChanges?.[0]).not.toBeUndefined()
       expect(actual.metadataChanges?.[0].blockName).toEqual('Citation Metadata')
@@ -549,12 +551,13 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getDatasetVersionDiff(
         testDatasetIds.numericId,
         '1.0',
-        DatasetNotNumberedVersion.DRAFT
+        DatasetNotNumberedVersion.DRAFT,
+        false
       )
       expect(actual.filesAdded).toEqual(expectedFilesAdded)
     })
 
-    test('should return  diff between :latestPublished and :draft', async () => {
+    test('should return diff between :latestPublished and :draft', async () => {
       const fileMetadata = {
         description: 'test description',
         directoryLabel: 'directoryLabel',
@@ -583,9 +586,41 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getDatasetVersionDiff(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST_PUBLISHED,
-        DatasetNotNumberedVersion.DRAFT
+        DatasetNotNumberedVersion.DRAFT,
+        false
       )
       expect(actual.filesAdded).toEqual(expectedFilesAdded)
+    })
+
+    test('should return diff between :latestPublished deaccessioned and :draft when includeDeaccessioned param is true', async () => {
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
+
+      // Update dataset
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+
+      await sut.updateDataset(testDatasetIds.numericId, TEST_DIFF_DATASET_DTO, [
+        citationMetadataBlock
+      ])
+
+      const actual = await sut.getDatasetVersionDiff(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST_PUBLISHED,
+        DatasetNotNumberedVersion.DRAFT,
+        true
+      )
+
+      expect(actual).not.toBeUndefined()
+      expect(actual.oldVersion.versionState).toBe('DEACCESSIONED')
+      expect(actual.oldVersion.versionNumber).toBe('1.0')
+
+      expect(actual.newVersion.versionState).toBe('DRAFT')
+      expect(actual.newVersion.versionNumber).toBe('DRAFT')
+
+      expect(actual.metadataChanges?.[0]).not.toBeUndefined()
+      expect(actual.metadataChanges?.[0].blockName).toEqual('Citation Metadata')
     })
 
     afterEach(async () => {

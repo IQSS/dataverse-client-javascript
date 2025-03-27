@@ -14,16 +14,19 @@ export class GetDatasetVersionDiff implements UseCase<DatasetVersionDiff> {
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {string } [oldVersionId] - The dataset version identifier, which can be a version-specific numeric string (for example, 1.0) or a DatasetNotNumberedVersion enum value.
    * @param {string } [newVersionId] - The dataset version identifier, which can be a version-specific numeric string (for example, 1.0) or a DatasetNotNumberedVersion enum value.
+   * @param {boolean} [includeDeaccessioned=false] - Indicates if you want to include deaccessioned dataset versions. The default value is false
    */
   async execute(
     datasetId: number | string,
     oldVersionId: string,
-    newVersionId: string
+    newVersionId: string,
+    includeDeaccessioned = false
   ): Promise<DatasetVersionDiff> {
     return await this.datasetsRepository.getDatasetVersionDiff(
       datasetId,
       oldVersionId,
-      newVersionId
+      newVersionId,
+      includeDeaccessioned
     )
   }
 }
