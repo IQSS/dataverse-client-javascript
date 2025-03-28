@@ -1280,6 +1280,16 @@ describe('DatasetsRepository', () => {
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new ReadError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(sut.getDatasetVersionsSummaries(nonExistentTestDatasetId)).rejects.toThrow(
+        expectedError
+      )
+    })
   })
 
   describe('getDatasetDownloadCount', () => {
@@ -1315,14 +1325,6 @@ describe('DatasetsRepository', () => {
     test('should return error when dataset does not exist', async () => {
       await expect(sut.getDatasetDownloadCount(nonExistentTestDatasetId)).rejects.toBeInstanceOf(
         ReadError
-      )
-
-      const expectedError = new ReadError(
-        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
-      )
-
-      await expect(sut.getDatasetVersionsSummaries(nonExistentTestDatasetId)).rejects.toThrow(
-        expectedError
       )
     })
   })
