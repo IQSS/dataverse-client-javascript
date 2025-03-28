@@ -2,9 +2,9 @@ import config from './jest.config'
 
 config.modulePathIgnorePatterns = [
   '<rootDir>/test/unit',
-  '<rootDir>/test/integration',
-  '<rootDir>/test/check-remaining-data'
+  '<rootDir>/test/functional',
+  '<rootDir>/test/integration'
 ]
-console.log('RUNNING FUNCTIONAL TESTS')
+console.log('RUNNING TESTS TO GET FILE COUNTS')
 
 export default config
