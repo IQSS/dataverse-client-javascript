@@ -595,7 +595,6 @@ describe('DatasetsRepository', () => {
     test('should return diff between :latestPublished deaccessioned and :draft when includeDeaccessioned param is true', async () => {
       await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
 
-      // Update dataset
       const metadataBlocksRepository = new MetadataBlocksRepository()
       const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
         'citation'
