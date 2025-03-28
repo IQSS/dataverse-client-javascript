@@ -1293,30 +1293,39 @@ describe('DatasetsRepository', () => {
   })
 
   describe('getDatasetDownloadCount', () => {
-    test('should return download count for a dataset', async () => {
-      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    const testGetDatasetDownloadCountCollectionAlias = 'testGetDatasetDownloadCountCollection'
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testGetDatasetDownloadCountCollectionAlias)
+      await publishCollectionViaApi(testGetDatasetDownloadCountCollectionAlias)
+      testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testGetDatasetDownloadCountCollectionAlias
+      )
+
       await publishDatasetViaApi(testDatasetIds.numericId)
       await waitForNoLocks(testDatasetIds.numericId, 10)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testGetDatasetDownloadCountCollectionAlias)
+    })
+
+    test('should return download count for a dataset', async () => {
       const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId)
 
       expect(actual.downloadCount).toBe(0)
     })
 
     test('should return download count including MDC data', async () => {
-      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      await publishDatasetViaApi(testDatasetIds.numericId)
-      await waitForNoLocks(testDatasetIds.numericId, 10)
-
       const actual = await sut.getDatasetDownloadCount(testDatasetIds.numericId, true)
 
       expect(actual.downloadCount).toBe(0)
     })
 
     test('should return download count including MDC data with persistent ID', async () => {
-      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      await publishDatasetViaApi(testDatasetIds.numericId)
-      await waitForNoLocks(testDatasetIds.numericId, 10)
-
       const actual = await sut.getDatasetDownloadCount(testDatasetIds.persistentId, true)
 
       expect(actual.downloadCount).toBe(0)
