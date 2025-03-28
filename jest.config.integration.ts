@@ -1,10 +1,6 @@
 import config from './jest.config'
 
-config.modulePathIgnorePatterns = [
-  '<rootDir>/test/unit',
-  '<rootDir>/test/functional',
-  '<rootDir>/test/check-remaining-data'
-]
+config.modulePathIgnorePatterns = ['<rootDir>/test/unit', '<rootDir>/test/functional']
 console.log('RUNNING INTEGRATION TESTS')
 
 export default config

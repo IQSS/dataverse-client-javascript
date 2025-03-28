@@ -9,8 +9,7 @@
     "jest.config.integration.ts",
     "jest.config.ts",
     "jest.config.unit.ts",
-    "jest.config.functional.ts",
-    "jest.config.check-remaining-data.ts"
+    "jest.config.functional.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }
