@@ -350,13 +350,12 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
   public async restrictFile(
     fileId: number | string,
     restrictFileDTO: RestrictFileDTO
-  ): Promise<string> {
+  ): Promise<void> {
     return this.doPut(
       this.buildApiEndpoint(this.filesResourceName, 'restrict', fileId),
       restrictFileDTO
     )
       .then((response) => {
-        console.log('test', response.data.data.message)
         return response.data.data.message
       })
       .catch((error) => {

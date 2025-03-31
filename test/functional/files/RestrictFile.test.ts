@@ -4,7 +4,8 @@ import {
   CreatedDatasetIdentifiers,
   restrictFile,
   getDatasetFiles,
-  WriteError
+  WriteError,
+  getDataset
 } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import {
@@ -69,6 +70,32 @@ describe('execute', () => {
     }
   })
 
+  test('should successfully restrict a file with terms of use', async () => {
+    try {
+      const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+
+      await restrictFile.execute(datasetFiles.files[0].id, {
+        restrict: true,
+        enableAccessRequest: false,
+        termsOfAccess: 'This file is restricted for testing purposes'
+      })
+    } catch (error) {
+      throw new Error('File should be restricted')
+    } finally {
+      const datasetFilesAfterRestriction = await getDatasetFiles.execute(testDatasetIds.numericId)
+
+      expect(datasetFilesAfterRestriction.files[0].restricted).toEqual(true)
+
+      const dataset = await getDataset.execute(testDatasetIds.numericId)
+
+      expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toEqual(
+        'This file is restricted for testing purposes'
+      )
+
+      await restrictFile.execute(datasetFilesAfterRestriction.files[0].id, { restrict: false })
+    }
+  })
+
   test('should succesfully unrestrict a file', async () => {
     try {
       const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
@@ -124,7 +151,8 @@ describe('execute', () => {
 
     expect(caughtError).toBeInstanceOf(WriteError)
     expect((caughtError as WriteError).message).toEqual(
-      'There was an error when writing the resource. Reason was: [409] Terms of Use and Access are invalid. You must enable request access or add terms of access in datasets with restricted files.'
+      new WriteError().message +
+        ' Reason was: [409] Terms of Use and Access are invalid. You must enable request access or add terms of access in datasets with restricted files.'
     )
   })
 })

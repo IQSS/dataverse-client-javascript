@@ -66,7 +66,7 @@ export interface IFilesRepository {
 
   replaceFile(fileId: number | string, uploadedFileDTO: UploadedFileDTO): Promise<number>
 
-  restrictFile(fileId: number | string, restrictFileDTO: RestrictFileDTO): Promise<string>
+  restrictFile(fileId: number | string, restrictFileDTO: RestrictFileDTO): Promise<void>
 
   updateFileMetadata(
     fileId: number | string,

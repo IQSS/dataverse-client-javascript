@@ -1420,8 +1420,8 @@ import { restrictFile } from '@iqss/dataverse-client-javascript'
 const fileId = 12345
 const restrictFileDTO = {
   restrict: true,
-  enableAccessRequest: boolean,
-  termsOfAccess: string
+  enableAccessRequest: false,
+  termsOfAccess: 'terms of access'
 }
 
 restrictFile.execute(fileId, restrictFileDTO)

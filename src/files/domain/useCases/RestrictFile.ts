@@ -1,8 +1,8 @@
 import { IFilesRepository } from '../repositories/IFilesRepository'
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { RestrictFileDTO } from '../dtos/RestrictFileDTO'
-// https://github.com/IQSS/dataverse/pull/11349/files
-export class RestrictFile implements UseCase<string> {
+
+export class RestrictFile implements UseCase<void> {
   constructor(private readonly filesRepository: IFilesRepository) {}
 
   /**
@@ -14,7 +14,7 @@ export class RestrictFile implements UseCase<string> {
    * @returns {Promise<void>} -This method does not return anything upon successful completion.
    */
 
-  async execute(fileId: number | string, restrictFileDTO: RestrictFileDTO): Promise<string> {
+  async execute(fileId: number | string, restrictFileDTO: RestrictFileDTO): Promise<void> {
     return await this.filesRepository.restrictFile(fileId, restrictFileDTO)
   }
 }

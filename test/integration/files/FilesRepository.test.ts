@@ -901,5 +901,25 @@ describe('FilesRepository', () => {
 
       await expect(setFileToRestricted(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
+
+    test('should return error when the terms of use is empty while enableAccess is false', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      const errorExpected = new WriteError(
+        `[409] Terms of Use and Access are invalid. You must enable request access or add terms of access in datasets with restricted files.`
+      )
+
+      await expect(
+        sut.restrictFile(datasetFiles.files[0].id, {
+          restrict: true,
+          enableAccessRequest: false
+        })
+      ).rejects.toThrow(errorExpected)
+    })
   })
 })
