@@ -593,6 +593,8 @@ The `datasetId` parameter can be a string, for persistent identifiers, or a numb
 
 The `oldVersion` and `newVersion` parameters specify the versions of the dataset to compare.
 
+There is an optional third parameter called `includeDeaccessioned`, by default, deaccessioned dataset versions are not included in the search when applying the `:latest` or `:latest-published` identifiers. If not set, the default value is `false`.
+
 #### List All Datasets
 
 Returns an instance of [DatasetPreviewSubset](../src/datasets/domain/models/DatasetPreviewSubset.ts) that contains reduced information for each dataset that the calling user can access in the installation.

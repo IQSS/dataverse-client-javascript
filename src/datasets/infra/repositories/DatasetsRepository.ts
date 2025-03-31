@@ -149,7 +149,8 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async getDatasetVersionDiff(
     datasetId: string | number,
     oldVersionId: string,
-    newVersionId: string
+    newVersionId: string,
+    includeDeaccessioned: boolean
   ): Promise<DatasetVersionDiff> {
     return this.doGet(
       this.buildApiEndpoint(
@@ -157,7 +158,10 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         `versions/${oldVersionId}/compare/${newVersionId}`,
         datasetId
       ),
-      true
+      true,
+      {
+        includeDeaccessioned
+      }
     )
       .then((response) => transformDatasetVersionDiffResponseToDatasetVersionDiff(response))
       .catch((error) => {
