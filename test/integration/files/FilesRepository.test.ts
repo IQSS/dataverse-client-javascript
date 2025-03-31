@@ -42,9 +42,11 @@ import {
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { RestrictFileDTO } from '../../../src/files/domain/dtos/RestrictFileDTO'
+import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
+  const sutDataset: DatasetsRepository = new DatasetsRepository()
 
   let testDatasetIds: CreatedDatasetIdentifiers
 
@@ -773,10 +775,7 @@ describe('FilesRepository', () => {
       termsOfAccess: 'This file is restricted for testing purposes'
     }
 
-    const unrestrictFileDTO: RestrictFileDTO = {
-      restrict: false,
-      termsOfAccess: 'This file is restricted for testing purposes'
-    }
+    const unrestrictFileDTO: RestrictFileDTO = { restrict: false }
 
     const setFileToRestricted = async (fileId: number) => {
       await sut.restrictFile(fileId, restrictFileDTO)
@@ -797,11 +796,15 @@ describe('FilesRepository', () => {
       })
     })
 
-    afterEach(async () => {
-      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
-    })
+    test('should successfully restrict a file enabling access request', async () => {
+      await publishDatasetViaApi(restrictFileDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
 
-    test('should successfully restrict a file', async () => {
+      await waitForNoLocks(restrictFileDatasetIds.numericId, 10).catch(() => {
+        throw new Error('Error while waiting for no locks')
+      })
+
       const datasetFiles = await sut.getDatasetFiles(
         restrictFileDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
@@ -820,10 +823,22 @@ describe('FilesRepository', () => {
         FileOrderCriteria.NAME_AZ
       )
 
-      expect(datasetFilesAfterRestrict.files[0].restricted).toEqual(true)
+      expect(datasetFilesAfterRestrict.files[0].restricted).toEqual(restrictFileDTO.restrict)
 
-      // Unrestrict the file Just in case to avoid conflicts with other tests
-      await setFileToUnrestricted(datasetFiles.files[0].id)
+      const dataset = await sutDataset.getDataset(
+        restrictFileDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+      expect(datasetFilesAfterRestrict.files[0].fileAccessRequest).toEqual(
+        restrictFileDTO.enableAccessRequest
+      )
+      expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toEqual(
+        restrictFileDTO.termsOfAccess
+      )
+
+      await deletePublishedDatasetViaApi(restrictFileDatasetIds.persistentId)
     })
 
     test('should successfully unrestrict a file', async () => {
@@ -857,6 +872,8 @@ describe('FilesRepository', () => {
       )
 
       expect(datasetFilesAfterUnrestrict.files[0].restricted).toEqual(false)
+
+      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
     })
 
     test('should return error when file was already restricted', async () => {
@@ -877,6 +894,8 @@ describe('FilesRepository', () => {
 
       // Unrestrict the file Just in case to avoid conflicts with other tests
       await setFileToUnrestricted(datasetFiles.files[0].id)
+
+      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
     })
 
     test('should return error when files was already unrestricted', async () => {
@@ -892,6 +911,8 @@ describe('FilesRepository', () => {
       )
 
       await expect(setFileToUnrestricted(datasetFiles.files[0].id)).rejects.toThrow(expectedError)
+
+      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
     })
 
     test('should return error when file does not exist', async () => {
@@ -900,6 +921,8 @@ describe('FilesRepository', () => {
       )
 
       await expect(setFileToRestricted(nonExistentFiledId)).rejects.toThrow(expectedError)
+
+      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
     })
 
     test('should return error when the terms of use is empty while enableAccess is false', async () => {
@@ -920,6 +943,8 @@ describe('FilesRepository', () => {
           enableAccessRequest: false
         })
       ).rejects.toThrow(errorExpected)
+
+      await deleteUnpublishedDatasetViaApi(restrictFileDatasetIds.numericId)
     })
   })
 })
