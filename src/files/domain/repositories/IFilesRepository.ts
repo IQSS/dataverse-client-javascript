@@ -9,6 +9,7 @@ import { Dataset } from '../../../datasets'
 import { FileUploadDestination } from '../models/FileUploadDestination'
 import { UploadedFileDTO } from '../dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../dtos/UpdateFileMetadataDTO'
+import { RestrictFileDTO } from '../dtos/RestrictFileDTO'
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -65,7 +66,8 @@ export interface IFilesRepository {
 
   replaceFile(fileId: number | string, uploadedFileDTO: UploadedFileDTO): Promise<number>
 
-  restrictFile(fileId: number | string, restrict: boolean): Promise<undefined>
+  restrictFile(fileId: number | string, restrictFileDTO: RestrictFileDTO): Promise<string>
+
   updateFileMetadata(
     fileId: number | string,
     updateFileMetadataDTO: UpdateFileMetadataDTO

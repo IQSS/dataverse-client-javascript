@@ -41,6 +41,7 @@ import {
   deleteCollectionViaApi,
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
+import { RestrictFileDTO } from '../../../src/files/domain/dtos/RestrictFileDTO'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -766,13 +767,23 @@ describe('FilesRepository', () => {
   describe('restrictFile', () => {
     let restrictFileDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'
+    const restrictFileDTO: RestrictFileDTO = {
+      restrict: true,
+      enableAccessRequest: true,
+      termsOfAccess: 'This file is restricted for testing purposes'
+    }
+
+    const unrestrictFileDTO: RestrictFileDTO = {
+      restrict: false,
+      termsOfAccess: 'This file is restricted for testing purposes'
+    }
 
     const setFileToRestricted = async (fileId: number) => {
-      await sut.restrictFile(fileId, true)
+      await sut.restrictFile(fileId, restrictFileDTO)
     }
 
     const setFileToUnrestricted = async (fileId: number) => {
-      await sut.restrictFile(fileId, false)
+      await sut.restrictFile(fileId, unrestrictFileDTO)
     }
 
     beforeEach(async () => {
