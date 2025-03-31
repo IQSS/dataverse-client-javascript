@@ -159,7 +159,7 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
   /**
    * This method allows setting empty values for conditionally required child fields.
    * A child field is conditionally required if it is required and its parent field is not required.
-   * The childfield should be required only if any of its sibling fields has a value, otherwise it should be optional.
+   * The child field should be required only if any of its sibling fields has a value, otherwise it should be optional.
    */
 
   private allowEmptyValueForConditionallyRequiredField(

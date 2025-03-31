@@ -18,6 +18,7 @@ import { transformDatasetLocksResponseToDatasetLocks } from './transformers/data
 import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transformers/datasetPreviewsTransformers'
 import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
+import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
 
 export interface GetAllDatasetPreviewsQueryParams {
@@ -238,6 +239,23 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       deaccessionDTO
     )
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetDownloadCount(
+    datasetId: number | string,
+    includeMDC?: boolean
+  ): Promise<DatasetDownloadCount> {
+    const queryParams = includeMDC !== undefined ? { includeMDC } : {}
+
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, `download/count`, datasetId),
+      true,
+      queryParams
+    )
+      .then((response) => response.data)
       .catch((error) => {
         throw error
       })
