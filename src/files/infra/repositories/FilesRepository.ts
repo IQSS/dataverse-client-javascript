@@ -21,6 +21,7 @@ import { transformUploadDestinationsResponseToUploadDestination } from './transf
 import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
+import { RestrictFileDTO } from '../../domain/dtos/RestrictFileDTO'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -346,9 +347,17 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       })
   }
 
-  public async restrictFile(fileId: number | string, restrict: boolean): Promise<undefined> {
-    return this.doPut(this.buildApiEndpoint(this.filesResourceName, 'restrict', fileId), restrict)
-      .then(() => undefined)
+  public async restrictFile(
+    fileId: number | string,
+    restrictFileDTO: RestrictFileDTO
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.filesResourceName, 'restrict', fileId),
+      restrictFileDTO
+    )
+      .then((response) => {
+        return response.data.data.message
+      })
       .catch((error) => {
         throw error
       })

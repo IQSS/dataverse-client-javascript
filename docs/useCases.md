@@ -1410,7 +1410,7 @@ The use case returns a number, which is the identifier of the new file.
 
 #### Restrict or Unrestrict a File
 
-Restrict or unrestrict an existing file.
+Restrict or unrestrict an existing file, given a [RestrictFileDTO](../src/users/domain/dtos/RestrictFileDTO.ts)
 
 ##### Example call:
 
@@ -1420,8 +1420,13 @@ import { restrictFile } from '@iqss/dataverse-client-javascript'
 /* ... */
 
 const fileId = 12345
+const restrictFileDTO = {
+  restrict: true,
+  enableAccessRequest: false,
+  termsOfAccess: 'terms of access'
+}
 
-restrictFile.execute(fileId, true)
+restrictFile.execute(fileId, restrictFileDTO)
 
 /* ... */
 ```
@@ -1429,6 +1434,9 @@ restrictFile.execute(fileId, true)
 _See [use case](../src/files/domain/useCases/RestrictFile.ts) implementation_.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+If restrict is false then enableAccessRequest and termsOfAccess are ignored
+If restrict is true and enableAccessRequest is false then termsOfAccess is required.
+The enableAccessRequest and termsOfAccess are applied to the Draft version of the Dataset and affect all of the restricted files in said Draft version.
 
 ## Metadata Blocks
 
