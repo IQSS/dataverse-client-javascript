@@ -1,4 +1,6 @@
 export interface UpdateFileMetadataDTO {
+  label?: string
+  directoryLabel?: string
   description?: string
   prevFreeform?: string
   categories?: string[]

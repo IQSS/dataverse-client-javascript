@@ -55,6 +55,7 @@ The different use cases currently available in the package are classified below,
     - [Delete a File](#delete-a-file)
     - [Replace a File](#replace-a-file)
     - [Restrict or Unrestrict a File](#restrict-or-unrestrict-a-file)
+    - [Update File Metadata](#update-file-metadata)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
@@ -1331,6 +1332,8 @@ import { updateFileMetadata } from '@iqss/dataverse-client-javascript'
 
 const fileId: number | string = 123
 const updateFileMetadataDTO = {
+  label: 'myfile.txt',
+  directoryLabel: 'mydir',
   description: 'My description bbb.',
   categories: ['Data'],
   restrict: false
