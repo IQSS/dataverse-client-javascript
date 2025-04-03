@@ -74,6 +74,6 @@ export const createDatasetVersionDiff = (): DatasetVersionDiff => {
     filesRemoved: [fileSummary],
     fileChanges: [fileDiff],
     filesReplaced: [fileReplacement],
-    termsOfAccess: [fieldDiff]
+    termsOfAccess: { changed: [fieldDiff] }
   }
 }
