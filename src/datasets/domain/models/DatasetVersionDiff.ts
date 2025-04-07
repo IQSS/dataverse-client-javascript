@@ -8,7 +8,9 @@ export interface DatasetVersionDiff {
   filesRemoved?: FileSummary[]
   fileChanges?: FileDiff[]
   filesReplaced?: FileReplacement[]
-  termsOfAccess?: FieldDiff[]
+  termsOfAccess?: {
+    changed: FieldDiff[]
+  }
 }
 
 export interface FileSummary {

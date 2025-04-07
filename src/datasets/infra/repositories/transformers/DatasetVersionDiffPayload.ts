@@ -6,7 +6,7 @@ export interface DatasetVersionDiffPayload {
   filesRemoved: FileSummaryPayload[]
   fileChanges: FileDiffPayload[]
   filesReplaced: FileReplacementPayload[]
-  TermsOfAccess: FieldDiffPayload[]
+  TermsOfAccess: { changed: FieldDiffPayload[] }
 }
 
 export interface FileSummaryPayload {
