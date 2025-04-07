@@ -655,6 +655,8 @@ describe('FilesRepository', () => {
       const testFileMetadata = {
         description: 'My description test.',
         categories: ['Data'],
+        label: 'myfile.txt',
+        directoryLabel: 'mydir',
         restrict: false
       }
 
@@ -670,6 +672,8 @@ describe('FilesRepository', () => {
 
       expect(fileInfo.description).toBe(testFileMetadata.description)
       expect(fileInfo.categories).toEqual(testFileMetadata.categories)
+      expect(fileInfo.name).toBe(testFileMetadata.label)
+      expect(fileInfo.directoryLabel).toBe(testFileMetadata.directoryLabel)
       expect(fileInfo.restricted).toBe(testFileMetadata.restrict)
     })
 
