@@ -1345,6 +1345,53 @@ _See [use case](../src/files/domain/useCases/UpdateFileMetadata.ts) implementati
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
+#### Update File Categories
+
+Updates Categories of a File.
+
+###### Example call:
+
+```typescript
+import { updateFileCategories } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId: number | string = 123
+const categories = ['category 1', 'category 1']
+const replace = true
+
+await updateFileCategories.execute(fileId, categories, replace).then((fileId) => {
+  console.log(`File updated successfully with file ID: ${fileId}`)
+})
+```
+
+_See [use case](../src/files/domain/useCases/updateFileCategories.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Update File Tabular Tags
+
+Updates Tabular Tags of a File.
+
+###### Example call:
+
+```typescript
+import { updateFileTabularTags } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId: number | string = 123
+const tabularTags = ['Surveys']
+
+await updateFileTabularTags.execute(fileId, tabularTags, replace).then((fileId) => {
+  console.log(`File updated successfully with file ID: ${fileId}`)
+})
+```
+
+_See [use case](../src/files/domain/useCases/updateFileTabularTags.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
 #### Delete a File
 
 Deletes a File.

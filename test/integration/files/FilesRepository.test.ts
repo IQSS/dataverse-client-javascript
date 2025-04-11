@@ -687,6 +687,76 @@ describe('FilesRepository', () => {
     })
   })
 
+  describe('updateFileTabularTags', () => {
+    test('should add a new file tabularTags', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        testDatasetIds.persistentId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const tabularDatasetId = datasetFiles.files[3].id
+      const tag = ['Survey']
+
+      const actual = await sut.updateFileTabularTags(tabularDatasetId, tag)
+
+      expect(actual).toBeUndefined()
+    })
+
+    test('should replace file tabular Tags to new', async () => {
+      const datasetFiles = await sut.getDatasetFiles(
+        testDatasetIds.persistentId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const tabularDatasetId = datasetFiles.files[3].id
+      const tag = ['Survey']
+
+      const actual = await sut.updateFileTabularTags(tabularDatasetId, tag, true)
+
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error when file does not exist', async () => {
+      const tag = ['Data']
+
+      const errorExpected = new WriteError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+      await expect(sut.updateFileCategories(nonExistentFiledId, tag, false)).rejects.toThrow(
+        errorExpected
+      )
+    })
+  })
+
+  describe('updateFileCategories', () => {
+    test('should update file categories when file exists', async () => {
+      const categories = ['Data']
+
+      const actual = await sut.updateFileCategories(testFileId, categories)
+
+      expect(actual).toBeUndefined()
+    })
+
+    test('should replace file categories when file exists', async () => {
+      const categories = ['Data']
+
+      const actual = await sut.updateFileCategories(testFileId, categories, true)
+
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error when file does not exist', async () => {
+      const categories = ['Data']
+
+      const errorExpected = new WriteError(`[404] File with ID ${nonExistentFiledId} not found`)
+
+      await expect(sut.updateFileCategories(nonExistentFiledId, categories, false)).rejects.toThrow(
+        errorExpected
+      )
+    })
+  })
+
   describe('deleteFile', () => {
     let deleFileTestDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'

@@ -15,6 +15,8 @@ import { DeleteFile } from './domain/useCases/DeleteFile'
 import { ReplaceFile } from './domain/useCases/ReplaceFile'
 import { RestrictFile } from './domain/useCases/RestrictFile'
 import { UpdateFileMetadata } from './domain/useCases/UpdateFileMetadata'
+import { UpdateFileTabularTags } from './domain/useCases/UpdateFileTabularTags'
+import { UpdateFileCategories } from './domain/useCases/UpdateFileCategories'
 
 const filesRepository = new FilesRepository()
 const directUploadClient = new DirectUploadClient(filesRepository)
@@ -34,6 +36,8 @@ const deleteFile = new DeleteFile(filesRepository)
 const replaceFile = new ReplaceFile(filesRepository)
 const restrictFile = new RestrictFile(filesRepository)
 const updateFileMetadata = new UpdateFileMetadata(filesRepository)
+const updateFileTabularTags = new UpdateFileTabularTags(filesRepository)
+const updateFileCategories = new UpdateFileCategories(filesRepository)
 
 export {
   getDatasetFiles,
@@ -50,6 +54,8 @@ export {
   deleteFile,
   restrictFile,
   updateFileMetadata,
+  updateFileTabularTags,
+  updateFileCategories,
   replaceFile
 }
 

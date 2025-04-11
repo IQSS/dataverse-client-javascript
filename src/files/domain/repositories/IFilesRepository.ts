@@ -72,4 +72,16 @@ export interface IFilesRepository {
     fileId: number | string,
     updateFileMetadataDTO: UpdateFileMetadataDTO
   ): Promise<void>
+
+  updateFileTabularTags(
+    fileId: number | string,
+    tabularTags: string[],
+    replace?: boolean
+  ): Promise<void>
+
+  updateFileCategories(
+    fileId: number | string,
+    categories: string[],
+    replace?: boolean
+  ): Promise<void>
 }
