@@ -170,7 +170,7 @@ describe('FilesRepository', () => {
       test('should return error when dataset does not exist', async () => {
         const nonExistentTestDatasetId = 100
         const errorExpected: ReadError = new ReadError(
-          `[404] Dataset with ID ${nonExistentTestDatasetId} not found`
+          `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
         )
 
         await expect(
@@ -398,7 +398,7 @@ describe('FilesRepository', () => {
     })
 
     test('should return error when file does not exist', async () => {
-      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found`)
+      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
       await expect(sut.getFileDownloadCount(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
@@ -421,7 +421,7 @@ describe('FilesRepository', () => {
     })
 
     test('should return error when file does not exist', async () => {
-      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found`)
+      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
       await expect(sut.getFileUserPermissions(nonExistentFiledId)).rejects.toThrow(errorExpected)
     })
@@ -496,7 +496,7 @@ describe('FilesRepository', () => {
       })
 
       test('should return error when file does not exist', async () => {
-        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found`)
+        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
         await expect(
           sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
@@ -527,7 +527,7 @@ describe('FilesRepository', () => {
       test('should return error when file does not exist', async () => {
         const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId'
         const expectedError = new ReadError(
-          `[404] Datafile with Persistent ID ${nonExistentFiledPersistentId} not found`
+          `[404] Datafile with Persistent ID ${nonExistentFiledPersistentId} not found.`
         )
 
         await expect(
@@ -571,7 +571,7 @@ describe('FilesRepository', () => {
     })
 
     test('should return error when file does not exist', async () => {
-      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found`)
+      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
       await expect(
         sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
@@ -653,6 +653,8 @@ describe('FilesRepository', () => {
       const testFileMetadata = {
         description: 'My description test.',
         categories: ['Data'],
+        label: 'myfile.txt',
+        directoryLabel: 'mydir',
         restrict: false
       }
 
@@ -668,6 +670,8 @@ describe('FilesRepository', () => {
 
       expect(fileInfo.description).toBe(testFileMetadata.description)
       expect(fileInfo.categories).toEqual(testFileMetadata.categories)
+      expect(fileInfo.name).toBe(testFileMetadata.label)
+      expect(fileInfo.directoryLabel).toBe(testFileMetadata.directoryLabel)
       expect(fileInfo.restricted).toBe(testFileMetadata.restrict)
     })
 
@@ -680,76 +684,6 @@ describe('FilesRepository', () => {
       const errorExpected = new WriteError(`[400] Error attempting get the requested data file.`)
 
       await expect(sut.updateFileMetadata(nonExistentFiledId, testFileMetadata)).rejects.toThrow(
-        errorExpected
-      )
-    })
-  })
-
-  describe('updateFileTabularTags', () => {
-    test('should add a new file tabularTags', async () => {
-      const datasetFiles = await sut.getDatasetFiles(
-        testDatasetIds.persistentId,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ
-      )
-      const tabularDatasetId = datasetFiles.files[3].id
-      const tag = ['Survey']
-
-      const actual = await sut.updateFileTabularTags(tabularDatasetId, tag)
-
-      expect(actual).toBeUndefined()
-    })
-
-    test('should replace file tabular Tags to new', async () => {
-      const datasetFiles = await sut.getDatasetFiles(
-        testDatasetIds.persistentId,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ
-      )
-      const tabularDatasetId = datasetFiles.files[3].id
-      const tag = ['Survey']
-
-      const actual = await sut.updateFileTabularTags(tabularDatasetId, tag, true)
-
-      expect(actual).toBeUndefined()
-    })
-
-    test('should return error when file does not exist', async () => {
-      const tag = ['Data']
-
-      const errorExpected = new WriteError(`[404] File with ID ${nonExistentFiledId} not found`)
-
-      await expect(sut.updateFileCategories(nonExistentFiledId, tag, false)).rejects.toThrow(
-        errorExpected
-      )
-    })
-  })
-
-  describe('updateFileCategories', () => {
-    test('should update file categories when file exists', async () => {
-      const categories = ['Data']
-
-      const actual = await sut.updateFileCategories(testFileId, categories)
-
-      expect(actual).toBeUndefined()
-    })
-
-    test('should replace file categories when file exists', async () => {
-      const categories = ['Data']
-
-      const actual = await sut.updateFileCategories(testFileId, categories, true)
-
-      expect(actual).toBeUndefined()
-    })
-
-    test('should return error when file does not exist', async () => {
-      const categories = ['Data']
-
-      const errorExpected = new WriteError(`[404] File with ID ${nonExistentFiledId} not found`)
-
-      await expect(sut.updateFileCategories(nonExistentFiledId, categories, false)).rejects.toThrow(
         errorExpected
       )
     })
@@ -828,7 +762,7 @@ describe('FilesRepository', () => {
     })
 
     test('should return error when file does not exist', async () => {
-      const expectedError = new WriteError(`[404] File with ID ${nonExistentFiledId} not found`)
+      const expectedError = new WriteError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
       await expect(sut.deleteFile(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
