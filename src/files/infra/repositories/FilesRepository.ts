@@ -387,10 +387,11 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     tabularTags: string[],
     replace?: boolean
   ): Promise<void> {
+    const queryParams = replace !== undefined ? { replace } : {}
     return this.doPost(
       this.buildApiEndpoint(this.filesResourceName, 'metadata/tabularTags', fileId),
       { tabularTags },
-      { replace: replace ?? false }
+      queryParams
     )
       .then(() => undefined)
       .catch((error) => {
@@ -403,10 +404,11 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     categories: string[],
     replace?: boolean
   ): Promise<void> {
+    const queryParams = replace !== undefined ? { replace } : {}
     return this.doPost(
       this.buildApiEndpoint(this.filesResourceName, 'metadata/categories', fileId),
       { categories },
-      { replace: replace ?? false }
+      queryParams
     )
       .then(() => undefined)
       .catch((error) => {

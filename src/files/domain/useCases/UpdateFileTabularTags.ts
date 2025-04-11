@@ -14,7 +14,7 @@ export class UpdateFileTabularTags implements UseCase<void> {
    *
    * @param {number | string} [fileId] - The file identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {string[]} [tabularTags] - The tabular tags to be added to the file.
-   * @param {boolean} [replace] - If true, replaces the existing tabularTags with the new ones. If false, adds the new tabularTags to the existing ones.
+   * @param {boolean} [replace](optional) - If true, replaces the existing tabularTags with the new ones. If false, adds the new tabularTags to the existing ones.
    * @returns {Promise<void>}
    */
   async execute(fileId: number | string, tabularTags: string[], replace?: boolean): Promise<void> {

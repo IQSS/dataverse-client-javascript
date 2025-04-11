@@ -14,7 +14,7 @@ export class UpdateFileCategories implements UseCase<void> {
    *
    * @param {number | string} [fileId] - The file identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {string[]} [categories] - The categories to be added to the file.
-   * @param {boolean} [replace] - If true, replaces the existing categories with the new ones. If false, adds the new categories to the existing ones.
+   * @param {boolean} [replace](optional) - If true, replaces the existing categories with the new ones. If false, adds the new categories to the existing ones.
    * @returns {Promise<void>}
    */
   async execute(fileId: number | string, categories: string[], replace?: boolean): Promise<void> {
