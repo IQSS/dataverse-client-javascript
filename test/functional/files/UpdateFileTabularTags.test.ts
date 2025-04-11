@@ -22,7 +22,7 @@ describe('execute', () => {
   const testCollectionAlias = 'updateFileMetadataFunctionalTest'
   let testDatasetIds: CreatedDatasetIdentifiers
   const testTextFile4Name = 'test-file-4.tab'
-  const tabularTags = ['Survey', 'Event']
+  const tabularTags = ['Event', 'Survey']
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -62,7 +62,6 @@ describe('execute', () => {
   test('should successfully update tabular tags of a file', async () => {
     const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
     const fileId = datasetFiles.files[0].id
-    const tabularTags = ['Event', 'Survey']
 
     //wait for the tabular file to be ingested
     await new Promise((res) => setTimeout(res, 1000))

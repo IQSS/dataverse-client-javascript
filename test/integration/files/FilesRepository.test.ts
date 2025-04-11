@@ -421,7 +421,7 @@ describe('FilesRepository', () => {
     })
 
     test('should return error when file does not exist', async () => {
-      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found`)
 
       await expect(sut.getFileUserPermissions(nonExistentFiledId)).rejects.toThrow(errorExpected)
     })
