@@ -22,7 +22,7 @@ describe('execute', () => {
   const testCollectionAlias = 'updateFileMetadataFunctionalTest'
   let testDatasetIds: CreatedDatasetIdentifiers
   const testTextFile4Name = 'test-file-4.tab'
-  const tabularTags = ['Event', 'Survey']
+  const tabularTags = ['Event']
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -75,7 +75,7 @@ describe('execute', () => {
         DatasetNotNumberedVersion.LATEST
       )) as FileModel
 
-      expect(fileInfo.tabularTags).toEqual(['Event', 'Survey'])
+      expect(fileInfo.tabularTags).toEqual(tabularTags)
     }
   })
 

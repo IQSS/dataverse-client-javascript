@@ -170,7 +170,7 @@ describe('FilesRepository', () => {
       test('should return error when dataset does not exist', async () => {
         const nonExistentTestDatasetId = 100
         const errorExpected: ReadError = new ReadError(
-          `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+          `[404] Dataset with ID ${nonExistentTestDatasetId} not found`
         )
 
         await expect(
@@ -496,7 +496,7 @@ describe('FilesRepository', () => {
       })
 
       test('should return error when file does not exist', async () => {
-        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found`)
 
         await expect(
           sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
@@ -527,7 +527,7 @@ describe('FilesRepository', () => {
       test('should return error when file does not exist', async () => {
         const nonExistentFiledPersistentId = 'nonExistentFiledPersistentId'
         const expectedError = new ReadError(
-          `[404] Datafile with Persistent ID ${nonExistentFiledPersistentId} not found.`
+          `[404] Datafile with Persistent ID ${nonExistentFiledPersistentId} not found`
         )
 
         await expect(
@@ -571,7 +571,7 @@ describe('FilesRepository', () => {
     })
 
     test('should return error when file does not exist', async () => {
-      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+      const errorExpected = new ReadError(`[404] File with ID ${nonExistentFiledId} not found`)
 
       await expect(
         sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
@@ -630,9 +630,7 @@ describe('FilesRepository', () => {
 
     test('should return error when dataset does not exist', async () => {
       const nonExistentDatasetId = 400000
-      const errorExpected = new ReadError(
-        `[404] Dataset with ID ${nonExistentDatasetId} not found.`
-      )
+      const errorExpected = new ReadError(`[404] Dataset with ID ${nonExistentDatasetId} not found`)
 
       await expect(
         sut.getFileUploadDestination(nonExistentDatasetId, singlepartFile)
@@ -721,7 +719,7 @@ describe('FilesRepository', () => {
     test('should return error when file does not exist', async () => {
       const tag = ['Data']
 
-      const errorExpected = new WriteError(`[404] File with ID ${nonExistentFiledId} not found.`)
+      const errorExpected = new WriteError(`[404] File with ID ${nonExistentFiledId} not found`)
 
       await expect(sut.updateFileCategories(nonExistentFiledId, tag, false)).rejects.toThrow(
         errorExpected
@@ -830,7 +828,7 @@ describe('FilesRepository', () => {
     })
 
     test('should return error when file does not exist', async () => {
-      const expectedError = new WriteError(`[404] File with ID ${nonExistentFiledId} not found.`)
+      const expectedError = new WriteError(`[404] File with ID ${nonExistentFiledId} not found`)
 
       await expect(sut.deleteFile(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
