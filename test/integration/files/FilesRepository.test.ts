@@ -630,7 +630,9 @@ describe('FilesRepository', () => {
 
     test('should return error when dataset does not exist', async () => {
       const nonExistentDatasetId = 400000
-      const errorExpected = new ReadError(`[404] Dataset with ID ${nonExistentDatasetId} not found`)
+      const errorExpected = new ReadError(
+        `[404] Dataset with ID ${nonExistentDatasetId} not found.`
+      )
 
       await expect(
         sut.getFileUploadDestination(nonExistentDatasetId, singlepartFile)
