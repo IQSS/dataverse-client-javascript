@@ -56,6 +56,22 @@ npm run test:unit
 npm run test:integration
 ```
 
+### Run individual tests
+
+It's also possible to run individual tests. Below are some examples.
+
+```bash
+npm run test:unit UpdateCollectionFeaturedItems.test.ts
+```
+
+```bash
+npm run test:functional UpdateCollectionFeaturedItems.test.ts
+```
+
+```bash
+npm run test:integration CollectionsRepository.test.ts
+```
+
 #### Configure the integration testing environment
 
 The integration testing environment uses different environment variables, defined in a .env file, available in the _test/integration/environment_ folder.
