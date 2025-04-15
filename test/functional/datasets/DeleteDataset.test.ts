@@ -1,13 +1,7 @@
-import {
-  createDataset,
-  publishDataset,
-  VersionUpdateType,
-  deleteDataset
-} from '../../../src/datasets'
+import { createDataset, deleteDataset } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
-import { waitForNoLocks } from '../../testHelpers/datasets/datasetHelper'
 
 const testDataset = {
   license: {
@@ -56,24 +50,7 @@ describe('execute', () => {
     )
   })
 
-  test('should delete a dataset when it is published successfully', async () => {
-    const createdDatasetIdentifiers = await createDataset.execute(testDataset)
-
-    const response = await publishDataset.execute(
-      createdDatasetIdentifiers.persistentId,
-      VersionUpdateType.MAJOR
-    )
-
-    await waitForNoLocks(createdDatasetIdentifiers.numericId, 10)
-
-    expect(response).toBeUndefined()
-
-    const actual = await deleteDataset.execute(createdDatasetIdentifiers.numericId)
-
-    expect(actual).toBeUndefined()
-  })
-
-  test('should delete a dataset when it is not published successfully', async () => {
+  test('should delete a dataset when it is draft successfully', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testDataset)
 
     const actual = await deleteDataset.execute(createdDatasetIdentifiers.numericId)

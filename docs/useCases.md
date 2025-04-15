@@ -838,9 +838,9 @@ The `version` parameter should be a string or a [DatasetNotNumberedVersion](../s
 
 You cannot deaccession a dataset more than once. If you call this endpoint twice for the same dataset version, you will get a not found error on the second call, since the dataset you are looking for will no longer be published since it is already deaccessioned.
 
-#### Delete a Dataset
+#### Delete a Draft Dataset
 
-Delete a Dataset, given its identifier.
+Delete a Draft Dataset, given its identifier.
 
 ##### Example call:
 

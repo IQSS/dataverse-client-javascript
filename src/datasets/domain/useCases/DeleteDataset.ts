@@ -9,7 +9,7 @@ export class DeleteDataset implements UseCase<void> {
   }
 
   /**
-   * Delete a Dataset
+   * Delete a Draft Dataset
    *
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    */

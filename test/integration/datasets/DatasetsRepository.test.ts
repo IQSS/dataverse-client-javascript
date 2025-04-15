@@ -1356,26 +1356,6 @@ describe('DatasetsRepository', () => {
       ).rejects.toThrow(expectedError)
     })
 
-    test('should delete a published dataset', async () => {
-      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-
-      await publishDatasetViaApi(testDatasetIds.numericId)
-
-      await waitForNoLocks(testDatasetIds.numericId, 10)
-
-      const actual = await sut.deleteDataset(testDatasetIds.numericId)
-
-      expect(actual).toBeUndefined()
-
-      const expectedError = new ReadError(
-        `[404] Dataset with ID ${testDatasetIds.numericId} not found.`
-      )
-
-      await expect(
-        sut.getDataset(testDatasetIds.numericId, DatasetNotNumberedVersion.LATEST, false, false)
-      ).rejects.toThrow(expectedError)
-    })
-
     test('should return error when dataset does not exist', async () => {
       const expectedError = new WriteError(
         `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
