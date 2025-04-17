@@ -39,7 +39,7 @@ The different use cases currently available in the package are classified below,
     - [Update a Dataset](#update-a-dataset)
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
-    - [Delete a Dataset](#delete-a-dataset)
+    - [Delete a Draft Dataset](#delete-a-draft-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -845,20 +845,22 @@ Delete a Draft Dataset, given its identifier.
 ##### Example call:
 
 ```typescript
-import { deleteDataset } from '@iqss/dataverse-client-javascript'
+import { deleteDatasetDraft } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const datasetId = 1
 
-deletedataset.execute(datasetId)
+deleteDatasetDraft.execute(datasetId)
 
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/DeleteDataset.ts) implementation_.
+_See [use case](../src/datasets/domain/useCases/DeleteDatasetDraft.ts) implementation_.
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
+
+If you try to delete a dataset without draft version, you will get a not found error.
 
 #### Get Download Count of a Dataset
 

@@ -1337,13 +1337,13 @@ describe('DatasetsRepository', () => {
     })
   })
 
-  describe('deleteDataset', () => {
+  describe('deleteDatasetDraft', () => {
     test('should delete a draft dataset', async () => {
       const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
 
       await waitForNoLocks(testDatasetIds.numericId, 10)
 
-      const actual = await sut.deleteDataset(testDatasetIds.numericId)
+      const actual = await sut.deleteDatasetDraft(testDatasetIds.numericId)
 
       expect(actual).toBeUndefined()
 
@@ -1361,7 +1361,7 @@ describe('DatasetsRepository', () => {
         `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
       )
 
-      await expect(sut.deleteDataset(nonExistentTestDatasetId)).rejects.toThrow(expectedError)
+      await expect(sut.deleteDatasetDraft(nonExistentTestDatasetId)).rejects.toThrow(expectedError)
     })
   })
 })

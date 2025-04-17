@@ -1,4 +1,4 @@
-import { createDataset, deleteDataset } from '../../../src/datasets'
+import { createDataset, deleteDatasetDraft } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -53,12 +53,12 @@ describe('execute', () => {
   test('should delete a dataset when it is draft successfully', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testDataset)
 
-    const actual = await deleteDataset.execute(createdDatasetIdentifiers.numericId)
+    const actual = await deleteDatasetDraft.execute(createdDatasetIdentifiers.numericId)
 
     expect(actual).toBeUndefined()
   })
 
   test('should throw an error when the dataset id is incorrect', async () => {
-    await expect(deleteDataset.execute(1111)).rejects.toBeInstanceOf(WriteError)
+    await expect(deleteDatasetDraft.execute(1111)).rejects.toBeInstanceOf(WriteError)
   })
 })
