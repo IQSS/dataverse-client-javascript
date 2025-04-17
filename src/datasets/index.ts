@@ -19,7 +19,7 @@ import { GetDatasetVersionDiff } from './domain/useCases/GetDatasetVersionDiff'
 import { DeaccessionDataset } from './domain/useCases/DeaccessionDataset'
 import { GetDatasetDownloadCount } from './domain/useCases/GetDatasetDownloadCount'
 import { GetDatasetVersionsSummaries } from './domain/useCases/GetDatasetVersionsSummaries'
-import { DeleteDataset } from './domain/useCases/DeleteDataset'
+import { DeleteDatasetDraft } from './domain/useCases/DeleteDatasetDraft'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -53,7 +53,7 @@ const updateDataset = new UpdateDataset(
 const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
 const getDatasetDownloadCount = new GetDatasetDownloadCount(datasetsRepository)
 const getDatasetVersionsSummaries = new GetDatasetVersionsSummaries(datasetsRepository)
-const deleteDataset = new DeleteDataset(datasetsRepository)
+const deleteDataset = new DeleteDatasetDraft(datasetsRepository)
 
 export {
   getDataset,
