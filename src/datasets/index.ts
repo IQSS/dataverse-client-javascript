@@ -53,7 +53,7 @@ const updateDataset = new UpdateDataset(
 const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
 const getDatasetDownloadCount = new GetDatasetDownloadCount(datasetsRepository)
 const getDatasetVersionsSummaries = new GetDatasetVersionsSummaries(datasetsRepository)
-const deleteDataset = new DeleteDatasetDraft(datasetsRepository)
+const deleteDatasetDraft = new DeleteDatasetDraft(datasetsRepository)
 
 export {
   getDataset,
@@ -71,7 +71,7 @@ export {
   deaccessionDataset,
   getDatasetDownloadCount,
   getDatasetVersionsSummaries,
-  deleteDataset
+  deleteDatasetDraft
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
