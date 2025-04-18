@@ -35,7 +35,8 @@ import {
   createCollectionViaApi,
   deleteCollectionViaApi,
   publishCollectionViaApi,
-  ROOT_COLLECTION_ALIAS
+  ROOT_COLLECTION_ALIAS,
+  setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import {
   calculateBlobChecksum,
@@ -1121,6 +1122,7 @@ describe('DatasetsRepository', () => {
     beforeAll(async () => {
       await createCollectionViaApi(testDatasetVersionsCollectionAlias)
       await publishCollectionViaApi(testDatasetVersionsCollectionAlias)
+      await setStorageDriverViaApi(testDatasetVersionsCollectionAlias, 'LocalStack')
     })
 
     afterAll(async () => {
