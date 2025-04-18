@@ -35,8 +35,7 @@ import {
   createCollectionViaApi,
   deleteCollectionViaApi,
   publishCollectionViaApi,
-  ROOT_COLLECTION_ALIAS,
-  setStorageDriverViaApi
+  ROOT_COLLECTION_ALIAS
 } from '../../testHelpers/collections/collectionHelper'
 import {
   calculateBlobChecksum,
@@ -1122,7 +1121,6 @@ describe('DatasetsRepository', () => {
     beforeAll(async () => {
       await createCollectionViaApi(testDatasetVersionsCollectionAlias)
       await publishCollectionViaApi(testDatasetVersionsCollectionAlias)
-      await setStorageDriverViaApi(testDatasetVersionsCollectionAlias, 'LocalStack')
     })
 
     afterAll(async () => {
@@ -1158,6 +1156,29 @@ describe('DatasetsRepository', () => {
       expect(actual.length).toBeGreaterThan(0)
       expect(actual[0].versionNumber).toBe('1.0')
       expect(actual[0].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return dataset versions correctly after deaccessioned', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const deaccessionReason = {
+        deaccessioned: { reason: 'Test reason.' }
+      }
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
+
+      const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
+
+      expect(actual.length).toBeGreaterThan(0)
+      expect(actual[0].versionNumber).toBe('1.0')
+      expect(actual[0].summary).toStrictEqual(deaccessionReason)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
