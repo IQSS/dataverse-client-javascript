@@ -39,6 +39,7 @@ The different use cases currently available in the package are classified below,
     - [Update a Dataset](#update-a-dataset)
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
+    - [Delete a Draft Dataset](#delete-a-draft-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -836,6 +837,30 @@ The `datasetId` parameter can be a string for persistent identifiers, or a numbe
 The `version` parameter should be a string or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value.
 
 You cannot deaccession a dataset more than once. If you call this endpoint twice for the same dataset version, you will get a not found error on the second call, since the dataset you are looking for will no longer be published since it is already deaccessioned.
+
+#### Delete a Draft Dataset
+
+Delete a Draft Dataset, given its identifier.
+
+##### Example call:
+
+```typescript
+import { deleteDatasetDraft } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+
+deleteDatasetDraft.execute(datasetId)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/DeleteDatasetDraft.ts) implementation_.
+
+The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
+
+If you try to delete a dataset without draft version, you will get a not found error.
 
 #### Get Download Count of a Dataset
 

@@ -277,4 +277,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error
       })
   }
+
+  public async deleteDatasetDraft(datasetId: string | number): Promise<void> {
+    return this.doDelete(
+      this.buildApiEndpoint(this.datasetsResourceName, 'versions/:draft', datasetId)
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }
