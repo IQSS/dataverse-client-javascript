@@ -52,7 +52,8 @@ export const createDatasetModel = (
       state: DatasetVersionState.RELEASED,
       createTime: new Date(DATASET_CREATE_TIME_STR),
       lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
-      releaseTime: new Date(DATASET_RELEASE_TIME_STR)
+      releaseTime: new Date(DATASET_RELEASE_TIME_STR),
+      deaccessionNote: undefined
     },
     termsOfUse: {
       termsOfAccess: {
