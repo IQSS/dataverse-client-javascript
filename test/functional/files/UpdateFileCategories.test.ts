@@ -19,7 +19,7 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import { FileModel } from '../../../src/files/domain/models/FileModel'
 
 describe('execute', () => {
-  const testCollectionAlias = 'updateFileMetadataFunctionalTest'
+  const testCollectionAlias = 'updateFileMetadataFunctionalTest-categories'
   let testDatasetIds: CreatedDatasetIdentifiers
   const testTextFile1Name = 'test-file-1.txt'
   const metadataUpdate = ['file']
