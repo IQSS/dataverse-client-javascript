@@ -381,4 +381,38 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
         throw error
       })
   }
+
+  public async updateFileTabularTags(
+    fileId: number | string,
+    tabularTags: string[],
+    replace?: boolean
+  ): Promise<void> {
+    const queryParams = replace !== undefined ? { replace } : {}
+    return this.doPost(
+      this.buildApiEndpoint(this.filesResourceName, 'metadata/tabularTags', fileId),
+      { tabularTags },
+      queryParams
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateFileCategories(
+    fileId: number | string,
+    categories: string[],
+    replace?: boolean
+  ): Promise<void> {
+    const queryParams = replace !== undefined ? { replace } : {}
+    return this.doPost(
+      this.buildApiEndpoint(this.filesResourceName, 'metadata/categories', fileId),
+      { categories },
+      queryParams
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }
