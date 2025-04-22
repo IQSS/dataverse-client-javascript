@@ -96,6 +96,37 @@ describe('execute', () => {
     }
   })
 
+  test('should not duplicate categories when merging', async () => {
+    const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+    const fileId = datasetFiles.files[0].id
+
+    const initialCategories = ['Category 1', 'Category 2']
+    const newCategories = ['Category 2', 'Category 3']
+    const expectedMergedCategories = ['Category 1', 'Category 2', 'Category 3']
+
+    await updateFileCategories.execute(fileId, initialCategories, true)
+    await updateFileCategories.execute(fileId, newCategories, false)
+
+    const fileInfo = (await getFile.execute(fileId, DatasetNotNumberedVersion.LATEST)) as FileModel
+
+    expect(fileInfo.categories?.sort()).toEqual(expectedMergedCategories.sort())
+  })
+
+  test('should replace categories when replace = true', async () => {
+    const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+    const fileId = datasetFiles.files[0].id
+
+    const initialCategories = ['Category 1', 'Category 2', 'Category 3']
+    const newCategories = ['Category 4', 'Category 5', 'Category 6']
+
+    await updateFileCategories.execute(fileId, initialCategories, true)
+    await updateFileCategories.execute(fileId, newCategories, true)
+
+    const fileInfo = (await getFile.execute(fileId, DatasetNotNumberedVersion.LATEST)) as FileModel
+
+    expect(fileInfo.categories?.sort()).toEqual(newCategories.sort())
+  })
+
   test('should throw an error when the file id does not exist', async () => {
     let writeError: WriteError | undefined = undefined
     const nonExistentFileId = 5

@@ -1336,8 +1336,8 @@ const updateFileMetadataDTO = {
   restrict: false
 }
 
-await updateFileMetadata.execute(fileId, updateFileMetadataDTO).then((fileId) => {
-  console.log(`File updated successfully with file ID: ${fileId}`)
+await updateFileMetadata.execute(fileId, updateFileMetadataDTO).then(() => {
+  console.log(`File updated successfully`)
 })
 ```
 
@@ -1360,8 +1360,8 @@ const fileId: number | string = 123
 const categories = ['category 1', 'category 1']
 const replace = true
 
-await updateFileCategories.execute(fileId, categories, replace).then((fileId) => {
-  console.log(`File updated successfully with file ID: ${fileId}`)
+await updateFileCategories.execute(fileId, categories, replace).then(() => {
+  console.log(`File updated successfully`)
 })
 ```
 
@@ -1383,8 +1383,8 @@ import { updateFileTabularTags } from '@iqss/dataverse-client-javascript'
 const fileId: number | string = 123
 const tabularTags = ['Surveys']
 
-await updateFileTabularTags.execute(fileId, tabularTags, replace).then((fileId) => {
-  console.log(`File updated successfully with file ID: ${fileId}`)
+await updateFileTabularTags.execute(fileId, tabularTags, replace).then(() => {
+  console.log(`File updated successfully`)
 })
 ```
 

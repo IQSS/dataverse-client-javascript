@@ -97,6 +97,67 @@ describe('execute', () => {
     }
   })
 
+  test('should not duplicate tabular tags when merging', async () => {
+    const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+    const fileId = datasetFiles.files[0].id
+
+    const initialTags = ['Survey', 'Panel']
+    const newTags = ['Panel', 'Event']
+    const expectedMergedTags = ['Survey', 'Panel', 'Event']
+
+    await updateFileTabularTags.execute(fileId, initialTags, true)
+    await updateFileTabularTags.execute(fileId, newTags, false)
+
+    const fileInfo = (await getFile.execute(fileId, DatasetNotNumberedVersion.LATEST)) as FileModel
+
+    expect(fileInfo.tabularTags?.sort()).toEqual(expectedMergedTags.sort())
+  })
+
+  test('should replace tabular tags when replace = true', async () => {
+    const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+    const fileId = datasetFiles.files[0].id
+
+    const initialTags = ['Survey', 'Panel', 'Event']
+    const newTags = ['Survey', 'Network']
+
+    await updateFileTabularTags.execute(fileId, initialTags, true)
+    await updateFileTabularTags.execute(fileId, newTags, true)
+
+    const fileInfo = (await getFile.execute(fileId, DatasetNotNumberedVersion.LATEST)) as FileModel
+
+    expect(fileInfo.tabularTags?.sort()).toEqual(newTags.sort())
+  })
+
+  test('should throw an error when updating tabular tags on a non-tabular file', async () => {
+    const nonTabularFileName = 'test-file-1.txt'
+
+    try {
+      await uploadFileViaApi(testDatasetIds.numericId, nonTabularFileName)
+    } catch {
+      throw new Error(`Error uploading non-tabular file: ${nonTabularFileName}`)
+    }
+    const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+    const matchingFile = datasetFiles.files.find((f) => f.name === nonTabularFileName)
+    if (!matchingFile) {
+      throw new Error('Uploaded non-tabular file not found in dataset')
+    }
+
+    const fileId = matchingFile.id
+
+    let writeError: WriteError | undefined = undefined
+
+    try {
+      await updateFileTabularTags.execute(fileId, ['Survey'], false)
+    } catch (error) {
+      writeError = error as WriteError
+    } finally {
+      expect(writeError).toBeInstanceOf(WriteError)
+      expect(writeError?.message).toEqual(
+        `There was an error when writing the resource. Reason was: [400] This operation is only available for tabular files.`
+      )
+    }
+  })
+
   test('should throw an error when the file id does not exist', async () => {
     let writeError: WriteError | undefined = undefined
     const nonExistentFileId = 5
