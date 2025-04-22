@@ -35,6 +35,7 @@ export interface DatasetPayload {
   disclaimer?: string
   files: FilePayload[]
   isPartOf: OwnerNodePayload
+  deaccessionNote?: string
 }
 
 export interface LicensePayload {

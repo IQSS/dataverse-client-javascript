@@ -233,7 +233,8 @@ export const transformVersionPayloadToDataset = (
       state: versionPayload.versionState as DatasetVersionState,
       createTime: new Date(versionPayload.createTime),
       lastUpdateTime: new Date(versionPayload.lastUpdateTime),
-      releaseTime: new Date(versionPayload.releaseTime)
+      releaseTime: new Date(versionPayload.releaseTime),
+      deaccessionNote: versionPayload.deaccessionNote
     },
     termsOfUse: {
       termsOfAccess: {
