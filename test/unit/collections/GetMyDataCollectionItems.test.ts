@@ -5,28 +5,51 @@ import { CollectionItemType } from '../../../dist'
 import { createDatasetPreviewModel } from '../../testHelpers/datasets/datasetPreviewHelper'
 import { createFilePreviewModel } from '../../testHelpers/files/filePreviewHelper'
 import { createCollectionPreviewModel } from '../../testHelpers/collections/collectionPreviewHelper'
-import { MyDataCollectionItemSubset } from '../../../src/collections/domain/models/CollectionItemSubset'
+import {
+  CollectionItemsFacetLabel,
+  MyDataCollectionItemSubset
+} from '../../../src/collections/domain/models/CollectionItemSubset'
+import { PublicationStatus } from '../../../dist/core/domain/models/PublicationStatus'
 
-describe('GetCollectionItemsByUserRole', () => {
+describe('GetMyDataCollectionItems', () => {
   let collectionRepositoryStub: ICollectionsRepository
   let testGetMyDataCollectionItems: GetMyDataCollectionItems
 
   const testRoleIds = [1, 2]
   const testCollectionItemTypes = [CollectionItemType.DATASET, CollectionItemType.FILE]
+  const testPublishingStatuses = [
+    PublicationStatus.Published,
+    PublicationStatus.Draft,
+    PublicationStatus.Unpublished
+  ]
   const testLimit = 10
   const testPage = 1
   const testSearchText = 'test'
+  const testOtherUserName = 'testUser'
   const testItems = [
     createDatasetPreviewModel(),
     createFilePreviewModel(),
     createCollectionPreviewModel()
   ]
-
+  const testFacets = [
+    {
+      name: 'Published',
+      count: 10
+    },
+    {
+      name: 'Draft',
+      count: 5
+    },
+    {
+      name: 'Unpublished',
+      count: 15
+    }
+  ] as CollectionItemsFacetLabel[]
   const testItemSubset: MyDataCollectionItemSubset = {
     items: testItems,
     publishingFacet: testFacets,
-    totalItemCount: testTotalCount,
-    countPerObjectType: testCountPerObjectType
+    totalItemCount: 30,
+    countPerObjectType: { dataverses: 10, datasets: 15, files: 5 }
   }
   beforeEach(() => {
     collectionRepositoryStub = {} as ICollectionsRepository
@@ -39,6 +62,7 @@ describe('GetCollectionItemsByUserRole', () => {
     const actual = await testGetMyDataCollectionItems.execute(
       testRoleIds,
       testCollectionItemTypes,
+      testPublishingStatuses,
       testLimit,
       testPage,
       testSearchText
@@ -54,6 +78,7 @@ describe('GetCollectionItemsByUserRole', () => {
       testGetMyDataCollectionItems.execute(
         testRoleIds,
         testCollectionItemTypes,
+        testPublishingStatuses,
         testLimit,
         testPage,
         testSearchText
@@ -61,29 +86,20 @@ describe('GetCollectionItemsByUserRole', () => {
     ).rejects.toThrow(ReadError)
   })
 
-  test('should handle roleIds parameter', async () => {
+  test('should handle required parameters', async () => {
     collectionRepositoryStub.getMyDataCollectionItems = jest.fn().mockResolvedValue(testItemSubset)
 
-    const actual = await testGetMyDataCollectionItems.execute(testRoleIds, [], undefined)
+    const actual = await testGetMyDataCollectionItems.execute(
+      testRoleIds,
+      testCollectionItemTypes,
+      testPublishingStatuses
+    )
 
     expect(collectionRepositoryStub.getMyDataCollectionItems).toHaveBeenCalledWith(
       testRoleIds,
-      [],
-      undefined,
-      undefined,
-      undefined
-    )
-    expect(actual).toEqual(testItemSubset)
-  })
-
-  test('should handle collectionItemTypes parameter', async () => {
-    collectionRepositoryStub.getMyDataCollectionItems = jest.fn().mockResolvedValue(testItemSubset)
-
-    const actual = await testGetMyDataCollectionItems.execute([], testCollectionItemTypes)
-
-    expect(collectionRepositoryStub.getMyDataCollectionItems).toHaveBeenCalledWith(
-      [],
       testCollectionItemTypes,
+      testPublishingStatuses,
+      undefined,
       undefined,
       undefined,
       undefined
@@ -97,9 +113,11 @@ describe('GetCollectionItemsByUserRole', () => {
     const actual = await testGetMyDataCollectionItems.execute(
       testRoleIds,
       testCollectionItemTypes,
+      testPublishingStatuses,
       testLimit,
       testPage,
-      testSearchText
+      testSearchText,
+      testOtherUserName
     )
 
     expect(collectionRepositoryStub.getMyDataCollectionItems).toHaveBeenCalledWith(
@@ -107,7 +125,8 @@ describe('GetCollectionItemsByUserRole', () => {
       testCollectionItemTypes,
       testLimit,
       testPage,
-      testSearchText
+      testSearchText,
+      testOtherUserName
     )
     expect(actual).toEqual(testItemSubset)
   })

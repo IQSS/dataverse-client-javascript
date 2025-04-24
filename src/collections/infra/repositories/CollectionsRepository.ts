@@ -26,6 +26,7 @@ import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from
 import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { PublicationStatus } from '../../../../dist/core/domain/models/PublicationStatus'
+import { ReadError } from '../../../core/domain/repositories/ReadError'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -258,9 +259,16 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       )
     })
 
-    return this.doGet('/retrieve', true, queryParams)
-      .then((response) => transformMyDataResponseToCollectionItemSubset(response))
+    return this.doGet('/mydata/retrieve', true, queryParams)
+      .then((response) => {
+        if (response.data.success !== true) {
+          throw new ReadError(response.data.error_message)
+        }
+        return transformMyDataResponseToCollectionItemSubset(response)
+      })
       .catch((error) => {
+        console.error('Error in getMyDataCollectionItems:', error)
+        console.log('Error response:', error.response)
         throw error
       })
   }

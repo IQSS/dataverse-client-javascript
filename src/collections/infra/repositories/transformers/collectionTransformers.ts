@@ -151,8 +151,9 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
 export const transformMyDataResponseToCollectionItemSubset = (
   response: AxiosResponse
 ): MyDataCollectionItemSubset => {
+  console.log('response', JSON.stringify(response.data))
   const responseDataPayload = response.data.data
-  const itemsPayload = responseDataPayload.items
+  const itemsPayload = responseDataPayload.items ?? []
   const countPerObjectTypePayload = responseDataPayload[
     'dvobject_counts'
   ] as MyDataCountPerObjectTypePayload
