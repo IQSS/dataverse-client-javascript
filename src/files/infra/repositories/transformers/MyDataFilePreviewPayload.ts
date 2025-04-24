@@ -1,4 +1,4 @@
-import { FilePreviewChecksumPayload } from '../../../../../dist/files/infra/repositories/transformers/FilePreviewPayload'
+import { FilePreviewChecksumPayload } from '../../../../../src/files/infra/repositories/transformers/FilePreviewPayload'
 
 export interface MyDataFilePreviewPayload {
   name: string

@@ -1,8 +1,8 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { MyDataCollectionItemSubset } from '../models/CollectionItemSubset'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
-import { CollectionItemType } from '../../../../dist'
-import { PublicationStatus } from '../../../../dist/core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../../src/collections/domain/models/CollectionItemType'
+import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
 
 export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSubset> {
   private collectionsRepository: ICollectionsRepository

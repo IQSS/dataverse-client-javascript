@@ -6,8 +6,8 @@ import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
 import { CollectionItemSubset, MyDataCollectionItemSubset } from '../models/CollectionItemSubset'
 import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
-import { CollectionItemType } from '../../../../dist'
-import { PublicationStatus } from '../../../../dist/core/domain/models/PublicationStatus'
+import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../../src/collections/domain/models/CollectionItemType'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>

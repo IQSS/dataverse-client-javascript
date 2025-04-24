@@ -15,8 +15,8 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
-import { CollectionItemType } from '../../../dist'
-import { PublicationStatus } from '../../../dist/core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../src/collections/domain/models/CollectionItemType'
+import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 
 const testRoleIds = [1, 2, 3, 4, 5, 6, 7, 8]
 const testCollectionItemTypes = [CollectionItemType.DATASET, CollectionItemType.FILE]

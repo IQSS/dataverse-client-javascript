@@ -215,6 +215,64 @@ This use case supports the following optional parameters depending on the search
 - **offset**: (number) Offset for pagination.
 - **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
 
+#### List My Data Collection Items
+
+Returns an instance of [MyDataCollectionItemSubset](../src/collections/domain/models/CollectionItemSubset.ts) that contains reduced information for each collection item for which the calling user has a role.
+
+##### Example call:
+
+```typescript
+import { getMyDataCollectionItems } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const roleIds = [1, 2]
+const collectionItemTypes = [CollectionItemType.DATASET, CollectionItemType.FILE]
+const publishingStatuses = [
+  PublicationStatus.Published,
+  PublicationStatus.Draft,
+  PublicationStatus.Unpublished
+]
+const limit = 10
+const offset = 20
+const searchText = 'search text'
+const otherUserName = 'otherUserName'
+
+getCollectionItems
+  .execute(
+    roleIds,
+    collectionItemTypes,
+    publishingStatuses,
+    limit,
+    offset,
+    searchText,
+    otherUserName
+  )
+  .then((subset: MyDataCollectionItemSubset) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetMyDataCollectionItems.ts) implementation_.
+
+The `roleIds` parameter is an array of role identifiers that the user has in the collection items. At least one roleId must be specified.
+The `collectionItemTypes` parameter is an array of collection item types to filter the results. At least one collectionItemType must be specified.
+The `publishingStatuses` parameter is an array of publishing statuses to filter the results. At least one publishingStatus must be specified.
+
+This use case supports the following optional parameters depending on the search goals:
+
+The `searchText` parameter is an optional string to filter the results by.
+The `otherUserName` parameter is an optional string to return the collection items of another user. If not set, the calling user will be used. Only superusers can use this parameter.
+The `MyDataCollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
+
+This use case supports the following optional parameters depending on the search goals:
+
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
+- **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
+
 #### Get Collection Featured Items
 
 Returns a [CollectionFeaturedItem](../src/collections/domain/models/CollectionFeaturedItem.ts) array containing the featured items of the requested collection, given the collection identifier or alias.

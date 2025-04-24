@@ -1,7 +1,7 @@
 import { ICollectionsRepository } from '../../../src/collections/domain/repositories/ICollectionsRepository'
 import { GetMyDataCollectionItems } from '../../../src/collections/domain/useCases/GetMyDataCollectionItems'
 import { ReadError } from '../../../src'
-import { CollectionItemType } from '../../../dist'
+import { CollectionItemType } from '../../../src/collections/domain/models/CollectionItemType'
 import { createDatasetPreviewModel } from '../../testHelpers/datasets/datasetPreviewHelper'
 import { createFilePreviewModel } from '../../testHelpers/files/filePreviewHelper'
 import { createCollectionPreviewModel } from '../../testHelpers/collections/collectionPreviewHelper'
@@ -9,7 +9,7 @@ import {
   CollectionItemsFacetLabel,
   MyDataCollectionItemSubset
 } from '../../../src/collections/domain/models/CollectionItemSubset'
-import { PublicationStatus } from '../../../dist/core/domain/models/PublicationStatus'
+import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 
 describe('GetMyDataCollectionItems', () => {
   let collectionRepositoryStub: ICollectionsRepository
