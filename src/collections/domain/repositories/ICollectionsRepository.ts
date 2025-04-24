@@ -3,9 +3,11 @@ import { CollectionFeaturedItemsDTO } from '../dtos/CollectionFeaturedItemsDTO'
 import { Collection } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
 import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
-import { CollectionItemSubset } from '../models/CollectionItemSubset'
+import { CollectionItemSubset, MyDataCollectionItemSubset } from '../models/CollectionItemSubset'
 import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
+import { CollectionItemType } from '../../../../dist'
+import { PublicationStatus } from '../../../../dist/core/domain/models/PublicationStatus'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -25,6 +27,15 @@ export interface ICollectionsRepository {
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria
   ): Promise<CollectionItemSubset>
+  getMyDataCollectionItems(
+    roleIds: number[],
+    collectionItemTypes: CollectionItemType[],
+    publicationStatuses: PublicationStatus[],
+    limit?: number,
+    page?: number,
+    searchText?: string,
+    otherUserName?: string
+  ): Promise<MyDataCollectionItemSubset>
   updateCollection(
     collectionIdOrAlias: number | string,
     updatedCollection: CollectionDTO

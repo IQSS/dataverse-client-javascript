@@ -27,6 +27,7 @@ export interface FilePreview {
   tabularTags?: string[]
   variables?: number
   observations?: number
+  userRoles?: string[]
 }
 
 export interface FilePreviewChecksum {

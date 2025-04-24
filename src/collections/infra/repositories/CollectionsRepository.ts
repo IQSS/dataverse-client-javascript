@@ -3,14 +3,18 @@ import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRe
 import {
   transformCollectionFacetsResponseToCollectionFacets,
   transformCollectionItemsResponseToCollectionItemSubset,
-  transformCollectionResponseToCollection
+  transformCollectionResponseToCollection,
+  transformMyDataResponseToCollectionItemSubset
 } from './transformers/collectionTransformers'
 import { Collection, ROOT_COLLECTION_ID } from '../../domain/models/Collection'
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
 import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
-import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
+import {
+  CollectionItemSubset,
+  MyDataCollectionItemSubset
+} from '../../domain/models/CollectionItemSubset'
 import {
   CollectionSearchCriteria,
   OrderType,
@@ -21,6 +25,7 @@ import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedIt
 import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
 import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
+import { PublicationStatus } from '../../../../dist/core/domain/models/PublicationStatus'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -60,6 +65,17 @@ export enum GetCollectionItemsQueryParams {
   START = 'start',
   TYPE = 'type',
   FILTERQUERY = 'fq',
+  SHOW_TYPE_COUNTS = 'show_type_counts'
+}
+
+export enum GetMyDataCollectionItemsQueryParams {
+  QUERY = 'q',
+  PER_PAGE = 'per_page',
+  SELECTED_PAGE = 'selected_page',
+  ROLE_ID = 'role_ids',
+  TYPE = 'dvobject_types',
+  PUBLISHED_STATES = 'published_states',
+  USER_IDENTIFIER = 'userIdentifier',
   SHOW_TYPE_COUNTS = 'show_type_counts'
 }
 
@@ -183,6 +199,67 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     return this.doPut(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, requestBody)
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getMyDataCollectionItems(
+    roleIds: number[],
+    collectionItemTypes: CollectionItemType[],
+    publicationStatuses: PublicationStatus[],
+    limit?: number,
+    page?: number,
+    searchText?: string,
+    userIdentifier?: string
+  ): Promise<MyDataCollectionItemSubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.PER_PAGE, limit.toString())
+    }
+
+    if (page) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.SELECTED_PAGE, page.toString())
+    }
+
+    if (searchText) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.QUERY, encodeURIComponent(searchText))
+    }
+
+    roleIds.forEach((roleId) => {
+      queryParams.append(GetMyDataCollectionItemsQueryParams.ROLE_ID, roleId.toString())
+    })
+    if (userIdentifier) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.USER_IDENTIFIER, userIdentifier)
+    }
+
+    collectionItemTypes.forEach((itemType) => {
+      let mappedItemType: string
+
+      switch (itemType) {
+        case CollectionItemType.COLLECTION:
+          mappedItemType = 'Dataverse'
+          break
+        case CollectionItemType.DATASET:
+          mappedItemType = 'Dataset'
+          break
+        case CollectionItemType.FILE:
+          mappedItemType = 'DataFile'
+          break
+      }
+      queryParams.append(GetMyDataCollectionItemsQueryParams.TYPE, mappedItemType)
+    })
+
+    publicationStatuses.forEach((publicationStatus) => {
+      queryParams.append(
+        GetMyDataCollectionItemsQueryParams.PUBLISHED_STATES,
+        publicationStatus.toString()
+      )
+    })
+
+    return this.doGet('/retrieve', true, queryParams)
+      .then((response) => transformMyDataResponseToCollectionItemSubset(response))
       .catch((error) => {
         throw error
       })
