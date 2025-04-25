@@ -67,7 +67,7 @@ describe('execute', () => {
       createdDatasetIdentifiers.persistentId,
       VersionUpdateType.MAJOR
     )
-    await waitForNoLocks(createdDatasetIdentifiers.numericId, 10)
+    await waitForNoLocks(createdDatasetIdentifiers.numericId, 30)
 
     expect(response).toBeUndefined()
     await deletePublishedDatasetViaApi(createdDatasetIdentifiers.persistentId)

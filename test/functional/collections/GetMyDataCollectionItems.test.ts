@@ -27,9 +27,9 @@ const testPublishingStatuses = [
 ]
 
 describe('execute', () => {
-  const testCollectionAlias = 'collectionsRepositoryFunctionalTestCollection'
+  const testCollectionAlias = 'collectionsRepositoryGetMyDataCollection'
   let testDatasetIds: CreatedDatasetIdentifiers
-  const testTextFile1Name = 'test-file-1.txt'
+  const testTextFile1Name = 'test-file-2.txt'
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -99,11 +99,12 @@ describe('execute', () => {
         const actualFilePreview = actual.items[1] as FilePreview
         const actualDatasetPreview = actual.items[0] as DatasetPreview
 
-        expect(actualFilePreview.name).toBe('test-file-1.txt')
+        expect(actualFilePreview.name).toBe(testTextFile1Name)
         expect(actualDatasetPreview.title).toBe('Dataset created using the createDataset use case')
 
         expect(actual.totalItemCount).toBe(2)
       } catch (error) {
+        console.log(error)
         throw new Error('Item subset should be retrieved')
       }
     })
