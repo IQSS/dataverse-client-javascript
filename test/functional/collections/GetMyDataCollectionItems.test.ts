@@ -106,6 +106,33 @@ describe('execute', () => {
         expect(actualCollectionPreview.alias).toBe(testCollectionAlias)
 
         expect(actual.totalItemCount).toBe(1)
+        expect(actual.publishingFacet).toEqual([
+          {
+            name: 'Published',
+            count: 0
+          },
+          {
+            name: 'Unpublished',
+            count: 1
+          },
+          {
+            name: 'Draft',
+            count: 0
+          },
+          {
+            name: 'In Review',
+            count: 0
+          },
+          {
+            name: 'Deaccessioned',
+            count: 0
+          }
+        ])
+        expect(actual.countPerObjectType).toEqual({
+          dataverses: 1,
+          datasets: 0,
+          files: 0
+        })
       } catch (error) {
         console.log(error)
         throw new Error('Item subset should be retrieved')

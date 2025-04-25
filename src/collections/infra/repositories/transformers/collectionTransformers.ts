@@ -216,7 +216,7 @@ const transformPublicationStatusResponseToLabels = (
   const labels: CollectionItemsFacetLabel[] = []
   labels.push({ name: 'Published', count: publicationStatusCounts.published_count })
   labels.push({ name: 'Unpublished', count: publicationStatusCounts.unpublished_count })
-  labels.push({ name: 'Draft ', count: publicationStatusCounts.draft_count })
+  labels.push({ name: 'Draft', count: publicationStatusCounts.draft_count })
   labels.push({ name: 'In Review', count: publicationStatusCounts.in_review_count })
   labels.push({ name: 'Deaccessioned', count: publicationStatusCounts.deaccessioned_count })
   return labels
