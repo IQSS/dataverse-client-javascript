@@ -2,7 +2,7 @@ import {
   ApiConfig,
   createDataset,
   CreatedDatasetIdentifiers,
-  FilePreview,
+  CollectionPreview,
   getMyDataCollectionItems,
   ReadError
 } from '../../../src'
@@ -18,7 +18,11 @@ import { CollectionItemType } from '../../../src/collections/domain/models/Colle
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 
 const testRoleIds = [1, 2, 3, 4, 5, 6, 7, 8]
-const testCollectionItemTypes = [CollectionItemType.DATASET, CollectionItemType.FILE]
+const testCollectionItemTypes = [
+  CollectionItemType.COLLECTION,
+  CollectionItemType.DATASET,
+  CollectionItemType.FILE
+]
 const testPublishingStatuses = [
   PublicationStatus.Published,
   PublicationStatus.Draft,
@@ -95,11 +99,11 @@ describe('execute', () => {
           testPublishingStatuses,
           undefined,
           undefined,
-          testTextFile1Name
+          testCollectionAlias
         )
 
-        const actualFilePreview = actual.items[0] as FilePreview
-        expect(actualFilePreview.name).toBe(testTextFile1Name)
+        const actualCollectionPreview = actual.items[0] as CollectionPreview
+        expect(actualCollectionPreview.alias).toBe(testCollectionAlias)
 
         expect(actual.totalItemCount).toBe(1)
       } catch (error) {
