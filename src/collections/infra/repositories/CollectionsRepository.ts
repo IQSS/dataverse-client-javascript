@@ -70,14 +70,13 @@ export enum GetCollectionItemsQueryParams {
 }
 
 export enum GetMyDataCollectionItemsQueryParams {
-  QUERY = 'q',
+  SEARCH_TEXT = 'mydata_search_term',
   PER_PAGE = 'per_page',
   SELECTED_PAGE = 'selected_page',
   ROLE_ID = 'role_ids',
   TYPE = 'dvobject_types',
   PUBLISHED_STATES = 'published_states',
-  USER_IDENTIFIER = 'userIdentifier',
-  SHOW_TYPE_COUNTS = 'show_type_counts'
+  USER_IDENTIFIER = 'userIdentifier'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -225,7 +224,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     }
 
     if (searchText) {
-      queryParams.set(GetMyDataCollectionItemsQueryParams.QUERY, encodeURIComponent(searchText))
+      queryParams.set(
+        GetMyDataCollectionItemsQueryParams.SEARCH_TEXT,
+        encodeURIComponent(searchText)
+      )
     }
 
     roleIds.forEach((roleId) => {

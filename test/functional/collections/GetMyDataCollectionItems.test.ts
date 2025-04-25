@@ -2,7 +2,6 @@ import {
   ApiConfig,
   createDataset,
   CreatedDatasetIdentifiers,
-  DatasetPreview,
   FilePreview,
   getMyDataCollectionItems,
   ReadError
@@ -93,16 +92,16 @@ describe('execute', () => {
         const actual = await getMyDataCollectionItems.execute(
           testRoleIds,
           testCollectionItemTypes,
-          testPublishingStatuses
+          testPublishingStatuses,
+          undefined,
+          undefined,
+          testTextFile1Name
         )
 
-        const actualFilePreview = actual.items[1] as FilePreview
-        const actualDatasetPreview = actual.items[0] as DatasetPreview
-
+        const actualFilePreview = actual.items[0] as FilePreview
         expect(actualFilePreview.name).toBe(testTextFile1Name)
-        expect(actualDatasetPreview.title).toBe('Dataset created using the createDataset use case')
 
-        expect(actual.totalItemCount).toBe(2)
+        expect(actual.totalItemCount).toBe(1)
       } catch (error) {
         console.log(error)
         throw new Error('Item subset should be retrieved')
