@@ -20,7 +20,7 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
    * @param {number} [limit] - Limit for pagination (optional).
    * @param {number} [offset] - Offset for pagination (optional).
    * @param {string} [searchText] - filter by searching for this text in the results (optional).
-   * * @returns {Promise<CollectionItemSubset>}
+   * * @returns {Promise<MyDataCollectionItemSubset>}
    */
   async execute(
     roleIds: number[],
