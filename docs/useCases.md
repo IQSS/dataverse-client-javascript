@@ -256,22 +256,23 @@ getCollectionItems
 ```
 
 _See [use case](../src/collections/domain/useCases/GetMyDataCollectionItems.ts) implementation_.
+This use case requires the following parameters:
 
-The `roleIds` parameter is an array of role identifiers that the user has in the collection items. At least one roleId must be specified.
-The `collectionItemTypes` parameter is an array of collection item types to filter the results. At least one collectionItemType must be specified.
-The `publishingStatuses` parameter is an array of publishing statuses to filter the results. At least one publishingStatus must be specified.
+- **roleIds** is an array of user role identifiers to filter the results. At least one roleId must be specified.
+- **collectionItemTypes** is an array of collection item types to filter the results. At least one collectionItemType must be specified.
+- **publishingStatuses** is an array of publishing statuses to filter the results. At least one publishingStatus must be specified.
 
 This use case supports the following optional parameters depending on the search goals:
 
-The `searchText` parameter is an optional string to filter the results by.
-The `otherUserName` parameter is an optional string to return the collection items of another user. If not set, the calling user will be used. Only superusers can use this parameter.
+- **searchText** is an optional string to filter the results by.
+- **otherUserName** is an optional string to return the collection items of another user. If not set, the calling user will be used. _Only superusers can use this parameter_.
+
 The `MyDataCollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
 
 This use case supports the following optional parameters depending on the search goals:
 
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
-- **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
 
 #### Get Collection Featured Items
 
