@@ -267,8 +267,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         return transformMyDataResponseToCollectionItemSubset(response)
       })
       .catch((error) => {
-        console.error('Error in getMyDataCollectionItems:', error)
-        console.log('Error response:', error.response)
         throw error
       })
   }

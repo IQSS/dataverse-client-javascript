@@ -123,6 +123,7 @@ describe('GetMyDataCollectionItems', () => {
     expect(collectionRepositoryStub.getMyDataCollectionItems).toHaveBeenCalledWith(
       testRoleIds,
       testCollectionItemTypes,
+      testPublishingStatuses,
       testLimit,
       testPage,
       testSearchText,
