@@ -135,7 +135,7 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
   )
 
   const countPerObjectType = {
-    dataverses: countPerObjectTypePayload['Dataverses'],
+    collections: countPerObjectTypePayload['Dataverses'],
     datasets: countPerObjectTypePayload['Datasets'],
     files: countPerObjectTypePayload['Files']
   }
@@ -185,7 +185,7 @@ export const transformMyDataResponseToCollectionItemSubset = (
   })
 
   const countPerObjectType = {
-    dataverses: countPerObjectTypePayload['dataverses_count'],
+    collections: countPerObjectTypePayload['dataverses_count'],
     datasets: countPerObjectTypePayload['datasets_count'],
     files: countPerObjectTypePayload['files_count']
   }

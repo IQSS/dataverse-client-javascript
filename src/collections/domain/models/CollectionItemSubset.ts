@@ -27,7 +27,7 @@ export interface CollectionItemsFacetLabel {
 }
 
 interface CountPerObjectType {
-  dataverses: number
+  collections: number
   datasets: number
   files: number
 }
