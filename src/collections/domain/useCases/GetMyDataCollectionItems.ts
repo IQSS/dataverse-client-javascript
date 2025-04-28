@@ -17,8 +17,8 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
    * @param {number[]} [roleIds] - the ids of the roles to filter the items by.
    * @param {CollectionItemType[]} [collectionItemTypes] - the types of items to filter by.
    * @param {PublicationStatus[]} [publicationStatuses] - the publication statuses to filter by.
-   * @param {number} [limit] - Limit for pagination (optional).
-   * @param {number} [offset] - Offset for pagination (optional).
+   * @param {number} [limit] - Limit number of items to return for pagination (optional).
+   * @param {number} [offset] - Offset (starting point) for pagination (optional).
    * @param {string} [searchText] - filter by searching for this text in the results (optional).
    * * @returns {Promise<MyDataCollectionItemSubset>}
    */

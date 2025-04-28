@@ -234,17 +234,17 @@ const publishingStatuses = [
   PublicationStatus.Unpublished
 ]
 const limit = 10
-const offset = 20
+const selectedPage = 1
 const searchText = 'search text'
 const otherUserName = 'otherUserName'
 
-getCollectionItems
+getMyDataCollectionItems
   .execute(
     roleIds,
     collectionItemTypes,
     publishingStatuses,
     limit,
-    offset,
+    selectedPage,
     searchText,
     otherUserName
   )

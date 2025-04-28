@@ -209,7 +209,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionItemTypes: CollectionItemType[],
     publicationStatuses: PublicationStatus[],
     limit?: number,
-    page?: number,
+    selectedPage?: number,
     searchText?: string,
     userIdentifier?: string
   ): Promise<MyDataCollectionItemSubset> {
@@ -219,8 +219,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       queryParams.set(GetMyDataCollectionItemsQueryParams.PER_PAGE, limit.toString())
     }
 
-    if (page) {
-      queryParams.set(GetMyDataCollectionItemsQueryParams.SELECTED_PAGE, page.toString())
+    if (selectedPage) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.SELECTED_PAGE, selectedPage.toString())
     }
 
     if (searchText) {

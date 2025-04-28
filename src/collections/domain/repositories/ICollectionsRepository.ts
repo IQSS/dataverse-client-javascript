@@ -32,7 +32,7 @@ export interface ICollectionsRepository {
     collectionItemTypes: CollectionItemType[],
     publicationStatuses: PublicationStatus[],
     limit?: number,
-    page?: number,
+    selectedPage?: number,
     searchText?: string,
     otherUserName?: string
   ): Promise<MyDataCollectionItemSubset>
