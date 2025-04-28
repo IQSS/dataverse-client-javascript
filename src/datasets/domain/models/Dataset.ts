@@ -22,6 +22,7 @@ export interface DatasetVersionInfo {
   createTime: Date
   lastUpdateTime: Date
   releaseTime?: Date
+  deaccessionNote?: string
 }
 
 export enum DatasetVersionState {
