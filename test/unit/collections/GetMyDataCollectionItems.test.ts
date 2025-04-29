@@ -49,7 +49,7 @@ describe('GetMyDataCollectionItems', () => {
     items: testItems,
     publishingFacet: testFacets,
     totalItemCount: 30,
-    countPerObjectType: { dataverses: 10, datasets: 15, files: 5 }
+    countPerObjectType: { collections: 10, datasets: 15, files: 5 }
   }
   beforeEach(() => {
     collectionRepositoryStub = {} as ICollectionsRepository
