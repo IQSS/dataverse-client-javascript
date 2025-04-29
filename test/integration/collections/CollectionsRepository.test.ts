@@ -524,7 +524,7 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
 
       expect(actual.totalItemCount).toBe(3)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -548,7 +548,7 @@ describe('CollectionsRepository', () => {
       )
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
-      expect(actual.countPerObjectType.dataverses).toBe(0)
+      expect(actual.countPerObjectType.collections).toBe(0)
       expect(actual.countPerObjectType.datasets).toBe(0)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -563,7 +563,7 @@ describe('CollectionsRepository', () => {
       )
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
-      expect(actual.countPerObjectType.dataverses).toBe(0)
+      expect(actual.countPerObjectType.collections).toBe(0)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(0)
 
@@ -578,7 +578,7 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(2)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(0)
 
@@ -592,7 +592,7 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(2)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(0)
 
@@ -609,7 +609,7 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionOnly)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -627,7 +627,7 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect(actual.facets).toEqual(expectedFacetsFromDatasetOnly)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -645,7 +645,7 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect(actual.facets).toEqual(expectedFacetsFromFileOnly)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -665,7 +665,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionAndFile)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -685,7 +685,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -705,7 +705,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as FilePreview).type).toBe(CollectionItemType.FILE)
       expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect((actual.items[2] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -725,7 +725,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -745,7 +745,7 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[1] as FilePreview).type).toBe(CollectionItemType.FILE)
       expect((actual.items[2] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(1)
 
@@ -763,7 +763,7 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionOnly)
-      expect(actual.countPerObjectType.dataverses).toBe(1)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(0)
       expect(actual.countPerObjectType.files).toBe(0)
 
@@ -783,7 +783,7 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect(actual.facets).toEqual(expectedFacetsFromDatasetOnly)
-      expect(actual.countPerObjectType.dataverses).toBe(0)
+      expect(actual.countPerObjectType.collections).toBe(0)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(0)
 
@@ -802,7 +802,7 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect(actual.facets).toEqual(expectedFacetsFromFileOnly)
-      expect(actual.countPerObjectType.dataverses).toBe(0)
+      expect(actual.countPerObjectType.collections).toBe(0)
       expect(actual.countPerObjectType.datasets).toBe(0)
       expect(actual.countPerObjectType.files).toBe(1)
     })

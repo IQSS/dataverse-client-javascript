@@ -129,7 +129,7 @@ describe('execute', () => {
           }
         ])
         expect(actual.countPerObjectType).toEqual({
-          dataverses: 1,
+          collections: 1,
           datasets: 0,
           files: 0
         })
