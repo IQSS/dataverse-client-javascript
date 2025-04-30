@@ -75,6 +75,7 @@ The different use cases currently available in the package are classified below,
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
   - [Get ZIP Download Limit](#get-zip-download-limit)
+  - [Get Application Terms of Use](#get-application-terms-of-use)
 - [Contact](#Contact)
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
 
@@ -1780,6 +1781,26 @@ getZipDownloadLimit.execute().then((downloadLimit: number) => {
 ```
 
 _See [use case](../src/info/domain/useCases/GetZipDownloadLimit.ts) implementation_.
+
+#### Get Application Terms of Use
+
+Returns the Application Terms of Use. If you have enabled Internationalization you can pass a two-character language code (e.g. “en”) as the lang parameter.
+
+##### Example call:
+
+```typescript
+import { getApplicationTermsOfUse } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getApplicationTermsOfUse.execute().then((termsOfUse: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/info/domain/useCases/GetApplicationTermsOfUse.ts) implementation_.
 
 ## Contact
 
