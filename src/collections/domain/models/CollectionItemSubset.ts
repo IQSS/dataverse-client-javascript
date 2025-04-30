@@ -8,12 +8,6 @@ export interface CollectionItemSubset {
   totalItemCount: number
   countPerObjectType: CountPerObjectType
 }
-export interface MyDataCollectionItemSubset {
-  items: (CollectionPreview | DatasetPreview | FilePreview)[]
-  publishingFacet: CollectionItemsFacetLabel[]
-  totalItemCount: number
-  countPerObjectType: CountPerObjectType
-}
 
 export interface CollectionItemsFacet {
   name: string

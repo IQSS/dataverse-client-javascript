@@ -11,10 +11,7 @@ import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
 import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
-import {
-  CollectionItemSubset,
-  MyDataCollectionItemSubset
-} from '../../domain/models/CollectionItemSubset'
+import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
 import {
   CollectionSearchCriteria,
   OrderType,
@@ -212,7 +209,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     selectedPage?: number,
     searchText?: string,
     userIdentifier?: string
-  ): Promise<MyDataCollectionItemSubset> {
+  ): Promise<CollectionItemSubset> {
     const queryParams = new URLSearchParams()
 
     if (limit) {

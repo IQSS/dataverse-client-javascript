@@ -14,6 +14,7 @@ The different use cases currently available in the package are classified below,
     - [Get Collection Facets](#get-collection-facets)
     - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
     - [List All Collection Items](#list-all-collection-items)
+    - [List My Data Collection Items](#list-my-data-collection-items)
     - [Get Collection Featured Items](#get-collection-featured-items)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
@@ -217,7 +218,7 @@ This use case supports the following optional parameters depending on the search
 
 #### List My Data Collection Items
 
-Returns an instance of [MyDataCollectionItemSubset](../src/collections/domain/models/CollectionItemSubset.ts) that contains reduced information for each collection item for which the calling user has a role.
+Returns an instance of [CollectionItemSubset](../src/collections/domain/models/CollectionItemSubset.ts) that contains reduced information for each collection item for which the calling user has a role.
 
 ##### Example call:
 
@@ -248,7 +249,7 @@ getMyDataCollectionItems
     searchText,
     otherUserName
   )
-  .then((subset: MyDataCollectionItemSubset) => {
+  .then((subset: CollectionItemSubset) => {
     /* ... */
   })
 
@@ -271,8 +272,8 @@ The `MyDataCollectionItemSubset`returned instance contains a property called `to
 
 This use case supports the following optional parameters depending on the search goals:
 
-- **limit**: (number) Limit for pagination.
-- **offset**: (number) Offset for pagination.
+- **limit**: (number) Limit of items per page for pagination. (default is 10)
+- **selectedPage**: (number) the page of results to be returned. (default is 1)
 
 #### Get Collection Featured Items
 

@@ -106,26 +106,32 @@ describe('execute', () => {
         expect(actualCollectionPreview.alias).toBe(testCollectionAlias)
 
         expect(actual.totalItemCount).toBe(1)
-        expect(actual.publishingFacet).toEqual([
+        expect(actual.facets).toEqual([
           {
-            name: 'Published',
-            count: 0
-          },
-          {
-            name: 'Unpublished',
-            count: 1
-          },
-          {
-            name: 'Draft',
-            count: 0
-          },
-          {
-            name: 'In Review',
-            count: 0
-          },
-          {
-            name: 'Deaccessioned',
-            count: 0
+            name: 'publicationStatus',
+            friendlyName: 'Publication Status',
+            labels: [
+              {
+                name: 'Published',
+                count: 0
+              },
+              {
+                name: 'Unpublished',
+                count: 1
+              },
+              {
+                name: 'Draft',
+                count: 0
+              },
+              {
+                name: 'In Review',
+                count: 0
+              },
+              {
+                name: 'Deaccessioned',
+                count: 0
+              }
+            ]
           }
         ])
         expect(actual.countPerObjectType).toEqual({

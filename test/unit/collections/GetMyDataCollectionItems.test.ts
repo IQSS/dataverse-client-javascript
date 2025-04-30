@@ -5,12 +5,9 @@ import { CollectionItemType } from '../../../src/collections/domain/models/Colle
 import { createDatasetPreviewModel } from '../../testHelpers/datasets/datasetPreviewHelper'
 import { createFilePreviewModel } from '../../testHelpers/files/filePreviewHelper'
 import { createCollectionPreviewModel } from '../../testHelpers/collections/collectionPreviewHelper'
-import {
-  CollectionItemsFacetLabel,
-  MyDataCollectionItemSubset
-} from '../../../src/collections/domain/models/CollectionItemSubset'
+import { CollectionItemsFacet } from '../../../src/collections/domain/models/CollectionItemSubset'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
-
+import { CollectionItemSubset } from '../../../src/collections/domain/models/CollectionItemSubset'
 describe('GetMyDataCollectionItems', () => {
   let collectionRepositoryStub: ICollectionsRepository
   let testGetMyDataCollectionItems: GetMyDataCollectionItems
@@ -27,27 +24,33 @@ describe('GetMyDataCollectionItems', () => {
   const testSearchText = 'test'
   const testOtherUserName = 'testUser'
   const testItems = [
+    createCollectionPreviewModel(),
     createDatasetPreviewModel(),
-    createFilePreviewModel(),
-    createCollectionPreviewModel()
+    createFilePreviewModel()
   ]
   const testFacets = [
     {
-      name: 'Published',
-      count: 10
-    },
-    {
-      name: 'Draft',
-      count: 5
-    },
-    {
-      name: 'Unpublished',
-      count: 15
+      name: 'publicationStatus',
+      friendlyName: 'Publication Status',
+      labels: [
+        {
+          name: 'Published',
+          count: 10
+        },
+        {
+          name: 'Draft',
+          count: 5
+        },
+        {
+          name: 'Unpublished',
+          count: 15
+        }
+      ]
     }
-  ] as CollectionItemsFacetLabel[]
-  const testItemSubset: MyDataCollectionItemSubset = {
+  ] as CollectionItemsFacet[]
+  const testItemSubset: CollectionItemSubset = {
     items: testItems,
-    publishingFacet: testFacets,
+    facets: testFacets,
     totalItemCount: 30,
     countPerObjectType: { collections: 10, datasets: 15, files: 5 }
   }

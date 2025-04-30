@@ -11,8 +11,7 @@ import { CollectionFacetPayload } from './CollectionFacetPayload'
 import {
   CollectionItemsFacet,
   CollectionItemsFacetLabel,
-  CollectionItemSubset,
-  MyDataCollectionItemSubset
+  CollectionItemSubset
 } from '../../../domain/models/CollectionItemSubset'
 import { DatasetPreview } from '../../../../datasets'
 import { FilePreview } from '../../../../files'
@@ -150,7 +149,7 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
 
 export const transformMyDataResponseToCollectionItemSubset = (
   response: AxiosResponse
-): MyDataCollectionItemSubset => {
+): CollectionItemSubset => {
   const responseDataPayload = response.data.data
   const itemsPayload = responseDataPayload.items
   const countPerObjectTypePayload = responseDataPayload[
@@ -189,13 +188,14 @@ export const transformMyDataResponseToCollectionItemSubset = (
     datasets: countPerObjectTypePayload['datasets_count'],
     files: countPerObjectTypePayload['files_count']
   }
-  const publishingFacet: CollectionItemsFacetLabel[] = transformPublicationStatusResponseToLabels(
+  const publishingFacet: CollectionItemsFacet = transformPublicationStatusResponseToFacet(
     responseDataPayload.pubstatus_counts as MyDataPublicationStatusCountsPayload
   )
+  const facets: CollectionItemsFacet[] = [publishingFacet]
 
   return {
     items,
-    publishingFacet,
+    facets,
     totalItemCount: responseDataPayload.pagination.numResults,
     countPerObjectType
   }
@@ -210,14 +210,19 @@ const transformContactsPayloadToContacts = (
   }))
 }
 
-const transformPublicationStatusResponseToLabels = (
+const transformPublicationStatusResponseToFacet = (
   publicationStatusCounts: MyDataPublicationStatusCountsPayload
-): CollectionItemsFacetLabel[] => {
-  const labels: CollectionItemsFacetLabel[] = []
-  labels.push({ name: 'Published', count: publicationStatusCounts.published_count })
-  labels.push({ name: 'Unpublished', count: publicationStatusCounts.unpublished_count })
-  labels.push({ name: 'Draft', count: publicationStatusCounts.draft_count })
-  labels.push({ name: 'In Review', count: publicationStatusCounts.in_review_count })
-  labels.push({ name: 'Deaccessioned', count: publicationStatusCounts.deaccessioned_count })
-  return labels
+): CollectionItemsFacet => {
+  const labels: CollectionItemsFacetLabel[] = [
+    { name: 'Published', count: publicationStatusCounts.published_count },
+    { name: 'Unpublished', count: publicationStatusCounts.unpublished_count },
+    { name: 'Draft', count: publicationStatusCounts.draft_count },
+    { name: 'In Review', count: publicationStatusCounts.in_review_count },
+    { name: 'Deaccessioned', count: publicationStatusCounts.deaccessioned_count }
+  ]
+  return {
+    name: 'publicationStatus',
+    friendlyName: 'Publication Status',
+    labels
+  }
 }

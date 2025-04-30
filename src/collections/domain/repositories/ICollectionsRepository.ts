@@ -3,7 +3,7 @@ import { CollectionFeaturedItemsDTO } from '../dtos/CollectionFeaturedItemsDTO'
 import { Collection } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
 import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
-import { CollectionItemSubset, MyDataCollectionItemSubset } from '../models/CollectionItemSubset'
+import { CollectionItemSubset } from '../models/CollectionItemSubset'
 import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
@@ -35,7 +35,7 @@ export interface ICollectionsRepository {
     selectedPage?: number,
     searchText?: string,
     otherUserName?: string
-  ): Promise<MyDataCollectionItemSubset>
+  ): Promise<CollectionItemSubset>
   updateCollection(
     collectionIdOrAlias: number | string,
     updatedCollection: CollectionDTO

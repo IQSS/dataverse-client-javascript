@@ -1,10 +1,10 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
-import { MyDataCollectionItemSubset } from '../models/CollectionItemSubset'
+import { CollectionItemSubset } from '../models/CollectionItemSubset'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 import { CollectionItemType } from '../../../../src/collections/domain/models/CollectionItemType'
 import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
 
-export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSubset> {
+export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
   private collectionsRepository: ICollectionsRepository
 
   constructor(collectionsRepository: ICollectionsRepository) {
@@ -18,7 +18,7 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
    * @param {CollectionItemType[]} [collectionItemTypes] - the types of items to filter by.
    * @param {PublicationStatus[]} [publicationStatuses] - the publication statuses to filter by.
    * @param {number} [limit] - Limit number of items to return for pagination (optional).
-   * @param {number} [offset] - Offset (starting point) for pagination (optional).
+   * @param {number} [selected] - Offset (starting point) for pagination (optional).
    * @param {string} [searchText] - filter by searching for this text in the results (optional).
    * * @returns {Promise<MyDataCollectionItemSubset>}
    */
@@ -27,16 +27,16 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
     collectionItemTypes: CollectionItemType[],
     publicationStatuses: PublicationStatus[],
     limit?: number,
-    offset?: number,
+    selectedPage?: number,
     searchText?: string,
     otherUserName?: string
-  ): Promise<MyDataCollectionItemSubset> {
+  ): Promise<CollectionItemSubset> {
     return await this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
       collectionItemTypes,
       publicationStatuses,
       limit,
-      offset,
+      selectedPage,
       searchText,
       otherUserName
     )
