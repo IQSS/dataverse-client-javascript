@@ -41,8 +41,7 @@ import {
   deleteCollectionFeaturedItemsViaApi,
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
-import { CollectionItemsFacet } from '../../../dist/collections/domain/models/CollectionItemSubset'
-
+import { CollectionItemsFacet } from '../../../src/collections/domain/models/CollectionItemSubset'
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -845,6 +844,7 @@ describe('CollectionsRepository', () => {
     afterAll(async () => {
       try {
         await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+        console.log('Deleted dataset')
       } catch (error) {
         throw new Error(
           `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
@@ -852,6 +852,7 @@ describe('CollectionsRepository', () => {
       }
       try {
         await deleteCollectionViaApi(testSubCollectionAlias)
+        console.log('Deleted collection')
       } catch (error) {
         throw new Error(
           `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
@@ -861,7 +862,7 @@ describe('CollectionsRepository', () => {
 
     test('should return collection items given valid roleIds', async () => {
       // Give enough time to Solr for indexing
-      await new Promise((resolve) => setTimeout(resolve, 15000))
+      await new Promise((resolve) => setTimeout(resolve, 5000))
       // TODO: replace this with API call to get the role ids
       const roleIds = [1, 2, 3, 4, 5, 6, 7, 8]
       const publicationStatuses = [PublicationStatus.Draft, PublicationStatus.Unpublished]
