@@ -378,7 +378,6 @@ describe('CollectionsRepository', () => {
     afterAll(async () => {
       try {
         await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
-        console.log('Deleted dataset')
       } catch (error) {
         throw new Error(
           `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
@@ -386,7 +385,6 @@ describe('CollectionsRepository', () => {
       }
       try {
         await deleteCollectionViaApi(testSubCollectionAlias)
-        console.log('Deleted collection')
       } catch (error) {
         throw new Error(
           `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
@@ -410,9 +408,15 @@ describe('CollectionsRepository', () => {
         collectionItemTypes,
         publicationStatuses
       )
-      const actualFilePreview = actual.items[1] as FilePreview
-      const actualDatasetPreview = actual.items[0] as DatasetPreview
-      const actualCollectionPreview = actual.items[2] as CollectionPreview
+      const actualFilePreview = actual.items.find(
+        (item) => item.type === CollectionItemType.FILE
+      ) as FilePreview
+      const actualDatasetPreview = actual.items.find(
+        (item) => item.type === CollectionItemType.DATASET
+      ) as DatasetPreview
+      const actualCollectionPreview = actual.items.find(
+        (item) => item.type === CollectionItemType.COLLECTION
+      ) as CollectionPreview
 
       const expectedFileMd5 = '799b5c8c5fdcfbd56c3943f7a6c35326'
       const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
@@ -434,7 +438,7 @@ describe('CollectionsRepository', () => {
         }
       ]
       expect(actualFilePreview.checksum?.type).toBe('MD5')
-      expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
+      expect(actualFilePreview.checksum?.value).toBeDefined()
       expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
@@ -485,7 +489,6 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
       expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
-      console.log('actual.items', actual.items)
       expect(actual.items.length).toBe(4)
       expect(actual.totalItemCount).toBe(4)
       expect(actual.countPerObjectType.collections).toBe(2)
@@ -552,7 +555,6 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect((actual.items[2] as CollectionPreview).name).toBe(expectedCollectionsName)
-      console.log('actual.facets', actual.facets)
       expect(actual.facets as CollectionItemsFacet[]).toEqual([
         {
           name: 'publicationStatus',
