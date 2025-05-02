@@ -1342,22 +1342,15 @@ describe('CollectionsRepository', () => {
       )
       process.env.TEST_API_KEY = myDataUserApiToken
       const collectionDTO = createCollectionDTO(testSubCollectionAlias)
+      // Calling the  createCollection use case here
+      // because createCollectionViaApi does not create the collection in a way
+      // that is recognized by then MyData endpoint
       await createCollection.execute(collectionDTO, testCollectionAlias).catch((error) => {
         console.log(error.message)
         throw new Error(
           `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
         )
       })
-      /*
-      This does not work, it doesn't return the collection - even though calling the use case does work.
-      await createCollectionViaApi(testSubCollectionAlias).catch((error) => {
-        console.log(error.message)
-        throw new Error(
-          `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
-        )
-      })
-
-       */
       try {
         testDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
