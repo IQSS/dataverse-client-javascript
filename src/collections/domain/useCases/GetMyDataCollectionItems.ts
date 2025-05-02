@@ -18,8 +18,9 @@ export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
    * @param {CollectionItemType[]} [collectionItemTypes] - the types of items to filter by.
    * @param {PublicationStatus[]} [publicationStatuses] - the publication statuses to filter by.
    * @param {number} [limit] - Limit number of items to return for pagination (optional).
-   * @param {number} [selected] - Offset (starting point) for pagination (optional).
+   * @param {number} [selectedPage] - Offset (starting point) for pagination (optional).
    * @param {string} [searchText] - filter by searching for this text in the results (optional).
+   * @param {string} [otherUserName] - filter by searching for this text in the results (optional).
    * * @returns {Promise<MyDataCollectionItemSubset>}
    */
   async execute(
@@ -31,17 +32,7 @@ export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
     searchText?: string,
     otherUserName?: string
   ): Promise<CollectionItemSubset> {
-    console.log('Execute called with params:', {
-      roleIds,
-      collectionItemTypes,
-      publicationStatuses,
-      limit,
-      selectedPage,
-      searchText,
-      otherUserName
-    })
-
-    const result = await this.collectionsRepository.getMyDataCollectionItems(
+    return this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
       collectionItemTypes,
       publicationStatuses,
@@ -50,8 +41,5 @@ export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
       searchText,
       otherUserName
     )
-
-    console.log('Execute returned:', result)
-    return result
   }
 }

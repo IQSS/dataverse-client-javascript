@@ -1333,7 +1333,8 @@ describe('CollectionsRepository', () => {
     const testSubCollectionAlias = 'collectionsRepositoryMyDataCollection'
     const testCollectionName = 'Scientific Research'
     beforeAll(async () => {
-      const myDataUserApiToken = await createApiTokenViaApi('myDataUser')
+      const createSuperUser = true
+      const myDataUserApiToken = await createApiTokenViaApi('myDataUser', createSuperUser)
       ApiConfig.init(
         TestConstants.TEST_API_URL,
         DataverseApiAuthMechanism.API_KEY,
@@ -1341,7 +1342,8 @@ describe('CollectionsRepository', () => {
       )
       process.env.TEST_API_KEY = myDataUserApiToken
       const collectionDTO = createCollectionDTO(testSubCollectionAlias)
-      await createCollection.execute(collectionDTO, testCollectionAlias).catch(() => {
+      await createCollection.execute(collectionDTO, testCollectionAlias).catch((error) => {
+        console.log(error.message)
         throw new Error(
           `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
         )
