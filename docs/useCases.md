@@ -265,15 +265,12 @@ This use case requires the following parameters:
 
 This use case supports the following optional parameters depending on the search goals:
 
+- **limit**: (number) Limit of items per page for pagination. (default is 10)
+- **selectedPage**: (number) the page of results to be returned. (default is 1)
 - **searchText** is an optional string to filter the results by.
 - **otherUserName** is an optional string to return the collection items of another user. If not set, the calling user will be used. _Only superusers can use this parameter_.
 
-The `MyDataCollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
-
-This use case supports the following optional parameters depending on the search goals:
-
-- **limit**: (number) Limit of items per page for pagination. (default is 10)
-- **selectedPage**: (number) the page of results to be returned. (default is 1)
+The `CollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
 
 #### Get Collection Featured Items
 
