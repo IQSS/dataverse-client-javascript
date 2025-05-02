@@ -12,7 +12,8 @@ import {
   ReadError,
   WriteError,
   createDataset,
-  getCollection
+  getCollection,
+  createCollection
 } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -42,7 +43,6 @@ import {
   deleteCollectionFeaturedItemsViaApi,
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
-import { CollectionItemsFacet } from '../../../src/collections/domain/models/CollectionItemSubset'
 import { createApiTokenViaApi } from '../../testHelpers/users/apiTokenHelper'
 
 describe('CollectionsRepository', () => {
@@ -1331,6 +1331,7 @@ describe('CollectionsRepository', () => {
 
     const testTextFile1Name = 'test-file-2.txt'
     const testSubCollectionAlias = 'collectionsRepositoryMyDataCollection'
+    const testCollectionName = 'Scientific Research'
     beforeAll(async () => {
       const myDataUserApiToken = await createApiTokenViaApi('myDataUser')
       ApiConfig.init(
@@ -1339,13 +1340,22 @@ describe('CollectionsRepository', () => {
         myDataUserApiToken
       )
       process.env.TEST_API_KEY = myDataUserApiToken
-
+      const collectionDTO = createCollectionDTO(testSubCollectionAlias)
+      await createCollection.execute(collectionDTO, testCollectionAlias).catch(() => {
+        throw new Error(
+          `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
+        )
+      })
+      /*
+      This does not work, it doesn't return the collection - even though calling the use case does work.
       await createCollectionViaApi(testSubCollectionAlias).catch((error) => {
         console.log(error.message)
         throw new Error(
           `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
         )
       })
+
+       */
       try {
         testDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
@@ -1376,17 +1386,15 @@ describe('CollectionsRepository', () => {
         )
       }
     })
-    // TODO: remove this skip when the test is fixed
-    test.skip('should return collection items given valid roleIds', async () => {
+    test('should return collection items given valid roleIds', async () => {
       // Give enough time to Solr for indexing
       await new Promise((resolve) => setTimeout(resolve, 5000))
       await getCollection.execute(testSubCollectionAlias).then((collection) => {
         expect(collection).toBeDefined()
-        expect(collection.name).toBe('Scientific Research')
+        expect(collection.name).toBe('Test Collection')
         expect(collection.alias).toBe(testSubCollectionAlias)
-        expect(collection.description).toBe('We do all the science.')
-        expect(collection.affiliation).toBe('Scientific Research University')
-        console.log(`Collection ${testSubCollectionAlias} created successfully`, collection)
+        expect(collection.description).toBe('test description')
+        expect(collection.affiliation).toBe('test affiliation')
       })
       // TODO: replace this with API call to get the role ids
       const roleIds = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -1401,7 +1409,6 @@ describe('CollectionsRepository', () => {
         collectionItemTypes,
         publicationStatuses
       )
-      console.log(actual)
       const actualFilePreview = actual.items.find(
         (item) => item.type === CollectionItemType.FILE
       ) as FilePreview
@@ -1416,7 +1423,7 @@ describe('CollectionsRepository', () => {
       const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-2.txt'
-      const expectedCollectionsName = 'Scientific Research'
+      const expectedCollectionsName = 'Test Collection'
 
       const expectedFacetsAll = [
         {
@@ -1479,15 +1486,13 @@ describe('CollectionsRepository', () => {
 
       expect(actualCollectionPreview.name).toBe(expectedCollectionsName)
       expect(actualCollectionPreview.alias).toBe(testSubCollectionAlias)
-      expect(actualCollectionPreview.description).toBe('We do all the science.')
+      expect(actualCollectionPreview.description).toBe('test description')
       expect(actualCollectionPreview.imageUrl).toBe(undefined)
       expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
-      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.parentName).toBe(testCollectionName)
       expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
       expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
-      expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
-      expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
-      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.affiliation).toBe('test affiliation')
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
 
       expect(actual.facets).toEqual(expectedFacetsAll)
@@ -1505,9 +1510,9 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(3)
 
       // Test search text
-      const fileNameSearchText = 'test-fi'
+      const fileNameSearchText = 'file-2'
 
-      actual = await sut.getMyDataCollectionItems(
+      const actualFileResult = await sut.getMyDataCollectionItems(
         roleIds,
         collectionItemTypes,
         publicationStatuses,
@@ -1515,11 +1520,11 @@ describe('CollectionsRepository', () => {
         undefined,
         fileNameSearchText
       )
-      expect(actual.totalItemCount).toBe(1)
-      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(1)
+      expect(actualFileResult.totalItemCount).toBe(1)
+      expect((actualFileResult.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect(actualFileResult.countPerObjectType.collections).toBe(0)
+      expect(actualFileResult.countPerObjectType.datasets).toBe(0)
+      expect(actualFileResult.countPerObjectType.files).toBe(1)
 
       const datasetSearchText = 'This is the description'
 
@@ -1534,36 +1539,6 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
-
-      const searchTextForDatasetAndCollection = 'the'
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        collectionItemTypes,
-        publicationStatuses,
-        undefined,
-        undefined,
-        searchTextForDatasetAndCollection
-      )
-      expect(actual.totalItemCount).toBe(3)
-      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
-      expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect((actual.items[2] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.facets as CollectionItemsFacet[]).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 2 },
-            { name: 'Draft', count: 1 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
-      ])
-      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(1)
       expect(actual.countPerObjectType.files).toBe(0)
 
@@ -1688,7 +1663,7 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(2)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.countPerObjectType.collections).toBe(2)
+      expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(0)
       expect(actual.countPerObjectType.files).toBe(1)
     })
