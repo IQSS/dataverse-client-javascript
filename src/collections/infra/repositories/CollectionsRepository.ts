@@ -210,6 +210,16 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     searchText?: string,
     userIdentifier?: string
   ): Promise<CollectionItemSubset> {
+    console.log('getMyDataCollectionItems called with params:', {
+      roleIds,
+      collectionItemTypes,
+      publicationStatuses,
+      limit,
+      selectedPage,
+      searchText,
+      userIdentifier
+    })
+
     const queryParams = new URLSearchParams()
 
     if (limit) {
@@ -257,8 +267,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         publicationStatus.toString()
       )
     })
-
-    return this.doGet('/mydata/retrieve', true, queryParams)
+    console.log('getMyDataCollectionItems queryParams:', queryParams)
+    const result = await this.doGet('/mydata/retrieve', true, queryParams)
       .then((response) => {
         if (response.data.success !== true) {
           throw new ReadError(response.data.error_message)
@@ -268,6 +278,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       .catch((error) => {
         throw error
       })
+
+    console.log('getMyDataCollectionItems returned:', result)
+    return result
   }
 
   private createCreateOrUpdateRequestBody(

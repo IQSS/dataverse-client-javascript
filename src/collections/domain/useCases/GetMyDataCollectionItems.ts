@@ -31,7 +31,17 @@ export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
     searchText?: string,
     otherUserName?: string
   ): Promise<CollectionItemSubset> {
-    return await this.collectionsRepository.getMyDataCollectionItems(
+    console.log('Execute called with params:', {
+      roleIds,
+      collectionItemTypes,
+      publicationStatuses,
+      limit,
+      selectedPage,
+      searchText,
+      otherUserName
+    })
+
+    const result = await this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
       collectionItemTypes,
       publicationStatuses,
@@ -40,5 +50,8 @@ export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
       searchText,
       otherUserName
     )
+
+    console.log('Execute returned:', result)
+    return result
   }
 }

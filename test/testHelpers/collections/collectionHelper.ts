@@ -90,7 +90,8 @@ export async function createCollectionViaApi(
     if (parentCollectionAlias == undefined) {
       parentCollectionAlias = ':root'
     }
-
+    // Print api key to make sure it is set
+    console.log(`creating collection, API Key: ${process.env.TEST_API_KEY}`)
     return await axios
       .post(
         `${TestConstants.TEST_API_URL}/dataverses/${parentCollectionAlias}`,

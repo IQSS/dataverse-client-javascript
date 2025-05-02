@@ -11,7 +11,8 @@ import {
   FilePreview,
   ReadError,
   WriteError,
-  createDataset
+  createDataset,
+  getCollection
 } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -42,6 +43,8 @@ import {
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 import { CollectionItemsFacet } from '../../../src/collections/domain/models/CollectionItemSubset'
+import { createApiTokenViaApi } from '../../testHelpers/users/apiTokenHelper'
+
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -49,6 +52,7 @@ describe('CollectionsRepository', () => {
   const currentYear = new Date().getFullYear()
 
   beforeAll(async () => {
+    // create builtin user and pass API key to APiConfig
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
@@ -349,361 +353,6 @@ describe('CollectionsRepository', () => {
       await expect(sut.getCollectionUserPermissions(nonExistentCollectionAlias)).rejects.toThrow(
         expectedError
       )
-    })
-  })
-  describe('getMyDataCollectionItems', () => {
-    let testDatasetIds: CreatedDatasetIdentifiers
-
-    const testTextFile1Name = 'test-file-2.txt'
-    const testSubCollectionAlias = 'collectionsRepositoryMyDataCollection'
-    beforeAll(async () => {
-      await createCollectionViaApi(testSubCollectionAlias, testCollectionAlias).catch(() => {
-        throw new Error(
-          `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
-        )
-      })
-      try {
-        testDatasetIds = await createDataset.execute(
-          TestConstants.TEST_NEW_DATASET_DTO,
-          testSubCollectionAlias
-        )
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test dataset')
-      }
-      await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name).catch(() => {
-        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
-      })
-    })
-
-    afterAll(async () => {
-      try {
-        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
-      } catch (error) {
-        throw new Error(
-          `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
-        )
-      }
-      try {
-        await deleteCollectionViaApi(testSubCollectionAlias)
-      } catch (error) {
-        throw new Error(
-          `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
-        )
-      }
-    })
-
-    test('should return collection items given valid roleIds', async () => {
-      // Give enough time to Solr for indexing
-      await new Promise((resolve) => setTimeout(resolve, 5000))
-      // TODO: replace this with API call to get the role ids
-      const roleIds = [1, 2, 3, 4, 5, 6, 7, 8]
-      const publicationStatuses = [PublicationStatus.Draft, PublicationStatus.Unpublished]
-      const collectionItemTypes = [
-        CollectionItemType.COLLECTION,
-        CollectionItemType.DATASET,
-        CollectionItemType.FILE
-      ]
-      let actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        collectionItemTypes,
-        publicationStatuses
-      )
-      const actualFilePreview = actual.items.find(
-        (item) => item.type === CollectionItemType.FILE
-      ) as FilePreview
-      const actualDatasetPreview = actual.items.find(
-        (item) => item.type === CollectionItemType.DATASET
-      ) as DatasetPreview
-      const actualCollectionPreview = actual.items.find(
-        (item) => item.type === CollectionItemType.COLLECTION
-      ) as CollectionPreview
-
-      const expectedFileMd5 = '799b5c8c5fdcfbd56c3943f7a6c35326'
-      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
-      const expectedDatasetDescription = 'Dataset created using the createDataset use case'
-      const expectedFileName = 'test-file-2.txt'
-      const expectedCollectionsName = 'Scientific Research'
-
-      const expectedFacetsAll = [
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 4 },
-            { name: 'Draft', count: 2 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
-      ]
-      expect(actualFilePreview.checksum?.type).toBe('MD5')
-      expect(actualFilePreview.checksum?.value).toBeDefined()
-      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
-      expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
-      expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
-      expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
-      expect(actualFilePreview.description).toBe('')
-      expect(actualFilePreview.fileContentType).toBe('text/plain')
-      expect(actualFilePreview.fileId).not.toBeUndefined()
-      expect(actualFilePreview.fileType).toBe('Plain Text')
-      expect(actualFilePreview.md5).toBe(expectedFileMd5)
-      expect(actualFilePreview.name).toBe(expectedFileName)
-      expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
-      expect(actualFilePreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
-      expect(actualFilePreview.sizeInBytes).toBe(12)
-      expect(actualFilePreview.url).not.toBeUndefined()
-      expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
-      expect(actualFilePreview.type).toBe(CollectionItemType.FILE)
-      expect(actualFilePreview.restricted).toBe(false)
-      expect(actualFilePreview.canDownloadFile).toBe(true)
-
-      expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
-      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
-      expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
-      expect(actualDatasetPreview.persistentId).not.toBeUndefined()
-      expect(actualDatasetPreview.persistentId).not.toBeUndefined()
-      expect(actualDatasetPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
-      expect(actualDatasetPreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
-      expect(actualDatasetPreview.versionId).not.toBeUndefined()
-      expect(actualDatasetPreview.versionInfo.createTime).not.toBeUndefined()
-      expect(actualDatasetPreview.versionInfo.lastUpdateTime).not.toBeUndefined()
-      expect(actualDatasetPreview.versionInfo.majorNumber).toBeUndefined()
-      expect(actualDatasetPreview.versionInfo.minorNumber).toBeUndefined()
-      expect(actualDatasetPreview.versionInfo.state).toBe('DRAFT')
-      expect(actualDatasetPreview.parentCollectionAlias).toBe(
-        'collectionsRepositoryMyDataCollection'
-      )
-      expect(actualDatasetPreview.parentCollectionName).toBe(expectedCollectionsName)
-      expect(actualDatasetPreview.type).toBe(CollectionItemType.DATASET)
-
-      expect(actualCollectionPreview.name).toBe(expectedCollectionsName)
-      expect(actualCollectionPreview.alias).toBe(testSubCollectionAlias)
-      expect(actualCollectionPreview.description).toBe('We do all the science.')
-      expect(actualCollectionPreview.imageUrl).toBe(undefined)
-      expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
-      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
-      expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
-      expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
-      expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
-      expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
-      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
-      expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
-      expect(actual.items.length).toBe(4)
-      expect(actual.totalItemCount).toBe(4)
-      expect(actual.countPerObjectType.collections).toBe(2)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
-
-      expect(actual.facets).toEqual(expectedFacetsAll)
-
-      // Test limit and selectedPage
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        collectionItemTypes,
-        publicationStatuses,
-        1,
-        1
-      )
-      expect((actual.items[1] as FilePreview).name).toBe(expectedFileName)
-      expect(actual.items.length).toBe(4)
-      expect(actual.totalItemCount).toBe(4)
-
-      // Test search text
-      const fileNameSearchText = 'test-fi'
-
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        collectionItemTypes,
-        publicationStatuses,
-        undefined,
-        undefined,
-        fileNameSearchText
-      )
-      expect(actual.totalItemCount).toBe(1)
-      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(1)
-
-      const datasetSearchText = 'This is the description'
-
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        collectionItemTypes,
-        publicationStatuses,
-        undefined,
-        undefined,
-        datasetSearchText
-      )
-      expect(actual.totalItemCount).toBe(1)
-      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
-
-      const searchTextForDatasetAndCollection = 'the'
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        collectionItemTypes,
-        publicationStatuses,
-        undefined,
-        undefined,
-        searchTextForDatasetAndCollection
-      )
-      expect(actual.totalItemCount).toBe(3)
-      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
-      expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect((actual.items[2] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.facets as CollectionItemsFacet[]).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 3 },
-            { name: 'Draft', count: 1 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
-      ])
-      expect(actual.countPerObjectType.collections).toBe(2)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
-
-      // Test search text, limit and offset
-      // TODO: run this test when the limit param has been fixed in the Dataverse API
-      /*
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        collectionItemTypes,
-        publicationStatuses,
-        1,
-        1,
-        searchTextForDatasetAndCollection
-      )
-      expect(actual.items.length).toBe(1)
-      expect(actual.totalItemCount).toBe(2)
-      expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
-      */
-
-      // Test type collection
-      const searchForCollectionType = [CollectionItemType.COLLECTION]
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        searchForCollectionType,
-        publicationStatuses,
-        undefined,
-        undefined
-      )
-      expect(actual.items.length).toBe(2)
-      expect(actual.totalItemCount).toBe(2)
-      expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 2 },
-            { name: 'Draft', count: 0 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
-      ])
-      expect(actual.countPerObjectType.collections).toBe(2)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(0)
-
-      // Test type dataset
-      const searchDatasetType = [CollectionItemType.DATASET]
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        searchDatasetType,
-        publicationStatuses,
-        undefined,
-        undefined
-      )
-      expect(actual.items.length).toBe(1)
-      expect(actual.totalItemCount).toBe(1)
-      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 1 },
-            { name: 'Draft', count: 1 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
-      ])
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
-
-      // Test type file
-      const searchFileType = [CollectionItemType.FILE]
-
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        searchFileType,
-        publicationStatuses,
-        undefined,
-        undefined
-      )
-      expect(actual.items.length).toBe(1)
-      expect(actual.totalItemCount).toBe(1)
-      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 1 },
-            { name: 'Draft', count: 1 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
-      ])
-
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(1)
-
-      // Test multiple types
-      const searchForMultiTypes = [CollectionItemType.FILE, CollectionItemType.COLLECTION]
-      actual = await sut.getMyDataCollectionItems(
-        roleIds,
-        searchForMultiTypes,
-        publicationStatuses,
-        undefined,
-        undefined
-      )
-      expect(actual.items.length).toBe(3)
-      expect(actual.totalItemCount).toBe(3)
-      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
-      expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.countPerObjectType.collections).toBe(2)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(1)
-    })
-
-    test('should return error when role, type and publication status params are empty', async () => {
-      const expectedError = new ReadError('No results. Please select at least one Role.')
-
-      await expect(
-        sut.getMyDataCollectionItems([], [], [], 0, 0, undefined, undefined)
-      ).rejects.toThrow(expectedError)
     })
   })
 
@@ -1675,6 +1324,381 @@ describe('CollectionsRepository', () => {
       )
 
       expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
+    })
+  })
+  describe('getMyDataCollectionItems', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    const testTextFile1Name = 'test-file-2.txt'
+    const testSubCollectionAlias = 'collectionsRepositoryMyDataCollection'
+    beforeAll(async () => {
+      const myDataUserApiToken = await createApiTokenViaApi('myDataUser')
+      ApiConfig.init(
+        TestConstants.TEST_API_URL,
+        DataverseApiAuthMechanism.API_KEY,
+        myDataUserApiToken
+      )
+      process.env.TEST_API_KEY = myDataUserApiToken
+
+      await createCollectionViaApi(testSubCollectionAlias).catch((error) => {
+        console.log(error.message)
+        throw new Error(
+          `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
+        )
+      })
+      try {
+        testDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          testSubCollectionAlias
+        )
+      } catch (error: any) {
+        console.log(error.message)
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
+      }
+      await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
+      })
+    })
+
+    afterAll(async () => {
+      try {
+        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
+        )
+      }
+      try {
+        await deleteCollectionViaApi(testSubCollectionAlias)
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
+        )
+      }
+    })
+    // TODO: remove this skip when the test is fixed
+    test.skip('should return collection items given valid roleIds', async () => {
+      // Give enough time to Solr for indexing
+      await new Promise((resolve) => setTimeout(resolve, 5000))
+      await getCollection.execute(testSubCollectionAlias).then((collection) => {
+        expect(collection).toBeDefined()
+        expect(collection.name).toBe('Scientific Research')
+        expect(collection.alias).toBe(testSubCollectionAlias)
+        expect(collection.description).toBe('We do all the science.')
+        expect(collection.affiliation).toBe('Scientific Research University')
+        console.log(`Collection ${testSubCollectionAlias} created successfully`, collection)
+      })
+      // TODO: replace this with API call to get the role ids
+      const roleIds = [1, 2, 3, 4, 5, 6, 7, 8]
+      const publicationStatuses = [PublicationStatus.Draft, PublicationStatus.Unpublished]
+      const collectionItemTypes = [
+        CollectionItemType.COLLECTION,
+        CollectionItemType.DATASET,
+        CollectionItemType.FILE
+      ]
+      let actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        collectionItemTypes,
+        publicationStatuses
+      )
+      console.log(actual)
+      const actualFilePreview = actual.items.find(
+        (item) => item.type === CollectionItemType.FILE
+      ) as FilePreview
+      const actualDatasetPreview = actual.items.find(
+        (item) => item.type === CollectionItemType.DATASET
+      ) as DatasetPreview
+      const actualCollectionPreview = actual.items.find(
+        (item) => item.type === CollectionItemType.COLLECTION
+      ) as CollectionPreview
+
+      const expectedFileMd5 = '799b5c8c5fdcfbd56c3943f7a6c35326'
+      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
+      const expectedDatasetDescription = 'Dataset created using the createDataset use case'
+      const expectedFileName = 'test-file-2.txt'
+      const expectedCollectionsName = 'Scientific Research'
+
+      const expectedFacetsAll = [
+        {
+          name: 'publicationStatus',
+          friendlyName: 'Publication Status',
+          labels: [
+            { name: 'Published', count: 0 },
+            { name: 'Unpublished', count: 3 },
+            { name: 'Draft', count: 2 },
+            { name: 'In Review', count: 0 },
+            { name: 'Deaccessioned', count: 0 }
+          ]
+        }
+      ]
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+      expect(actual.countPerObjectType.collections).toBe(1)
+      expect(actual.countPerObjectType.datasets).toBe(1)
+      expect(actual.countPerObjectType.files).toBe(1)
+
+      expect(actualFilePreview.checksum?.type).toBe('MD5')
+      expect(actualFilePreview.checksum?.value).toBeDefined()
+      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
+      expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
+      expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
+      expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
+      expect(actualFilePreview.description).toBe('')
+      expect(actualFilePreview.fileContentType).toBe('text/plain')
+      expect(actualFilePreview.fileId).not.toBeUndefined()
+      expect(actualFilePreview.fileType).toBe('Plain Text')
+      expect(actualFilePreview.md5).toBe(expectedFileMd5)
+      expect(actualFilePreview.name).toBe(expectedFileName)
+      expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
+      expect(actualFilePreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
+      expect(actualFilePreview.sizeInBytes).toBe(12)
+      expect(actualFilePreview.url).not.toBeUndefined()
+      expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
+      expect(actualFilePreview.type).toBe(CollectionItemType.FILE)
+      expect(actualFilePreview.restricted).toBe(false)
+      expect(actualFilePreview.canDownloadFile).toBe(true)
+
+      expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
+      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
+      expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
+      expect(actualDatasetPreview.persistentId).not.toBeUndefined()
+      expect(actualDatasetPreview.persistentId).not.toBeUndefined()
+      expect(actualDatasetPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
+      expect(actualDatasetPreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
+      expect(actualDatasetPreview.versionId).not.toBeUndefined()
+      expect(actualDatasetPreview.versionInfo.createTime).not.toBeUndefined()
+      expect(actualDatasetPreview.versionInfo.lastUpdateTime).not.toBeUndefined()
+      expect(actualDatasetPreview.versionInfo.majorNumber).toBeUndefined()
+      expect(actualDatasetPreview.versionInfo.minorNumber).toBeUndefined()
+      expect(actualDatasetPreview.versionInfo.state).toBe('DRAFT')
+      expect(actualDatasetPreview.parentCollectionAlias).toBe(
+        'collectionsRepositoryMyDataCollection'
+      )
+      expect(actualDatasetPreview.parentCollectionName).toBe(expectedCollectionsName)
+      expect(actualDatasetPreview.type).toBe(CollectionItemType.DATASET)
+
+      expect(actualCollectionPreview.name).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.alias).toBe(testSubCollectionAlias)
+      expect(actualCollectionPreview.description).toBe('We do all the science.')
+      expect(actualCollectionPreview.imageUrl).toBe(undefined)
+      expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
+      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
+      expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
+      expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
+      expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
+      expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
+      expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
+
+      expect(actual.facets).toEqual(expectedFacetsAll)
+
+      // Test limit and selectedPage
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        collectionItemTypes,
+        publicationStatuses,
+        1,
+        1
+      )
+      expect((actual.items[1] as FilePreview).name).toBe(expectedFileName)
+      expect(actual.items.length).toBe(3)
+      expect(actual.totalItemCount).toBe(3)
+
+      // Test search text
+      const fileNameSearchText = 'test-fi'
+
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        collectionItemTypes,
+        publicationStatuses,
+        undefined,
+        undefined,
+        fileNameSearchText
+      )
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect(actual.countPerObjectType.collections).toBe(0)
+      expect(actual.countPerObjectType.datasets).toBe(0)
+      expect(actual.countPerObjectType.files).toBe(1)
+
+      const datasetSearchText = 'This is the description'
+
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        collectionItemTypes,
+        publicationStatuses,
+        undefined,
+        undefined,
+        datasetSearchText
+      )
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+      expect(actual.countPerObjectType.collections).toBe(0)
+      expect(actual.countPerObjectType.datasets).toBe(1)
+      expect(actual.countPerObjectType.files).toBe(0)
+
+      const searchTextForDatasetAndCollection = 'the'
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        collectionItemTypes,
+        publicationStatuses,
+        undefined,
+        undefined,
+        searchTextForDatasetAndCollection
+      )
+      expect(actual.totalItemCount).toBe(3)
+      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+      expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect((actual.items[2] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect(actual.facets as CollectionItemsFacet[]).toEqual([
+        {
+          name: 'publicationStatus',
+          friendlyName: 'Publication Status',
+          labels: [
+            { name: 'Published', count: 0 },
+            { name: 'Unpublished', count: 2 },
+            { name: 'Draft', count: 1 },
+            { name: 'In Review', count: 0 },
+            { name: 'Deaccessioned', count: 0 }
+          ]
+        }
+      ])
+      expect(actual.countPerObjectType.collections).toBe(1)
+      expect(actual.countPerObjectType.datasets).toBe(1)
+      expect(actual.countPerObjectType.files).toBe(0)
+
+      // Test search text, limit and offset
+      // TODO: run this test when the limit param has been fixed in the Dataverse API
+      /*
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        collectionItemTypes,
+        publicationStatuses,
+        1,
+        1,
+        searchTextForDatasetAndCollection
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(2)
+      expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect(actual.countPerObjectType.collections).toBe(1)
+      expect(actual.countPerObjectType.datasets).toBe(1)
+      expect(actual.countPerObjectType.files).toBe(0)
+      */
+
+      // Test type collection
+      const searchForCollectionType = [CollectionItemType.COLLECTION]
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        searchForCollectionType,
+        publicationStatuses,
+        undefined,
+        undefined
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect(actual.facets).toEqual([
+        {
+          name: 'publicationStatus',
+          friendlyName: 'Publication Status',
+          labels: [
+            { name: 'Published', count: 0 },
+            { name: 'Unpublished', count: 1 },
+            { name: 'Draft', count: 0 },
+            { name: 'In Review', count: 0 },
+            { name: 'Deaccessioned', count: 0 }
+          ]
+        }
+      ])
+      expect(actual.countPerObjectType.collections).toBe(1)
+      expect(actual.countPerObjectType.datasets).toBe(0)
+      expect(actual.countPerObjectType.files).toBe(0)
+
+      // Test type dataset
+      const searchDatasetType = [CollectionItemType.DATASET]
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        searchDatasetType,
+        publicationStatuses,
+        undefined,
+        undefined
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
+      expect(actual.facets).toEqual([
+        {
+          name: 'publicationStatus',
+          friendlyName: 'Publication Status',
+          labels: [
+            { name: 'Published', count: 0 },
+            { name: 'Unpublished', count: 1 },
+            { name: 'Draft', count: 1 },
+            { name: 'In Review', count: 0 },
+            { name: 'Deaccessioned', count: 0 }
+          ]
+        }
+      ])
+      expect(actual.countPerObjectType.collections).toBe(0)
+      expect(actual.countPerObjectType.datasets).toBe(1)
+      expect(actual.countPerObjectType.files).toBe(0)
+
+      // Test type file
+      const searchFileType = [CollectionItemType.FILE]
+
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        searchFileType,
+        publicationStatuses,
+        undefined,
+        undefined
+      )
+      expect(actual.items.length).toBe(1)
+      expect(actual.totalItemCount).toBe(1)
+      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect(actual.facets).toEqual([
+        {
+          name: 'publicationStatus',
+          friendlyName: 'Publication Status',
+          labels: [
+            { name: 'Published', count: 0 },
+            { name: 'Unpublished', count: 1 },
+            { name: 'Draft', count: 1 },
+            { name: 'In Review', count: 0 },
+            { name: 'Deaccessioned', count: 0 }
+          ]
+        }
+      ])
+
+      expect(actual.countPerObjectType.collections).toBe(0)
+      expect(actual.countPerObjectType.datasets).toBe(0)
+      expect(actual.countPerObjectType.files).toBe(1)
+
+      // Test multiple types
+      const searchForMultiTypes = [CollectionItemType.FILE, CollectionItemType.COLLECTION]
+      actual = await sut.getMyDataCollectionItems(
+        roleIds,
+        searchForMultiTypes,
+        publicationStatuses,
+        undefined,
+        undefined
+      )
+      expect(actual.items.length).toBe(2)
+      expect(actual.totalItemCount).toBe(2)
+      expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
+      expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
+      expect(actual.countPerObjectType.collections).toBe(2)
+      expect(actual.countPerObjectType.datasets).toBe(0)
+      expect(actual.countPerObjectType.files).toBe(1)
+    })
+
+    test('should return error when role, type and publication status params are empty', async () => {
+      const expectedError = new ReadError('No results. Please select at least one Role.')
+
+      await expect(
+        sut.getMyDataCollectionItems([], [], [], 0, 0, undefined, undefined)
+      ).rejects.toThrow(expectedError)
     })
   })
 })
