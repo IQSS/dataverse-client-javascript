@@ -21,7 +21,7 @@ export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
    * @param {number} [selectedPage] - Offset (starting point) for pagination (optional).
    * @param {string} [searchText] - filter by searching for this text in the results (optional).
    * @param {string} [otherUserName] - filter by searching for this text in the results (optional).
-   * * @returns {Promise<MyDataCollectionItemSubset>}
+   * * @returns {Promise<CollectionItemSubset>}
    */
   async execute(
     roleIds: number[],
