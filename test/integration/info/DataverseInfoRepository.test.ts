@@ -62,6 +62,7 @@ describe('DataverseInfoRepository', () => {
 
       expect(actual).toBe(defaultNoTermsOfUseMessage)
     })
+
     test('should return terms when terms are set', async () => {
       const testTermsOfUse = 'Be excellent to each other.'
       await setApplicationTermsOfUseViaApi(testTermsOfUse)

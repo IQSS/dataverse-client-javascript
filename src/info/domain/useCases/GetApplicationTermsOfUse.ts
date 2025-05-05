@@ -11,6 +11,7 @@ export class GetApplicationTermsOfUse implements UseCase<string> {
   /**
    * Returns a string containing the application terms of use.
    *
+   * @param {string} [lang] - Optional language parameter to specify the language of the terms of use.
    * @returns {Promise<string>}
    */
   async execute(lang?: string): Promise<string> {
