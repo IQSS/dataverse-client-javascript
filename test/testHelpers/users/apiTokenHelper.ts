@@ -27,9 +27,7 @@ export const createApiTokenViaApi = async (
       await axios.put(`${TestConstants.TEST_API_URL}/admin/superuser/${userName}`, 'true')
     }
     return token
-  } catch (error: Error | any) {
-    console.log(error.message)
-
+  } catch (error) {
     throw new Error(`Error while creating API token`)
   }
 }
