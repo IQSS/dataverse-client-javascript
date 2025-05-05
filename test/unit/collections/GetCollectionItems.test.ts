@@ -19,7 +19,7 @@ describe('execute', () => {
   const testTotalCount = 3
   const testFacets = createCollectionItemsFacetsModel()
   const testCountPerObjectType = {
-    dataverses: 1,
+    collections: 1,
     datasets: 1,
     files: 1
   }

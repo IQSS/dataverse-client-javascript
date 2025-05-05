@@ -10,6 +10,7 @@ import { CollectionsRepository } from './infra/repositories/CollectionsRepositor
 import { UpdateCollectionFeaturedItems } from './domain/useCases/UpdateCollectionFeaturedItems'
 import { DeleteCollectionFeaturedItems } from './domain/useCases/DeleteCollectionFeaturedItems'
 import { DeleteCollection } from './domain/useCases/DeleteCollection'
+import { GetMyDataCollectionItems } from './domain/useCases/GetMyDataCollectionItems'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -18,6 +19,7 @@ const createCollection = new CreateCollection(collectionsRepository)
 const getCollectionFacets = new GetCollectionFacets(collectionsRepository)
 const getCollectionUserPermissions = new GetCollectionUserPermissions(collectionsRepository)
 const getCollectionItems = new GetCollectionItems(collectionsRepository)
+const getMyDataCollectionItems = new GetMyDataCollectionItems(collectionsRepository)
 const publishCollection = new PublishCollection(collectionsRepository)
 const updateCollection = new UpdateCollection(collectionsRepository)
 const getCollectionFeaturedItems = new GetCollectionFeaturedItems(collectionsRepository)
@@ -31,6 +33,7 @@ export {
   getCollectionFacets,
   getCollectionUserPermissions,
   getCollectionItems,
+  getMyDataCollectionItems,
   publishCollection,
   updateCollection,
   getCollectionFeaturedItems,

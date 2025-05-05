@@ -14,4 +14,5 @@ export interface DatasetPreview {
   parentCollectionName: string
   parentCollectionAlias: string
   imageUrl?: string
+  userRoles?: string[]
 }

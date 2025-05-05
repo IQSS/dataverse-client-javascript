@@ -6,6 +6,8 @@ import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
 import { CollectionItemSubset } from '../models/CollectionItemSubset'
 import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
+import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../../src/collections/domain/models/CollectionItemType'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -24,6 +26,15 @@ export interface ICollectionsRepository {
     limit?: number,
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria
+  ): Promise<CollectionItemSubset>
+  getMyDataCollectionItems(
+    roleIds: number[],
+    collectionItemTypes: CollectionItemType[],
+    publicationStatuses: PublicationStatus[],
+    limit?: number,
+    selectedPage?: number,
+    searchText?: string,
+    otherUserName?: string
   ): Promise<CollectionItemSubset>
   updateCollection(
     collectionIdOrAlias: number | string,

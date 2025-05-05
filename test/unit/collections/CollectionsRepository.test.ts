@@ -375,7 +375,7 @@ describe('CollectionsRepository', () => {
     const testTotalCount = 2
     const testFacets = createCollectionItemsFacetsModel()
     const testCountPerObjectType = {
-      dataverses: 0,
+      collections: 0,
       datasets: 1,
       files: 1
     }

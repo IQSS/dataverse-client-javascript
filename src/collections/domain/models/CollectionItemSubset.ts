@@ -15,13 +15,13 @@ export interface CollectionItemsFacet {
   labels: CollectionItemsFacetLabel[]
 }
 
-interface CollectionItemsFacetLabel {
+export interface CollectionItemsFacetLabel {
   name: string
   count: number
 }
 
 interface CountPerObjectType {
-  dataverses: number
+  collections: number
   datasets: number
   files: number
 }

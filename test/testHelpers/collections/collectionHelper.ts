@@ -90,7 +90,6 @@ export async function createCollectionViaApi(
     if (parentCollectionAlias == undefined) {
       parentCollectionAlias = ':root'
     }
-
     return await axios
       .post(
         `${TestConstants.TEST_API_URL}/dataverses/${parentCollectionAlias}`,

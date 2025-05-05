@@ -5,6 +5,7 @@ import { DatasetPreviewSubset } from '../../../domain/models/DatasetPreviewSubse
 import { DatasetPreviewPayload } from './DatasetPreviewPayload'
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 import { CollectionItemType } from '../../../../collections/domain/models/CollectionItemType'
+import { MyDataDatasetPreviewPayload } from './MyDataDatasetPreviewPayload'
 
 export const transformDatasetPreviewsResponseToDatasetPreviewSubset = (
   response: AxiosResponse
@@ -51,5 +52,39 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
     ...(datasetPreviewPayload.image_url && {
       imageUrl: datasetPreviewPayload.image_url
     })
+  }
+}
+
+export const transformMyDataDatasetPreviewPayloadToDatasetPreview = (
+  datasetPreviewPayload: MyDataDatasetPreviewPayload
+): DatasetPreview => {
+  const publicationStatuses: PublicationStatus[] = []
+  datasetPreviewPayload.publicationStatuses.forEach((element) => {
+    publicationStatuses.push(element as unknown as PublicationStatus)
+  })
+  return {
+    type: CollectionItemType.DATASET,
+    persistentId: datasetPreviewPayload.global_id,
+    title: datasetPreviewPayload.name,
+    versionId: datasetPreviewPayload.versionId,
+    versionInfo: {
+      majorNumber: datasetPreviewPayload.majorVersion,
+      minorNumber: datasetPreviewPayload.minorVersion,
+      state: datasetPreviewPayload.versionState as DatasetVersionState,
+      createTime: new Date(datasetPreviewPayload.createdAt),
+      lastUpdateTime: new Date(datasetPreviewPayload.updatedAt),
+      ...(datasetPreviewPayload.published_at && {
+        releaseTime: new Date(datasetPreviewPayload.published_at)
+      })
+    },
+    citation: datasetPreviewPayload.citationHtml,
+    description: datasetPreviewPayload.description,
+    publicationStatuses: publicationStatuses,
+    parentCollectionAlias: datasetPreviewPayload.identifier_of_dataverse,
+    parentCollectionName: datasetPreviewPayload.name_of_dataverse,
+    ...(datasetPreviewPayload.image_url && {
+      imageUrl: datasetPreviewPayload.image_url
+    }),
+    userRoles: datasetPreviewPayload.user_roles
   }
 }

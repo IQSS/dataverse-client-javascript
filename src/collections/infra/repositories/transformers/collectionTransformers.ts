@@ -10,21 +10,36 @@ import { CollectionFacet } from '../../../domain/models/CollectionFacet'
 import { CollectionFacetPayload } from './CollectionFacetPayload'
 import {
   CollectionItemsFacet,
+  CollectionItemsFacetLabel,
   CollectionItemSubset
 } from '../../../domain/models/CollectionItemSubset'
 import { DatasetPreview } from '../../../../datasets'
 import { FilePreview } from '../../../../files'
 import { DatasetPreviewPayload } from '../../../../datasets/infra/repositories/transformers/DatasetPreviewPayload'
 import { FilePreviewPayload } from '../../../../files/infra/repositories/transformers/FilePreviewPayload'
-import { transformDatasetPreviewPayloadToDatasetPreview } from '../../../../datasets/infra/repositories/transformers/datasetPreviewsTransformers'
-import { transformFilePreviewPayloadToFilePreview } from '../../../../files/infra/repositories/transformers/filePreviewTransformers'
-import { transformCollectionPreviewPayloadToCollectionPreview } from './collectionPreviewsTransformers'
+import {
+  transformDatasetPreviewPayloadToDatasetPreview,
+  transformMyDataDatasetPreviewPayloadToDatasetPreview
+} from '../../../../datasets/infra/repositories/transformers/datasetPreviewsTransformers'
+import {
+  transformFilePreviewPayloadToFilePreview,
+  transformMyDataFilePreviewPayloadToFilePreview
+} from '../../../../files/infra/repositories/transformers/filePreviewTransformers'
+import {
+  transformCollectionPreviewPayloadToCollectionPreview,
+  transformMyDataCollectionPreviewPayloadToCollectionPreview
+} from './collectionPreviewsTransformers'
 import { CollectionPreviewPayload } from './CollectionPreviewPayload'
 import { CollectionPreview } from '../../../domain/models/CollectionPreview'
 import { CollectionContact } from '../../../domain/models/CollectionContact'
 import { CollectionType } from '../../../domain/models/CollectionType'
 import { CollectionItemsFacetPayload } from './CollectionItemsFacetsPayload'
 import { CollectionItemsCountPerObjectTypePayload } from './CollectionItemsCountPerObjectTypePayload'
+import { MyDataFilePreviewPayload } from '../../../../files/infra/repositories/transformers/MyDataFilePreviewPayload'
+import { MyDataDatasetPreviewPayload } from '../../../../datasets/infra/repositories/transformers/MyDataDatasetPreviewPayload'
+import { MyDataCollectionPreviewPayload } from './MyDataCollectionPreviewPayload'
+import { MyDataCountPerObjectTypePayload } from './MyDataCountPerObjectTypePayload'
+import { MyDataPublicationStatusCountsPayload } from './MyDataPublicationStatusCountsPayload'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -119,7 +134,7 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
   )
 
   const countPerObjectType = {
-    dataverses: countPerObjectTypePayload['Dataverses'],
+    collections: countPerObjectTypePayload['Dataverses'],
     datasets: countPerObjectTypePayload['Datasets'],
     files: countPerObjectTypePayload['Files']
   }
@@ -132,6 +147,60 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
   }
 }
 
+export const transformMyDataResponseToCollectionItemSubset = (
+  response: AxiosResponse
+): CollectionItemSubset => {
+  const responseDataPayload = response.data.data
+  const itemsPayload = responseDataPayload.items
+  const countPerObjectTypePayload = responseDataPayload[
+    'dvobject_counts'
+  ] as MyDataCountPerObjectTypePayload
+
+  const items: (DatasetPreview | FilePreview | CollectionPreview)[] = []
+
+  itemsPayload.forEach(function (
+    itemPayload:
+      | MyDataCollectionPreviewPayload
+      | MyDataDatasetPreviewPayload
+      | MyDataFilePreviewPayload
+  ) {
+    if (itemPayload.type === 'file') {
+      items.push(
+        transformMyDataFilePreviewPayloadToFilePreview(itemPayload as MyDataFilePreviewPayload)
+      )
+    } else if (itemPayload.type === 'dataset') {
+      items.push(
+        transformMyDataDatasetPreviewPayloadToDatasetPreview(
+          itemPayload as MyDataDatasetPreviewPayload
+        )
+      )
+    } else if (itemPayload.type === 'dataverse') {
+      items.push(
+        transformMyDataCollectionPreviewPayloadToCollectionPreview(
+          itemPayload as unknown as MyDataCollectionPreviewPayload
+        )
+      )
+    }
+  })
+
+  const countPerObjectType = {
+    collections: countPerObjectTypePayload['dataverses_count'],
+    datasets: countPerObjectTypePayload['datasets_count'],
+    files: countPerObjectTypePayload['files_count']
+  }
+  const publishingFacet: CollectionItemsFacet = transformPublicationStatusResponseToFacet(
+    responseDataPayload.pubstatus_counts as MyDataPublicationStatusCountsPayload
+  )
+  const facets: CollectionItemsFacet[] = [publishingFacet]
+
+  return {
+    items,
+    facets,
+    totalItemCount: responseDataPayload.pagination.numResults,
+    countPerObjectType
+  }
+}
+
 const transformContactsPayloadToContacts = (
   contactsPayload: CollectionContactPayload[]
 ): CollectionContact[] => {
@@ -139,4 +208,21 @@ const transformContactsPayloadToContacts = (
     email: contactPayload.contactEmail,
     displayOrder: contactPayload.displayOrder
   }))
+}
+
+const transformPublicationStatusResponseToFacet = (
+  publicationStatusCounts: MyDataPublicationStatusCountsPayload
+): CollectionItemsFacet => {
+  const labels: CollectionItemsFacetLabel[] = [
+    { name: 'Published', count: publicationStatusCounts.published_count },
+    { name: 'Unpublished', count: publicationStatusCounts.unpublished_count },
+    { name: 'Draft', count: publicationStatusCounts.draft_count },
+    { name: 'In Review', count: publicationStatusCounts.in_review_count },
+    { name: 'Deaccessioned', count: publicationStatusCounts.deaccessioned_count }
+  ]
+  return {
+    name: 'publicationStatus',
+    friendlyName: 'Publication Status',
+    labels
+  }
 }

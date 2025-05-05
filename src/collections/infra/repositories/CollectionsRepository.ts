@@ -3,7 +3,8 @@ import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRe
 import {
   transformCollectionFacetsResponseToCollectionFacets,
   transformCollectionItemsResponseToCollectionItemSubset,
-  transformCollectionResponseToCollection
+  transformCollectionResponseToCollection,
+  transformMyDataResponseToCollectionItemSubset
 } from './transformers/collectionTransformers'
 import { Collection, ROOT_COLLECTION_ID } from '../../domain/models/Collection'
 import { CollectionDTO } from '../../domain/dtos/CollectionDTO'
@@ -21,6 +22,8 @@ import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedIt
 import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
 import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
+import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
+import { ReadError } from '../../../core/domain/repositories/ReadError'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -61,6 +64,16 @@ export enum GetCollectionItemsQueryParams {
   TYPE = 'type',
   FILTERQUERY = 'fq',
   SHOW_TYPE_COUNTS = 'show_type_counts'
+}
+
+export enum GetMyDataCollectionItemsQueryParams {
+  SEARCH_TEXT = 'mydata_search_term',
+  PER_PAGE = 'per_page',
+  SELECTED_PAGE = 'selected_page',
+  ROLE_ID = 'role_ids',
+  TYPE = 'dvobject_types',
+  PUBLISHED_STATES = 'published_states',
+  USER_IDENTIFIER = 'userIdentifier'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -186,6 +199,76 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       .catch((error) => {
         throw error
       })
+  }
+
+  public async getMyDataCollectionItems(
+    roleIds: number[],
+    collectionItemTypes: CollectionItemType[],
+    publicationStatuses: PublicationStatus[],
+    limit?: number,
+    selectedPage?: number,
+    searchText?: string,
+    userIdentifier?: string
+  ): Promise<CollectionItemSubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.PER_PAGE, limit.toString())
+    }
+
+    if (selectedPage) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.SELECTED_PAGE, selectedPage.toString())
+    }
+
+    if (searchText) {
+      queryParams.set(
+        GetMyDataCollectionItemsQueryParams.SEARCH_TEXT,
+        encodeURIComponent(searchText)
+      )
+    }
+
+    roleIds.forEach((roleId) => {
+      queryParams.append(GetMyDataCollectionItemsQueryParams.ROLE_ID, roleId.toString())
+    })
+    if (userIdentifier) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.USER_IDENTIFIER, userIdentifier)
+    }
+
+    collectionItemTypes.forEach((itemType) => {
+      let mappedItemType: string
+
+      switch (itemType) {
+        case CollectionItemType.COLLECTION:
+          mappedItemType = 'Dataverse'
+          break
+        case CollectionItemType.DATASET:
+          mappedItemType = 'Dataset'
+          break
+        case CollectionItemType.FILE:
+          mappedItemType = 'DataFile'
+          break
+      }
+      queryParams.append(GetMyDataCollectionItemsQueryParams.TYPE, mappedItemType)
+    })
+
+    publicationStatuses.forEach((publicationStatus) => {
+      queryParams.append(
+        GetMyDataCollectionItemsQueryParams.PUBLISHED_STATES,
+        publicationStatus.toString()
+      )
+    })
+    const result = await this.doGet('/mydata/retrieve', true, queryParams)
+      .then((response) => {
+        if (response.data.success !== true) {
+          throw new ReadError(response.data.error_message)
+        }
+        return transformMyDataResponseToCollectionItemSubset(response)
+      })
+      .catch((error) => {
+        throw error
+      })
+
+    return result
   }
 
   private createCreateOrUpdateRequestBody(

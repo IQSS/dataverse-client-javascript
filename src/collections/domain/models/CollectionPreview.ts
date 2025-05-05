@@ -12,4 +12,5 @@ export interface CollectionPreview {
   publicationStatuses: PublicationStatus[]
   releaseOrCreateDate: Date
   imageUrl?: string
+  userRoles?: string[]
 }

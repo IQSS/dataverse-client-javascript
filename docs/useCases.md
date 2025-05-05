@@ -14,6 +14,7 @@ The different use cases currently available in the package are classified below,
     - [Get Collection Facets](#get-collection-facets)
     - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
     - [List All Collection Items](#list-all-collection-items)
+    - [List My Data Collection Items](#list-my-data-collection-items)
     - [Get Collection Featured Items](#get-collection-featured-items)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
@@ -214,6 +215,62 @@ This use case supports the following optional parameters depending on the search
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
 - **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
+
+#### List My Data Collection Items
+
+Returns an instance of [CollectionItemSubset](../src/collections/domain/models/CollectionItemSubset.ts) that contains reduced information for each collection item for which the calling user has a role.
+
+##### Example call:
+
+```typescript
+import { getMyDataCollectionItems } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const roleIds = [1, 2]
+const collectionItemTypes = [CollectionItemType.DATASET, CollectionItemType.FILE]
+const publishingStatuses = [
+  PublicationStatus.Published,
+  PublicationStatus.Draft,
+  PublicationStatus.Unpublished
+]
+const limit = 10
+const selectedPage = 1
+const searchText = 'search text'
+const otherUserName = 'otherUserName'
+
+getMyDataCollectionItems
+  .execute(
+    roleIds,
+    collectionItemTypes,
+    publishingStatuses,
+    limit,
+    selectedPage,
+    searchText,
+    otherUserName
+  )
+  .then((subset: CollectionItemSubset) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetMyDataCollectionItems.ts) implementation_.
+This use case requires the following parameters:
+
+- **roleIds** is an array of user role identifiers to filter the results. At least one roleId must be specified.
+- **collectionItemTypes** is an array of collection item types to filter the results. At least one collectionItemType must be specified.
+- **publishingStatuses** is an array of publishing statuses to filter the results. At least one publishingStatus must be specified.
+
+This use case supports the following optional parameters depending on the search goals:
+
+- **limit**: (number) Limit of items per page for pagination. (default is 10)
+- **selectedPage**: (number) the page of results to be returned. (default is 1)
+- **searchText** is an optional string to filter the results by.
+- **otherUserName** is an optional string to return the collection items of another user. If not set, the calling user will be used. _Only superusers can use this parameter_.
+
+The `CollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
 
 #### Get Collection Featured Items
 
