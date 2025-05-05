@@ -39,4 +39,20 @@ export class DataverseInfoRepository extends ApiRepository implements IDataverse
       build: responseData.build
     }
   }
+
+  public async getApplicationTermsOfUse(lang?: string): Promise<string> {
+    return this.doGet(
+      this.buildApiEndpoint(this.infoResourceName, `applicationTermsOfUse`),
+      false,
+      {
+        ...(lang ? { lang } : {})
+      }
+    )
+      .then((response: AxiosResponse<{ data: { message: string } }>) => {
+        return response.data.data.message
+      })
+      .catch((error) => {
+        throw error
+      })
+  }
 }

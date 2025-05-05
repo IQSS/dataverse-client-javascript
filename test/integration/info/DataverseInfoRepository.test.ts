@@ -4,7 +4,11 @@ import {
   DataverseApiAuthMechanism
 } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { setMaxEmbargoDurationInMonthsViaApi } from '../../testHelpers/info/infoHelper'
+import {
+  deleteApplicationTermsOfUseViaApi,
+  setApplicationTermsOfUseViaApi,
+  setMaxEmbargoDurationInMonthsViaApi
+} from '../../testHelpers/info/infoHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 
 describe('DataverseInfoRepository', () => {
@@ -47,6 +51,26 @@ describe('DataverseInfoRepository', () => {
       const actual = await sut.getMaxEmbargoDurationInMonths()
 
       expect(actual).toBe(testMaxEmbargoDurationInMonths)
+    })
+  })
+
+  describe('getApplicationTermsOfUse', () => {
+    test('should return no terms message when terms are not set', async () => {
+      const defaultNoTermsOfUseMessage =
+        'There are no Terms of Use for this Dataverse installation.'
+      const actual = await sut.getApplicationTermsOfUse()
+
+      expect(actual).toBe(defaultNoTermsOfUseMessage)
+    })
+
+    test('should return terms when terms are set', async () => {
+      const testTermsOfUse = 'Be excellent to each other.'
+      await setApplicationTermsOfUseViaApi(testTermsOfUse)
+      const actual = await sut.getApplicationTermsOfUse()
+
+      expect(actual).toBe(testTermsOfUse)
+
+      await deleteApplicationTermsOfUseViaApi()
     })
   })
 })

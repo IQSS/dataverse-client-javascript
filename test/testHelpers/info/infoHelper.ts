@@ -12,3 +12,19 @@ export const setMaxEmbargoDurationInMonthsViaApi = async (
     }
   )
 }
+
+export const setApplicationTermsOfUseViaApi = async (
+  applicationTermsOfUse: string
+): Promise<AxiosResponse> => {
+  return await axios.put(
+    `${TestConstants.TEST_API_URL}/admin/settings/:ApplicationTermsOfUse`,
+    applicationTermsOfUse,
+    {
+      headers: { 'Content-Type': 'text/plain' }
+    }
+  )
+}
+
+export const deleteApplicationTermsOfUseViaApi = async (): Promise<AxiosResponse> => {
+  return await axios.delete(`${TestConstants.TEST_API_URL}/admin/settings/:ApplicationTermsOfUse`)
+}

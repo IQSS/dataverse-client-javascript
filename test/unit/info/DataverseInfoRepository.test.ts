@@ -123,4 +123,69 @@ describe('DataverseInfoRepository', () => {
       expect(error).toBeInstanceOf(Error)
     })
   })
+
+  describe('getApplicationTermsOfUse', () => {
+    test('should return terms of use on successful response', async () => {
+      const testTermsOfUse = 'Be excellent to each other.'
+      const testSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: {
+            message: testTermsOfUse
+          }
+        }
+      }
+      jest.spyOn(axios, 'get').mockResolvedValue(testSuccessfulResponse)
+
+      const actual = await sut.getApplicationTermsOfUse()
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/applicationTermsOfUse`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(actual).toMatch(testTermsOfUse)
+    })
+
+    test('should return terms of use on successful response with lang', async () => {
+      const testLang = 'en'
+      const testTermsOfUse = 'Be excellent to each other.'
+      const testSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: {
+            message: testTermsOfUse
+          }
+        }
+      }
+      jest.spyOn(axios, 'get').mockResolvedValue(testSuccessfulResponse)
+
+      const actual = await sut.getApplicationTermsOfUse(testLang)
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/applicationTermsOfUse`,
+        {
+          params: {
+            lang: testLang
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      expect(actual).toMatch(testTermsOfUse)
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: ReadError | undefined
+      await sut.getApplicationTermsOfUse().catch((e) => (error = e))
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/applicationTermsOfUse`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
 })
