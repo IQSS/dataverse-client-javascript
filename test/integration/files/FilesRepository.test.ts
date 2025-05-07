@@ -43,6 +43,10 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { RestrictFileDTO } from '../../../src/files/domain/dtos/RestrictFileDTO'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
+import {
+  FileVersionState,
+  FileVersionSummaryInfo
+} from '../../../src/files/domain/models/FileVersionSummaryInfo'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -758,6 +762,182 @@ describe('FilesRepository', () => {
       await expect(sut.updateFileCategories(nonExistentFiledId, categories, false)).rejects.toThrow(
         errorExpected
       )
+    })
+  })
+
+  describe('getFileVersionSummaries', () => {
+    let fileTestDatasetIds: CreatedDatasetIdentifiers
+    const testTextFile1Name = 'test-file-1.txt'
+
+    beforeEach(async () => {
+      try {
+        fileTestDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeEach(): Error while creating test dataset')
+      }
+      await uploadFileViaApi(fileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+      })
+    })
+
+    test('should return file version summaries when file draft exists', async () => {
+      const currentTestFilesSubset = await sut.getDatasetFiles(
+        fileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const testFile = currentTestFilesSubset.files[0]
+      const actual = await sut.getFileVersionSummaries(testFile.id)
+
+      const fileSummmaries: FileVersionSummaryInfo = {
+        datasetVersion: 'DRAFT',
+        isDraft: true,
+        isReleased: false,
+        isDeaccessioned: false,
+        versionState: FileVersionState.DRAFT,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        publishedDate: '',
+        fileDifferenceSummary: { file: 'Added' }
+      }
+
+      expect(actual).toHaveLength(1)
+      expect(actual[0]).toEqual(fileSummmaries)
+      deleteUnpublishedDatasetViaApi(fileTestDatasetIds.numericId)
+    })
+
+    test('should return file version summaries when dataset is deaccessioned', async () => {
+      await publishDatasetViaApi(fileTestDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
+
+      await waitForNoLocks(fileTestDatasetIds.numericId, 10).catch(() => {
+        throw new Error('Error while waiting for no locks')
+      })
+
+      const datasetFiles = await sut.getDatasetFiles(
+        fileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const testFile = datasetFiles.files[0]
+      const publishedFileVersionSummariesActual = await sut.getFileVersionSummaries(testFile.id)
+
+      const publishedFileVersionSummmaries: FileVersionSummaryInfo = {
+        datasetVersion: '1.0',
+        isDraft: false,
+        isReleased: true,
+        isDeaccessioned: false,
+        versionNumber: 1,
+        versionMinorNumber: 0,
+        publishedDate: new Date().toISOString().split('T')[0], // Format: yyyy-mm-dd
+        versionState: FileVersionState.RELEASED,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: { file: 'Added' }
+      }
+
+      expect(publishedFileVersionSummariesActual).toHaveLength(1)
+      expect(publishedFileVersionSummariesActual[0]).toEqual(publishedFileVersionSummmaries)
+
+      await deaccessionDatasetViaApi(fileTestDatasetIds.numericId, '1.0').catch(() => {
+        throw new Error('Error while deaccessioning test Dataset')
+      })
+
+      const actual = await sut.getFileVersionSummaries(testFile.id)
+
+      const fileSummmaries: FileVersionSummaryInfo = {
+        datasetVersion: '1.0',
+        versionNumber: 1,
+        versionMinorNumber: 0,
+        publishedDate: new Date().toISOString().split('T')[0],
+        isDraft: false,
+        isReleased: false,
+        isDeaccessioned: true,
+        versionState: FileVersionState.DEACCESSIONED,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: {
+          deaccessionedReason: 'Test reason.',
+          file: 'Added'
+        }
+      }
+
+      expect(actual).toHaveLength(1)
+      expect(actual[0]).toEqual(fileSummmaries)
+      deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
+    })
+
+    test('should return file version summaries when file is updated', async () => {
+      await publishDatasetViaApi(fileTestDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
+
+      await waitForNoLocks(fileTestDatasetIds.numericId, 10).catch(() => {
+        throw new Error('Error while waiting for no locks')
+      })
+
+      const datasetFiles = await sut.getDatasetFiles(
+        fileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const testFile = datasetFiles.files[0]
+      const actual = await sut.getFileVersionSummaries(testFile.id)
+
+      expect(actual).toHaveLength(1)
+
+      await sut.updateFileMetadata(testFile.id, {
+        description: 'My description test.',
+        categories: ['Data', 'Test'],
+        label: 'myfile.txt',
+        directoryLabel: 'mydir',
+        restrict: true
+      })
+      const updatedFileVersionSummariesActual = await sut.getFileVersionSummaries(testFile.id)
+      const updatedFileVersionSummaries: FileVersionSummaryInfo = {
+        datasetVersion: 'DRAFT',
+        publishedDate: '',
+        isDraft: true,
+        isReleased: false,
+        isDeaccessioned: false,
+        versionState: FileVersionState.DRAFT,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: {
+          FileMetadata: [
+            {
+              name: 'File Name',
+              action: 'Changed'
+            },
+            {
+              name: 'Description',
+              action: 'Changed'
+            }
+          ],
+          FileTags: {
+            Added: 2
+          },
+          FileAccess: 'Restricted'
+        }
+      }
+
+      expect(updatedFileVersionSummariesActual).toHaveLength(2)
+      expect(updatedFileVersionSummariesActual[0]).toEqual(updatedFileVersionSummaries)
+      deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
+    })
+
+    test('should return error when file does not exist', async () => {
+      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+      await expect(sut.getFileVersionSummaries(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
   })
 

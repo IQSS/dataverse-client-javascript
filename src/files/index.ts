@@ -17,6 +17,7 @@ import { RestrictFile } from './domain/useCases/RestrictFile'
 import { UpdateFileMetadata } from './domain/useCases/UpdateFileMetadata'
 import { UpdateFileTabularTags } from './domain/useCases/UpdateFileTabularTags'
 import { UpdateFileCategories } from './domain/useCases/UpdateFileCategories'
+import { GetFileVersionSummaries } from './domain/useCases/GetFileVersionSummaries'
 
 const filesRepository = new FilesRepository()
 const directUploadClient = new DirectUploadClient(filesRepository)
@@ -38,6 +39,7 @@ const restrictFile = new RestrictFile(filesRepository)
 const updateFileMetadata = new UpdateFileMetadata(filesRepository)
 const updateFileTabularTags = new UpdateFileTabularTags(filesRepository)
 const updateFileCategories = new UpdateFileCategories(filesRepository)
+const getFileVersionSummaries = new GetFileVersionSummaries(filesRepository)
 
 export {
   getDatasetFiles,
@@ -56,7 +58,8 @@ export {
   updateFileMetadata,
   updateFileTabularTags,
   updateFileCategories,
-  replaceFile
+  replaceFile,
+  getFileVersionSummaries
 }
 
 export { FileModel as File, FileEmbargo, FileChecksum } from './domain/models/FileModel'

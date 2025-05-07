@@ -22,6 +22,7 @@ import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { RestrictFileDTO } from '../../domain/dtos/RestrictFileDTO'
+import { FileVersionSummaryInfo } from '../../domain/models/FileVersionSummaryInfo'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -411,6 +412,17 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       queryParams
     )
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFileVersionSummaries(fileId: number | string): Promise<FileVersionSummaryInfo[]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.filesResourceName, 'versionDifferences', fileId),
+      true
+    )
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })

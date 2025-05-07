@@ -1571,6 +1571,28 @@ If restrict is false then enableAccessRequest and termsOfAccess are ignored
 If restrict is true and enableAccessRequest is false then termsOfAccess is required.
 The enableAccessRequest and termsOfAccess are applied to the Draft version of the Dataset and affect all of the restricted files in said Draft version.
 
+#### Get File Version Summaries
+
+Returns an array of [FileVersionSummaryInfo](../src/files/domain/models/FileVersionSummaryInfo.ts) that contains information about what changed in every specific version.
+
+##### Example call:
+
+```typescript
+import { getFileVersionSummaries } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 1
+
+getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummaryInfo[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileVersionSummaries.ts) implementation_.
+
 ## Metadata Blocks
 
 ### Metadata Blocks read use cases
