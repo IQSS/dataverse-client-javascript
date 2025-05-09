@@ -3,7 +3,7 @@ export interface FileVersionSummaryInfo {
   versionNumber?: number
   versionMinorNumber?: number
   contributors?: string
-  publishedDate: string
+  publishedDate?: string
   fileDifferenceSummary?: FileDifferenceSummary
   isDraft: boolean
   isDeaccessioned: boolean

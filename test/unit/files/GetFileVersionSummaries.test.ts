@@ -14,7 +14,7 @@ describe('execute', () => {
         contributors: 'John Doe',
         publishedDate: '2023-01-01',
         fileDifferenceSummary: {
-          fileMetadata: [
+          FileMetadata: [
             {
               name: 'file.txt',
               action: 'Added'
