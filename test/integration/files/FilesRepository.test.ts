@@ -840,6 +840,83 @@ describe('FilesRepository', () => {
     })
   })
 
+  describe('fileHasBeenDeleted', () => {
+    let deleFileTestDatasetIds: CreatedDatasetIdentifiers
+    const testTextFile1Name = 'test-file-1.txt'
+    let fileId: number
+
+    beforeAll(async () => {
+      try {
+        deleFileTestDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeEach(): Error while creating test dataset')
+      }
+      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+      })
+
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      fileId = datasetFiles.files[0].id
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(deleFileTestDatasetIds.persistentId)
+    })
+
+    test('should return False if a file has not been deleted', async () => {
+      const hasBeenDeleted = await sut.fileHasBeenDeleted(fileId)
+      expect(hasBeenDeleted).toBe(false)
+    })
+
+    test('should return error if the dataset is unpublished and the file has been deleted', async () => {
+      await sut.deleteFile(fileId)
+
+      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+      await expect(sut.fileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+    })
+
+    test('should return True when the dataset is published and the file has not been deleted', async () => {
+      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+      })
+
+      await publishDatasetViaApi(deleFileTestDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
+      await waitForNoLocks(deleFileTestDatasetIds.numericId, 10)
+
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+
+      fileId = datasetFiles.files[0].id
+
+      const hasBeenDeleted = await sut.fileHasBeenDeleted(fileId)
+      expect(hasBeenDeleted).toBe(false)
+
+      await sut.deleteFile(fileId)
+
+      const actual = await sut.fileHasBeenDeleted(fileId)
+      expect(actual).toBe(true)
+    })
+
+    test('should return error when file does not exist', async () => {
+      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+      await expect(sut.fileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+    })
+  })
+
   describe('restrictFile', () => {
     let restrictFileDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'

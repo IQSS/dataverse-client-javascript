@@ -415,4 +415,12 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
         throw error
       })
   }
+
+  public async fileHasBeenDeleted(fileId: number | string): Promise<boolean> {
+    return this.doGet(this.buildApiEndpoint(this.filesResourceName, 'hasBeenDeleted', fileId), true)
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
 }

@@ -1571,6 +1571,30 @@ If restrict is false then enableAccessRequest and termsOfAccess are ignored
 If restrict is true and enableAccessRequest is false then termsOfAccess is required.
 The enableAccessRequest and termsOfAccess are applied to the Draft version of the Dataset and affect all of the restricted files in said Draft version.
 
+#### File Has Been Deleted
+
+Check if the file has been deleted, return a boolean.
+
+##### Example call:
+
+```typescript
+import { fileHasBeenDeleted } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 12345
+
+await fileHasBeenDeleted.execute(fileId).then((deleted: boolean) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/FileHasBeenDeleted.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
 ## Metadata Blocks
 
 ### Metadata Blocks read use cases
