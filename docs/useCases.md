@@ -1584,7 +1584,7 @@ import { fileHasBeenDeleted } from '@iqss/dataverse-client-javascript'
 
 const fileId = 12345
 
-await fileHasBeenDeleted.execute(fileId).then((deleted: boolean) => {
+await fileHasBeenDeleted.execute(fileId).then((hasBeenDeleted: boolean) => {
   /* ... */
 })
 

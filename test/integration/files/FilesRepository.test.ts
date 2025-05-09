@@ -849,10 +849,11 @@ describe('FilesRepository', () => {
       try {
         deleFileTestDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
       } catch (error) {
-        throw new Error('Tests beforeEach(): Error while creating test dataset')
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
       }
+
       await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
-        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
       })
 
       const datasetFiles = await sut.getDatasetFiles(
@@ -861,7 +862,6 @@ describe('FilesRepository', () => {
         false,
         FileOrderCriteria.NAME_AZ
       )
-
       fileId = datasetFiles.files[0].id
     })
 
@@ -878,13 +878,12 @@ describe('FilesRepository', () => {
       await sut.deleteFile(fileId)
 
       const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
-
       await expect(sut.fileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
 
     test('should return True when the dataset is published and the file has not been deleted', async () => {
       await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
-        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+        throw new Error(`Error while uploading file ${testTextFile1Name}`)
       })
 
       await publishDatasetViaApi(deleFileTestDatasetIds.numericId).catch(() => {
@@ -898,16 +897,15 @@ describe('FilesRepository', () => {
         false,
         FileOrderCriteria.NAME_AZ
       )
-
       fileId = datasetFiles.files[0].id
 
-      const hasBeenDeleted = await sut.fileHasBeenDeleted(fileId)
-      expect(hasBeenDeleted).toBe(false)
+      const notDeleted = await sut.fileHasBeenDeleted(fileId)
+      expect(notDeleted).toBe(false)
 
       await sut.deleteFile(fileId)
 
-      const actual = await sut.fileHasBeenDeleted(fileId)
-      expect(actual).toBe(true)
+      const hasBeenDeleted = await sut.fileHasBeenDeleted(fileId)
+      expect(hasBeenDeleted).toBe(true)
     })
 
     test('should return error when file does not exist', async () => {
