@@ -847,10 +847,19 @@ describe('FilesRepository', () => {
     const testTextFile1Name = 'test-file-1.txt'
     const testTextFile2Name = 'test-file-2.txt'
     let fileId: number
+    const testCollectionAlias = 'getFileHasBeenDeletedTestCollection'
+    let singlepartFile: File
 
     beforeAll(async () => {
       try {
-        deleFileTestDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+        await createCollectionViaApi(testCollectionAlias)
+        await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
+        deleFileTestDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          testCollectionAlias
+        )
+
+        singlepartFile = await createSinglepartFileBlob()
       } catch (error) {
         throw new Error('Tests beforeAll(): Error while creating test dataset')
       }
@@ -909,23 +918,13 @@ describe('FilesRepository', () => {
 
       const fileHasBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
       expect(fileHasBeenDeleted).toBe(true)
+      deletePublishedDatasetViaApi(deleFileTestDatasetIds.persistentId)
     })
 
     test('should return True when file has been replaced', async () => {
       const directUploadSut: DirectUploadClient = new DirectUploadClient(sut)
-
-      // Upload original file
-      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
-        throw new Error(`Error while uploading file ${testTextFile1Name}`)
-      })
-
-      const datasetFiles = await sut.getDatasetFiles(
-        deleFileTestDatasetIds.numericId,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ
-      )
-      const originalFileId = datasetFiles.files[0].id
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
 
       const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {
         const destination = await sut.getFileUploadDestination(testDatasetId, file)
@@ -935,15 +934,52 @@ describe('FilesRepository', () => {
         return destination
       }
 
+      const calculateBlobChecksum = (blob: Buffer): string => {
+        const hash = crypto.createHash('md5')
+        hash.update(blob)
+        return hash.digest('hex')
+      }
+
+      const fileArrayBuffer = await singlepartFile.arrayBuffer()
+      const fileBuffer = Buffer.from(fileArrayBuffer)
+
+      const destination = await createTestFileUploadDestination(
+        singlepartFile,
+        deleFileTestDatasetIds.numericId
+      )
+
+      const actualStorageId = await directUploadSut.uploadFile(
+        deleFileTestDatasetIds.numericId,
+        singlepartFile,
+        progressMock,
+        abortController,
+        destination
+      )
+
+      const uploadedFileDTO = {
+        fileName: singlepartFile.name,
+        storageId: actualStorageId,
+        checksumType: 'md5',
+        checksumValue: calculateBlobChecksum(fileBuffer),
+        mimeType: singlepartFile.type
+      }
+      // Upload original file
+      await sut.addUploadedFilesToDataset(deleFileTestDatasetIds.numericId, [uploadedFileDTO])
+
+      const originalDatasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        true,
+        FileOrderCriteria.NAME_AZ
+      )
+      const originalFileId = originalDatasetFiles.files[0].id
+
       // Create a new file and replace the original file
       const newFileBlob = await createSinglepartFileBlob(testTextFile2Name, 2000)
       const newDestination = await createTestFileUploadDestination(
         newFileBlob,
         deleFileTestDatasetIds.numericId
       )
-
-      const progressMock = jest.fn()
-      const abortController = new AbortController()
 
       const newStorageId = await directUploadSut.uploadFile(
         deleFileTestDatasetIds.numericId,
@@ -953,20 +989,14 @@ describe('FilesRepository', () => {
         newDestination
       )
 
-      const fileArrayBuffer = await newFileBlob.arrayBuffer()
-      const fileBuffer = Buffer.from(fileArrayBuffer)
-
-      const calculateBlobChecksum = (blob: Buffer): string => {
-        const hash = crypto.createHash('md5')
-        hash.update(blob)
-        return hash.digest('hex')
-      }
+      const fileArrayBuffer2 = await newFileBlob.arrayBuffer()
+      const fileBuffer2 = Buffer.from(fileArrayBuffer2)
 
       const newUploadedFileDTO = {
         fileName: newFileBlob.name,
         storageId: newStorageId,
         checksumType: 'md5',
-        checksumValue: calculateBlobChecksum(fileBuffer),
+        checksumValue: calculateBlobChecksum(fileBuffer2),
         mimeType: newFileBlob.type
       }
 
@@ -980,12 +1010,12 @@ describe('FilesRepository', () => {
       const isDeleted = await sut.getFileHasBeenDeleted(originalFileId)
       expect(isDeleted).toBe(true)
     })
-  })
 
-  test('should return error when file does not exist', async () => {
-    const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+    test('should return error when file does not exist', async () => {
+      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
-    await expect(sut.getFileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+      await expect(sut.getFileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+    })
   })
 
   describe('restrictFile', () => {
