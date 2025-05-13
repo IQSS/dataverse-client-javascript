@@ -1,3 +1,4 @@
+import * as crypto from 'crypto'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import {
   ApiConfig,
@@ -43,6 +44,7 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { RestrictFileDTO } from '../../../src/files/domain/dtos/RestrictFileDTO'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
+import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -840,9 +842,10 @@ describe('FilesRepository', () => {
     })
   })
 
-  describe('fileHasBeenDeleted', () => {
+  describe('getFileHasBeenDeleted', () => {
     let deleFileTestDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'
+    const testTextFile2Name = 'test-file-2.txt'
     let fileId: number
 
     beforeAll(async () => {
@@ -870,7 +873,7 @@ describe('FilesRepository', () => {
     })
 
     test('should return False if a file has not been deleted', async () => {
-      const hasBeenDeleted = await sut.fileHasBeenDeleted(fileId)
+      const hasBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
       expect(hasBeenDeleted).toBe(false)
     })
 
@@ -878,7 +881,7 @@ describe('FilesRepository', () => {
       await sut.deleteFile(fileId)
 
       const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
-      await expect(sut.fileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+      await expect(sut.getFileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
 
     test('should return True when the dataset is published and the file has not been deleted', async () => {
@@ -899,20 +902,91 @@ describe('FilesRepository', () => {
       )
       fileId = datasetFiles.files[0].id
 
-      const notDeleted = await sut.fileHasBeenDeleted(fileId)
+      const notDeleted = await sut.getFileHasBeenDeleted(fileId)
       expect(notDeleted).toBe(false)
 
       await sut.deleteFile(fileId)
 
-      const hasBeenDeleted = await sut.fileHasBeenDeleted(fileId)
+      const hasBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
       expect(hasBeenDeleted).toBe(true)
     })
 
-    test('should return error when file does not exist', async () => {
-      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+    test('should return True when file has been replaced', async () => {
+      const directUploadSut: DirectUploadClient = new DirectUploadClient(sut)
 
-      await expect(sut.fileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+      // Upload original file
+      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Error while uploading file ${testTextFile1Name}`)
+      })
+
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const originalFileId = datasetFiles.files[0].id
+
+      const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {
+        const filesRepository = new FilesRepository()
+        const destination = await filesRepository.getFileUploadDestination(testDatasetId, file)
+        destination.urls.forEach((destinationUrl, index) => {
+          destination.urls[index] = destinationUrl.replace('localstack', 'localhost')
+        })
+        return destination
+      }
+
+      // Create a new file and replace the original file
+      const newFileBlob = await createSinglepartFileBlob(testTextFile2Name, 2000)
+      const newDestination = await createTestFileUploadDestination(
+        newFileBlob,
+        deleFileTestDatasetIds.numericId
+      )
+
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      const newStorageId = await directUploadSut.uploadFile(
+        deleFileTestDatasetIds.numericId,
+        newFileBlob,
+        progressMock,
+        abortController,
+        newDestination
+      )
+
+      const fileArrayBuffer = await newFileBlob.arrayBuffer()
+      const fileBuffer = Buffer.from(fileArrayBuffer)
+
+      const calculateBlobChecksum = (blob: Buffer): string => {
+        const hash = crypto.createHash('md5')
+        hash.update(blob)
+        return hash.digest('hex')
+      }
+
+      const newUploadedFileDTO = {
+        fileName: newFileBlob.name,
+        storageId: newStorageId,
+        checksumType: 'md5',
+        checksumValue: calculateBlobChecksum(fileBuffer),
+        mimeType: newFileBlob.type
+      }
+
+      //Publish the dataset and check if the original file has been deleted
+      await publishDatasetViaApi(deleFileTestDatasetIds.numericId)
+
+      await waitForNoLocks(deleFileTestDatasetIds.numericId, 10)
+
+      await sut.replaceFile(originalFileId, newUploadedFileDTO)
+
+      const isDeleted = await sut.getFileHasBeenDeleted(originalFileId)
+      expect(isDeleted).toBe(true)
     })
+  })
+
+  test('should return error when file does not exist', async () => {
+    const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+    await expect(sut.getFileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
   })
 
   describe('restrictFile', () => {

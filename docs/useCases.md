@@ -1578,20 +1578,20 @@ Check if the file has been deleted, return a boolean.
 ##### Example call:
 
 ```typescript
-import { fileHasBeenDeleted } from '@iqss/dataverse-client-javascript'
+import { getFileHasBeenDeleted } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const fileId = 12345
 
-await fileHasBeenDeleted.execute(fileId).then((hasBeenDeleted: boolean) => {
+await getFileHasBeenDeleted.execute(fileId).then((hasBeenDeleted: boolean) => {
   /* ... */
 })
 
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/FileHasBeenDeleted.ts) implementation_.
+_See [use case](../src/files/domain/useCases/GetFileHasBeenDeleted.ts) implementation_.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 

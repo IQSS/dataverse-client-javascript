@@ -17,7 +17,7 @@ import { RestrictFile } from './domain/useCases/RestrictFile'
 import { UpdateFileMetadata } from './domain/useCases/UpdateFileMetadata'
 import { UpdateFileTabularTags } from './domain/useCases/UpdateFileTabularTags'
 import { UpdateFileCategories } from './domain/useCases/UpdateFileCategories'
-import { FileHasBeenDeleted } from './domain/useCases/FileHasBeenDeleted'
+import { GetFileHasBeenDeleted } from './domain/useCases/GetFileHasBeenDeleted'
 
 const filesRepository = new FilesRepository()
 const directUploadClient = new DirectUploadClient(filesRepository)
@@ -39,7 +39,7 @@ const restrictFile = new RestrictFile(filesRepository)
 const updateFileMetadata = new UpdateFileMetadata(filesRepository)
 const updateFileTabularTags = new UpdateFileTabularTags(filesRepository)
 const updateFileCategories = new UpdateFileCategories(filesRepository)
-const fileHasBeenDeleted = new FileHasBeenDeleted(filesRepository)
+const getFileHasBeenDeleted = new GetFileHasBeenDeleted(filesRepository)
 
 export {
   getDatasetFiles,
@@ -59,7 +59,7 @@ export {
   updateFileTabularTags,
   updateFileCategories,
   replaceFile,
-  fileHasBeenDeleted
+  getFileHasBeenDeleted
 }
 
 export { FileModel as File, FileEmbargo, FileChecksum } from './domain/models/FileModel'
