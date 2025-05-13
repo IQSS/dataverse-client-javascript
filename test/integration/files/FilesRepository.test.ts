@@ -884,7 +884,7 @@ describe('FilesRepository', () => {
       await expect(sut.getFileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
 
-    test('should return True when the dataset is published and the file has not been deleted', async () => {
+    test('should return correctly when the file has or has not been deleted, in a published dataset', async () => {
       await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
         throw new Error(`Error while uploading file ${testTextFile1Name}`)
       })
@@ -902,13 +902,13 @@ describe('FilesRepository', () => {
       )
       fileId = datasetFiles.files[0].id
 
-      const notDeleted = await sut.getFileHasBeenDeleted(fileId)
-      expect(notDeleted).toBe(false)
+      const fileHasNotBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
+      expect(fileHasNotBeenDeleted).toBe(false)
 
       await sut.deleteFile(fileId)
 
-      const hasBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
-      expect(hasBeenDeleted).toBe(true)
+      const fileHasBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
+      expect(fileHasBeenDeleted).toBe(true)
     })
 
     test('should return True when file has been replaced', async () => {
@@ -928,8 +928,7 @@ describe('FilesRepository', () => {
       const originalFileId = datasetFiles.files[0].id
 
       const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {
-        const filesRepository = new FilesRepository()
-        const destination = await filesRepository.getFileUploadDestination(testDatasetId, file)
+        const destination = await sut.getFileUploadDestination(testDatasetId, file)
         destination.urls.forEach((destinationUrl, index) => {
           destination.urls[index] = destinationUrl.replace('localstack', 'localhost')
         })
