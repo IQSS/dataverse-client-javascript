@@ -84,4 +84,6 @@ export interface IFilesRepository {
     categories: string[],
     replace?: boolean
   ): Promise<void>
+
+  isFileDeleted(fileId: number | string): Promise<boolean>
 }
