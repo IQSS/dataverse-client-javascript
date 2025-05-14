@@ -416,7 +416,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       })
   }
 
-  public async getFileHasBeenDeleted(fileId: number | string): Promise<boolean> {
+  public async isFileDeleted(fileId: number | string): Promise<boolean> {
     return this.doGet(this.buildApiEndpoint(this.filesResourceName, 'hasBeenDeleted', fileId), true)
       .then((response) => response.data.data)
       .catch((error) => {

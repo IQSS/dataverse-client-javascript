@@ -40,6 +40,7 @@ import {
 import {
   createCollectionViaApi,
   deleteCollectionViaApi,
+  publishCollectionViaApi,
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { RestrictFileDTO } from '../../../src/files/domain/dtos/RestrictFileDTO'
@@ -842,179 +843,166 @@ describe('FilesRepository', () => {
     })
   })
 
-  describe('getFileHasBeenDeleted', () => {
-    let deleFileTestDatasetIds: CreatedDatasetIdentifiers
+  describe('isFileDeleted', () => {
     const testTextFile1Name = 'test-file-1.txt'
     const testTextFile2Name = 'test-file-2.txt'
+    const testCollectionAlias = 'isFileDeletedTestCollection'
+
+    let deleFileTestDatasetIds: CreatedDatasetIdentifiers
     let fileId: number
-    const testCollectionAlias = 'getFileHasBeenDeletedTestCollection'
     let singlepartFile: File
 
+    const createTestFileUploadDestination = async (file: File, datasetId: number) => {
+      const destination = await sut.getFileUploadDestination(datasetId, file)
+      destination.urls = destination.urls.map((url) => url.replace('localstack', 'localhost'))
+      return destination
+    }
+
+    const calculateBlobChecksum = (blob: Buffer): string => {
+      return crypto.createHash('md5').update(blob).digest('hex')
+    }
+
     beforeAll(async () => {
-      try {
-        await createCollectionViaApi(testCollectionAlias)
-        await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
-        deleFileTestDatasetIds = await createDataset.execute(
-          TestConstants.TEST_NEW_DATASET_DTO,
-          testCollectionAlias
+      await createCollectionViaApi(testCollectionAlias)
+      await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
+      await publishCollectionViaApi(testCollectionAlias)
+
+      deleFileTestDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+
+      singlepartFile = await createSinglepartFileBlob()
+
+      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name)
+
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      fileId = datasetFiles.files[0].id
+    })
+
+    describe('Basic deletion scenarios', () => {
+      test('should return False if a file has not been deleted', async () => {
+        const hasBeenDeleted = await sut.isFileDeleted(fileId)
+        expect(hasBeenDeleted).toBe(false)
+      })
+
+      test('should return error if the dataset is unpublished and the file has been deleted', async () => {
+        await sut.deleteFile(fileId)
+
+        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+        await expect(sut.isFileDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+      })
+
+      test('should return correctly when the file has or has not been deleted, in a published dataset', async () => {
+        await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name)
+        await publishDatasetViaApi(deleFileTestDatasetIds.numericId)
+        await waitForNoLocks(deleFileTestDatasetIds.numericId, 10)
+
+        const datasetFiles = await sut.getDatasetFiles(
+          deleFileTestDatasetIds.numericId,
+          latestDatasetVersionId,
+          false,
+          FileOrderCriteria.NAME_AZ
+        )
+        fileId = datasetFiles.files[0].id
+
+        const fileHasNotBeenDeleted = await sut.isFileDeleted(fileId)
+        expect(fileHasNotBeenDeleted).toBe(false)
+
+        await sut.deleteFile(fileId)
+
+        const fileHasBeenDeleted = await sut.isFileDeleted(fileId)
+        expect(fileHasBeenDeleted).toBe(true)
+      })
+
+      test('should return error when file does not exist', async () => {
+        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+        await expect(sut.isFileDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+      })
+    })
+
+    describe('File replacement scenario', () => {
+      test('should return True when file has been replaced', async () => {
+        const directUploadSut = new DirectUploadClient(sut)
+        const progressMock = jest.fn()
+        const abortController = new AbortController()
+
+        // Upload original file
+        const originalBuffer = Buffer.from(await singlepartFile.arrayBuffer())
+        const originalDestination = await createTestFileUploadDestination(
+          singlepartFile,
+          deleFileTestDatasetIds.numericId
         )
 
-        singlepartFile = await createSinglepartFileBlob()
-      } catch (error) {
-        throw new Error('Tests beforeAll(): Error while creating test dataset')
-      }
+        const originalStorageId = await directUploadSut.uploadFile(
+          deleFileTestDatasetIds.numericId,
+          singlepartFile,
+          progressMock,
+          abortController,
+          originalDestination
+        )
 
-      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
-        throw new Error(`Tests beforeAll(): Error while uploading file ${testTextFile1Name}`)
+        const originalUploadedFileDTO = {
+          fileName: singlepartFile.name,
+          storageId: originalStorageId,
+          checksumType: 'md5',
+          checksumValue: calculateBlobChecksum(originalBuffer),
+          mimeType: singlepartFile.type
+        }
+
+        await sut.addUploadedFilesToDataset(deleFileTestDatasetIds.numericId, [
+          originalUploadedFileDTO
+        ])
+
+        const originalFileId = (
+          await sut.getDatasetFiles(
+            deleFileTestDatasetIds.numericId,
+            DatasetNotNumberedVersion.LATEST,
+            true,
+            FileOrderCriteria.NAME_AZ
+          )
+        ).files[0].id
+
+        // Create and upload replacement file
+        const newFileBlob = await createSinglepartFileBlob(testTextFile2Name, 2000)
+        const newBuffer = Buffer.from(await newFileBlob.arrayBuffer())
+        const newDestination = await createTestFileUploadDestination(
+          newFileBlob,
+          deleFileTestDatasetIds.numericId
+        )
+
+        const newStorageId = await directUploadSut.uploadFile(
+          deleFileTestDatasetIds.numericId,
+          newFileBlob,
+          progressMock,
+          abortController,
+          newDestination
+        )
+
+        const newUploadedFileDTO = {
+          fileName: newFileBlob.name,
+          storageId: newStorageId,
+          checksumType: 'md5',
+          checksumValue: calculateBlobChecksum(newBuffer),
+          mimeType: newFileBlob.type
+        }
+
+        await publishDatasetViaApi(deleFileTestDatasetIds.numericId)
+        await waitForNoLocks(deleFileTestDatasetIds.numericId, 10)
+
+        await sut.replaceFile(originalFileId, newUploadedFileDTO)
+
+        const isDeleted = await sut.isFileDeleted(originalFileId)
+        expect(isDeleted).toBe(true)
+
+        await deletePublishedDatasetViaApi(deleFileTestDatasetIds.persistentId)
+        await deleteCollectionViaApi(testCollectionAlias)
       })
-
-      const datasetFiles = await sut.getDatasetFiles(
-        deleFileTestDatasetIds.numericId,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ
-      )
-      fileId = datasetFiles.files[0].id
-    })
-
-    afterAll(async () => {
-      await deletePublishedDatasetViaApi(deleFileTestDatasetIds.persistentId)
-    })
-
-    test('should return False if a file has not been deleted', async () => {
-      const hasBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
-      expect(hasBeenDeleted).toBe(false)
-    })
-
-    test('should return error if the dataset is unpublished and the file has been deleted', async () => {
-      await sut.deleteFile(fileId)
-
-      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
-      await expect(sut.getFileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
-    })
-
-    test('should return correctly when the file has or has not been deleted, in a published dataset', async () => {
-      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
-        throw new Error(`Error while uploading file ${testTextFile1Name}`)
-      })
-
-      await publishDatasetViaApi(deleFileTestDatasetIds.numericId).catch(() => {
-        throw new Error('Error while publishing test Dataset')
-      })
-      await waitForNoLocks(deleFileTestDatasetIds.numericId, 10)
-
-      const datasetFiles = await sut.getDatasetFiles(
-        deleFileTestDatasetIds.numericId,
-        latestDatasetVersionId,
-        false,
-        FileOrderCriteria.NAME_AZ
-      )
-      fileId = datasetFiles.files[0].id
-
-      const fileHasNotBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
-      expect(fileHasNotBeenDeleted).toBe(false)
-
-      await sut.deleteFile(fileId)
-
-      const fileHasBeenDeleted = await sut.getFileHasBeenDeleted(fileId)
-      expect(fileHasBeenDeleted).toBe(true)
-      deletePublishedDatasetViaApi(deleFileTestDatasetIds.persistentId)
-    })
-
-    test('should return True when file has been replaced', async () => {
-      const directUploadSut: DirectUploadClient = new DirectUploadClient(sut)
-      const progressMock = jest.fn()
-      const abortController = new AbortController()
-
-      const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {
-        const destination = await sut.getFileUploadDestination(testDatasetId, file)
-        destination.urls.forEach((destinationUrl, index) => {
-          destination.urls[index] = destinationUrl.replace('localstack', 'localhost')
-        })
-        return destination
-      }
-
-      const calculateBlobChecksum = (blob: Buffer): string => {
-        const hash = crypto.createHash('md5')
-        hash.update(blob)
-        return hash.digest('hex')
-      }
-
-      const fileArrayBuffer = await singlepartFile.arrayBuffer()
-      const fileBuffer = Buffer.from(fileArrayBuffer)
-
-      const destination = await createTestFileUploadDestination(
-        singlepartFile,
-        deleFileTestDatasetIds.numericId
-      )
-
-      const actualStorageId = await directUploadSut.uploadFile(
-        deleFileTestDatasetIds.numericId,
-        singlepartFile,
-        progressMock,
-        abortController,
-        destination
-      )
-
-      const uploadedFileDTO = {
-        fileName: singlepartFile.name,
-        storageId: actualStorageId,
-        checksumType: 'md5',
-        checksumValue: calculateBlobChecksum(fileBuffer),
-        mimeType: singlepartFile.type
-      }
-      // Upload original file
-      await sut.addUploadedFilesToDataset(deleFileTestDatasetIds.numericId, [uploadedFileDTO])
-
-      const originalDatasetFiles = await sut.getDatasetFiles(
-        deleFileTestDatasetIds.numericId,
-        DatasetNotNumberedVersion.LATEST,
-        true,
-        FileOrderCriteria.NAME_AZ
-      )
-      const originalFileId = originalDatasetFiles.files[0].id
-
-      // Create a new file and replace the original file
-      const newFileBlob = await createSinglepartFileBlob(testTextFile2Name, 2000)
-      const newDestination = await createTestFileUploadDestination(
-        newFileBlob,
-        deleFileTestDatasetIds.numericId
-      )
-
-      const newStorageId = await directUploadSut.uploadFile(
-        deleFileTestDatasetIds.numericId,
-        newFileBlob,
-        progressMock,
-        abortController,
-        newDestination
-      )
-
-      const fileArrayBuffer2 = await newFileBlob.arrayBuffer()
-      const fileBuffer2 = Buffer.from(fileArrayBuffer2)
-
-      const newUploadedFileDTO = {
-        fileName: newFileBlob.name,
-        storageId: newStorageId,
-        checksumType: 'md5',
-        checksumValue: calculateBlobChecksum(fileBuffer2),
-        mimeType: newFileBlob.type
-      }
-
-      //Publish the dataset and check if the original file has been deleted
-      await publishDatasetViaApi(deleFileTestDatasetIds.numericId)
-
-      await waitForNoLocks(deleFileTestDatasetIds.numericId, 10)
-
-      await sut.replaceFile(originalFileId, newUploadedFileDTO)
-
-      const isDeleted = await sut.getFileHasBeenDeleted(originalFileId)
-      expect(isDeleted).toBe(true)
-    })
-
-    test('should return error when file does not exist', async () => {
-      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
-
-      await expect(sut.getFileHasBeenDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
     })
   })
 

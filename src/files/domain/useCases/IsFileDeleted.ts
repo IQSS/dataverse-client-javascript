@@ -1,7 +1,7 @@
 import { IFilesRepository } from '../repositories/IFilesRepository'
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 
-export class GetFileHasBeenDeleted implements UseCase<boolean> {
+export class IsFileDeleted implements UseCase<boolean> {
   constructor(private readonly filesRepository: IFilesRepository) {}
 
   /**
@@ -11,6 +11,6 @@ export class GetFileHasBeenDeleted implements UseCase<boolean> {
    * @returns {Promise<boolean>} - A boolean indicating whether the file has been deleted or not.
    */
   async execute(fileId: number | string): Promise<boolean> {
-    return await this.filesRepository.getFileHasBeenDeleted(fileId)
+    return await this.filesRepository.isFileDeleted(fileId)
   }
 }

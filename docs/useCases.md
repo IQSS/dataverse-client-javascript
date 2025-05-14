@@ -52,6 +52,7 @@ The different use cases currently available in the package are classified below,
     - [Get the size of Downloading all the files of a Dataset Version](#get-the-size-of-downloading-all-the-files-of-a-dataset-version)
     - [Get User Permissions on a File](#get-user-permissions-on-a-file)
     - [List Files in a Dataset](#list-files-in-a-dataset)
+    - [Is File Deleted](#is-file-deleted)
   - [Files write use cases](#files-write-use-cases)
     - [File Uploading Use Cases](#file-uploading-use-cases)
     - [Delete a File](#delete-a-file)
@@ -1571,27 +1572,27 @@ If restrict is false then enableAccessRequest and termsOfAccess are ignored
 If restrict is true and enableAccessRequest is false then termsOfAccess is required.
 The enableAccessRequest and termsOfAccess are applied to the Draft version of the Dataset and affect all of the restricted files in said Draft version.
 
-#### File Has Been Deleted
+#### Is File Deleted
 
 Check if the file has been deleted, return a boolean.
 
 ##### Example call:
 
 ```typescript
-import { getFileHasBeenDeleted } from '@iqss/dataverse-client-javascript'
+import { isFileDeleted } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const fileId = 12345
 
-await getFileHasBeenDeleted.execute(fileId).then((hasBeenDeleted: boolean) => {
+await isFileDeleted.execute(fileId).then((isDeleted: boolean) => {
   /* ... */
 })
 
 /* ... */
 ```
 
-_See [use case](../src/files/domain/useCases/GetFileHasBeenDeleted.ts) implementation_.
+_See [use case](../src/files/domain/useCases/isFileDeleted.ts) implementation_.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 

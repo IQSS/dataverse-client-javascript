@@ -85,5 +85,5 @@ export interface IFilesRepository {
     replace?: boolean
   ): Promise<void>
 
-  getFileHasBeenDeleted(fileId: number | string): Promise<boolean>
+  isFileDeleted(fileId: number | string): Promise<boolean>
 }
