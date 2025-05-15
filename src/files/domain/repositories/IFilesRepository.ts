@@ -10,6 +10,7 @@ import { FileUploadDestination } from '../models/FileUploadDestination'
 import { UploadedFileDTO } from '../dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../dtos/UpdateFileMetadataDTO'
 import { RestrictFileDTO } from '../dtos/RestrictFileDTO'
+import { FileVersionSummaryInfo } from '../models/FileVersionSummaryInfo'
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -84,6 +85,8 @@ export interface IFilesRepository {
     categories: string[],
     replace?: boolean
   ): Promise<void>
+
+  getFileVersionSummaries(fileId: number | string): Promise<FileVersionSummaryInfo[]>
 
   isFileDeleted(fileId: number | string): Promise<boolean>
 }

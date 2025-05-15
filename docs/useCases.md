@@ -53,6 +53,7 @@ The different use cases currently available in the package are classified below,
     - [Get User Permissions on a File](#get-user-permissions-on-a-file)
     - [List Files in a Dataset](#list-files-in-a-dataset)
     - [Is File Deleted](#is-file-deleted)
+    - [Get File Version Summaries](#get-file-version-summaries)
   - [Files write use cases](#files-write-use-cases)
     - [File Uploading Use Cases](#file-uploading-use-cases)
     - [Delete a File](#delete-a-file)
@@ -1595,6 +1596,28 @@ await isFileDeleted.execute(fileId).then((isDeleted: boolean) => {
 _See [use case](../src/files/domain/useCases/isFileDeleted.ts) implementation_.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Get File Version Summaries
+
+Get the file versions summaries, return a list of summaries for each version
+
+##### Example call:
+
+```typescript
+import { getFileVersionSummaries } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 1
+
+getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummaryInfo[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileVersionSummaries.ts) implementation_.
 
 ## Metadata Blocks
 
