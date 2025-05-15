@@ -1,5 +1,4 @@
 import { DatasetVersionState } from '../../../datasets/domain/models/Dataset'
-import { FileAccessStatus } from '../../../files/domain/models/FileCriteria'
 
 export interface FileVersionSummaryInfo {
   datasetVersion: string
@@ -14,7 +13,7 @@ export interface FileVersionSummaryInfo {
 
 export type FileDifferenceSummary = {
   file?: FileChangeType
-  fileAccess?: FileAccessStatus
+  fileAccess?: 'Restricted' | 'Unrestricted'
   fileMetadata?: FileMetadataChange[]
   deaccessionedReason?: string
   fileTags?: { [key in FileChangeType]?: number }

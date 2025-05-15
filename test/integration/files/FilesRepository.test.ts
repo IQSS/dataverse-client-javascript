@@ -908,7 +908,7 @@ describe('FilesRepository', () => {
           fileTags: {
             Added: 2
           },
-          fileAccess: FileAccessStatus.RESTRICTED
+          fileAccess: 'Restricted'
         }
       }
 
