@@ -894,6 +894,8 @@ describe('FilesRepository', () => {
         contributors: 'Dataverse Admin',
         datafileId: testFile.id,
         persistentId: testFile.persistentId,
+        publishedDate: actual[0].publishedDate,
+        versionNote: undefined,
         fileDifferenceSummary: {
           fileMetadata: [
             {

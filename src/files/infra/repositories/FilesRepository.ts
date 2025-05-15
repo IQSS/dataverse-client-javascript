@@ -423,7 +423,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       this.buildApiEndpoint(this.filesResourceName, 'versionDifferences', fileId),
       true
     )
-      .then((response) => FileVersionSummaryInfoTransformers(response.data.data))
+      .then((response) => FileVersionSummaryInfoTransformers(response))
       .catch((error) => {
         throw error
       })
