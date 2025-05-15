@@ -23,7 +23,7 @@ import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { RestrictFileDTO } from '../../domain/dtos/RestrictFileDTO'
 import { FileVersionSummaryInfo } from '../../domain/models/FileVersionSummaryInfo'
-import { FileVersionSummaryInfoTransformers } from './transformers/fileVersionSummaryInfoTransformers'
+import { transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo } from './transformers/fileVersionSummaryInfoTransformers'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -423,7 +423,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       this.buildApiEndpoint(this.filesResourceName, 'versionDifferences', fileId),
       true
     )
-      .then((response) => FileVersionSummaryInfoTransformers(response))
+      .then((response) => transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo(response))
       .catch((error) => {
         throw error
       })

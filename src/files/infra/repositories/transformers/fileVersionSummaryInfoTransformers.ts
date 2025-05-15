@@ -27,7 +27,7 @@ export interface FileVersionSummaryInfoPayload {
   versionNote?: string
 }
 
-export const FileVersionSummaryInfoTransformers = (
+export const transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo = (
   response: AxiosResponse
 ): FileVersionSummaryInfo[] => {
   const payload = response.data.data
