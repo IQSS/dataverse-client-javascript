@@ -9,21 +9,16 @@ describe('execute', () => {
     const fileVersionSummaries: FileVersionSummaryInfo[] = [
       {
         datasetVersion: '1.0',
-        versionNumber: 1,
-        versionMinorNumber: 0,
         contributors: 'John Doe',
         publishedDate: '2023-01-01',
         fileDifferenceSummary: {
-          FileMetadata: [
+          fileMetadata: [
             {
               name: 'file.txt',
               action: 'Added'
             }
           ]
         },
-        isDraft: false,
-        isDeaccessioned: false,
-        isReleased: false,
         datafileId: 1
       }
     ]

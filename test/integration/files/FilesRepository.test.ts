@@ -45,10 +45,8 @@ import {
 } from '../../testHelpers/collections/collectionHelper'
 import { RestrictFileDTO } from '../../../src/files/domain/dtos/RestrictFileDTO'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
-import {
-  FileVersionState,
-  FileVersionSummaryInfo
-} from '../../../src/files/domain/models/FileVersionSummaryInfo'
+import { FileVersionSummaryInfo } from '../../../src/files/domain/models/FileVersionSummaryInfo'
+import { DatasetVersionState } from '../../../src/datasets'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 
 describe('FilesRepository', () => {
@@ -795,14 +793,10 @@ describe('FilesRepository', () => {
 
       const fileSummmaries: FileVersionSummaryInfo = {
         datasetVersion: 'DRAFT',
-        isDraft: true,
-        isReleased: false,
-        isDeaccessioned: false,
-        versionState: FileVersionState.DRAFT,
+        versionState: DatasetVersionState.DRAFT,
         contributors: 'Dataverse Admin',
         datafileId: testFile.id,
         persistentId: testFile.persistentId,
-        // publishedDate: '', Uncomment this line until the API is fixed
         fileDifferenceSummary: { file: 'Added' }
       }
 
@@ -829,23 +823,18 @@ describe('FilesRepository', () => {
       const testFile = datasetFiles.files[0]
       const publishedFileVersionSummariesActual = await sut.getFileVersionSummaries(testFile.id)
 
-      // const publishedFileVersionSummmaries: FileVersionSummaryInfo = {
-      //   datasetVersion: '1.0',
-      //   isDraft: false,
-      //   isReleased: true,
-      //   isDeaccessioned: false,
-      //   versionNumber: 1,
-      //   versionMinorNumber: 0,
-      //   publishedDate: new Date().toISOString().split('T')[0], // Format: yyyy-mm-dd
-      //   versionState: FileVersionState.RELEASED,
-      //   contributors: 'Dataverse Admin',
-      //   datafileId: testFile.id,
-      //   persistentId: testFile.persistentId,
-      //   fileDifferenceSummary: { file: 'Added' }
-      // }
+      const publishedFileVersionSummmaries: FileVersionSummaryInfo = {
+        datasetVersion: '1.0',
+        publishedDate: publishedFileVersionSummariesActual[0].publishedDate,
+        versionState: DatasetVersionState.RELEASED,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: { file: 'Added' }
+      }
 
       expect(publishedFileVersionSummariesActual).toHaveLength(1)
-      // expect(publishedFileVersionSummariesActual[0]).toEqual(publishedFileVersionSummmaries)  Uncomment this line until the API is fixed
+      expect(publishedFileVersionSummariesActual[0]).toEqual(publishedFileVersionSummmaries)
 
       await deaccessionDatasetViaApi(fileTestDatasetIds.numericId, '1.0').catch(() => {
         throw new Error('Error while deaccessioning test Dataset')
@@ -853,26 +842,21 @@ describe('FilesRepository', () => {
 
       const actual = await sut.getFileVersionSummaries(testFile.id)
 
-      // const fileSummmaries: FileVersionSummaryInfo = {
-      // datasetVersion: '1.0',
-      // versionNumber: 1,
-      // versionMinorNumber: 0,
-      // publishedDate: new Date().toISOString().split('T')[0],
-      // isDraft: false,
-      // isReleased: false,
-      // isDeaccessioned: true,
-      // versionState: FileVersionState.DEACCESSIONED,
-      // contributors: 'Dataverse Admin',
-      // datafileId: testFile.id,
-      // persistentId: testFile.persistentId,
-      // fileDifferenceSummary: {
-      //   deaccessionedReason: 'Test reason.',
-      //   file: 'Added'
-      // }
-      // }
+      const fileSummmaries: FileVersionSummaryInfo = {
+        datasetVersion: '1.0',
+        publishedDate: publishedFileVersionSummariesActual[0].publishedDate,
+        versionState: DatasetVersionState.DEACCESSIONED,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: {
+          deaccessionedReason: 'Test reason.',
+          file: 'Added'
+        }
+      }
 
       expect(actual).toHaveLength(1)
-      // expect(actual[0]).toEqual(fileSummmaries) Uncomment this line until the API is fixed
+      expect(actual[0]).toEqual(fileSummmaries)
       deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
     })
 
@@ -904,36 +888,32 @@ describe('FilesRepository', () => {
         restrict: true
       })
       const updatedFileVersionSummariesActual = await sut.getFileVersionSummaries(testFile.id)
-      // const updatedFileVersionSummaries: FileVersionSummaryInfo = {
-      //   datasetVersion: 'DRAFT',
-      //   publishedDate: '',
-      //   isDraft: true,
-      //   isReleased: false,
-      //   isDeaccessioned: false,
-      //   versionState: FileVersionState.DRAFT,
-      //   contributors: 'Dataverse Admin',
-      //   datafileId: testFile.id,
-      //   persistentId: testFile.persistentId,
-      //   fileDifferenceSummary: {
-      //     FileMetadata: [
-      //       {
-      //         name: 'File Name',
-      //         action: 'Changed'
-      //       },
-      //       {
-      //         name: 'Description',
-      //         action: 'Changed'
-      //       }
-      //     ],
-      //     FileTags: {
-      //       Added: 2
-      //     },
-      //     FileAccess: 'Restricted'
-      //   }
-      // }
+      const updatedFileVersionSummaries: FileVersionSummaryInfo = {
+        datasetVersion: 'DRAFT',
+        versionState: DatasetVersionState.DRAFT,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: {
+          fileMetadata: [
+            {
+              name: 'File Name',
+              action: 'Changed'
+            },
+            {
+              name: 'Description',
+              action: 'Changed'
+            }
+          ],
+          fileTags: {
+            Added: 2
+          },
+          fileAccess: FileAccessStatus.RESTRICTED
+        }
+      }
 
       expect(updatedFileVersionSummariesActual).toHaveLength(2)
-      // expect(updatedFileVersionSummariesActual[0]).toEqual(updatedFileVersionSummaries) Uncomment this line until the API is fixed
+      expect(updatedFileVersionSummariesActual[0]).toEqual(updatedFileVersionSummaries)
       deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
     })
 

@@ -61,7 +61,7 @@ export {
   updateFileTabularTags,
   updateFileCategories,
   replaceFile,
-  getFileVersionSummaries
+  getFileVersionSummaries,
   isFileDeleted
 }
 
