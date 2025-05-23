@@ -11,6 +11,7 @@ export interface DatasetPreview {
   citation: string
   description: string
   publicationStatuses: PublicationStatus[]
+  publicationDate?: string
   parentCollectionName: string
   parentCollectionAlias: string
   imageUrl?: string

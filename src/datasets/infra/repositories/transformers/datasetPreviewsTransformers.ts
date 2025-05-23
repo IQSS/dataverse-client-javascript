@@ -47,6 +47,7 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
     citation: datasetPreviewPayload.citation,
     description: datasetPreviewPayload.description,
     publicationStatuses: publicationStatuses,
+    publicationDate: datasetPreviewPayload.published_at,
     parentCollectionAlias: datasetPreviewPayload.identifier_of_dataverse,
     parentCollectionName: datasetPreviewPayload.name_of_dataverse,
     ...(datasetPreviewPayload.image_url && {
