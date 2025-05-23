@@ -27,6 +27,7 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
     },
     citation: DATASET_CITATION,
     description: 'test',
+    publicationDate: DATASET_RELEASE_TIME_STR,
     publicationStatuses: [PublicationStatus.Draft, PublicationStatus.Unpublished],
     parentCollectionAlias: 'parentCollection',
     parentCollectionName: 'Parent Collection',
