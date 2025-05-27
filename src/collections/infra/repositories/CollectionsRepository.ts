@@ -221,10 +221,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     }
 
     if (searchText) {
-      queryParams.set(
-        GetMyDataCollectionItemsQueryParams.SEARCH_TEXT,
-        encodeURIComponent(searchText)
-      )
+      queryParams.set(GetMyDataCollectionItemsQueryParams.SEARCH_TEXT, searchText)
     }
 
     roleIds.forEach((roleId) => {
@@ -315,10 +312,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionSearchCriteria: CollectionSearchCriteria
   ) {
     if (collectionSearchCriteria.searchText) {
-      queryParams.set(
-        GetCollectionItemsQueryParams.QUERY,
-        encodeURIComponent(collectionSearchCriteria.searchText)
-      )
+      queryParams.set(GetCollectionItemsQueryParams.QUERY, collectionSearchCriteria.searchText)
     }
 
     if (collectionSearchCriteria?.itemTypes) {
