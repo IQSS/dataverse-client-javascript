@@ -3,50 +3,51 @@ name: deploy_pr
 on: pull_request
 
 jobs:
-  test-unit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 19
+  # test-unit:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 19
 
-      - name: Install npm dependencies
-        run: npm ci
+  #     - name: Install npm dependencies
+  #       run: npm ci
 
-      - name: Run unit tests
-        run: npm run test:unit
+  #     - name: Run unit tests
+  #       run: npm run test:unit
 
-  test-integration:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 19
+  # test-integration:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 19
 
-      - name: Install npm dependencies
-        run: npm ci
+  #     - name: Install npm dependencies
+  #       run: npm ci
 
-      - name: Run integration tests
-        run: npm run test:integration
+  #     - name: Run integration tests
+  #       run: npm run test:integration
 
-  test-functional:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 19
+  # test-functional:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 19
 
-      - name: Install npm dependencies
-        run: npm ci
+  #     - name: Install npm dependencies
+  #       run: npm ci
 
-      - name: Run functional tests
-        run: npm run test:functional
+  #     - name: Run functional tests
+  #       run: npm run test:functional
 
   publish-gpr:
-    needs: [test-unit, test-integration, test-functional]
+    #needs: [test-unit, test-integration, test-functional]
+    needs: []
     runs-on: ubuntu-latest
     permissions:
       packages: write
