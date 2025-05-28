@@ -1,0 +1,24 @@
+import { ApiConfig } from '../../../src'
+import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
+import { SearchServicesRepository } from '../../../src/search/infra/repositories/SearchServicesRepository'
+import { TestConstants } from '../../testHelpers/TestConstants'
+
+// TODO
+describe.skip('SearchServicesRepository', () => {
+  const sut: SearchServicesRepository = new SearchServicesRepository()
+
+  afterAll(async () => {
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.API_KEY,
+      process.env.TEST_API_KEY
+    )
+  })
+
+  describe('getSearchServices', () => {
+    test('should return search services', async () => {
+      const actual = await sut.getSearchServices()
+      expect(actual.length).toEqual(2)
+    })
+  })
+})
