@@ -10,7 +10,7 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
     this.collectionsRepository = collectionsRepository
   }
 
-  /**
+  /** TODO: document searchServiceName
    * Returns an instance of CollectionItemSubset that contains reduced information for each item that the calling user can access in the installation.
    * If the collectionId parameter is not set, the use case will return items starting from the root collection.
    *
@@ -24,13 +24,15 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
     collectionId?: string,
     limit?: number,
     offset?: number,
-    collectionSearchCriteria?: CollectionSearchCriteria
+    collectionSearchCriteria?: CollectionSearchCriteria,
+    searchServiceName?: string
   ): Promise<CollectionItemSubset> {
     return await this.collectionsRepository.getCollectionItems(
       collectionId,
       limit,
       offset,
-      collectionSearchCriteria
+      collectionSearchCriteria,
+      searchServiceName
     )
   }
 }

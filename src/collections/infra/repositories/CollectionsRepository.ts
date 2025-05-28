@@ -63,7 +63,8 @@ export enum GetCollectionItemsQueryParams {
   START = 'start',
   TYPE = 'type',
   FILTERQUERY = 'fq',
-  SHOW_TYPE_COUNTS = 'show_type_counts'
+  SHOW_TYPE_COUNTS = 'show_type_counts',
+  SEARCH_SERVICE_NAME = 'search_service'
 }
 
 export enum GetMyDataCollectionItemsQueryParams {
@@ -155,7 +156,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionId?: string,
     limit?: number,
     offset?: number,
-    collectionSearchCriteria?: CollectionSearchCriteria
+    collectionSearchCriteria?: CollectionSearchCriteria,
+    searchServiceName?: string
   ): Promise<CollectionItemSubset> {
     const queryParams = new URLSearchParams({
       [GetCollectionItemsQueryParams.QUERY]: '*',
@@ -175,6 +177,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     if (offset) {
       queryParams.set(GetCollectionItemsQueryParams.START, offset.toString())
+    }
+
+    if (searchServiceName) {
+      queryParams.set(GetCollectionItemsQueryParams.SEARCH_SERVICE_NAME, searchServiceName)
     }
 
     if (collectionSearchCriteria) {

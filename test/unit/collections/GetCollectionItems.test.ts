@@ -60,6 +60,7 @@ describe('execute', () => {
       collectionId,
       undefined,
       undefined,
+      undefined,
       undefined
     )
     expect(actual).toEqual(testItemSubset)
@@ -74,6 +75,7 @@ describe('execute', () => {
     expect(collectionRepositoryStub.getCollectionItems).toHaveBeenCalledWith(
       undefined,
       limit,
+      undefined,
       undefined,
       undefined
     )
@@ -90,6 +92,7 @@ describe('execute', () => {
       undefined,
       undefined,
       offset,
+      undefined,
       undefined
     )
     expect(actual).toEqual(testItemSubset)
@@ -112,7 +115,8 @@ describe('execute', () => {
       undefined,
       undefined,
       undefined,
-      searchCriteria
+      searchCriteria,
+      undefined
     )
     expect(actual).toEqual(testItemSubset)
   })
@@ -133,7 +137,8 @@ describe('execute', () => {
       collectionId,
       limit,
       offset,
-      searchCriteria
+      searchCriteria,
+      undefined
     )
     expect(actual).toEqual(testItemSubset)
   })
