@@ -5,7 +5,7 @@ import { transformSearchServicesResponseToSearchServices } from './transformers/
 
 export class SearchServicesRepository extends ApiRepository implements ISearchServicesRepository {
   public async getSearchServices(): Promise<SearchService[]> {
-    return this.doGet(`/searchServices/`)
+    return this.doGet(`/search/services`)
       .then((response) => transformSearchServicesResponseToSearchServices(response))
       .catch((error) => {
         throw error
