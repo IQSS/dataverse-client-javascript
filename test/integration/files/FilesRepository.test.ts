@@ -1,3 +1,4 @@
+import * as crypto from 'crypto'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import {
   ApiConfig,
@@ -39,10 +40,14 @@ import {
 import {
   createCollectionViaApi,
   deleteCollectionViaApi,
+  publishCollectionViaApi,
   setStorageDriverViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { RestrictFileDTO } from '../../../src/files/domain/dtos/RestrictFileDTO'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
+import { FileVersionSummaryInfo } from '../../../src/files/domain/models/FileVersionSummaryInfo'
+import { DatasetVersionState } from '../../../src/datasets'
+import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 
 describe('FilesRepository', () => {
   const sut: FilesRepository = new FilesRepository()
@@ -761,6 +766,166 @@ describe('FilesRepository', () => {
     })
   })
 
+  describe('getFileVersionSummaries', () => {
+    let fileTestDatasetIds: CreatedDatasetIdentifiers
+    const testTextFile1Name = 'test-file-1.txt'
+
+    beforeEach(async () => {
+      try {
+        fileTestDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      } catch (error) {
+        throw new Error('Tests beforeEach(): Error while creating test dataset')
+      }
+      await uploadFileViaApi(fileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
+        throw new Error(`Tests beforeEach(): Error while uploading file ${testTextFile1Name}`)
+      })
+    })
+
+    test('should return file version summaries when file draft exists', async () => {
+      const currentTestFilesSubset = await sut.getDatasetFiles(
+        fileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const testFile = currentTestFilesSubset.files[0]
+      const actual = await sut.getFileVersionSummaries(testFile.id)
+
+      const fileSummmaries: FileVersionSummaryInfo = {
+        datasetVersion: 'DRAFT',
+        versionState: DatasetVersionState.DRAFT,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: { file: 'Added' }
+      }
+
+      expect(actual).toHaveLength(1)
+      expect(actual[0]).toEqual(fileSummmaries)
+      deleteUnpublishedDatasetViaApi(fileTestDatasetIds.numericId)
+    })
+
+    test('should return file version summaries when dataset is deaccessioned', async () => {
+      await publishDatasetViaApi(fileTestDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
+
+      await waitForNoLocks(fileTestDatasetIds.numericId, 10).catch(() => {
+        throw new Error('Error while waiting for no locks')
+      })
+
+      const datasetFiles = await sut.getDatasetFiles(
+        fileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const testFile = datasetFiles.files[0]
+      const publishedFileVersionSummariesActual = await sut.getFileVersionSummaries(testFile.id)
+
+      const publishedFileVersionSummmaries: FileVersionSummaryInfo = {
+        datasetVersion: '1.0',
+        publishedDate: publishedFileVersionSummariesActual[0].publishedDate,
+        versionState: DatasetVersionState.RELEASED,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: { file: 'Added' }
+      }
+
+      expect(publishedFileVersionSummariesActual).toHaveLength(1)
+      expect(publishedFileVersionSummariesActual[0]).toEqual(publishedFileVersionSummmaries)
+
+      await deaccessionDatasetViaApi(fileTestDatasetIds.numericId, '1.0').catch(() => {
+        throw new Error('Error while deaccessioning test Dataset')
+      })
+
+      const actual = await sut.getFileVersionSummaries(testFile.id)
+
+      const fileSummmaries: FileVersionSummaryInfo = {
+        datasetVersion: '1.0',
+        publishedDate: publishedFileVersionSummariesActual[0].publishedDate,
+        versionState: DatasetVersionState.DEACCESSIONED,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        fileDifferenceSummary: {
+          deaccessionedReason: 'Test reason.',
+          file: 'Added'
+        }
+      }
+
+      expect(actual).toHaveLength(1)
+      expect(actual[0]).toEqual(fileSummmaries)
+      deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
+    })
+
+    test('should return file version summaries when file is updated', async () => {
+      await publishDatasetViaApi(fileTestDatasetIds.numericId).catch(() => {
+        throw new Error('Error while publishing test Dataset')
+      })
+
+      await waitForNoLocks(fileTestDatasetIds.numericId, 10).catch(() => {
+        throw new Error('Error while waiting for no locks')
+      })
+
+      const datasetFiles = await sut.getDatasetFiles(
+        fileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const testFile = datasetFiles.files[0]
+      const actual = await sut.getFileVersionSummaries(testFile.id)
+
+      expect(actual).toHaveLength(1)
+
+      await sut.updateFileMetadata(testFile.id, {
+        description: 'My description test.',
+        categories: ['Data', 'Test'],
+        label: 'myfile.txt',
+        directoryLabel: 'mydir',
+        restrict: true
+      })
+      const updatedFileVersionSummariesActual = await sut.getFileVersionSummaries(testFile.id)
+      const updatedFileVersionSummaries: FileVersionSummaryInfo = {
+        datasetVersion: 'DRAFT',
+        versionState: DatasetVersionState.DRAFT,
+        contributors: 'Dataverse Admin',
+        datafileId: testFile.id,
+        persistentId: testFile.persistentId,
+        publishedDate: actual[0].publishedDate,
+        versionNote: undefined,
+        fileDifferenceSummary: {
+          fileMetadata: [
+            {
+              name: 'File Name',
+              action: 'Changed'
+            },
+            {
+              name: 'Description',
+              action: 'Changed'
+            }
+          ],
+          fileTags: {
+            Added: 2
+          },
+          fileAccess: 'Restricted'
+        }
+      }
+
+      expect(updatedFileVersionSummariesActual).toHaveLength(2)
+      expect(updatedFileVersionSummariesActual[0]).toEqual(updatedFileVersionSummaries)
+      deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
+    })
+
+    test('should return error when file does not exist', async () => {
+      const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+
+      await expect(sut.getFileVersionSummaries(nonExistentFiledId)).rejects.toThrow(expectedError)
+    })
+  })
+
   describe('deleteFile', () => {
     let deleFileTestDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'
@@ -837,6 +1002,169 @@ describe('FilesRepository', () => {
       const expectedError = new WriteError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
       await expect(sut.deleteFile(nonExistentFiledId)).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('isFileDeleted', () => {
+    const testTextFile1Name = 'test-file-1.txt'
+    const testTextFile2Name = 'test-file-2.txt'
+    const testCollectionAlias = 'isFileDeletedTestCollection'
+
+    let deleFileTestDatasetIds: CreatedDatasetIdentifiers
+    let fileId: number
+    let singlepartFile: File
+
+    const createTestFileUploadDestination = async (file: File, datasetId: number) => {
+      const destination = await sut.getFileUploadDestination(datasetId, file)
+      destination.urls = destination.urls.map((url) => url.replace('localstack', 'localhost'))
+      return destination
+    }
+
+    const calculateBlobChecksum = (blob: Buffer): string => {
+      return crypto.createHash('md5').update(blob).digest('hex')
+    }
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testCollectionAlias)
+      await setStorageDriverViaApi(testCollectionAlias, 'LocalStack')
+      await publishCollectionViaApi(testCollectionAlias)
+
+      deleFileTestDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+
+      singlepartFile = await createSinglepartFileBlob()
+
+      await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name)
+
+      const datasetFiles = await sut.getDatasetFiles(
+        deleFileTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      fileId = datasetFiles.files[0].id
+    })
+
+    describe('Basic deletion scenarios', () => {
+      test('should return False if a file has not been deleted', async () => {
+        const hasBeenDeleted = await sut.isFileDeleted(fileId)
+        expect(hasBeenDeleted).toBe(false)
+      })
+
+      test('should return error if the dataset is unpublished and the file has been deleted', async () => {
+        await sut.deleteFile(fileId)
+
+        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+        await expect(sut.isFileDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+      })
+
+      test('should return correctly when the file has or has not been deleted, in a published dataset', async () => {
+        await uploadFileViaApi(deleFileTestDatasetIds.numericId, testTextFile1Name)
+        await publishDatasetViaApi(deleFileTestDatasetIds.numericId)
+        await waitForNoLocks(deleFileTestDatasetIds.numericId, 10)
+
+        const datasetFiles = await sut.getDatasetFiles(
+          deleFileTestDatasetIds.numericId,
+          latestDatasetVersionId,
+          false,
+          FileOrderCriteria.NAME_AZ
+        )
+        fileId = datasetFiles.files[0].id
+
+        const fileHasNotBeenDeleted = await sut.isFileDeleted(fileId)
+        expect(fileHasNotBeenDeleted).toBe(false)
+
+        await sut.deleteFile(fileId)
+
+        const fileHasBeenDeleted = await sut.isFileDeleted(fileId)
+        expect(fileHasBeenDeleted).toBe(true)
+      })
+
+      test('should return error when file does not exist', async () => {
+        const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
+        await expect(sut.isFileDeleted(nonExistentFiledId)).rejects.toThrow(expectedError)
+      })
+    })
+
+    describe('File replacement scenario', () => {
+      test('should return True when file has been replaced', async () => {
+        const directUploadSut = new DirectUploadClient(sut)
+        const progressMock = jest.fn()
+        const abortController = new AbortController()
+
+        // Upload original file
+        const originalBuffer = Buffer.from(await singlepartFile.arrayBuffer())
+        const originalDestination = await createTestFileUploadDestination(
+          singlepartFile,
+          deleFileTestDatasetIds.numericId
+        )
+
+        const originalStorageId = await directUploadSut.uploadFile(
+          deleFileTestDatasetIds.numericId,
+          singlepartFile,
+          progressMock,
+          abortController,
+          originalDestination
+        )
+
+        const originalUploadedFileDTO = {
+          fileName: singlepartFile.name,
+          storageId: originalStorageId,
+          checksumType: 'md5',
+          checksumValue: calculateBlobChecksum(originalBuffer),
+          mimeType: singlepartFile.type
+        }
+
+        await sut.addUploadedFilesToDataset(deleFileTestDatasetIds.numericId, [
+          originalUploadedFileDTO
+        ])
+
+        const originalFileId = (
+          await sut.getDatasetFiles(
+            deleFileTestDatasetIds.numericId,
+            DatasetNotNumberedVersion.LATEST,
+            true,
+            FileOrderCriteria.NAME_AZ
+          )
+        ).files[0].id
+
+        // Create and upload replacement file
+        const newFileBlob = await createSinglepartFileBlob(testTextFile2Name, 2000)
+        const newBuffer = Buffer.from(await newFileBlob.arrayBuffer())
+        const newDestination = await createTestFileUploadDestination(
+          newFileBlob,
+          deleFileTestDatasetIds.numericId
+        )
+
+        const newStorageId = await directUploadSut.uploadFile(
+          deleFileTestDatasetIds.numericId,
+          newFileBlob,
+          progressMock,
+          abortController,
+          newDestination
+        )
+
+        const newUploadedFileDTO = {
+          fileName: newFileBlob.name,
+          storageId: newStorageId,
+          checksumType: 'md5',
+          checksumValue: calculateBlobChecksum(newBuffer),
+          mimeType: newFileBlob.type
+        }
+
+        await publishDatasetViaApi(deleFileTestDatasetIds.numericId)
+        await waitForNoLocks(deleFileTestDatasetIds.numericId, 10)
+
+        await sut.replaceFile(originalFileId, newUploadedFileDTO)
+
+        const isDeleted = await sut.isFileDeleted(originalFileId)
+        expect(isDeleted).toBe(true)
+
+        await deletePublishedDatasetViaApi(deleFileTestDatasetIds.persistentId)
+        await deleteCollectionViaApi(testCollectionAlias)
+      })
     })
   })
 

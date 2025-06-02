@@ -94,7 +94,7 @@ describe('DatasetsRepository', () => {
   const testCollectionAlias = 'datasetsRepositoryTestCollection'
 
   const sut: DatasetsRepository = new DatasetsRepository()
-  const nonExistentTestDatasetId = 100
+  const nonExistentTestDatasetId = 1000
 
   const filesRepositorySut = new FilesRepository()
   const directUploadSut: DirectUploadClient = new DirectUploadClient(filesRepositorySut)

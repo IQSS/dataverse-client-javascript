@@ -52,6 +52,8 @@ The different use cases currently available in the package are classified below,
     - [Get the size of Downloading all the files of a Dataset Version](#get-the-size-of-downloading-all-the-files-of-a-dataset-version)
     - [Get User Permissions on a File](#get-user-permissions-on-a-file)
     - [List Files in a Dataset](#list-files-in-a-dataset)
+    - [Is File Deleted](#is-file-deleted)
+    - [Get File Version Summaries](#get-file-version-summaries)
   - [Files write use cases](#files-write-use-cases)
     - [File Uploading Use Cases](#file-uploading-use-cases)
     - [Delete a File](#delete-a-file)
@@ -1570,6 +1572,52 @@ The `fileId` parameter can be a string, for persistent identifiers, or a number,
 If restrict is false then enableAccessRequest and termsOfAccess are ignored
 If restrict is true and enableAccessRequest is false then termsOfAccess is required.
 The enableAccessRequest and termsOfAccess are applied to the Draft version of the Dataset and affect all of the restricted files in said Draft version.
+
+#### Is File Deleted
+
+Check if the file has been deleted, return a boolean.
+
+##### Example call:
+
+```typescript
+import { isFileDeleted } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 12345
+
+await isFileDeleted.execute(fileId).then((isDeleted: boolean) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/isFileDeleted.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Get File Version Summaries
+
+Get the file versions summaries, return a list of summaries for each version
+
+##### Example call:
+
+```typescript
+import { getFileVersionSummaries } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 1
+
+getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummaryInfo[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileVersionSummaries.ts) implementation_.
 
 ## Metadata Blocks
 

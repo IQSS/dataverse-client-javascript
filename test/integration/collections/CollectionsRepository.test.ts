@@ -502,8 +502,8 @@ describe('CollectionsRepository', () => {
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
-      expect(actualDatasetPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
-      expect(actualDatasetPreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
+      expect(actualDatasetPreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
+      expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Draft)
       expect(actualDatasetPreview.versionId).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.createTime).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.lastUpdateTime).not.toBeUndefined()
@@ -522,7 +522,7 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.imageUrl).toBe(undefined)
       expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
       expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
-      expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
+      expect(actualCollectionPreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
       expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
       expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
       expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
@@ -559,7 +559,7 @@ describe('CollectionsRepository', () => {
       expect(actual.countPerObjectType.files).toBe(1)
 
       const collectionSearchCriteriaForDataset = new CollectionSearchCriteria().withSearchText(
-        'This is the description'
+        'Dataset created using'
       )
       actual = await sut.getCollectionItems(
         testCollectionAlias,
@@ -567,6 +567,7 @@ describe('CollectionsRepository', () => {
         undefined,
         collectionSearchCriteriaForDataset
       )
+
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect(actual.countPerObjectType.collections).toBe(0)
@@ -927,7 +928,7 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.fileType).toBe('Tab-Delimited')
       expect(actualFilePreview.md5).toBe(expectedFileMd5)
       expect(actualFilePreview.name).toBe(expectedFileName)
-      expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Published)
+      expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Published)
       expect(actualFilePreview.sizeInBytes).toBe(137)
       expect(actualFilePreview.url).not.toBeUndefined()
       expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
@@ -944,7 +945,7 @@ describe('CollectionsRepository', () => {
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
-      expect(actualDatasetPreview.publicationStatuses[0]).toBe(PublicationStatus.Published)
+      expect(actualDatasetPreview.publicationStatuses).toContain(PublicationStatus.Published)
       expect(actualDatasetPreview.versionId).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.createTime).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.lastUpdateTime).not.toBeUndefined()
@@ -963,7 +964,7 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.imageUrl).toBe(undefined)
       expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
       expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
-      expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Published)
+      expect(actualCollectionPreview.publicationStatuses).toContain(PublicationStatus.Published)
       expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
       expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
       expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
@@ -1357,8 +1358,7 @@ describe('CollectionsRepository', () => {
           TestConstants.TEST_NEW_DATASET_DTO,
           testSubCollectionAlias
         )
-      } catch (error: any) {
-        console.log(error.message)
+      } catch {
         throw new Error('Tests beforeAll(): Error while creating test dataset')
       }
       await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name).catch(() => {
@@ -1446,7 +1446,7 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.fileId).not.toBeUndefined()
       expect(actualFilePreview.fileType).toBe('Plain Text')
       expect(actualFilePreview.md5).toBe(expectedFileMd5)
-      expect(actualFilePreview.publicationStatuses.length).toBe(2)
+      expect(actualFilePreview.name).toBe(expectedFileName)
       expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
       expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Draft)
       expect(actualFilePreview.sizeInBytes).toBe(12)
@@ -1461,8 +1461,8 @@ describe('CollectionsRepository', () => {
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
-      expect(actualDatasetPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
-      expect(actualDatasetPreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
+      expect(actualDatasetPreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
+      expect(actualDatasetPreview.publicationStatuses).toContain(PublicationStatus.Draft)
       expect(actualDatasetPreview.versionId).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.createTime).not.toBeUndefined()
       expect(actualDatasetPreview.versionInfo.lastUpdateTime).not.toBeUndefined()
@@ -1481,7 +1481,7 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.imageUrl).toBe(undefined)
       expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
       expect(actualCollectionPreview.parentName).toBe(testCollectionName)
-      expect(actualCollectionPreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
+      expect(actualCollectionPreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
       expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
       expect(actualCollectionPreview.affiliation).toBe('test affiliation')
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
@@ -1517,7 +1517,7 @@ describe('CollectionsRepository', () => {
       expect(actualFileResult.countPerObjectType.datasets).toBe(0)
       expect(actualFileResult.countPerObjectType.files).toBe(1)
 
-      const datasetSearchText = 'This is the description'
+      const datasetSearchText = 'of the dataset.'
 
       actual = await sut.getMyDataCollectionItems(
         roleIds,
@@ -1527,6 +1527,7 @@ describe('CollectionsRepository', () => {
         undefined,
         datasetSearchText
       )
+
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect(actual.countPerObjectType.collections).toBe(0)

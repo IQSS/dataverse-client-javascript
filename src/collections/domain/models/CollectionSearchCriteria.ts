@@ -2,7 +2,8 @@ import { CollectionItemType } from './CollectionItemType'
 
 export enum SortType {
   NAME = 'name',
-  DATE = 'date'
+  DATE = 'date',
+  SCORE = 'score'
 }
 
 export enum OrderType {
