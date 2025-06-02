@@ -11,6 +11,9 @@ const DATASET_RELEASE_TIME_STR = '2023-05-15T08:21:03Z'
 const DATASET_CITATION =
   'Doe, John, 2023, "Test Dataset 1", https://doi.org/10.5072/FK2/XXXXXX, Root, V1, UNF:6:AAc5A5tAI9AVodAAAsOysA== [fileUNF]'
 
+const DATASET_CITATION_HTML =
+  'Finch, Fiona; Spruce, Sabrina; Poe, Edgar Allen; Mulligan, Hercules, 2019, "Darwin\'s Finches", <a href="https://doi.org/10.70122/FK2/MB5VGR" target="_blank">https://doi.org/10.70122/FK2/MB5VGR</a>, Root, V3'
+
 export const createDatasetPreviewModel = (): DatasetPreview => {
   const datasetPreviewModel: DatasetPreview = {
     type: CollectionItemType.DATASET,
@@ -25,7 +28,7 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
       lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
       releaseTime: new Date(DATASET_RELEASE_TIME_STR)
     },
-    citation: DATASET_CITATION,
+    citation: DATASET_CITATION_HTML,
     description: 'test',
     publicationStatuses: [PublicationStatus.Draft, PublicationStatus.Unpublished],
     parentCollectionAlias: 'parentCollection',
@@ -47,6 +50,7 @@ export const createDatasetPreviewPayload = (): DatasetPreviewPayload => {
     updatedAt: DATASET_UPDATE_TIME_STR,
     published_at: DATASET_RELEASE_TIME_STR,
     citation: DATASET_CITATION,
+    citationHtml: DATASET_CITATION_HTML,
     description: 'test',
     type: 'dataset',
     publicationStatuses: ['Draft', 'Unpublished'],
