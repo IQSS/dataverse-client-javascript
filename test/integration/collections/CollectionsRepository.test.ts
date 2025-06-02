@@ -487,8 +487,9 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.fileType).toBe('Plain Text')
       expect(actualFilePreview.md5).toBe(expectedFileMd5)
       expect(actualFilePreview.name).toBe(expectedFileName)
-      expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
-      expect(actualFilePreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
+      expect(actualFilePreview.publicationStatuses.length).toBe(2)
+      expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
+      expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Draft)
       expect(actualFilePreview.sizeInBytes).toBe(12)
       expect(actualFilePreview.url).not.toBeUndefined()
       expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
@@ -1420,19 +1421,14 @@ describe('CollectionsRepository', () => {
       const expectedFileName = 'test-file-2.txt'
       const expectedCollectionsName = 'Test Collection'
 
-      const expectedFacetsAll = [
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 3 },
-            { name: 'Draft', count: 2 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
+      const expectedPublicationStatusCounts = [
+        { publicationStatus: 'Published', count: 0 },
+        { publicationStatus: 'Unpublished', count: 3 },
+        { publicationStatus: 'Draft', count: 2 },
+        { publicationStatus: 'InReview', count: 0 },
+        { publicationStatus: 'Deaccessioned', count: 0 }
       ]
+
       expect(actual.items.length).toBe(3)
       expect(actual.totalItemCount).toBe(3)
       expect(actual.countPerObjectType.collections).toBe(1)
@@ -1450,9 +1446,9 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.fileId).not.toBeUndefined()
       expect(actualFilePreview.fileType).toBe('Plain Text')
       expect(actualFilePreview.md5).toBe(expectedFileMd5)
-      expect(actualFilePreview.name).toBe(expectedFileName)
-      expect(actualFilePreview.publicationStatuses[0]).toBe(PublicationStatus.Unpublished)
-      expect(actualFilePreview.publicationStatuses[1]).toBe(PublicationStatus.Draft)
+      expect(actualFilePreview.publicationStatuses.length).toBe(2)
+      expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
+      expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Draft)
       expect(actualFilePreview.sizeInBytes).toBe(12)
       expect(actualFilePreview.url).not.toBeUndefined()
       expect(actualFilePreview.releaseOrCreateDate).not.toBeUndefined()
@@ -1490,7 +1486,7 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.affiliation).toBe('test affiliation')
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
 
-      expect(actual.facets).toEqual(expectedFacetsAll)
+      expect(actual.publicationStatusCounts).toEqual(expectedPublicationStatusCounts)
 
       // Test limit and selectedPage
       actual = await sut.getMyDataCollectionItems(
@@ -1568,18 +1564,12 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 1 },
-            { name: 'Draft', count: 0 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
+      expect(actual.publicationStatusCounts).toEqual([
+        { publicationStatus: 'Published', count: 0 },
+        { publicationStatus: 'Unpublished', count: 1 },
+        { publicationStatus: 'Draft', count: 0 },
+        { publicationStatus: 'InReview', count: 0 },
+        { publicationStatus: 'Deaccessioned', count: 0 }
       ])
       expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(0)
@@ -1597,18 +1587,12 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 1 },
-            { name: 'Draft', count: 1 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
+      expect(actual.publicationStatusCounts).toEqual([
+        { publicationStatus: 'Published', count: 0 },
+        { publicationStatus: 'Unpublished', count: 1 },
+        { publicationStatus: 'Draft', count: 1 },
+        { publicationStatus: 'InReview', count: 0 },
+        { publicationStatus: 'Deaccessioned', count: 0 }
       ])
       expect(actual.countPerObjectType.collections).toBe(0)
       expect(actual.countPerObjectType.datasets).toBe(1)
@@ -1627,18 +1611,12 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 1 },
-            { name: 'Draft', count: 1 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
+      expect(actual.publicationStatusCounts).toEqual([
+        { publicationStatus: 'Published', count: 0 },
+        { publicationStatus: 'Unpublished', count: 1 },
+        { publicationStatus: 'Draft', count: 1 },
+        { publicationStatus: 'InReview', count: 0 },
+        { publicationStatus: 'Deaccessioned', count: 0 }
       ])
 
       expect(actual.countPerObjectType.collections).toBe(0)

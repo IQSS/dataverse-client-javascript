@@ -4,6 +4,7 @@ import { Collection } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
 import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
 import { CollectionItemSubset } from '../models/CollectionItemSubset'
+import { MyDataCollectionItemSubset } from '../models/MyDataCollectionItemSubset'
 import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
@@ -35,7 +36,7 @@ export interface ICollectionsRepository {
     selectedPage?: number,
     searchText?: string,
     otherUserName?: string
-  ): Promise<CollectionItemSubset>
+  ): Promise<MyDataCollectionItemSubset>
   updateCollection(
     collectionIdOrAlias: number | string,
     updatedCollection: CollectionDTO
