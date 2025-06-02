@@ -120,7 +120,7 @@ describe('execute', () => {
             count: 0
           },
           {
-            publicationStatus: 'In Review',
+            publicationStatus: 'InReview',
             count: 0
           },
           {
