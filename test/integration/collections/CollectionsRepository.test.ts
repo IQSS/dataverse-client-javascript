@@ -1425,7 +1425,7 @@ describe('CollectionsRepository', () => {
         { publicationStatus: 'Published', count: 0 },
         { publicationStatus: 'Unpublished', count: 3 },
         { publicationStatus: 'Draft', count: 2 },
-        { publicationStatus: 'InReview', count: 0 },
+        { publicationStatus: 'In Review', count: 0 },
         { publicationStatus: 'Deaccessioned', count: 0 }
       ]
 
@@ -1569,7 +1569,7 @@ describe('CollectionsRepository', () => {
         { publicationStatus: 'Published', count: 0 },
         { publicationStatus: 'Unpublished', count: 1 },
         { publicationStatus: 'Draft', count: 0 },
-        { publicationStatus: 'InReview', count: 0 },
+        { publicationStatus: 'In Review', count: 0 },
         { publicationStatus: 'Deaccessioned', count: 0 }
       ])
       expect(actual.countPerObjectType.collections).toBe(1)
@@ -1592,7 +1592,7 @@ describe('CollectionsRepository', () => {
         { publicationStatus: 'Published', count: 0 },
         { publicationStatus: 'Unpublished', count: 1 },
         { publicationStatus: 'Draft', count: 1 },
-        { publicationStatus: 'InReview', count: 0 },
+        { publicationStatus: 'In Review', count: 0 },
         { publicationStatus: 'Deaccessioned', count: 0 }
       ])
       expect(actual.countPerObjectType.collections).toBe(0)
@@ -1616,7 +1616,7 @@ describe('CollectionsRepository', () => {
         { publicationStatus: 'Published', count: 0 },
         { publicationStatus: 'Unpublished', count: 1 },
         { publicationStatus: 'Draft', count: 1 },
-        { publicationStatus: 'InReview', count: 0 },
+        { publicationStatus: 'In Review', count: 0 },
         { publicationStatus: 'Deaccessioned', count: 0 }
       ])
 

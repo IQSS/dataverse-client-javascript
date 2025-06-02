@@ -1,6 +1,6 @@
 export enum PublicationStatus {
   Deaccessioned = 'Deaccessioned',
-  InReview = 'InReview',
+  InReview = 'In Review',
   Published = 'Published',
   Unpublished = 'Unpublished',
   Draft = 'Draft'
