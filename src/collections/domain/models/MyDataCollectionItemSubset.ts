@@ -2,7 +2,7 @@ import { CollectionPreview } from './CollectionPreview'
 import { DatasetPreview } from '../../../datasets'
 import { FilePreview } from '../../../files'
 import { CountPerObjectType } from './CollectionItemSubset'
-import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
+import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 
 export interface MyDataCollectionItemSubset {
   items: (CollectionPreview | DatasetPreview | FilePreview)[]

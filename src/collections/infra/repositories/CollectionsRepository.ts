@@ -23,7 +23,7 @@ import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedIt
 import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
 import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
-import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
+import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
 
 export interface NewCollectionRequestPayload {
