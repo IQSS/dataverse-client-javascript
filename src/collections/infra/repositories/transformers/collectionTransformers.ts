@@ -42,7 +42,7 @@ import {
   MyDataCollectionItemSubset,
   PublicationStatusCount
 } from '../../../domain/models/MyDataCollectionItemSubset'
-import { PublicationStatus } from '../../../../../src/core/domain/models/PublicationStatus'
+import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
