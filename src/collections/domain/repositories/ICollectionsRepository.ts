@@ -4,10 +4,11 @@ import { Collection } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
 import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
 import { CollectionItemSubset } from '../models/CollectionItemSubset'
+import { MyDataCollectionItemSubset } from '../models/MyDataCollectionItemSubset'
 import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
-import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
-import { CollectionItemType } from '../../../../src/collections/domain/models/CollectionItemType'
+import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -25,7 +26,8 @@ export interface ICollectionsRepository {
     collectionId?: string,
     limit?: number,
     offset?: number,
-    collectionSearchCriteria?: CollectionSearchCriteria
+    collectionSearchCriteria?: CollectionSearchCriteria,
+    showTypeCounts?: boolean
   ): Promise<CollectionItemSubset>
   getMyDataCollectionItems(
     roleIds: number[],
@@ -35,7 +37,7 @@ export interface ICollectionsRepository {
     selectedPage?: number,
     searchText?: string,
     otherUserName?: string
-  ): Promise<CollectionItemSubset>
+  ): Promise<MyDataCollectionItemSubset>
   updateCollection(
     collectionIdOrAlias: number | string,
     updatedCollection: CollectionDTO

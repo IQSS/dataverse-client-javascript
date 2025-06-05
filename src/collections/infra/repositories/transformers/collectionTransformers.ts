@@ -10,8 +10,8 @@ import { CollectionFacet } from '../../../domain/models/CollectionFacet'
 import { CollectionFacetPayload } from './CollectionFacetPayload'
 import {
   CollectionItemsFacet,
-  CollectionItemsFacetLabel,
-  CollectionItemSubset
+  CollectionItemSubset,
+  CountPerObjectType
 } from '../../../domain/models/CollectionItemSubset'
 import { DatasetPreview } from '../../../../datasets'
 import { FilePreview } from '../../../../files'
@@ -39,7 +39,11 @@ import { MyDataFilePreviewPayload } from '../../../../files/infra/repositories/t
 import { MyDataDatasetPreviewPayload } from '../../../../datasets/infra/repositories/transformers/MyDataDatasetPreviewPayload'
 import { MyDataCollectionPreviewPayload } from './MyDataCollectionPreviewPayload'
 import { MyDataCountPerObjectTypePayload } from './MyDataCountPerObjectTypePayload'
-import { MyDataPublicationStatusCountsPayload } from './MyDataPublicationStatusCountsPayload'
+import {
+  MyDataCollectionItemSubset,
+  PublicationStatusCount
+} from '../../../domain/models/MyDataCollectionItemSubset'
+import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -98,9 +102,9 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
   const responseDataPayload = response.data.data
   const itemsPayload = responseDataPayload.items
   const facetsPayload = responseDataPayload.facets as CollectionItemsFacetPayload
-  const countPerObjectTypePayload = responseDataPayload[
-    'total_count_per_object_type'
-  ] as CollectionItemsCountPerObjectTypePayload
+  const countPerObjectTypePayload = responseDataPayload['total_count_per_object_type'] as
+    | CollectionItemsCountPerObjectTypePayload
+    | undefined
 
   const items: (DatasetPreview | FilePreview | CollectionPreview)[] = []
 
@@ -133,23 +137,25 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
     })
   )
 
-  const countPerObjectType = {
-    collections: countPerObjectTypePayload['Dataverses'],
-    datasets: countPerObjectTypePayload['Datasets'],
-    files: countPerObjectTypePayload['Files']
-  }
+  const countPerObjectType: CountPerObjectType | undefined = countPerObjectTypePayload
+    ? {
+        collections: countPerObjectTypePayload['Dataverses'],
+        datasets: countPerObjectTypePayload['Datasets'],
+        files: countPerObjectTypePayload['Files']
+      }
+    : undefined
 
   return {
     items,
     facets,
     totalItemCount: responseDataPayload.total_count,
-    countPerObjectType
+    ...(countPerObjectType && { countPerObjectType })
   }
 }
 
 export const transformMyDataResponseToCollectionItemSubset = (
   response: AxiosResponse
-): CollectionItemSubset => {
+): MyDataCollectionItemSubset => {
   const responseDataPayload = response.data.data
   const itemsPayload = responseDataPayload.items
   const countPerObjectTypePayload = responseDataPayload[
@@ -188,14 +194,32 @@ export const transformMyDataResponseToCollectionItemSubset = (
     datasets: countPerObjectTypePayload['datasets_count'],
     files: countPerObjectTypePayload['files_count']
   }
-  const publishingFacet: CollectionItemsFacet = transformPublicationStatusResponseToFacet(
-    responseDataPayload.pubstatus_counts as MyDataPublicationStatusCountsPayload
-  )
-  const facets: CollectionItemsFacet[] = [publishingFacet]
 
+  const publicationStatusCounts: PublicationStatusCount[] = [
+    {
+      publicationStatus: PublicationStatus.Published,
+      count: responseDataPayload.pubstatus_counts.published_count
+    },
+    {
+      publicationStatus: PublicationStatus.Unpublished,
+      count: responseDataPayload.pubstatus_counts.unpublished_count
+    },
+    {
+      publicationStatus: PublicationStatus.Draft,
+      count: responseDataPayload.pubstatus_counts.draft_count
+    },
+    {
+      publicationStatus: PublicationStatus.InReview,
+      count: responseDataPayload.pubstatus_counts.in_review_count
+    },
+    {
+      publicationStatus: PublicationStatus.Deaccessioned,
+      count: responseDataPayload.pubstatus_counts.deaccessioned_count
+    }
+  ]
   return {
     items,
-    facets,
+    publicationStatusCounts,
     totalItemCount: responseDataPayload.pagination.numResults,
     countPerObjectType
   }
@@ -208,21 +232,4 @@ const transformContactsPayloadToContacts = (
     email: contactPayload.contactEmail,
     displayOrder: contactPayload.displayOrder
   }))
-}
-
-const transformPublicationStatusResponseToFacet = (
-  publicationStatusCounts: MyDataPublicationStatusCountsPayload
-): CollectionItemsFacet => {
-  const labels: CollectionItemsFacetLabel[] = [
-    { name: 'Published', count: publicationStatusCounts.published_count },
-    { name: 'Unpublished', count: publicationStatusCounts.unpublished_count },
-    { name: 'Draft', count: publicationStatusCounts.draft_count },
-    { name: 'In Review', count: publicationStatusCounts.in_review_count },
-    { name: 'Deaccessioned', count: publicationStatusCounts.deaccessioned_count }
-  ]
-  return {
-    name: 'publicationStatus',
-    friendlyName: 'Publication Status',
-    labels
-  }
 }
