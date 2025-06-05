@@ -26,7 +26,8 @@ export interface ICollectionsRepository {
     collectionId?: string,
     limit?: number,
     offset?: number,
-    collectionSearchCriteria?: CollectionSearchCriteria
+    collectionSearchCriteria?: CollectionSearchCriteria,
+    showTypeCounts?: boolean
   ): Promise<CollectionItemSubset>
   getMyDataCollectionItems(
     roleIds: number[],

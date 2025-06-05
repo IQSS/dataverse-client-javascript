@@ -6,7 +6,7 @@ export interface CollectionItemSubset {
   items: (CollectionPreview | DatasetPreview | FilePreview)[]
   facets: CollectionItemsFacet[]
   totalItemCount: number
-  countPerObjectType: CountPerObjectType
+  countPerObjectType?: CountPerObjectType
 }
 
 export interface CollectionItemsFacet {
