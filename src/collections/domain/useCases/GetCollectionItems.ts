@@ -26,16 +26,16 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
     limit?: number,
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria,
-    showTypeCounts = false,
-    searchServiceName?: string
+    searchServiceName?: string,
+    showTypeCounts = false
   ): Promise<CollectionItemSubset> {
     return await this.collectionsRepository.getCollectionItems(
       collectionId,
       limit,
       offset,
       collectionSearchCriteria,
-      showTypeCounts,
-      searchServiceName
+      searchServiceName,
+      showTypeCounts
     )
   }
 }

@@ -158,8 +158,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     limit?: number,
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria,
-    showTypeCounts?: boolean,
-    searchServiceName?: string
+    searchServiceName?: string,
+    showTypeCounts?: boolean
   ): Promise<CollectionItemSubset> {
     const queryParams = new URLSearchParams({
       [GetCollectionItemsQueryParams.QUERY]: '*',
