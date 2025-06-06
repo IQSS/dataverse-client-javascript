@@ -12,7 +12,7 @@ interface CreateCollectionFeaturedItemData {
   fileName?: string
 }
 
-export async function createCollectionFeaturedItemViaApi(
+export async function createCollectionCustomFeaturedItemViaApi(
   collectionAlias: string,
   {
     content,
@@ -27,6 +27,7 @@ export async function createCollectionFeaturedItemViaApi(
     }
 
     const formData = new FormData()
+    formData.append('type', 'custom')
     formData.append('content', content)
     formData.append('displayOrder', displayOrder.toString())
 
@@ -83,6 +84,7 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
   return [
     {
       id: 1,
+      type: 'custom',
       content: 'This is a featured item',
       displayOrder: 1,
       imageFileName: 'test-image.png',
@@ -90,10 +92,17 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
     },
     {
       id: 2,
+      type: 'custom',
       content: 'This is another featured item',
       displayOrder: 2,
       imageFileName: undefined,
       imageFileUrl: undefined
+    },
+    {
+      id: 3,
+      type: 'dataset',
+      displayOrder: 3,
+      dvObjectIdentifier: 'doi:10.5072/FK2/8YOKQI'
     }
   ]
 }
@@ -102,6 +111,7 @@ export const createCollectionFeaturedItemsDTO = (): CollectionFeaturedItemsDTO =
   return [
     {
       id: 1,
+      type: 'custom',
       content: 'This is a featured item',
       displayOrder: 1,
       file: createImageFile(),
@@ -109,10 +119,29 @@ export const createCollectionFeaturedItemsDTO = (): CollectionFeaturedItemsDTO =
     },
     {
       id: 2,
+      type: 'custom',
       content: 'This is another featured item',
       displayOrder: 2,
       file: undefined,
       keepFile: false
+    },
+    {
+      id: 3,
+      type: 'collection',
+      displayOrder: 3,
+      dvObjectIdentifier: 'collection-alias-foo-bar'
+    },
+    {
+      id: 4,
+      type: 'dataset',
+      displayOrder: 4,
+      dvObjectIdentifier: 'doi:10.5072/FK2/8YOKQI'
+    },
+    {
+      id: 5,
+      type: 'file',
+      displayOrder: 5,
+      dvObjectIdentifier: '12'
     }
   ]
 }

@@ -6,7 +6,7 @@ import {
   deleteCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import {
-  createCollectionFeaturedItemViaApi,
+  createCollectionCustomFeaturedItemViaApi,
   deleteCollectionFeaturedItemsViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 
@@ -24,18 +24,18 @@ describe('execute', () => {
   beforeAll(async () => {
     try {
       await createCollectionViaApi(testCollectionAlias)
-      await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+      await createCollectionCustomFeaturedItemViaApi(testCollectionAlias, {
         content: '<p class="rte-paragraph">Test content</p>',
         displayOrder: 1,
         withFile: true,
         fileName: 'featured-item-test-image.png'
       })
-      await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+      await createCollectionCustomFeaturedItemViaApi(testCollectionAlias, {
         content: '<p class="rte-paragraph">Test content 2</p>',
         displayOrder: 2,
         withFile: false
       })
-      await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+      await createCollectionCustomFeaturedItemViaApi(testCollectionAlias, {
         content: '<p class="rte-paragraph">Test content 3</p>',
         displayOrder: 3,
         withFile: false

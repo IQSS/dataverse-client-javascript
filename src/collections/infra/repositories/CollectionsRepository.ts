@@ -20,7 +20,11 @@ import {
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
 import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedItem'
 import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
-import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
+import {
+  CollectionFeaturedItemsDTO,
+  CustomFeaturedItemDTO,
+  DvObjectFeaturedItemDTO
+} from '../../domain/dtos/CollectionFeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
@@ -382,18 +386,40 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     const formData = new FormData()
 
-    orderedFeaturedItemsDTO.forEach((item) => {
-      const { id, content, displayOrder, file, keepFile } = item
-      const fileName = file ? file.name : ''
+    orderedFeaturedItemsDTO.forEach((item: CustomFeaturedItemDTO | DvObjectFeaturedItemDTO) => {
+      formData.append('id', item.id !== undefined ? item.id.toString() : '0')
+      formData.append('type', item.type)
+      formData.append('displayOrder', item.displayOrder.toString())
 
-      formData.append('id', id ? id.toString() : '0')
-      formData.append('content', content)
-      formData.append('displayOrder', displayOrder.toString())
-      formData.append('keepFile', keepFile.toString())
-      formData.append('fileName', fileName)
-      if (file) {
-        formData.append('file', file)
+      if (item.type === 'custom') {
+        // CustomFeaturedItemDTO
+        formData.append('content', item.content)
+        formData.append('keepFile', item.keepFile.toString())
+        formData.append('fileName', item.file ? item.file.name : '')
+        if (item.file) {
+          formData.append('file', item.file)
+        }
+      } else {
+        // DvObjectFeaturedItemDTO
+        formData.append('dvObjectIdentifier', item.dvObjectIdentifier)
+
+        // We still need to append content, keepFile, and fileName as they are expected by the backend even empty
+        formData.append('content', '')
+        formData.append('keepFile', '')
+        formData.append('fileName', '')
       }
+
+      // const { id, content, displayOrder, file, keepFile } = item
+      // const fileName = file ? file.name : ''
+
+      // formData.append('id', id ? id.toString() : '0')
+      // formData.append('content', content)
+      // formData.append('displayOrder', displayOrder.toString())
+      // formData.append('keepFile', keepFile.toString())
+      // formData.append('fileName', fileName)
+      // if (file) {
+      //   formData.append('file', file)
+      // }
     })
 
     return formData

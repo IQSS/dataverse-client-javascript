@@ -2,7 +2,7 @@ import { ApiConfig, ReadError, getCollectionFeaturedItems } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import {
-  createCollectionFeaturedItemViaApi,
+  createCollectionCustomFeaturedItemViaApi,
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 import {
@@ -10,6 +10,7 @@ import {
   deleteCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
+import { CustomFeaturedItem } from '../../../src/collections/domain/models/CollectionFeaturedItem'
 
 describe('execute', () => {
   const testCollectionAlias = 'getCollectionsFeaturedItemsTest'
@@ -27,12 +28,15 @@ describe('execute', () => {
     try {
       await createCollectionViaApi(testCollectionAlias)
 
-      const featuredItemCreated = await createCollectionFeaturedItemViaApi(testCollectionAlias, {
-        content: '<p class="rte-paragraph">Test content</p>',
-        displayOrder: 1,
-        withFile: true,
-        fileName: 'featured-item-test-image.png'
-      })
+      const featuredItemCreated = await createCollectionCustomFeaturedItemViaApi(
+        testCollectionAlias,
+        {
+          content: '<p class="rte-paragraph">Test content</p>',
+          displayOrder: 1,
+          withFile: true,
+          fileName: 'featured-item-test-image.png'
+        }
+      )
 
       testFeaturedItemId = featuredItemCreated.id
     } catch (error) {
@@ -54,30 +58,37 @@ describe('execute', () => {
   test('should return featured items array given a valid collection alias that has featured items', async () => {
     const featuredItemsResponse = await getCollectionFeaturedItems.execute(testCollectionAlias)
 
+    const featuredItemOne = featuredItemsResponse[0] as CustomFeaturedItem
+
     expect(featuredItemsResponse.length).toBe(1)
-    expect(featuredItemsResponse[0].id).toBe(testFeaturedItemId)
-    expect(featuredItemsResponse[0].displayOrder).toBe(1)
-    expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
-    expect(featuredItemsResponse[0].imageFileUrl).toBe(
-      `http://localhost:8080/api/access/dataverseFeaturedItemImage/${featuredItemsResponse[0].id}`
+    expect(featuredItemOne.id).toBe(testFeaturedItemId)
+    expect(featuredItemOne.displayOrder).toBe(1)
+    expect(featuredItemOne.content).toBe('<p class="rte-paragraph">Test content</p>')
+    expect(featuredItemOne.imageFileUrl).toBe(
+      `http://localhost:8080/api/access/dataverseFeaturedItemImage/${featuredItemOne.id}`
     )
-    expect(featuredItemsResponse[0].imageFileName).toBe('featured-item-test-image.png')
+    expect(featuredItemOne.imageFileName).toBe('featured-item-test-image.png')
   })
 
   it('should return imageFileUrl and imageFileName as undefined when featured item does not have an image', async () => {
-    const featuredItemCreated = await createCollectionFeaturedItemViaApi(testCollectionAlias, {
-      content: '<p class="rte-paragraph">Test content</p>',
-      displayOrder: 2
-    })
+    const featuredItemCreated = await createCollectionCustomFeaturedItemViaApi(
+      testCollectionAlias,
+      {
+        content: '<p class="rte-paragraph">Test content</p>',
+        displayOrder: 2
+      }
+    )
 
     const featuredItemsResponse = await getCollectionFeaturedItems.execute(testCollectionAlias)
 
+    const featuredItemTwo = featuredItemsResponse[1] as CustomFeaturedItem
+
     expect(featuredItemsResponse.length).toBe(2)
-    expect(featuredItemsResponse[1].id).toBe(featuredItemCreated.id)
-    expect(featuredItemsResponse[1].displayOrder).toBe(2)
-    expect(featuredItemsResponse[1].content).toBe('<p class="rte-paragraph">Test content</p>')
-    expect(featuredItemsResponse[1].imageFileUrl).toBeUndefined()
-    expect(featuredItemsResponse[1].imageFileName).toBeUndefined()
+    expect(featuredItemTwo.id).toBe(featuredItemCreated.id)
+    expect(featuredItemTwo.displayOrder).toBe(2)
+    expect(featuredItemTwo.content).toBe('<p class="rte-paragraph">Test content</p>')
+    expect(featuredItemTwo.imageFileUrl).toBeUndefined()
+    expect(featuredItemTwo.imageFileName).toBeUndefined()
 
     await deleteCollectionFeaturedItemViaApi(featuredItemCreated.id)
   })

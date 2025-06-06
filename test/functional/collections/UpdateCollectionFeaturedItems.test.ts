@@ -7,7 +7,7 @@ import {
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import {
-  createCollectionFeaturedItemViaApi,
+  createCollectionCustomFeaturedItemViaApi,
   createImageFile,
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
@@ -17,6 +17,7 @@ import {
   deleteCollectionViaApi,
   EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS
 } from '../../testHelpers/collections/collectionHelper'
+import { CustomFeaturedItem } from '../../../src/collections/domain/models/CollectionFeaturedItem'
 
 describe('execute', () => {
   const testCollectionAlias = 'updateCollectionFeaturedItemsTest'
@@ -52,18 +53,21 @@ describe('execute', () => {
   it('should successfully update the featured items of a collection', async () => {
     const newFeaturedItems: CollectionFeaturedItemsDTO = [
       {
+        type: 'custom',
         content: '<p class="rte-paragraph">Test content 1</p>',
         displayOrder: 0,
         file: undefined,
         keepFile: false
       },
       {
+        type: 'custom',
         content: '<p class="rte-paragraph">Test content 2</p>',
         displayOrder: 1,
         file: undefined,
         keepFile: false
       },
       {
+        type: 'custom',
         content: CONTENT_FIELD_WITH_ALL_TAGS,
         displayOrder: 2,
         file: createImageFile('featured-item-test-image-3.png'),
@@ -76,22 +80,26 @@ describe('execute', () => {
       newFeaturedItems
     )
 
+    const firstItemResponse = updatedFeaturedItemsResponse[0] as CustomFeaturedItem
+    const secondItemResponse = updatedFeaturedItemsResponse[1] as CustomFeaturedItem
+    const thirdItemResponse = updatedFeaturedItemsResponse[2] as CustomFeaturedItem
+
     expect(updatedFeaturedItemsResponse.length).toBe(3)
 
-    expect(updatedFeaturedItemsResponse[0].content).toBe(newFeaturedItems[0].content)
-    expect(updatedFeaturedItemsResponse[0].displayOrder).toBe(newFeaturedItems[0].displayOrder)
-    expect(updatedFeaturedItemsResponse[0].imageFileUrl).toBeUndefined()
-    expect(updatedFeaturedItemsResponse[0].imageFileName).toBeUndefined()
+    expect(firstItemResponse.content).toBe((newFeaturedItems[0] as CustomFeaturedItem).content)
+    expect(firstItemResponse.displayOrder).toBe(newFeaturedItems[0].displayOrder)
+    expect(firstItemResponse.imageFileUrl).toBeUndefined()
+    expect(firstItemResponse.imageFileName).toBeUndefined()
 
-    expect(updatedFeaturedItemsResponse[1].content).toBe(newFeaturedItems[1].content)
-    expect(updatedFeaturedItemsResponse[1].displayOrder).toBe(newFeaturedItems[1].displayOrder)
-    expect(updatedFeaturedItemsResponse[1].imageFileUrl).toBeUndefined()
-    expect(updatedFeaturedItemsResponse[1].imageFileName).toBeUndefined()
+    expect(secondItemResponse.content).toBe((newFeaturedItems[1] as CustomFeaturedItem).content)
+    expect(secondItemResponse.displayOrder).toBe(newFeaturedItems[1].displayOrder)
+    expect(secondItemResponse.imageFileUrl).toBeUndefined()
+    expect(secondItemResponse.imageFileName).toBeUndefined()
 
-    expect(updatedFeaturedItemsResponse[2].content).toEqual(EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS)
-    expect(updatedFeaturedItemsResponse[2].displayOrder).toBe(newFeaturedItems[2].displayOrder)
-    expect(updatedFeaturedItemsResponse[2].imageFileName).toEqual('featured-item-test-image-3.png')
-    expect(updatedFeaturedItemsResponse[2].imageFileUrl).toBe(
+    expect(thirdItemResponse.content).toEqual(EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS)
+    expect(thirdItemResponse.displayOrder).toBe(newFeaturedItems[2].displayOrder)
+    expect(thirdItemResponse.imageFileName).toEqual('featured-item-test-image-3.png')
+    expect(thirdItemResponse.imageFileUrl).toBe(
       `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[2].id}`
     )
   })
@@ -99,18 +107,21 @@ describe('execute', () => {
   test('should throw an error when collection does not exist', async () => {
     const newFeaturedItems: CollectionFeaturedItemsDTO = [
       {
+        type: 'custom',
         content: '<p class="rte-paragraph">Test content 1</p>',
         displayOrder: 0,
         file: undefined,
         keepFile: false
       },
       {
+        type: 'custom',
         content: '<p class="rte-paragraph">Test content 2</p>',
         displayOrder: 1,
         file: undefined,
         keepFile: false
       },
       {
+        type: 'custom',
         content: '<p class="rte-paragraph">Test content 3</p>',
         displayOrder: 2,
         file: createImageFile('featured-item-test-image-3.png'),
@@ -135,6 +146,7 @@ describe('execute', () => {
   test('should throw an error when featured item content is empty', async () => {
     const newFeaturedItems: CollectionFeaturedItemsDTO = [
       {
+        type: 'custom',
         content: '',
         displayOrder: 0,
         file: undefined,
@@ -163,12 +175,15 @@ describe('execute', () => {
 
     beforeEach(async () => {
       try {
-        const featuredItemCreated = await createCollectionFeaturedItemViaApi(testCollectionAlias, {
-          content: testFeaturedItemContent,
-          displayOrder: 1,
-          withFile: true,
-          fileName: testFeaturedItemFilename
-        })
+        const featuredItemCreated = await createCollectionCustomFeaturedItemViaApi(
+          testCollectionAlias,
+          {
+            content: testFeaturedItemContent,
+            displayOrder: 1,
+            withFile: true,
+            fileName: testFeaturedItemFilename
+          }
+        )
 
         testFeaturedItemId = featuredItemCreated.id
       } catch (error) {
@@ -190,6 +205,7 @@ describe('execute', () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
+          type: 'custom',
           content: '<p class="rte-paragraph">Test content Updated</p>',
           displayOrder: 0,
           file: undefined,
@@ -204,12 +220,14 @@ describe('execute', () => {
 
       expect(updatedFeaturedItemsResponse.length).toBe(1)
 
-      expect(updatedFeaturedItemsResponse[0].content).toBe(newFeaturedItems[0].content)
-      expect(updatedFeaturedItemsResponse[0].displayOrder).toBe(newFeaturedItems[0].displayOrder)
+      const updatedFeaturedItem = updatedFeaturedItemsResponse[0] as CustomFeaturedItem
+
+      expect(updatedFeaturedItem.content).toBe((newFeaturedItems[0] as CustomFeaturedItem).content)
+      expect(updatedFeaturedItem.displayOrder).toBe(newFeaturedItems[0].displayOrder)
       // Should keep the existing file even if a file was not provided because keepFile is true
-      expect(updatedFeaturedItemsResponse[0].imageFileName).toEqual(testFeaturedItemFilename)
-      expect(updatedFeaturedItemsResponse[0].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[0].id}`
+      expect(updatedFeaturedItem.imageFileName).toEqual(testFeaturedItemFilename)
+      expect(updatedFeaturedItem.imageFileUrl).toBe(
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItem.id}`
       )
     })
 
@@ -217,6 +235,7 @@ describe('execute', () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
+          type: 'custom',
           content: '<p class="rte-paragraph">Test content Updated</p>',
           displayOrder: 0,
           file: undefined,
@@ -231,16 +250,19 @@ describe('execute', () => {
 
       expect(updatedFeaturedItemsResponse.length).toBe(1)
 
-      expect(updatedFeaturedItemsResponse[0].content).toBe(newFeaturedItems[0].content)
-      expect(updatedFeaturedItemsResponse[0].displayOrder).toBe(newFeaturedItems[0].displayOrder)
-      expect(updatedFeaturedItemsResponse[0].imageFileUrl).toBeUndefined()
-      expect(updatedFeaturedItemsResponse[0].imageFileName).toBeUndefined()
+      const updatedFeaturedItem = updatedFeaturedItemsResponse[0] as CustomFeaturedItem
+
+      expect(updatedFeaturedItem.content).toBe((newFeaturedItems[0] as CustomFeaturedItem).content)
+      expect(updatedFeaturedItem.displayOrder).toBe(newFeaturedItems[0].displayOrder)
+      expect(updatedFeaturedItem.imageFileUrl).toBeUndefined()
+      expect(updatedFeaturedItem.imageFileName).toBeUndefined()
     })
 
     it('should replace existing file for a featured item if a new file is provided and keepFile is false', async () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
+          type: 'custom',
           content: '<p class="rte-paragraph">Test content Updated</p>',
           displayOrder: 0,
           file: createImageFile('featured-item-test-image-updated.png'),
@@ -255,13 +277,13 @@ describe('execute', () => {
 
       expect(updatedFeaturedItemsResponse.length).toBe(1)
 
-      expect(updatedFeaturedItemsResponse[0].content).toBe(newFeaturedItems[0].content)
-      expect(updatedFeaturedItemsResponse[0].displayOrder).toBe(newFeaturedItems[0].displayOrder)
-      expect(updatedFeaturedItemsResponse[0].imageFileName).toEqual(
-        'featured-item-test-image-updated.png'
-      )
-      expect(updatedFeaturedItemsResponse[0].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[0].id}`
+      const updatedFeaturedItem = updatedFeaturedItemsResponse[0] as CustomFeaturedItem
+
+      expect(updatedFeaturedItem.content).toBe((newFeaturedItems[0] as CustomFeaturedItem).content)
+      expect(updatedFeaturedItem.displayOrder).toBe(newFeaturedItems[0].displayOrder)
+      expect(updatedFeaturedItem.imageFileName).toEqual('featured-item-test-image-updated.png')
+      expect(updatedFeaturedItem.imageFileUrl).toBe(
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItem.id}`
       )
     })
 
@@ -269,6 +291,7 @@ describe('execute', () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
+          type: 'custom',
           content: '<p class="rte-paragraph">Test content Updated</p>',
           displayOrder: 0,
           file: createImageFile('featured-item-test-image-updated.png'),
@@ -281,13 +304,15 @@ describe('execute', () => {
         newFeaturedItems
       )
 
+      const testFeaturedItem = updatedFeaturedItemsResponse[0] as CustomFeaturedItem
+
       expect(updatedFeaturedItemsResponse.length).toBe(1)
 
-      expect(updatedFeaturedItemsResponse[0].content).toBe(newFeaturedItems[0].content)
-      expect(updatedFeaturedItemsResponse[0].displayOrder).toBe(newFeaturedItems[0].displayOrder)
+      expect(testFeaturedItem.content).toBe((newFeaturedItems[0] as CustomFeaturedItem).content)
+      expect(testFeaturedItem.displayOrder).toBe(newFeaturedItems[0].displayOrder)
       // Should keep the existing file even if a file was provided because keepFile is true
-      expect(updatedFeaturedItemsResponse[0].imageFileName).toEqual(testFeaturedItemFilename)
-      expect(updatedFeaturedItemsResponse[0].imageFileUrl).toBe(
+      expect(testFeaturedItem.imageFileName).toEqual(testFeaturedItemFilename)
+      expect(testFeaturedItem.imageFileUrl).toBe(
         `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[0].id}`
       )
     })
