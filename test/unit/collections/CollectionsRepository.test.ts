@@ -419,8 +419,7 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
-        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
-        [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true'
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
       })
 
       const expectedRequestConfigApiKey = {
@@ -465,7 +464,6 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
         [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
-        [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true',
         [GetCollectionItemsQueryParams.PER_PAGE]: testLimit.toString(),
         [GetCollectionItemsQueryParams.START]: testOffset.toString()
       })
@@ -513,7 +511,6 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
         [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
-        [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true',
         [GetCollectionItemsQueryParams.SUBTREE]: testCollectionId
       })
 
@@ -557,8 +554,7 @@ describe('CollectionsRepository', () => {
         [GetCollectionItemsQueryParams.QUERY]: '*',
         [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
         [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
-        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
-        [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true'
+        [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
       })
 
       const expectedRequestConfigApiKey = {

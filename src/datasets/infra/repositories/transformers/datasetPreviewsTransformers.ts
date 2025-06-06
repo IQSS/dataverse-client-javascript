@@ -44,7 +44,7 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
         releaseTime: new Date(datasetPreviewPayload.published_at)
       })
     },
-    citation: datasetPreviewPayload.citation,
+    citation: datasetPreviewPayload.citationHtml,
     description: datasetPreviewPayload.description,
     publicationStatuses: publicationStatuses,
     parentCollectionAlias: datasetPreviewPayload.identifier_of_dataverse,

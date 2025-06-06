@@ -12,6 +12,7 @@ import { CollectionFacet } from '../../domain/models/CollectionFacet'
 import { CollectionUserPermissions } from '../../domain/models/CollectionUserPermissions'
 import { transformCollectionUserPermissionsResponseToCollectionUserPermissions } from './transformers/collectionUserPermissionsTransformers'
 import { CollectionItemSubset } from '../../domain/models/CollectionItemSubset'
+import { MyDataCollectionItemSubset } from '../../domain/models/MyDataCollectionItemSubset'
 import {
   CollectionSearchCriteria,
   OrderType,
@@ -22,7 +23,7 @@ import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedIt
 import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
 import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
-import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
+import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
 
 export interface NewCollectionRequestPayload {
@@ -157,14 +158,14 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     limit?: number,
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria,
+    showTypeCounts?: boolean,
     searchServiceName?: string
   ): Promise<CollectionItemSubset> {
     const queryParams = new URLSearchParams({
       [GetCollectionItemsQueryParams.QUERY]: '*',
       [GetCollectionItemsQueryParams.SHOW_FACETS]: 'true',
       [GetCollectionItemsQueryParams.SORT]: SortType.DATE,
-      [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC,
-      [GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS]: 'true'
+      [GetCollectionItemsQueryParams.ORDER]: OrderType.DESC
     })
 
     if (collectionId) {
@@ -177,6 +178,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     if (offset) {
       queryParams.set(GetCollectionItemsQueryParams.START, offset.toString())
+    }
+
+    if (showTypeCounts) {
+      queryParams.set(GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS, 'true')
     }
 
     if (searchServiceName) {
@@ -215,7 +220,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     selectedPage?: number,
     searchText?: string,
     userIdentifier?: string
-  ): Promise<CollectionItemSubset> {
+  ): Promise<MyDataCollectionItemSubset> {
     const queryParams = new URLSearchParams()
 
     if (limit) {

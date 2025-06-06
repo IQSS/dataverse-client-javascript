@@ -9,6 +9,7 @@ export interface DatasetPreviewPayload {
   updatedAt: string
   published_at?: string
   citation: string
+  citationHtml: string
   description: string
   type?: string
   publicationStatuses: string[]
