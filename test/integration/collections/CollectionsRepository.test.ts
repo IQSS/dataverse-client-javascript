@@ -13,7 +13,9 @@ import {
   WriteError,
   createDataset,
   getCollection,
-  createCollection
+  createCollection,
+  getDatasetFiles,
+  restrictFile
 } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -28,7 +30,8 @@ import { updateFileTabularTags, uploadFileViaApi } from '../../testHelpers/files
 import {
   deletePublishedDatasetViaApi,
   deleteUnpublishedDatasetViaApi,
-  publishDatasetViaApi
+  publishDatasetViaApi,
+  waitForNoLocks
 } from '../../testHelpers/datasets/datasetHelper'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 import { CollectionType } from '../../../src/collections/domain/models/CollectionType'
@@ -44,7 +47,11 @@ import {
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 import { createApiTokenViaApi } from '../../testHelpers/users/apiTokenHelper'
-import { CustomFeaturedItem } from '../../../src/collections/domain/models/CollectionFeaturedItem'
+import {
+  CustomFeaturedItem,
+  DvObjectFeaturedItemType
+} from '../../../src/collections/domain/models/CollectionFeaturedItem'
+import { DvObjectFeaturedItemDTO } from '../../../src/collections/domain/dtos/CollectionFeaturedItemsDTO'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -1219,13 +1226,8 @@ describe('CollectionsRepository', () => {
         expectedError
       )
     })
-
-    // Should return error when the dvObjectIdentifier type 'collection' doesnt exist
-    // Should return error when the dvObjectIdentifier type 'dataset' doesnt exist
-    // Should return error when the dvObjectIdentifier type 'file' doesnt exist
-    // Should not return any more dv objects items dataset or file that were deaccessioned or restricted
   })
-  // eslint-disable-next-line no-unused-vars
+
   describe('updateCollectionFeaturedItems', () => {
     afterAll(async () => {
       try {
@@ -1269,22 +1271,158 @@ describe('CollectionsRepository', () => {
 
       expect(response).toHaveLength(3)
 
-      // expect(response[0].content).toEqual(newFeaturedItems[0].content)
-      // expect(response[0].displayOrder).toEqual(newFeaturedItems[0].displayOrder)
-      // expect(response[0].imageFileName).toEqual(undefined)
-      // expect(response[0].imageFileUrl).toEqual(undefined)
+      const firstFeaturedItem = response[0] as CustomFeaturedItem
+      const secondFeaturedItem = response[1] as CustomFeaturedItem
+      const thirdFeaturedItem = response[2] as CustomFeaturedItem
 
-      // expect(response[1].content).toEqual(newFeaturedItems[1].content)
-      // expect(response[1].displayOrder).toEqual(newFeaturedItems[1].displayOrder)
-      // expect(response[1].imageFileName).toEqual(undefined)
-      // expect(response[1].imageFileUrl).toEqual(undefined)
+      expect(firstFeaturedItem.content).toEqual((newFeaturedItems[0] as CustomFeaturedItem).content)
+      expect(firstFeaturedItem.displayOrder).toEqual(newFeaturedItems[0].displayOrder)
+      expect(firstFeaturedItem.imageFileName).toEqual(undefined)
+      expect(firstFeaturedItem.imageFileUrl).toEqual(undefined)
 
-      // expect(response[2].content).toEqual(newFeaturedItems[2].content)
-      // expect(response[2].displayOrder).toEqual(newFeaturedItems[2].displayOrder)
-      // expect(response[2].imageFileName).toEqual('featured-item-test-image-3.png')
-      // expect(response[2].imageFileUrl).toBe(
-      //   `http://localhost:8080/api/access/dataverseFeaturedItemImage/${response[2].id}`
-      // )
+      expect(secondFeaturedItem.content).toEqual(
+        (newFeaturedItems[1] as CustomFeaturedItem).content
+      )
+      expect(secondFeaturedItem.displayOrder).toEqual(newFeaturedItems[1].displayOrder)
+      expect(secondFeaturedItem.imageFileName).toEqual(undefined)
+      expect(secondFeaturedItem.imageFileUrl).toEqual(undefined)
+
+      expect(thirdFeaturedItem.content).toEqual((newFeaturedItems[2] as CustomFeaturedItem).content)
+      expect(thirdFeaturedItem.displayOrder).toEqual(newFeaturedItems[2].displayOrder)
+      expect(thirdFeaturedItem.imageFileName).toEqual('featured-item-test-image-3.png')
+      expect(thirdFeaturedItem.imageFileUrl).toBe(
+        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${response[2].id}`
+      )
+    })
+
+    it('should return error when the dvObjectIdentifier of a collection does not exist', async () => {
+      const invalidCollectionAlias = 'invalid-collection-alias'
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: DvObjectFeaturedItemType.COLLECTION,
+          dvObjectIdentifier: invalidCollectionAlias,
+          displayOrder: 0
+        }
+      ]
+
+      const expectedError = new WriteError(
+        `[400] Cant find Collection, Dataset, or Datafile with identifier: ${invalidCollectionAlias}.`
+      )
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+    })
+
+    it('should return error when the dvObjectIdentifier of a dataset does not exist', async () => {
+      const invalidDatasetPersistentId = 'doi:10.5072/FK2/INVALID_DATASET'
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: DvObjectFeaturedItemType.DATASET,
+          dvObjectIdentifier: invalidDatasetPersistentId,
+          displayOrder: 0
+        }
+      ]
+      const expectedError = new WriteError(
+        `[400] Cant find Collection, Dataset, or Datafile with identifier: ${invalidDatasetPersistentId}.`
+      )
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+    })
+
+    // TODO:ME - Fix from API. getting 500 error right now instead of 400
+
+    // eslint-disable-next-line jest/no-commented-out-tests
+    // it('should return error when the dvObjectIdentifier of a file does not exist', async () => {
+    //   const invalidFileId = '99'
+    //   const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+    //     {
+    //       type: DvObjectFeaturedItemType.FILE,
+    //       dvObjectIdentifier: invalidFileId,
+    //       displayOrder: 0
+    //     }
+    //   ]
+    //   const expectedError = new WriteError(
+    //     `[400] Cant find Collection, Dataset, or Datafile with identifier: ${invalidFileId}.`
+    //   )
+    //   await expect(
+    //     sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+    //   ).rejects.toThrow(expectedError)
+    // })
+
+    it('should return error when the collection to feature is not published', async () => {
+      const unpublishedCollectionAlias = 'unpublished-collection-featured-item-test'
+      await createCollectionViaApi(unpublishedCollectionAlias, testCollectionAlias)
+
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: DvObjectFeaturedItemType.COLLECTION,
+          dvObjectIdentifier: unpublishedCollectionAlias,
+          displayOrder: 0
+        }
+      ]
+      const expectedError = new WriteError('[400] Dataverse must be published to be featured.')
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+      await deleteCollectionViaApi(unpublishedCollectionAlias)
+    })
+
+    it('should return error when the dataset to feature is not published', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: DvObjectFeaturedItemType.DATASET,
+          dvObjectIdentifier: testDatasetIds.persistentId,
+          displayOrder: 0
+        }
+      ]
+      const expectedError = new WriteError('[400] Dataset must be published to be featured.')
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    it('should return error when the file to feature is restricted', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+      await uploadFileViaApi(testDatasetIds.numericId, 'test-file-1.txt')
+
+      const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+
+      const fileId = datasetFiles.files[0].id
+
+      await restrictFile.execute(fileId, {
+        restrict: true,
+        enableAccessRequest: true,
+        termsOfAccess: 'This file is restricted for testing purposes'
+      })
+
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: DvObjectFeaturedItemType.FILE,
+          dvObjectIdentifier: fileId.toString(),
+          displayOrder: 0
+        }
+      ]
+
+      const expectedError = new WriteError('[400] Datafile must not be restricted to be featured.')
+
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
   })
 
