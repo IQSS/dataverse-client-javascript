@@ -11,7 +11,13 @@ export interface CustomFeaturedItem {
 
 export interface DvObjectFeaturedItem {
   id: number
-  type: 'collection' | 'dataset' | 'file'
+  type: DvObjectFeaturedItemType
   dvObjectIdentifier: string
   displayOrder: number
+}
+
+export enum DvObjectFeaturedItemType {
+  COLLECTION = 'collection',
+  DATASET = 'dataset',
+  FILE = 'file'
 }

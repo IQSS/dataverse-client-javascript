@@ -1,17 +1,30 @@
 import {
   CollectionFeaturedItem,
   CustomFeaturedItem,
-  DvObjectFeaturedItem
+  DvObjectFeaturedItem,
+  DvObjectFeaturedItemType
 } from '../../../domain/models/CollectionFeaturedItem'
 import {
   CollectionFeaturedItemPayload,
   DvObjectFeaturedItemPayload
 } from './CollectionFeaturedItemPayload'
 
-const dvObjectTypeMap: Record<DvObjectFeaturedItemPayload['type'], DvObjectFeaturedItem['type']> = {
-  dataverse: 'collection',
-  dataset: 'dataset',
-  datafile: 'file'
+const apiTypeToDomainType: Record<
+  DvObjectFeaturedItemPayload['type'],
+  DvObjectFeaturedItem['type']
+> = {
+  dataverse: DvObjectFeaturedItemType.COLLECTION,
+  dataset: DvObjectFeaturedItemType.DATASET,
+  datafile: DvObjectFeaturedItemType.FILE
+}
+
+export const domainTypeToApiType: Record<
+  DvObjectFeaturedItem['type'],
+  DvObjectFeaturedItemPayload['type']
+> = {
+  [DvObjectFeaturedItemType.COLLECTION]: 'dataverse',
+  [DvObjectFeaturedItemType.DATASET]: 'dataset',
+  [DvObjectFeaturedItemType.FILE]: 'datafile'
 }
 
 export const transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems = (
@@ -32,10 +45,10 @@ export const transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems = 
         return customFeaturedItem
       } else {
         // Map API types to domain types
-        const type = dvObjectTypeMap[item.type]
+        const type = apiTypeToDomainType[item.type]
 
         if (!type) {
-          throw new Error(`Unknown dvObject type: ${item.type}`)
+          throw new Error(`Unknown type: ${item.type}`)
         }
 
         const dvObjectFeaturedItem: DvObjectFeaturedItem = {
