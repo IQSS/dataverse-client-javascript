@@ -1,11 +1,15 @@
 import axios from 'axios'
 import { File, Blob } from '@web-std/file'
-import { CollectionFeaturedItem } from '../../../src/collections/domain/models/CollectionFeaturedItem'
+import {
+  CollectionFeaturedItem,
+  DvObjectFeaturedItemType
+} from '../../../src/collections/domain/models/CollectionFeaturedItem'
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
 import { TestConstants } from '../TestConstants'
 import { CollectionFeaturedItemsDTO } from '../../../src'
+import { DvObjectFeaturedItemPayload } from '../../../src/collections/infra/repositories/transformers/CollectionFeaturedItemPayload'
 
-interface CreateCollectionFeaturedItemData {
+interface CreateCollectionCustomFeaturedItemData {
   content: string
   displayOrder?: number
   withFile?: boolean
@@ -19,7 +23,7 @@ export async function createCollectionCustomFeaturedItemViaApi(
     displayOrder = 1,
     withFile = false,
     fileName = 'test-image.png'
-  }: CreateCollectionFeaturedItemData
+  }: CreateCollectionCustomFeaturedItemData
 ): Promise<CollectionFeaturedItem> {
   try {
     if (collectionAlias == undefined) {
@@ -36,6 +40,42 @@ export async function createCollectionCustomFeaturedItemViaApi(
 
       formData.append('file', file)
     }
+
+    return await axios
+      .post(`${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/featuredItems`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'X-Dataverse-Key': process.env.TEST_API_KEY
+        }
+      })
+      .then((response) => {
+        return response.data.data
+      })
+  } catch (error) {
+    console.log(error)
+    throw new Error(`Error while creating collection featured item in ${collectionAlias}`)
+  }
+}
+
+interface CreateCollectionDvObjectFeaturedItemData {
+  type: DvObjectFeaturedItemPayload['type']
+  dvObjectIdentifier: DvObjectFeaturedItemPayload['dvObjectIdentifier']
+  displayOrder?: number
+}
+
+export async function createCollectionDvObjectFeaturedItemViaApi(
+  collectionAlias: string,
+  { type, dvObjectIdentifier, displayOrder = 1 }: CreateCollectionDvObjectFeaturedItemData
+): Promise<CollectionFeaturedItem> {
+  try {
+    const formData = new FormData()
+    formData.append('type', type)
+    formData.append('content', '')
+    formData.append('displayOrder', displayOrder.toString())
+    formData.append('dvObjectIdentifier', dvObjectIdentifier)
+    formData.append('content', '')
+    formData.append('keepFile', '')
+    formData.append('fileName', '')
 
     return await axios
       .post(`${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/featuredItems`, formData, {
@@ -100,7 +140,7 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
     },
     {
       id: 3,
-      type: 'dataset',
+      type: DvObjectFeaturedItemType.DATASET,
       displayOrder: 3,
       dvObjectIdentifier: 'doi:10.5072/FK2/8YOKQI'
     }
@@ -127,19 +167,19 @@ export const createCollectionFeaturedItemsDTO = (): CollectionFeaturedItemsDTO =
     },
     {
       id: 3,
-      type: 'collection',
+      type: DvObjectFeaturedItemType.COLLECTION,
       displayOrder: 3,
       dvObjectIdentifier: 'collection-alias-foo-bar'
     },
     {
       id: 4,
-      type: 'dataset',
+      type: DvObjectFeaturedItemType.DATASET,
       displayOrder: 4,
       dvObjectIdentifier: 'doi:10.5072/FK2/8YOKQI'
     },
     {
       id: 5,
-      type: 'file',
+      type: DvObjectFeaturedItemType.FILE,
       displayOrder: 5,
       dvObjectIdentifier: '12'
     }

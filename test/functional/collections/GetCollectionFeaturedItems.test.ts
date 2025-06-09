@@ -3,18 +3,26 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import {
   createCollectionCustomFeaturedItemViaApi,
+  createCollectionDvObjectFeaturedItemViaApi,
+  deleteCollectionFeaturedItemsViaApi,
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 import {
   createCollectionViaApi,
+  publishCollectionViaApi,
   deleteCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
-import { CustomFeaturedItem } from '../../../src/collections/domain/models/CollectionFeaturedItem'
+import {
+  CustomFeaturedItem,
+  DvObjectFeaturedItem,
+  DvObjectFeaturedItemType
+} from '../../../src/collections/domain/models/CollectionFeaturedItem'
 
 describe('execute', () => {
   const testCollectionAlias = 'getCollectionsFeaturedItemsTest'
-  let testFeaturedItemId: number
+  const featuredCollectionAlias = 'featured-collection-test'
+  let testFeaturedItemIds: number[] = []
 
   beforeEach(async () => {
     ApiConfig.init(
@@ -28,6 +36,12 @@ describe('execute', () => {
     try {
       await createCollectionViaApi(testCollectionAlias)
 
+      await createCollectionViaApi(featuredCollectionAlias, testCollectionAlias)
+
+      // Publish the collection to be featured otherwise it cannot be featured
+      await publishCollectionViaApi(testCollectionAlias)
+      await publishCollectionViaApi(featuredCollectionAlias)
+
       const featuredItemCreated = await createCollectionCustomFeaturedItemViaApi(
         testCollectionAlias,
         {
@@ -38,19 +52,29 @@ describe('execute', () => {
         }
       )
 
-      testFeaturedItemId = featuredItemCreated.id
+      const dvObjectFeaturedItemCreated = await createCollectionDvObjectFeaturedItemViaApi(
+        testCollectionAlias,
+        {
+          type: 'dataverse',
+          dvObjectIdentifier: featuredCollectionAlias,
+          displayOrder: 2
+        }
+      )
+      testFeaturedItemIds = [featuredItemCreated.id, dvObjectFeaturedItemCreated.id]
     } catch (error) {
+      console.dir(error)
       throw new Error(`Error while creating collection featured item in ${testCollectionAlias}`)
     }
   })
 
   afterAll(async () => {
     try {
-      await deleteCollectionFeaturedItemViaApi(testFeaturedItemId)
+      await deleteCollectionFeaturedItemsViaApi(testCollectionAlias)
+      await deleteCollectionViaApi(featuredCollectionAlias)
       await deleteCollectionViaApi(testCollectionAlias)
     } catch (error) {
       throw new Error(
-        `Tests afterAll(): Error while deleting featured item with id ${testFeaturedItemId}`
+        `Tests afterAll(): Error while deleting featured item with id ${testFeaturedItemIds}`
       )
     }
   })
@@ -59,15 +83,21 @@ describe('execute', () => {
     const featuredItemsResponse = await getCollectionFeaturedItems.execute(testCollectionAlias)
 
     const featuredItemOne = featuredItemsResponse[0] as CustomFeaturedItem
+    const featuredItemTwo = featuredItemsResponse[1] as DvObjectFeaturedItem
 
-    expect(featuredItemsResponse.length).toBe(1)
-    expect(featuredItemOne.id).toBe(testFeaturedItemId)
+    expect(featuredItemsResponse.length).toBe(2)
+    expect(featuredItemOne.id).toBe(testFeaturedItemIds[0])
     expect(featuredItemOne.displayOrder).toBe(1)
     expect(featuredItemOne.content).toBe('<p class="rte-paragraph">Test content</p>')
     expect(featuredItemOne.imageFileUrl).toBe(
       `http://localhost:8080/api/access/dataverseFeaturedItemImage/${featuredItemOne.id}`
     )
     expect(featuredItemOne.imageFileName).toBe('featured-item-test-image.png')
+
+    expect(featuredItemTwo.id).toBe(testFeaturedItemIds[1])
+    expect(featuredItemTwo.type).toBe(DvObjectFeaturedItemType.COLLECTION)
+    expect(featuredItemTwo.dvObjectIdentifier).toBe(featuredCollectionAlias)
+    expect(featuredItemTwo.displayOrder).toBe(2)
   })
 
   it('should return imageFileUrl and imageFileName as undefined when featured item does not have an image', async () => {
@@ -75,17 +105,17 @@ describe('execute', () => {
       testCollectionAlias,
       {
         content: '<p class="rte-paragraph">Test content</p>',
-        displayOrder: 2
+        displayOrder: 3
       }
     )
 
     const featuredItemsResponse = await getCollectionFeaturedItems.execute(testCollectionAlias)
 
-    const featuredItemTwo = featuredItemsResponse[1] as CustomFeaturedItem
+    const featuredItemTwo = featuredItemsResponse[2] as CustomFeaturedItem
 
-    expect(featuredItemsResponse.length).toBe(2)
+    expect(featuredItemsResponse.length).toBe(3)
     expect(featuredItemTwo.id).toBe(featuredItemCreated.id)
-    expect(featuredItemTwo.displayOrder).toBe(2)
+    expect(featuredItemTwo.displayOrder).toBe(3)
     expect(featuredItemTwo.content).toBe('<p class="rte-paragraph">Test content</p>')
     expect(featuredItemTwo.imageFileUrl).toBeUndefined()
     expect(featuredItemTwo.imageFileName).toBeUndefined()

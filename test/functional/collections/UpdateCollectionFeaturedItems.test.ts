@@ -1,6 +1,9 @@
 import {
   ApiConfig,
   CollectionFeaturedItemsDTO,
+  createDataset,
+  CreatedDatasetIdentifiers,
+  getDatasetFiles,
   updateCollectionFeaturedItems,
   WriteError
 } from '../../../src'
@@ -15,12 +18,29 @@ import {
   CONTENT_FIELD_WITH_ALL_TAGS,
   createCollectionViaApi,
   deleteCollectionViaApi,
-  EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS
+  EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS,
+  publishCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
-import { CustomFeaturedItem } from '../../../src/collections/domain/models/CollectionFeaturedItem'
+import {
+  CustomFeaturedItem,
+  DvObjectFeaturedItem,
+  DvObjectFeaturedItemType
+  // DvObjectFeaturedItemType
+} from '../../../src/collections/domain/models/CollectionFeaturedItem'
+import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
+import {
+  deletePublishedDatasetViaApi,
+  publishDatasetViaApi,
+  waitForNoLocks
+} from '../../testHelpers/datasets/datasetHelper'
 
 describe('execute', () => {
   const testCollectionAlias = 'updateCollectionFeaturedItemsTest'
+  const featuredCollectionAlias = 'featured-collection-test-1'
+  const testTextFile1Name = 'test-file-1.txt'
+
+  let testDatasetIds: CreatedDatasetIdentifiers
+  let featuredFileId: number
 
   beforeEach(async () => {
     ApiConfig.init(
@@ -31,22 +51,55 @@ describe('execute', () => {
   })
 
   beforeAll(async () => {
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.API_KEY,
+      process.env.TEST_API_KEY
+    )
+
     try {
       await createCollectionViaApi(testCollectionAlias)
+      await createCollectionViaApi(featuredCollectionAlias, testCollectionAlias)
+
+      // Publish the collection to be featured otherwise it cannot be featured
+      await publishCollectionViaApi(testCollectionAlias)
+      await publishCollectionViaApi(featuredCollectionAlias)
+
+      // Create a dataset to be featured
+      try {
+        testDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          testCollectionAlias
+        )
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while creating test dataset')
+      }
+      // Create a file to be featured
+      await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name)
+
+      // Get the file id
+      try {
+        const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+        featuredFileId = datasetFiles.files[0].id
+      } catch (error) {
+        throw new Error('Tests beforeAll(): Error while getting dataset files')
+      }
+
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
     } catch (error) {
-      throw new Error(
-        `Tests beforeAll(): Error while creating test collection: ${testCollectionAlias}`
-      )
+      console.log(error)
+      throw new Error('Tests beforeAll(): Error while creating test data')
     }
   })
 
   afterAll(async () => {
     try {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(featuredCollectionAlias)
       await deleteCollectionViaApi(testCollectionAlias)
     } catch (error) {
-      throw new Error(
-        `Tests afterAll(): Error while deleting test collection: ${testCollectionAlias}`
-      )
+      throw new Error('Tests afterAll(): Error while deleting test data')
     }
   })
 
@@ -72,6 +125,21 @@ describe('execute', () => {
         displayOrder: 2,
         file: createImageFile('featured-item-test-image-3.png'),
         keepFile: false
+      },
+      {
+        type: DvObjectFeaturedItemType.COLLECTION,
+        dvObjectIdentifier: featuredCollectionAlias,
+        displayOrder: 3
+      },
+      {
+        type: DvObjectFeaturedItemType.DATASET,
+        dvObjectIdentifier: testDatasetIds.persistentId,
+        displayOrder: 4
+      },
+      {
+        type: DvObjectFeaturedItemType.FILE,
+        dvObjectIdentifier: featuredFileId.toString(),
+        displayOrder: 5
       }
     ]
 
@@ -83,8 +151,11 @@ describe('execute', () => {
     const firstItemResponse = updatedFeaturedItemsResponse[0] as CustomFeaturedItem
     const secondItemResponse = updatedFeaturedItemsResponse[1] as CustomFeaturedItem
     const thirdItemResponse = updatedFeaturedItemsResponse[2] as CustomFeaturedItem
+    const fourthItemResponse = updatedFeaturedItemsResponse[3] as DvObjectFeaturedItem
+    const fifthItemResponse = updatedFeaturedItemsResponse[4] as DvObjectFeaturedItem
+    const sixthItemResponse = updatedFeaturedItemsResponse[5] as DvObjectFeaturedItem
 
-    expect(updatedFeaturedItemsResponse.length).toBe(3)
+    expect(updatedFeaturedItemsResponse.length).toBe(6)
 
     expect(firstItemResponse.content).toBe((newFeaturedItems[0] as CustomFeaturedItem).content)
     expect(firstItemResponse.displayOrder).toBe(newFeaturedItems[0].displayOrder)
@@ -102,6 +173,21 @@ describe('execute', () => {
     expect(thirdItemResponse.imageFileUrl).toBe(
       `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[2].id}`
     )
+
+    expect(fourthItemResponse.type).toBe(DvObjectFeaturedItemType.COLLECTION)
+    expect(fourthItemResponse.dvObjectIdentifier).toBe(featuredCollectionAlias)
+    expect(fourthItemResponse.displayOrder).toBe(newFeaturedItems[3].displayOrder)
+    expect(fourthItemResponse.id).toBeDefined()
+
+    expect(fifthItemResponse.type).toBe(DvObjectFeaturedItemType.DATASET)
+    expect(fifthItemResponse.dvObjectIdentifier).toBe(testDatasetIds.persistentId)
+    expect(fifthItemResponse.displayOrder).toBe(newFeaturedItems[4].displayOrder)
+    expect(fifthItemResponse.id).toBeDefined()
+
+    expect(sixthItemResponse.type).toBe(DvObjectFeaturedItemType.FILE)
+    expect(sixthItemResponse.dvObjectIdentifier).toBe(featuredFileId.toString())
+    expect(sixthItemResponse.displayOrder).toBe(newFeaturedItems[5].displayOrder)
+    expect(sixthItemResponse.id).toBeDefined()
   })
 
   test('should throw an error when collection does not exist', async () => {
@@ -187,6 +273,7 @@ describe('execute', () => {
 
         testFeaturedItemId = featuredItemCreated.id
       } catch (error) {
+        console.log(JSON.stringify(error, null, 2))
         throw new Error(`Error while creating collection featured item in ${testCollectionAlias}`)
       }
     })
