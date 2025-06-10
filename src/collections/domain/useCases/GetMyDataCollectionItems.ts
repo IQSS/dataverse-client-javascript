@@ -1,10 +1,10 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
-import { CollectionItemSubset } from '../models/CollectionItemSubset'
+import { MyDataCollectionItemSubset } from '../models/MyDataCollectionItemSubset'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
-import { CollectionItemType } from '../../../../src/collections/domain/models/CollectionItemType'
-import { PublicationStatus } from '../../../../src/core/domain/models/PublicationStatus'
+import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
+import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 
-export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
+export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSubset> {
   private collectionsRepository: ICollectionsRepository
 
   constructor(collectionsRepository: ICollectionsRepository) {
@@ -31,7 +31,7 @@ export class GetMyDataCollectionItems implements UseCase<CollectionItemSubset> {
     selectedPage?: number,
     searchText?: string,
     otherUserName?: string
-  ): Promise<CollectionItemSubset> {
+  ): Promise<MyDataCollectionItemSubset> {
     return this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
       collectionItemTypes,

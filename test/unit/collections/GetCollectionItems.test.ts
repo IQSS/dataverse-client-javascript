@@ -18,17 +18,11 @@ describe('execute', () => {
   ]
   const testTotalCount = 3
   const testFacets = createCollectionItemsFacetsModel()
-  const testCountPerObjectType = {
-    collections: 1,
-    datasets: 1,
-    files: 1
-  }
 
   const testItemSubset: CollectionItemSubset = {
     items: testItems,
     facets: testFacets,
-    totalItemCount: testTotalCount,
-    countPerObjectType: testCountPerObjectType
+    totalItemCount: testTotalCount
   }
 
   beforeEach(() => {
@@ -60,7 +54,8 @@ describe('execute', () => {
       collectionId,
       undefined,
       undefined,
-      undefined
+      undefined,
+      false
     )
     expect(actual).toEqual(testItemSubset)
   })
@@ -75,7 +70,8 @@ describe('execute', () => {
       undefined,
       limit,
       undefined,
-      undefined
+      undefined,
+      false
     )
     expect(actual).toEqual(testItemSubset)
   })
@@ -90,7 +86,8 @@ describe('execute', () => {
       undefined,
       undefined,
       offset,
-      undefined
+      undefined,
+      false
     )
     expect(actual).toEqual(testItemSubset)
   })
@@ -105,16 +102,51 @@ describe('execute', () => {
       undefined,
       undefined,
       undefined,
-      searchCriteria
+      searchCriteria,
+      false
     )
 
     expect(collectionRepositoryStub.getCollectionItems).toHaveBeenCalledWith(
       undefined,
       undefined,
       undefined,
-      searchCriteria
+      searchCriteria,
+      false
     )
     expect(actual).toEqual(testItemSubset)
+  })
+
+  test('should handle showTypeCounts parameter', async () => {
+    const testItemSubsetWithCount = {
+      ...testItemSubset,
+      countPerObjectType: {
+        collections: 1,
+        datasets: 1,
+        files: 1
+      }
+    }
+    collectionRepositoryStub.getCollectionItems = jest
+      .fn()
+      .mockResolvedValue(testItemSubsetWithCount)
+
+    const showTypeCounts = true
+
+    const actual = await testGetCollectionItems.execute(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      showTypeCounts
+    )
+
+    expect(collectionRepositoryStub.getCollectionItems).toHaveBeenCalledWith(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      showTypeCounts
+    )
+    expect(actual).toEqual(testItemSubsetWithCount)
   })
 
   test('should handle all parameters', async () => {
@@ -127,13 +159,20 @@ describe('execute', () => {
 
     collectionRepositoryStub.getCollectionItems = jest.fn().mockResolvedValue(testItemSubset)
 
-    const actual = await testGetCollectionItems.execute(collectionId, limit, offset, searchCriteria)
+    const actual = await testGetCollectionItems.execute(
+      collectionId,
+      limit,
+      offset,
+      searchCriteria,
+      false
+    )
 
     expect(collectionRepositoryStub.getCollectionItems).toHaveBeenCalledWith(
       collectionId,
       limit,
       offset,
-      searchCriteria
+      searchCriteria,
+      false
     )
     expect(actual).toEqual(testItemSubset)
   })

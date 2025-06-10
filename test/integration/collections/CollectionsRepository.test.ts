@@ -495,6 +495,7 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.fileType).toBe('Plain Text')
       expect(actualFilePreview.md5).toBe(expectedFileMd5)
       expect(actualFilePreview.name).toBe(expectedFileName)
+      expect(actualFilePreview.publicationStatuses.length).toBe(2)
       expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
       expect(actualFilePreview.publicationStatuses).toContain(PublicationStatus.Draft)
       expect(actualFilePreview.sizeInBytes).toBe(12)
@@ -537,9 +538,6 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
 
       expect(actual.totalItemCount).toBe(3)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       expect(actual.facets).toEqual(expectedFacetsAll)
 
@@ -561,9 +559,6 @@ describe('CollectionsRepository', () => {
       )
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       const collectionSearchCriteriaForDataset = new CollectionSearchCriteria().withSearchText(
         'Dataset created using'
@@ -577,9 +572,6 @@ describe('CollectionsRepository', () => {
 
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
 
       const collectionSearchCriteriaForDatasetAndCollection =
         new CollectionSearchCriteria().withSearchText('the')
@@ -592,9 +584,6 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(2)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
 
       // Test search text, limit and offset
       actual = await sut.getCollectionItems(
@@ -606,9 +595,6 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(2)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
 
       // Test type collection
       const collectionSearchCriteriaForCollectionType =
@@ -623,9 +609,6 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionOnly)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test type dataset
       const collectionSearchCriteriaForDatasetType = new CollectionSearchCriteria().withItemTypes([
@@ -641,9 +624,6 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect(actual.facets).toEqual(expectedFacetsFromDatasetOnly)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test type file
       const collectionSearchCriteriaForFileType = new CollectionSearchCriteria().withItemTypes([
@@ -659,9 +639,6 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect(actual.facets).toEqual(expectedFacetsFromFileOnly)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test multiple types
       const collectionSearchCriteriaForMultiTypes = new CollectionSearchCriteria().withItemTypes([
@@ -679,9 +656,6 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect((actual.items[1] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionAndFile)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test Sort by name ascending
       const collectionSearchCriteriaNameAscending = new CollectionSearchCriteria()
@@ -699,9 +673,6 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test Sort by name descending
       const collectionSearchCriteriaNameDescending = new CollectionSearchCriteria()
@@ -719,9 +690,6 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as FilePreview).type).toBe(CollectionItemType.FILE)
       expect((actual.items[1] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect((actual.items[2] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test Sort by date ascending
       const collectionSearchCriteriaDateAscending = new CollectionSearchCriteria()
@@ -739,9 +707,6 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
       expect((actual.items[1] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[2] as FilePreview).type).toBe(CollectionItemType.FILE)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test Sort by date descending
       const collectionSearchCriteriaDateDescending = new CollectionSearchCriteria()
@@ -759,9 +724,6 @@ describe('CollectionsRepository', () => {
       expect((actual.items[0] as DatasetPreview).type).toBe(CollectionItemType.DATASET)
       expect((actual.items[1] as FilePreview).type).toBe(CollectionItemType.FILE)
       expect((actual.items[2] as CollectionPreview).type).toBe(CollectionItemType.COLLECTION)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(1)
 
       // Test with Filter query related to the collection
       const collectionSearchCriteriaFilterQueryCollection =
@@ -777,9 +739,6 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
       expect(actual.facets).toEqual(expectedFacetsFromCollectionOnly)
-      expect(actual.countPerObjectType.collections).toBe(1)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(0)
 
       // Test with Filter query related to the dataset
       const collectionSearchCriteriaFilterQueryDataset =
@@ -797,9 +756,6 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
       expect(actual.facets).toEqual(expectedFacetsFromDatasetOnly)
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(1)
-      expect(actual.countPerObjectType.files).toBe(0)
 
       // Test with Filter query related to the file
       const collectionSearchCriteriaFilterQuerieCollAndFile =
@@ -816,9 +772,18 @@ describe('CollectionsRepository', () => {
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect(actual.facets).toEqual(expectedFacetsFromFileOnly)
-      expect(actual.countPerObjectType.collections).toBe(0)
-      expect(actual.countPerObjectType.datasets).toBe(0)
-      expect(actual.countPerObjectType.files).toBe(1)
+
+      // Test with showTypeCounts param in true
+      actual = await sut.getCollectionItems(
+        testCollectionAlias,
+        undefined,
+        undefined,
+        undefined,
+        true
+      )
+      expect(actual.countPerObjectType?.collections).toBe(1)
+      expect(actual.countPerObjectType?.datasets).toBe(1)
+      expect(actual.countPerObjectType?.files).toBe(1)
     })
 
     test('should return error when collection does not exist', async () => {
@@ -1571,19 +1536,14 @@ describe('CollectionsRepository', () => {
       const expectedFileName = 'test-file-2.txt'
       const expectedCollectionsName = 'Test Collection'
 
-      const expectedFacetsAll = [
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 3 },
-            { name: 'Draft', count: 2 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
+      const expectedPublicationStatusCounts = [
+        { publicationStatus: 'Published', count: 0 },
+        { publicationStatus: 'Unpublished', count: 3 },
+        { publicationStatus: 'Draft', count: 2 },
+        { publicationStatus: 'In Review', count: 0 },
+        { publicationStatus: 'Deaccessioned', count: 0 }
       ]
+
       expect(actual.items.length).toBe(3)
       expect(actual.totalItemCount).toBe(3)
       expect(actual.countPerObjectType.collections).toBe(1)
@@ -1641,7 +1601,7 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.affiliation).toBe('test affiliation')
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
 
-      expect(actual.facets).toEqual(expectedFacetsAll)
+      expect(actual.publicationStatusCounts).toEqual(expectedPublicationStatusCounts)
 
       // Test limit and selectedPage
       actual = await sut.getMyDataCollectionItems(
@@ -1720,18 +1680,12 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as CollectionPreview).name).toBe(expectedCollectionsName)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 1 },
-            { name: 'Draft', count: 0 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
+      expect(actual.publicationStatusCounts).toEqual([
+        { publicationStatus: 'Published', count: 0 },
+        { publicationStatus: 'Unpublished', count: 1 },
+        { publicationStatus: 'Draft', count: 0 },
+        { publicationStatus: 'In Review', count: 0 },
+        { publicationStatus: 'Deaccessioned', count: 0 }
       ])
       expect(actual.countPerObjectType.collections).toBe(1)
       expect(actual.countPerObjectType.datasets).toBe(0)
@@ -1749,18 +1703,12 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as DatasetPreview).title).toBe(expectedDatasetDescription)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 1 },
-            { name: 'Draft', count: 1 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
+      expect(actual.publicationStatusCounts).toEqual([
+        { publicationStatus: 'Published', count: 0 },
+        { publicationStatus: 'Unpublished', count: 1 },
+        { publicationStatus: 'Draft', count: 1 },
+        { publicationStatus: 'In Review', count: 0 },
+        { publicationStatus: 'Deaccessioned', count: 0 }
       ])
       expect(actual.countPerObjectType.collections).toBe(0)
       expect(actual.countPerObjectType.datasets).toBe(1)
@@ -1779,18 +1727,12 @@ describe('CollectionsRepository', () => {
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
-      expect(actual.facets).toEqual([
-        {
-          name: 'publicationStatus',
-          friendlyName: 'Publication Status',
-          labels: [
-            { name: 'Published', count: 0 },
-            { name: 'Unpublished', count: 1 },
-            { name: 'Draft', count: 1 },
-            { name: 'In Review', count: 0 },
-            { name: 'Deaccessioned', count: 0 }
-          ]
-        }
+      expect(actual.publicationStatusCounts).toEqual([
+        { publicationStatus: 'Published', count: 0 },
+        { publicationStatus: 'Unpublished', count: 1 },
+        { publicationStatus: 'Draft', count: 1 },
+        { publicationStatus: 'In Review', count: 0 },
+        { publicationStatus: 'Deaccessioned', count: 0 }
       ])
 
       expect(actual.countPerObjectType.collections).toBe(0)
