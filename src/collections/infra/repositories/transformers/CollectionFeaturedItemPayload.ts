@@ -13,5 +13,6 @@ export interface DvObjectFeaturedItemPayload {
   id: number
   type: 'dataverse' | 'dataset' | 'datafile'
   dvObjectIdentifier: string
+  dvObjectDisplayName: string
   displayOrder: number
 }

@@ -13,6 +13,7 @@ export interface DvObjectFeaturedItem {
   id: number
   type: DvObjectFeaturedItemType
   dvObjectIdentifier: string
+  dvObjectDisplayName: string
   displayOrder: number
 }
 

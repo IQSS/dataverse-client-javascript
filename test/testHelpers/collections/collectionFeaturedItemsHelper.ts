@@ -142,7 +142,8 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
       id: 3,
       type: DvObjectFeaturedItemType.DATASET,
       displayOrder: 3,
-      dvObjectIdentifier: 'doi:10.5072/FK2/8YOKQI'
+      dvObjectIdentifier: 'doi:10.5072/FK2/8YOKQI',
+      dvObjectDisplayName: 'Dataset Title'
     }
   ]
 }

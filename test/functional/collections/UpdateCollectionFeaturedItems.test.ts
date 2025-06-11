@@ -176,16 +176,21 @@ describe('execute', () => {
 
     expect(fourthItemResponse.type).toBe(DvObjectFeaturedItemType.COLLECTION)
     expect(fourthItemResponse.dvObjectIdentifier).toBe(featuredCollectionAlias)
+    expect(fourthItemResponse.dvObjectDisplayName).toBe('Scientific Research')
     expect(fourthItemResponse.displayOrder).toBe(newFeaturedItems[3].displayOrder)
     expect(fourthItemResponse.id).toBeDefined()
 
     expect(fifthItemResponse.type).toBe(DvObjectFeaturedItemType.DATASET)
     expect(fifthItemResponse.dvObjectIdentifier).toBe(testDatasetIds.persistentId)
+    expect(fifthItemResponse.dvObjectDisplayName).toBe(
+      'Dataset created using the createDataset use case'
+    )
     expect(fifthItemResponse.displayOrder).toBe(newFeaturedItems[4].displayOrder)
     expect(fifthItemResponse.id).toBeDefined()
 
     expect(sixthItemResponse.type).toBe(DvObjectFeaturedItemType.FILE)
     expect(sixthItemResponse.dvObjectIdentifier).toBe(featuredFileId.toString())
+    expect(sixthItemResponse.dvObjectDisplayName).toBe(testTextFile1Name)
     expect(sixthItemResponse.displayOrder).toBe(newFeaturedItems[5].displayOrder)
     expect(sixthItemResponse.id).toBeDefined()
   })

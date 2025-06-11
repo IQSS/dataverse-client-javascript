@@ -97,6 +97,7 @@ describe('execute', () => {
     expect(featuredItemTwo.id).toBe(testFeaturedItemIds[1])
     expect(featuredItemTwo.type).toBe(DvObjectFeaturedItemType.COLLECTION)
     expect(featuredItemTwo.dvObjectIdentifier).toBe(featuredCollectionAlias)
+    expect(featuredItemTwo.dvObjectDisplayName).toBe('Scientific Research')
     expect(featuredItemTwo.displayOrder).toBe(2)
   })
 

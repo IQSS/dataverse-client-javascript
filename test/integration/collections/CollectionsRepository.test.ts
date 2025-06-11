@@ -1295,25 +1295,22 @@ describe('CollectionsRepository', () => {
       ).rejects.toThrow(expectedError)
     })
 
-    // TODO:ME - Fix from API. getting 500 error right now instead of 400
-
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // it('should return error when the dvObjectIdentifier of a file does not exist', async () => {
-    //   const invalidFileId = '99'
-    //   const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
-    //     {
-    //       type: DvObjectFeaturedItemType.FILE,
-    //       dvObjectIdentifier: invalidFileId,
-    //       displayOrder: 0
-    //     }
-    //   ]
-    //   const expectedError = new WriteError(
-    //     `[400] Cant find Collection, Dataset, or Datafile with identifier: ${invalidFileId}.`
-    //   )
-    //   await expect(
-    //     sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
-    //   ).rejects.toThrow(expectedError)
-    // })
+    it('should return error when the dvObjectIdentifier of a file does not exist', async () => {
+      const invalidFileId = '99'
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: DvObjectFeaturedItemType.FILE,
+          dvObjectIdentifier: invalidFileId,
+          displayOrder: 0
+        }
+      ]
+      const expectedError = new WriteError(
+        `[400] Cant find Collection, Dataset, or Datafile with identifier: ${invalidFileId}.`
+      )
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+    })
 
     it('should return error when the collection to feature is not published', async () => {
       const unpublishedCollectionAlias = 'unpublished-collection-featured-item-test'

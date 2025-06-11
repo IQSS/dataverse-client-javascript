@@ -55,6 +55,7 @@ export const transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems = 
           id: item.id,
           type,
           dvObjectIdentifier: item.dvObjectIdentifier,
+          dvObjectDisplayName: item.dvObjectDisplayName,
           displayOrder: item.displayOrder
         }
 
