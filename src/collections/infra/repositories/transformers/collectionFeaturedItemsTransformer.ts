@@ -2,7 +2,7 @@ import {
   CollectionFeaturedItem,
   CustomFeaturedItem,
   DvObjectFeaturedItem,
-  DvObjectFeaturedItemType
+  FeaturedItemType
 } from '../../../domain/models/CollectionFeaturedItem'
 import {
   CollectionFeaturedItemPayload,
@@ -13,18 +13,18 @@ const apiTypeToDomainType: Record<
   DvObjectFeaturedItemPayload['type'],
   DvObjectFeaturedItem['type']
 > = {
-  dataverse: DvObjectFeaturedItemType.COLLECTION,
-  dataset: DvObjectFeaturedItemType.DATASET,
-  datafile: DvObjectFeaturedItemType.FILE
+  dataverse: FeaturedItemType.COLLECTION,
+  dataset: FeaturedItemType.DATASET,
+  datafile: FeaturedItemType.FILE
 }
 
 export const domainTypeToApiType: Record<
   DvObjectFeaturedItem['type'],
   DvObjectFeaturedItemPayload['type']
 > = {
-  [DvObjectFeaturedItemType.COLLECTION]: 'dataverse',
-  [DvObjectFeaturedItemType.DATASET]: 'dataset',
-  [DvObjectFeaturedItemType.FILE]: 'datafile'
+  [FeaturedItemType.COLLECTION]: 'dataverse',
+  [FeaturedItemType.DATASET]: 'dataset',
+  [FeaturedItemType.FILE]: 'datafile'
 }
 
 export const transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems = (
@@ -35,7 +35,7 @@ export const transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems = 
       if (item.type === 'custom') {
         const customFeaturedItem: CustomFeaturedItem = {
           id: item.id,
-          type: 'custom',
+          type: FeaturedItemType.CUSTOM,
           content: item.content,
           imageFileUrl: item.imageFileUrl || undefined,
           imageFileName: item.imageFileName || undefined,

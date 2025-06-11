@@ -49,7 +49,7 @@ import {
 import { createApiTokenViaApi } from '../../testHelpers/users/apiTokenHelper'
 import {
   CustomFeaturedItem,
-  DvObjectFeaturedItemType
+  FeaturedItemType
 } from '../../../src/collections/domain/models/CollectionFeaturedItem'
 import { DvObjectFeaturedItemDTO } from '../../../src/collections/domain/dtos/CollectionFeaturedItemsDTO'
 
@@ -1207,21 +1207,21 @@ describe('CollectionsRepository', () => {
     it('should update collection featured items sending all new items', async () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
-          type: 'custom',
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content 1</p>',
           displayOrder: 0,
           file: undefined,
           keepFile: false
         },
         {
-          type: 'custom',
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content 2</p>',
           displayOrder: 1,
           file: undefined,
           keepFile: false
         },
         {
-          type: 'custom',
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content 3</p>',
           displayOrder: 2,
           file: createImageFile('featured-item-test-image-3.png'),
@@ -1264,7 +1264,7 @@ describe('CollectionsRepository', () => {
       const invalidCollectionAlias = 'invalid-collection-alias'
       const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
         {
-          type: DvObjectFeaturedItemType.COLLECTION,
+          type: FeaturedItemType.COLLECTION,
           dvObjectIdentifier: invalidCollectionAlias,
           displayOrder: 0
         }
@@ -1282,7 +1282,7 @@ describe('CollectionsRepository', () => {
       const invalidDatasetPersistentId = 'doi:10.5072/FK2/INVALID_DATASET'
       const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
         {
-          type: DvObjectFeaturedItemType.DATASET,
+          type: FeaturedItemType.DATASET,
           dvObjectIdentifier: invalidDatasetPersistentId,
           displayOrder: 0
         }
@@ -1299,7 +1299,7 @@ describe('CollectionsRepository', () => {
       const invalidFileId = '99'
       const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
         {
-          type: DvObjectFeaturedItemType.FILE,
+          type: FeaturedItemType.FILE,
           dvObjectIdentifier: invalidFileId,
           displayOrder: 0
         }
@@ -1318,7 +1318,7 @@ describe('CollectionsRepository', () => {
 
       const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
         {
-          type: DvObjectFeaturedItemType.COLLECTION,
+          type: FeaturedItemType.COLLECTION,
           dvObjectIdentifier: unpublishedCollectionAlias,
           displayOrder: 0
         }
@@ -1338,7 +1338,7 @@ describe('CollectionsRepository', () => {
 
       const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
         {
-          type: DvObjectFeaturedItemType.DATASET,
+          type: FeaturedItemType.DATASET,
           dvObjectIdentifier: testDatasetIds.persistentId,
           displayOrder: 0
         }
@@ -1372,7 +1372,7 @@ describe('CollectionsRepository', () => {
 
       const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
         {
-          type: DvObjectFeaturedItemType.FILE,
+          type: FeaturedItemType.FILE,
           dvObjectIdentifier: fileId.toString(),
           displayOrder: 0
         }

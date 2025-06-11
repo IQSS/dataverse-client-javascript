@@ -24,8 +24,7 @@ import {
 import {
   CustomFeaturedItem,
   DvObjectFeaturedItem,
-  DvObjectFeaturedItemType
-  // DvObjectFeaturedItemType
+  FeaturedItemType
 } from '../../../src/collections/domain/models/CollectionFeaturedItem'
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import {
@@ -106,38 +105,38 @@ describe('execute', () => {
   it('should successfully update the featured items of a collection', async () => {
     const newFeaturedItems: CollectionFeaturedItemsDTO = [
       {
-        type: 'custom',
+        type: FeaturedItemType.CUSTOM,
         content: '<p class="rte-paragraph">Test content 1</p>',
         displayOrder: 0,
         file: undefined,
         keepFile: false
       },
       {
-        type: 'custom',
+        type: FeaturedItemType.CUSTOM,
         content: '<p class="rte-paragraph">Test content 2</p>',
         displayOrder: 1,
         file: undefined,
         keepFile: false
       },
       {
-        type: 'custom',
+        type: FeaturedItemType.CUSTOM,
         content: CONTENT_FIELD_WITH_ALL_TAGS,
         displayOrder: 2,
         file: createImageFile('featured-item-test-image-3.png'),
         keepFile: false
       },
       {
-        type: DvObjectFeaturedItemType.COLLECTION,
+        type: FeaturedItemType.COLLECTION,
         dvObjectIdentifier: featuredCollectionAlias,
         displayOrder: 3
       },
       {
-        type: DvObjectFeaturedItemType.DATASET,
+        type: FeaturedItemType.DATASET,
         dvObjectIdentifier: testDatasetIds.persistentId,
         displayOrder: 4
       },
       {
-        type: DvObjectFeaturedItemType.FILE,
+        type: FeaturedItemType.FILE,
         dvObjectIdentifier: featuredFileId.toString(),
         displayOrder: 5
       }
@@ -174,13 +173,13 @@ describe('execute', () => {
       `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[2].id}`
     )
 
-    expect(fourthItemResponse.type).toBe(DvObjectFeaturedItemType.COLLECTION)
+    expect(fourthItemResponse.type).toBe(FeaturedItemType.COLLECTION)
     expect(fourthItemResponse.dvObjectIdentifier).toBe(featuredCollectionAlias)
     expect(fourthItemResponse.dvObjectDisplayName).toBe('Scientific Research')
     expect(fourthItemResponse.displayOrder).toBe(newFeaturedItems[3].displayOrder)
     expect(fourthItemResponse.id).toBeDefined()
 
-    expect(fifthItemResponse.type).toBe(DvObjectFeaturedItemType.DATASET)
+    expect(fifthItemResponse.type).toBe(FeaturedItemType.DATASET)
     expect(fifthItemResponse.dvObjectIdentifier).toBe(testDatasetIds.persistentId)
     expect(fifthItemResponse.dvObjectDisplayName).toBe(
       'Dataset created using the createDataset use case'
@@ -188,7 +187,7 @@ describe('execute', () => {
     expect(fifthItemResponse.displayOrder).toBe(newFeaturedItems[4].displayOrder)
     expect(fifthItemResponse.id).toBeDefined()
 
-    expect(sixthItemResponse.type).toBe(DvObjectFeaturedItemType.FILE)
+    expect(sixthItemResponse.type).toBe(FeaturedItemType.FILE)
     expect(sixthItemResponse.dvObjectIdentifier).toBe(featuredFileId.toString())
     expect(sixthItemResponse.dvObjectDisplayName).toBe(testTextFile1Name)
     expect(sixthItemResponse.displayOrder).toBe(newFeaturedItems[5].displayOrder)
@@ -198,21 +197,21 @@ describe('execute', () => {
   test('should throw an error when collection does not exist', async () => {
     const newFeaturedItems: CollectionFeaturedItemsDTO = [
       {
-        type: 'custom',
+        type: FeaturedItemType.CUSTOM,
         content: '<p class="rte-paragraph">Test content 1</p>',
         displayOrder: 0,
         file: undefined,
         keepFile: false
       },
       {
-        type: 'custom',
+        type: FeaturedItemType.CUSTOM,
         content: '<p class="rte-paragraph">Test content 2</p>',
         displayOrder: 1,
         file: undefined,
         keepFile: false
       },
       {
-        type: 'custom',
+        type: FeaturedItemType.CUSTOM,
         content: '<p class="rte-paragraph">Test content 3</p>',
         displayOrder: 2,
         file: createImageFile('featured-item-test-image-3.png'),
@@ -237,7 +236,7 @@ describe('execute', () => {
   test('should throw an error when featured item content is empty', async () => {
     const newFeaturedItems: CollectionFeaturedItemsDTO = [
       {
-        type: 'custom',
+        type: FeaturedItemType.CUSTOM,
         content: '',
         displayOrder: 0,
         file: undefined,
@@ -297,7 +296,7 @@ describe('execute', () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
-          type: 'custom',
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content Updated</p>',
           displayOrder: 0,
           file: undefined,
@@ -327,7 +326,7 @@ describe('execute', () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
-          type: 'custom',
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content Updated</p>',
           displayOrder: 0,
           file: undefined,
@@ -354,7 +353,7 @@ describe('execute', () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
-          type: 'custom',
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content Updated</p>',
           displayOrder: 0,
           file: createImageFile('featured-item-test-image-updated.png'),
@@ -383,7 +382,7 @@ describe('execute', () => {
       const newFeaturedItems: CollectionFeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
-          type: 'custom',
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content Updated</p>',
           displayOrder: 0,
           file: createImageFile('featured-item-test-image-updated.png'),

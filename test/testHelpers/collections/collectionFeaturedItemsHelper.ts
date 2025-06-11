@@ -2,7 +2,7 @@ import axios from 'axios'
 import { File, Blob } from '@web-std/file'
 import {
   CollectionFeaturedItem,
-  DvObjectFeaturedItemType
+  FeaturedItemType
 } from '../../../src/collections/domain/models/CollectionFeaturedItem'
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
 import { TestConstants } from '../TestConstants'
@@ -124,7 +124,7 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
   return [
     {
       id: 1,
-      type: 'custom',
+      type: FeaturedItemType.CUSTOM,
       content: 'This is a featured item',
       displayOrder: 1,
       imageFileName: 'test-image.png',
@@ -132,7 +132,7 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
     },
     {
       id: 2,
-      type: 'custom',
+      type: FeaturedItemType.CUSTOM,
       content: 'This is another featured item',
       displayOrder: 2,
       imageFileName: undefined,
@@ -140,7 +140,7 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
     },
     {
       id: 3,
-      type: DvObjectFeaturedItemType.DATASET,
+      type: FeaturedItemType.DATASET,
       displayOrder: 3,
       dvObjectIdentifier: 'doi:10.5072/FK2/8YOKQI',
       dvObjectDisplayName: 'Dataset Title'
@@ -152,7 +152,7 @@ export const createCollectionFeaturedItemsDTO = (): CollectionFeaturedItemsDTO =
   return [
     {
       id: 1,
-      type: 'custom',
+      type: FeaturedItemType.CUSTOM,
       content: 'This is a featured item',
       displayOrder: 1,
       file: createImageFile(),
@@ -160,7 +160,7 @@ export const createCollectionFeaturedItemsDTO = (): CollectionFeaturedItemsDTO =
     },
     {
       id: 2,
-      type: 'custom',
+      type: FeaturedItemType.CUSTOM,
       content: 'This is another featured item',
       displayOrder: 2,
       file: undefined,
@@ -168,19 +168,19 @@ export const createCollectionFeaturedItemsDTO = (): CollectionFeaturedItemsDTO =
     },
     {
       id: 3,
-      type: DvObjectFeaturedItemType.COLLECTION,
+      type: FeaturedItemType.COLLECTION,
       displayOrder: 3,
       dvObjectIdentifier: 'collection-alias-foo-bar'
     },
     {
       id: 4,
-      type: DvObjectFeaturedItemType.DATASET,
+      type: FeaturedItemType.DATASET,
       displayOrder: 4,
       dvObjectIdentifier: 'doi:10.5072/FK2/8YOKQI'
     },
     {
       id: 5,
-      type: DvObjectFeaturedItemType.FILE,
+      type: FeaturedItemType.FILE,
       displayOrder: 5,
       dvObjectIdentifier: '12'
     }

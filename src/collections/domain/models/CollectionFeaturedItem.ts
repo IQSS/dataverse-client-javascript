@@ -2,7 +2,7 @@ export type CollectionFeaturedItem = CustomFeaturedItem | DvObjectFeaturedItem
 
 export interface CustomFeaturedItem {
   id: number
-  type: 'custom'
+  type: FeaturedItemType.CUSTOM
   content: string
   imageFileName?: string
   imageFileUrl?: string
@@ -11,13 +11,14 @@ export interface CustomFeaturedItem {
 
 export interface DvObjectFeaturedItem {
   id: number
-  type: DvObjectFeaturedItemType
+  type: FeaturedItemType.COLLECTION | FeaturedItemType.DATASET | FeaturedItemType.FILE
   dvObjectIdentifier: string
   dvObjectDisplayName: string
   displayOrder: number
 }
 
-export enum DvObjectFeaturedItemType {
+export enum FeaturedItemType {
+  CUSTOM = 'custom',
   COLLECTION = 'collection',
   DATASET = 'dataset',
   FILE = 'file'

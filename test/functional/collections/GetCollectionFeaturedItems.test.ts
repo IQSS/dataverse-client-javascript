@@ -16,7 +16,7 @@ import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Colle
 import {
   CustomFeaturedItem,
   DvObjectFeaturedItem,
-  DvObjectFeaturedItemType
+  FeaturedItemType
 } from '../../../src/collections/domain/models/CollectionFeaturedItem'
 
 describe('execute', () => {
@@ -95,7 +95,7 @@ describe('execute', () => {
     expect(featuredItemOne.imageFileName).toBe('featured-item-test-image.png')
 
     expect(featuredItemTwo.id).toBe(testFeaturedItemIds[1])
-    expect(featuredItemTwo.type).toBe(DvObjectFeaturedItemType.COLLECTION)
+    expect(featuredItemTwo.type).toBe(FeaturedItemType.COLLECTION)
     expect(featuredItemTwo.dvObjectIdentifier).toBe(featuredCollectionAlias)
     expect(featuredItemTwo.dvObjectDisplayName).toBe('Scientific Research')
     expect(featuredItemTwo.displayOrder).toBe(2)
