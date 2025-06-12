@@ -1440,6 +1440,42 @@ describe('CollectionsRepository', () => {
       expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
     })
   })
+
+  describe('deleteCollectionFeaturedItem', () => {
+    let featuredItemTestId: number
+
+    beforeAll(async () => {
+      try {
+        const featuredItem = await createCollectionCustomFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content</p>',
+          displayOrder: 1,
+          withFile: true,
+          fileName: 'featured-item-test-image.png'
+        })
+        featuredItemTestId = featuredItem.id
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while creating test featured items for collection: ${testCollectionAlias}`
+        )
+      }
+    })
+
+    it('should delete a collection featured item', async () => {
+      const featuredItemsResponseBeforeDeletion = await sut.getCollectionFeaturedItems(
+        testCollectionAlias
+      )
+
+      expect(featuredItemsResponseBeforeDeletion).toHaveLength(1)
+
+      await sut.deleteCollectionFeaturedItem(featuredItemTestId)
+
+      const featuredItemsResponseAfterDeletion = await sut.getCollectionFeaturedItems(
+        testCollectionAlias
+      )
+
+      expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
+    })
+  })
   describe('getMyDataCollectionItems', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 

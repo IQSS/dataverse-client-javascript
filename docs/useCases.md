@@ -23,6 +23,7 @@ The different use cases currently available in the package are classified below,
     - [Delete a Collection](#delete-a-collection)
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
+    - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -450,6 +451,26 @@ deleteCollectionFeaturedItems.execute(collectionIdOrAlias)
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItems.ts)_ definition.
+
+#### Delete A Collection Featured Item
+
+Deletes a single featured item, given a featured item id.
+
+##### Example call:
+
+```typescript
+import { deleteCollectionFeaturedItem } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const featuredItemId = 12345
+
+deleteCollectionFeaturedItem.execute(featuredItemId)
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
 ## Datasets
 

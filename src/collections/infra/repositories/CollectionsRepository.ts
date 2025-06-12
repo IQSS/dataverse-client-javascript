@@ -436,4 +436,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
+
+  public async deleteCollectionFeaturedItem(featuredItemId: number): Promise<void> {
+    return this.doDelete(`/dataverseFeaturedItems/${featuredItemId}`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }
