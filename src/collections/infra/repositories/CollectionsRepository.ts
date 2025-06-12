@@ -21,7 +21,8 @@ import {
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
 import {
   CollectionFeaturedItem,
-  DvObjectFeaturedItem
+  DvObjectFeaturedItem,
+  FeaturedItemType
 } from '../../domain/models/CollectionFeaturedItem'
 import {
   domainTypeToApiType,
@@ -401,7 +402,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       formData.append('id', item.id !== undefined ? item.id.toString() : '0')
       formData.append('displayOrder', item.displayOrder.toString())
 
-      if (item.type === 'custom') {
+      if (item.type === FeaturedItemType.CUSTOM) {
         // CustomFeaturedItemDTO
         formData.append('type', item.type)
         formData.append('content', item.content)
