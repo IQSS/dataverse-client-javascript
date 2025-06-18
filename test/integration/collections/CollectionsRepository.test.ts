@@ -1478,6 +1478,7 @@ describe('CollectionsRepository', () => {
       expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
     })
   })
+
   describe('getMyDataCollectionItems', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 

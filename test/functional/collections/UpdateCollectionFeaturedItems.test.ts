@@ -87,7 +87,6 @@ describe('execute', () => {
       await publishDatasetViaApi(testDatasetIds.numericId)
       await waitForNoLocks(testDatasetIds.numericId, 10)
     } catch (error) {
-      console.log(error)
       throw new Error('Tests beforeAll(): Error while creating test data')
     }
   })
@@ -277,7 +276,6 @@ describe('execute', () => {
 
         testFeaturedItemId = featuredItemCreated.id
       } catch (error) {
-        console.log(JSON.stringify(error, null, 2))
         throw new Error(`Error while creating collection featured item in ${testCollectionAlias}`)
       }
     })
