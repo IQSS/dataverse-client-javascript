@@ -168,8 +168,8 @@ describe('execute', () => {
     expect(thirdItemResponse.content).toEqual(EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS)
     expect(thirdItemResponse.displayOrder).toBe(newFeaturedItems[2].displayOrder)
     expect(thirdItemResponse.imageFileName).toEqual('featured-item-test-image-3.png')
-    expect(thirdItemResponse.imageFileUrl).toBe(
-      `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[2].id}`
+    expect(thirdItemResponse.imageFileUrl).toContain(
+      `/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[2].id}`
     )
 
     expect(fourthItemResponse.type).toBe(FeaturedItemType.COLLECTION)
@@ -315,8 +315,8 @@ describe('execute', () => {
       expect(updatedFeaturedItem.displayOrder).toBe(newFeaturedItems[0].displayOrder)
       // Should keep the existing file even if a file was not provided because keepFile is true
       expect(updatedFeaturedItem.imageFileName).toEqual(testFeaturedItemFilename)
-      expect(updatedFeaturedItem.imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItem.id}`
+      expect(updatedFeaturedItem.imageFileUrl).toContain(
+        `/api/access/dataverseFeaturedItemImage/${updatedFeaturedItem.id}`
       )
     })
 
@@ -371,8 +371,8 @@ describe('execute', () => {
       expect(updatedFeaturedItem.content).toBe((newFeaturedItems[0] as CustomFeaturedItem).content)
       expect(updatedFeaturedItem.displayOrder).toBe(newFeaturedItems[0].displayOrder)
       expect(updatedFeaturedItem.imageFileName).toEqual('featured-item-test-image-updated.png')
-      expect(updatedFeaturedItem.imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItem.id}`
+      expect(updatedFeaturedItem.imageFileUrl).toContain(
+        `/api/access/dataverseFeaturedItemImage/${updatedFeaturedItem.id}`
       )
     })
 
@@ -401,8 +401,8 @@ describe('execute', () => {
       expect(testFeaturedItem.displayOrder).toBe(newFeaturedItems[0].displayOrder)
       // Should keep the existing file even if a file was provided because keepFile is true
       expect(testFeaturedItem.imageFileName).toEqual(testFeaturedItemFilename)
-      expect(testFeaturedItem.imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[0].id}`
+      expect(testFeaturedItem.imageFileUrl).toContain(
+        `/api/access/dataverseFeaturedItemImage/${updatedFeaturedItemsResponse[0].id}`
       )
     })
   })

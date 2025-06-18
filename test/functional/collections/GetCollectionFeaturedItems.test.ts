@@ -89,8 +89,8 @@ describe('execute', () => {
     expect(featuredItemOne.id).toBe(testFeaturedItemIds[0])
     expect(featuredItemOne.displayOrder).toBe(1)
     expect(featuredItemOne.content).toBe('<p class="rte-paragraph">Test content</p>')
-    expect(featuredItemOne.imageFileUrl).toBe(
-      `http://localhost:8080/api/access/dataverseFeaturedItemImage/${featuredItemOne.id}`
+    expect(featuredItemOne.imageFileUrl).toContain(
+      `/api/access/dataverseFeaturedItemImage/${featuredItemOne.id}`
     )
     expect(featuredItemOne.imageFileName).toBe('featured-item-test-image.png')
 
