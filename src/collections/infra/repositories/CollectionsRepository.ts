@@ -27,7 +27,7 @@ import {
 import {
   domainTypeToApiType,
   transformFeaturedItemsPayloadToFeaturedItems
-} from './transformers/collectionFeaturedItemsTransformer'
+} from './transformers/featuredItemsTransformer'
 import {
   FeaturedItemsDTO,
   CustomFeaturedItemDTO,
