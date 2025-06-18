@@ -17,7 +17,7 @@ import {
   CustomFeaturedItem,
   DvObjectFeaturedItem,
   FeaturedItemType
-} from '../../../src/collections/domain/models/CollectionFeaturedItem'
+} from '../../../src/collections/domain/models/FeaturedItem'
 
 describe('execute', () => {
   const testCollectionAlias = 'getCollectionsFeaturedItemsTest'

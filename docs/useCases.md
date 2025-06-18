@@ -278,7 +278,7 @@ The `CollectionItemSubset`returned instance contains a property called `totalIte
 
 #### Get Collection Featured Items
 
-Returns a [CollectionFeaturedItem](../src/collections/domain/models/CollectionFeaturedItem.ts) array containing the featured items of the requested collection, given the collection identifier or alias.
+Returns a [FeaturedItem](../src/collections/domain/models/CollectionFeaturedItem.ts) array containing the featured items of the requested collection, given the collection identifier or alias.
 
 ##### Example call:
 
@@ -289,7 +289,7 @@ const collectionIdOrAlias = 12345
 
 getCollectionFeaturedItems
   .execute(collectionId)
-  .then((featuredItems: CollectionFeaturedItem[]) => {
+  .then((featuredItems: FeaturedItem[]) => {
     /* ... */
   })
   .catch((error: Error) => {
@@ -406,7 +406,7 @@ _See [use case](../src/collections/domain/useCases/DeleteCollection.ts)_ definit
 
 #### Update Collection Featured Items
 
-Updates all featured items, given a collection identifier and a CollectionFeaturedItemsDTO.
+Updates all featured items, given a collection identifier and a FeaturedItemsDTO.
 
 ##### Example call:
 
@@ -417,11 +417,9 @@ import { updateCollectionFeaturedItems } from '@iqss/dataverse-client-javascript
 
 const collectionIdOrAlias = 12345
 
-updateCollectionFeaturedItems
-  .execute(collectionIdOrAlias)
-  .then((collectionFeaturedItems: CollectionFeaturedItem[]) => {
-    /* ... */
-  })
+updateCollectionFeaturedItems.execute(collectionIdOrAlias).then((featuredItems: FeaturedItem[]) => {
+  /* ... */
+})
 
 /* ... */
 ```

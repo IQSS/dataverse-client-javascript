@@ -1,9 +1,9 @@
 import {
-  CollectionFeaturedItem,
+  FeaturedItem,
   CustomFeaturedItem,
   DvObjectFeaturedItem,
   FeaturedItemType
-} from '../../../domain/models/CollectionFeaturedItem'
+} from '../../../domain/models/FeaturedItem'
 import {
   CollectionFeaturedItemPayload,
   DvObjectFeaturedItemPayload
@@ -27,9 +27,9 @@ export const domainTypeToApiType: Record<
   [FeaturedItemType.FILE]: 'datafile'
 }
 
-export const transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems = (
+export const transformFeaturedItemsPayloadToFeaturedItems = (
   payload: CollectionFeaturedItemPayload[]
-): CollectionFeaturedItem[] => {
+): FeaturedItem[] => {
   return payload
     .map((item) => {
       if (item.type === 'custom') {

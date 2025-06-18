@@ -1,12 +1,9 @@
 import axios from 'axios'
 import { File, Blob } from '@web-std/file'
-import {
-  CollectionFeaturedItem,
-  FeaturedItemType
-} from '../../../src/collections/domain/models/CollectionFeaturedItem'
+import { FeaturedItem, FeaturedItemType } from '../../../src/collections/domain/models/FeaturedItem'
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
 import { TestConstants } from '../TestConstants'
-import { CollectionFeaturedItemsDTO } from '../../../src'
+import { FeaturedItemsDTO } from '../../../src'
 import { DvObjectFeaturedItemPayload } from '../../../src/collections/infra/repositories/transformers/CollectionFeaturedItemPayload'
 
 interface CreateCollectionCustomFeaturedItemData {
@@ -24,7 +21,7 @@ export async function createCollectionCustomFeaturedItemViaApi(
     withFile = false,
     fileName = 'test-image.png'
   }: CreateCollectionCustomFeaturedItemData
-): Promise<CollectionFeaturedItem> {
+): Promise<FeaturedItem> {
   try {
     if (collectionAlias == undefined) {
       collectionAlias = ROOT_COLLECTION_ID
@@ -66,7 +63,7 @@ interface CreateCollectionDvObjectFeaturedItemData {
 export async function createCollectionDvObjectFeaturedItemViaApi(
   collectionAlias: string,
   { type, dvObjectIdentifier, displayOrder = 1 }: CreateCollectionDvObjectFeaturedItemData
-): Promise<CollectionFeaturedItem> {
+): Promise<FeaturedItem> {
   try {
     const formData = new FormData()
     formData.append('type', type)
@@ -120,7 +117,7 @@ export async function deleteCollectionFeaturedItemsViaApi(collectionAlias: strin
   }
 }
 
-export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] => {
+export const createCollectionFeaturedItemsModel = (): FeaturedItem[] => {
   return [
     {
       id: 1,
@@ -148,7 +145,7 @@ export const createCollectionFeaturedItemsModel = (): CollectionFeaturedItem[] =
   ]
 }
 
-export const createCollectionFeaturedItemsDTO = (): CollectionFeaturedItemsDTO => {
+export const createCollectionFeaturedItemsDTO = (): FeaturedItemsDTO => {
   return [
     {
       id: 1,

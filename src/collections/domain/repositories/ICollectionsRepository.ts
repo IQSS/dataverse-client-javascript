@@ -1,8 +1,8 @@
 import { CollectionDTO } from '../dtos/CollectionDTO'
-import { CollectionFeaturedItemsDTO } from '../dtos/CollectionFeaturedItemsDTO'
+import { FeaturedItemsDTO } from '../dtos/FeaturedItemsDTO'
 import { Collection } from '../models/Collection'
 import { CollectionFacet } from '../models/CollectionFacet'
-import { CollectionFeaturedItem } from '../models/CollectionFeaturedItem'
+import { FeaturedItem } from '../models/FeaturedItem'
 import { CollectionItemSubset } from '../models/CollectionItemSubset'
 import { MyDataCollectionItemSubset } from '../models/MyDataCollectionItemSubset'
 import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
@@ -42,13 +42,11 @@ export interface ICollectionsRepository {
     collectionIdOrAlias: number | string,
     updatedCollection: CollectionDTO
   ): Promise<void>
-  getCollectionFeaturedItems(
-    collectionIdOrAlias: number | string
-  ): Promise<CollectionFeaturedItem[]>
+  getCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<FeaturedItem[]>
   updateCollectionFeaturedItems(
     collectionIdOrAlias: number | string,
-    featuredItemDTOs: CollectionFeaturedItemsDTO
-  ): Promise<CollectionFeaturedItem[]>
+    featuredItemDTOs: FeaturedItemsDTO
+  ): Promise<FeaturedItem[]>
   deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void>
   deleteCollectionFeaturedItem(featuredItemId: number): Promise<void>
 }

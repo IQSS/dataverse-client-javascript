@@ -51,5 +51,5 @@ export { CollectionDTO, CollectionInputLevelDTO } from './domain/dtos/Collection
 export { CollectionPreview } from './domain/models/CollectionPreview'
 export { CollectionItemType } from './domain/models/CollectionItemType'
 export { CollectionSearchCriteria } from './domain/models/CollectionSearchCriteria'
-export { CollectionFeaturedItem } from './domain/models/CollectionFeaturedItem'
-export { CollectionFeaturedItemsDTO } from './domain/dtos/CollectionFeaturedItemsDTO'
+export { FeaturedItem } from './domain/models/FeaturedItem'
+export { FeaturedItemsDTO } from './domain/dtos/FeaturedItemsDTO'

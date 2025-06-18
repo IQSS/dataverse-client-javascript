@@ -2,7 +2,6 @@ import { CollectionsRepository } from '../../../src/collections/infra/repositori
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   CollectionDTO,
-  CollectionFeaturedItemsDTO,
   CollectionItemType,
   CollectionPreview,
   CollectionSearchCriteria,
@@ -50,8 +49,11 @@ import { createApiTokenViaApi } from '../../testHelpers/users/apiTokenHelper'
 import {
   CustomFeaturedItem,
   FeaturedItemType
-} from '../../../src/collections/domain/models/CollectionFeaturedItem'
-import { DvObjectFeaturedItemDTO } from '../../../src/collections/domain/dtos/CollectionFeaturedItemsDTO'
+} from '../../../src/collections/domain/models/FeaturedItem'
+import {
+  DvObjectFeaturedItemDTO,
+  FeaturedItemsDTO
+} from '../../../src/collections/domain/dtos/FeaturedItemsDTO'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -1205,7 +1207,7 @@ describe('CollectionsRepository', () => {
     })
 
     it('should update collection featured items sending all new items', async () => {
-      const newFeaturedItems: CollectionFeaturedItemsDTO = [
+      const newFeaturedItems: FeaturedItemsDTO = [
         {
           type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content 1</p>',

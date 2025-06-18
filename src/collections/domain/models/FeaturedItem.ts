@@ -1,4 +1,4 @@
-export type CollectionFeaturedItem = CustomFeaturedItem | DvObjectFeaturedItem
+export type FeaturedItem = CustomFeaturedItem | DvObjectFeaturedItem
 
 export interface CustomFeaturedItem {
   id: number

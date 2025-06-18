@@ -20,19 +20,19 @@ import {
 } from '../../domain/models/CollectionSearchCriteria'
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
 import {
-  CollectionFeaturedItem,
+  FeaturedItem,
   DvObjectFeaturedItem,
   FeaturedItemType
-} from '../../domain/models/CollectionFeaturedItem'
+} from '../../domain/models/FeaturedItem'
 import {
   domainTypeToApiType,
-  transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems
+  transformFeaturedItemsPayloadToFeaturedItems
 } from './transformers/collectionFeaturedItemsTransformer'
 import {
-  CollectionFeaturedItemsDTO,
+  FeaturedItemsDTO,
   CustomFeaturedItemDTO,
   DvObjectFeaturedItemDTO
-} from '../../domain/dtos/CollectionFeaturedItemsDTO'
+} from '../../domain/dtos/FeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
@@ -362,11 +362,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async getCollectionFeaturedItems(
     collectionIdOrAlias: number | string
-  ): Promise<CollectionFeaturedItem[]> {
+  ): Promise<FeaturedItem[]> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`, true)
-      .then((response) =>
-        transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems(response.data.data)
-      )
+      .then((response) => transformFeaturedItemsPayloadToFeaturedItems(response.data.data))
       .catch((error) => {
         throw error
       })
@@ -374,8 +372,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async updateCollectionFeaturedItems(
     collectionIdOrAlias: number | string,
-    featuredItemsDTO: CollectionFeaturedItemsDTO
-  ): Promise<CollectionFeaturedItem[]> {
+    featuredItemsDTO: FeaturedItemsDTO
+  ): Promise<FeaturedItem[]> {
     const featuredItemsFormData = this.toFeaturedItemsFormData(featuredItemsDTO)
 
     return this.doPut(
@@ -384,15 +382,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       undefined,
       ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
     )
-      .then((response) =>
-        transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems(response.data.data)
-      )
+      .then((response) => transformFeaturedItemsPayloadToFeaturedItems(response.data.data))
       .catch((error) => {
         throw error
       })
   }
 
-  private toFeaturedItemsFormData(featuredItemsDTO: CollectionFeaturedItemsDTO): FormData {
+  private toFeaturedItemsFormData(featuredItemsDTO: FeaturedItemsDTO): FormData {
     // This is not really necessary because we are sending displayOrder property anyways, but I wanted to keep the order of the items in the form data
     const orderedFeaturedItemsDTO = featuredItemsDTO.sort((a, b) => a.displayOrder - b.displayOrder)
 

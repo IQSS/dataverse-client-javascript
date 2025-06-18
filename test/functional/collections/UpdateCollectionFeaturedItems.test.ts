@@ -1,6 +1,6 @@
 import {
   ApiConfig,
-  CollectionFeaturedItemsDTO,
+  FeaturedItemsDTO,
   createDataset,
   CreatedDatasetIdentifiers,
   getDatasetFiles,
@@ -25,7 +25,7 @@ import {
   CustomFeaturedItem,
   DvObjectFeaturedItem,
   FeaturedItemType
-} from '../../../src/collections/domain/models/CollectionFeaturedItem'
+} from '../../../src/collections/domain/models/FeaturedItem'
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import {
   deletePublishedDatasetViaApi,
@@ -103,7 +103,7 @@ describe('execute', () => {
   })
 
   it('should successfully update the featured items of a collection', async () => {
-    const newFeaturedItems: CollectionFeaturedItemsDTO = [
+    const newFeaturedItems: FeaturedItemsDTO = [
       {
         type: FeaturedItemType.CUSTOM,
         content: '<p class="rte-paragraph">Test content 1</p>',
@@ -195,7 +195,7 @@ describe('execute', () => {
   })
 
   test('should throw an error when collection does not exist', async () => {
-    const newFeaturedItems: CollectionFeaturedItemsDTO = [
+    const newFeaturedItems: FeaturedItemsDTO = [
       {
         type: FeaturedItemType.CUSTOM,
         content: '<p class="rte-paragraph">Test content 1</p>',
@@ -234,7 +234,7 @@ describe('execute', () => {
   })
 
   test('should throw an error when featured item content is empty', async () => {
-    const newFeaturedItems: CollectionFeaturedItemsDTO = [
+    const newFeaturedItems: FeaturedItemsDTO = [
       {
         type: FeaturedItemType.CUSTOM,
         content: '',
@@ -293,7 +293,7 @@ describe('execute', () => {
     })
 
     it('should keep existing file for a featured item if file is undefined and keepFile is true', async () => {
-      const newFeaturedItems: CollectionFeaturedItemsDTO = [
+      const newFeaturedItems: FeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
           type: FeaturedItemType.CUSTOM,
@@ -323,7 +323,7 @@ describe('execute', () => {
     })
 
     it('should remove existing file for a featured item if file is undefined and keepFile is false', async () => {
-      const newFeaturedItems: CollectionFeaturedItemsDTO = [
+      const newFeaturedItems: FeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
           type: FeaturedItemType.CUSTOM,
@@ -350,7 +350,7 @@ describe('execute', () => {
     })
 
     it('should replace existing file for a featured item if a new file is provided and keepFile is false', async () => {
-      const newFeaturedItems: CollectionFeaturedItemsDTO = [
+      const newFeaturedItems: FeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
           type: FeaturedItemType.CUSTOM,
@@ -379,7 +379,7 @@ describe('execute', () => {
     })
 
     it('should not replace existing file for a featured item if a new file is provided but keepFile is true', async () => {
-      const newFeaturedItems: CollectionFeaturedItemsDTO = [
+      const newFeaturedItems: FeaturedItemsDTO = [
         {
           id: testFeaturedItemId,
           type: FeaturedItemType.CUSTOM,
