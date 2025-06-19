@@ -1230,8 +1230,6 @@ describe('CollectionsRepository', () => {
       await deleteCollectionViaApi(testFileDeletedCollectionAlias)
     })
 
-    // TODO:ME - Maybe this should be Featured Item type File should not be returned if the file was restricted and the dataset published. Waiting for confirmation
-
     test('Featured Item type File should not be returned if the file was restricted', async () => {
       const testFileRestrictedCollectionAlias = 'testCollectionFeaturedItemsFileRestriction'
       await createCollectionViaApi(testFileRestrictedCollectionAlias)
@@ -1272,16 +1270,6 @@ describe('CollectionsRepository', () => {
       )
 
       expect(featuredItemsResponseAfterFileRestriction.length).toBe(0)
-
-      // // Once we publish the dataset the featured item will not be returned anymore
-      // await publishDatasetViaApi(testDatasetIds.numericId)
-      // await waitForNoLocks(testDatasetIds.numericId, 10)
-
-      // const featuredItemsResponseAfterDatasetPublish = await sut.getCollectionFeaturedItems(
-      //   testFileRestrictedCollectionAlias
-      // )
-
-      // expect(featuredItemsResponseAfterDatasetPublish.length).toBe(0)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
       await deleteCollectionViaApi(testFileRestrictedCollectionAlias)
