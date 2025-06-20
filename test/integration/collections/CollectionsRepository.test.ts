@@ -1453,7 +1453,6 @@ describe('CollectionsRepository', () => {
         }
       ]
 
-      // TODO:ME - Maybe this should be [400] Datafile must be published to be featured. Waiting for confirmation
       const expectedError = new WriteError('[400] Dataset must be published to be featured.')
 
       await expect(
