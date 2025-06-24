@@ -3,8 +3,8 @@ import { GetUserSelectableRoles } from './domain/useCases/GetUserSelectableRoles
 
 const rolesRepository = new RolesRepository()
 
-const getCurrentAuthenticatedUser = new GetUserSelectableRoles(rolesRepository)
+const getUserSelectableRoles = new GetUserSelectableRoles(rolesRepository)
 
-export { getCurrentAuthenticatedUser }
+export { getUserSelectableRoles }
 
 export { Role } from './domain/models/Role'
