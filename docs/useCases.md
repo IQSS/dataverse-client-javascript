@@ -23,6 +23,7 @@ The different use cases currently available in the package are classified below,
     - [Delete a Collection](#delete-a-collection)
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
+    - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -277,7 +278,7 @@ The `CollectionItemSubset`returned instance contains a property called `totalIte
 
 #### Get Collection Featured Items
 
-Returns a [CollectionFeaturedItem](../src/collections/domain/models/CollectionFeaturedItem.ts) array containing the featured items of the requested collection, given the collection identifier or alias.
+Returns a [FeaturedItem](../src/collections/domain/models/CollectionFeaturedItem.ts) array containing the featured items of the requested collection, given the collection identifier or alias.
 
 ##### Example call:
 
@@ -288,7 +289,7 @@ const collectionIdOrAlias = 12345
 
 getCollectionFeaturedItems
   .execute(collectionId)
-  .then((featuredItems: CollectionFeaturedItem[]) => {
+  .then((featuredItems: FeaturedItem[]) => {
     /* ... */
   })
   .catch((error: Error) => {
@@ -405,7 +406,7 @@ _See [use case](../src/collections/domain/useCases/DeleteCollection.ts)_ definit
 
 #### Update Collection Featured Items
 
-Updates all featured items, given a collection identifier and a CollectionFeaturedItemsDTO.
+Updates all featured items, given a collection identifier and a FeaturedItemsDTO.
 
 ##### Example call:
 
@@ -416,11 +417,9 @@ import { updateCollectionFeaturedItems } from '@iqss/dataverse-client-javascript
 
 const collectionIdOrAlias = 12345
 
-updateCollectionFeaturedItems
-  .execute(collectionIdOrAlias)
-  .then((collectionFeaturedItems: CollectionFeaturedItem[]) => {
-    /* ... */
-  })
+updateCollectionFeaturedItems.execute(collectionIdOrAlias).then((featuredItems: FeaturedItem[]) => {
+  /* ... */
+})
 
 /* ... */
 ```
@@ -450,6 +449,26 @@ deleteCollectionFeaturedItems.execute(collectionIdOrAlias)
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItems.ts)_ definition.
+
+#### Delete A Collection Featured Item
+
+Deletes a single featured item, given a featured item id.
+
+##### Example call:
+
+```typescript
+import { deleteCollectionFeaturedItem } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const featuredItemId = 12345
+
+deleteCollectionFeaturedItem.execute(featuredItemId)
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
 ## Datasets
 

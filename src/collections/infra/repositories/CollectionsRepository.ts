@@ -19,9 +19,20 @@ import {
   SortType
 } from '../../domain/models/CollectionSearchCriteria'
 import { CollectionItemType } from '../../domain/models/CollectionItemType'
-import { CollectionFeaturedItem } from '../../domain/models/CollectionFeaturedItem'
-import { transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems } from './transformers/collectionFeaturedItemsTransformer'
-import { CollectionFeaturedItemsDTO } from '../../domain/dtos/CollectionFeaturedItemsDTO'
+import {
+  FeaturedItem,
+  DvObjectFeaturedItem,
+  FeaturedItemType
+} from '../../domain/models/FeaturedItem'
+import {
+  domainTypeToApiType,
+  transformFeaturedItemsPayloadToFeaturedItems
+} from './transformers/featuredItemsTransformer'
+import {
+  FeaturedItemsDTO,
+  CustomFeaturedItemDTO,
+  DvObjectFeaturedItemDTO
+} from '../../domain/dtos/FeaturedItemsDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
@@ -351,11 +362,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async getCollectionFeaturedItems(
     collectionIdOrAlias: number | string
-  ): Promise<CollectionFeaturedItem[]> {
+  ): Promise<FeaturedItem[]> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`, true)
-      .then((response) =>
-        transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems(response.data.data)
-      )
+      .then((response) => transformFeaturedItemsPayloadToFeaturedItems(response.data.data))
       .catch((error) => {
         throw error
       })
@@ -363,8 +372,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async updateCollectionFeaturedItems(
     collectionIdOrAlias: number | string,
-    featuredItemsDTO: CollectionFeaturedItemsDTO
-  ): Promise<CollectionFeaturedItem[]> {
+    featuredItemsDTO: FeaturedItemsDTO
+  ): Promise<FeaturedItem[]> {
     const featuredItemsFormData = this.toFeaturedItemsFormData(featuredItemsDTO)
 
     return this.doPut(
@@ -373,31 +382,43 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       undefined,
       ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
     )
-      .then((response) =>
-        transformCollectionFeaturedItemsPayloadToCollectionFeaturedItems(response.data.data)
-      )
+      .then((response) => transformFeaturedItemsPayloadToFeaturedItems(response.data.data))
       .catch((error) => {
         throw error
       })
   }
 
-  private toFeaturedItemsFormData(featuredItemsDTO: CollectionFeaturedItemsDTO): FormData {
+  private toFeaturedItemsFormData(featuredItemsDTO: FeaturedItemsDTO): FormData {
     // This is not really necessary because we are sending displayOrder property anyways, but I wanted to keep the order of the items in the form data
     const orderedFeaturedItemsDTO = featuredItemsDTO.sort((a, b) => a.displayOrder - b.displayOrder)
 
     const formData = new FormData()
 
-    orderedFeaturedItemsDTO.forEach((item) => {
-      const { id, content, displayOrder, file, keepFile } = item
-      const fileName = file ? file.name : ''
+    orderedFeaturedItemsDTO.forEach((item: CustomFeaturedItemDTO | DvObjectFeaturedItemDTO) => {
+      formData.append('id', item.id !== undefined ? item.id.toString() : '0')
+      formData.append('displayOrder', item.displayOrder.toString())
 
-      formData.append('id', id ? id.toString() : '0')
-      formData.append('content', content)
-      formData.append('displayOrder', displayOrder.toString())
-      formData.append('keepFile', keepFile.toString())
-      formData.append('fileName', fileName)
-      if (file) {
-        formData.append('file', file)
+      if (item.type === FeaturedItemType.CUSTOM) {
+        // CustomFeaturedItemDTO
+        formData.append('type', item.type)
+        formData.append('content', item.content)
+        formData.append('keepFile', item.keepFile.toString())
+        formData.append('fileName', item.file ? item.file.name : '')
+        if (item.file) {
+          formData.append('file', item.file)
+        }
+
+        // We still need to append dvObjectIdentifier as it is expected by the backend even empty
+        formData.append('dvObjectIdentifier', '')
+      } else {
+        // DvObjectFeaturedItemDTO
+        formData.append('type', domainTypeToApiType[item.type as DvObjectFeaturedItem['type']])
+        formData.append('dvObjectIdentifier', item.dvObjectIdentifier)
+
+        // We still need to append content, keepFile, and fileName as they are expected by the backend even empty
+        formData.append('content', '')
+        formData.append('keepFile', '')
+        formData.append('fileName', '')
       }
     })
 
@@ -406,6 +427,14 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void> {
     return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}/featuredItems`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deleteCollectionFeaturedItem(featuredItemId: number): Promise<void> {
+    return this.doDelete(`/dataverseFeaturedItems/${featuredItemId}`)
       .then(() => undefined)
       .catch((error) => {
         throw error

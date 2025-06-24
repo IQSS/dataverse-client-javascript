@@ -11,6 +11,7 @@ import { UpdateCollectionFeaturedItems } from './domain/useCases/UpdateCollectio
 import { DeleteCollectionFeaturedItems } from './domain/useCases/DeleteCollectionFeaturedItems'
 import { DeleteCollection } from './domain/useCases/DeleteCollection'
 import { GetMyDataCollectionItems } from './domain/useCases/GetMyDataCollectionItems'
+import { DeleteCollectionFeaturedItem } from './domain/useCases/DeleteCollectionFeaturedItem'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -26,6 +27,7 @@ const getCollectionFeaturedItems = new GetCollectionFeaturedItems(collectionsRep
 const updateCollectionFeaturedItems = new UpdateCollectionFeaturedItems(collectionsRepository)
 const deleteCollectionFeaturedItems = new DeleteCollectionFeaturedItems(collectionsRepository)
 const deleteCollection = new DeleteCollection(collectionsRepository)
+const deleteCollectionFeaturedItem = new DeleteCollectionFeaturedItem(collectionsRepository)
 
 export {
   getCollection,
@@ -39,7 +41,8 @@ export {
   getCollectionFeaturedItems,
   updateCollectionFeaturedItems,
   deleteCollectionFeaturedItems,
-  deleteCollection
+  deleteCollection,
+  deleteCollectionFeaturedItem
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'
@@ -48,5 +51,5 @@ export { CollectionDTO, CollectionInputLevelDTO } from './domain/dtos/Collection
 export { CollectionPreview } from './domain/models/CollectionPreview'
 export { CollectionItemType } from './domain/models/CollectionItemType'
 export { CollectionSearchCriteria } from './domain/models/CollectionSearchCriteria'
-export { CollectionFeaturedItem } from './domain/models/CollectionFeaturedItem'
-export { CollectionFeaturedItemsDTO } from './domain/dtos/CollectionFeaturedItemsDTO'
+export { FeaturedItem } from './domain/models/FeaturedItem'
+export { FeaturedItemsDTO } from './domain/dtos/FeaturedItemsDTO'
