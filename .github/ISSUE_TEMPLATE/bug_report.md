@@ -6,7 +6,7 @@
 
 ## What did you expect to happen?
 
-## Which version of js-dataverse are you using?
+## Which version of dataverse-client-javascript are you using?
 
 ## Any related open or closed issues to this bug report?
 
