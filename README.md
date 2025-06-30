@@ -1,11 +1,49 @@
-# js-dataverse
+## Dataverse JavaScript Client
 
-[![npm](https://img.shields.io/npm/v/js-dataverse.svg)](https://www.npmjs.com/package/js-dataverse)
+![NPM Version](https://img.shields.io/npm/v/%40iqss%2Fdataverse-client-javascript)
 
-A JavaScript/TypeScript API wrapper for [Dataverse](http://guides.dataverse.org/en/latest/api/).
+The Dataverse JavaScript Client is an open-source package that provides a set of use-case-driven functions to interact with the [Dataverse API](http://guides.dataverse.org/en/latest/api/). Designed around Domain-Driven Design (DDD) principles, this package offers a structured, high-level interface to perform actions like retrieving datasets, managing collections, uploading files, and more.
 
-- [Installation](./docs/installation.md)
-- [Use Cases](./docs/useCases.md)
-- [Local Development](./docs/localDevelopment.md)
-- [Contributing](./CONTRIBUTING.md)
-- [License](./LICENSE)
+This package is part of the Dataverse Frontend ecosystem and is intended to be used by applications or services that integrate with the Dataverse platform.
+
+## Features
+
+- **Use case-centric API functions** – Organized around domain-specific actions like `getDataset`, `createCollection`, or `restrictFile`.
+- **TypeScript-first** – All use cases include strong typings for inputs and outputs, improving developer experience.
+
+## Installation
+
+Install the package via npm:
+
+```bash
+npm install @iqss/dataverse-client-javascript
+```
+
+## Usage
+
+```typescript
+import { getDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetIdentifier = 'doi:10.77777/FK2/AAAAAA'
+const datasetVersion = '1.0'
+
+getDataset.execute(datasetIdentifier, datasetVersion).then((dataset: Dataset) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+For detailed information about available use cases see [Use Cases Docs](https://github.com/IQSS/dataverse-client-javascript/blob/develop/docs/useCases.md).
+
+For detailed information about usage see [Usage Docs](https://github.com/IQSS/dataverse-client-javascript/blob/develop/docs/usage.md).
+
+## Contributing
+
+Want to add a new use case or improve an existing one? Please check the [Contributing](https://github.com/IQSS/dataverse-client-javascript/blob/develop/CONTRIBUTING.md) section.
+
+## License
+
+This project is open source and available under the [MIT License](https://github.com/IQSS/dataverse-client-javascript/blob/develop/LICENSE).
