@@ -24,7 +24,8 @@ import {
 import {
   DatasetNotNumberedVersion,
   CreatedDatasetIdentifiers,
-  createDataset
+  createDataset,
+  Dataset
 } from '../../../src/datasets'
 import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
@@ -489,6 +490,18 @@ describe('FilesRepository', () => {
         )) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
+      })
+
+      test('should return file and dataset when providing id, version, and returnDatasetVersion is true', async () => {
+        const actual = (await sut.getFile(
+          testFileId,
+          DatasetNotNumberedVersion.DRAFT,
+          true,
+          false
+        )) as [FileModel, Dataset]
+
+        expect(actual[0].name).toBe(testTextFile1Name)
+        expect(actual[1].id).toBe(testDatasetIds.numericId)
       })
 
       test('should return error when file does not exist', async () => {
