@@ -125,12 +125,12 @@ Two different versions are being pushed to the GitHub Packages registry:
 1. **PR-Generated Versions**:
 
    - These versions are generated from pull request commits.
-   - They follow the structure `2.1.0-pr<pr_number>.<commit_hash>`, where `pr_number` is the number of the pull request, and `commit_hash` is the specific commit hash from the PR branch.
+   - They follow the structure `<current_package_version>-pr<pr_number>.<commit_hash>`, where `pr_number` is the number of the pull request, and `commit_hash` is the specific commit hash from the PR branch.
    - These versions are unstable and correspond to the state of the package during the pull request.
 
 2. **Develop Alpha Versions**:
    - These versions are generated on every commit made to the `develop` branch, ideally after each pull request is merged.
-   - They follow the structure `2.1.0-alpha.<number>`, where `number` is an incremental value that starts at 1 and increases with each build.
+   - They follow the structure `<current_package_version>-alpha.<number>`, where `number` is an incremental value that starts at 1 and increases with each build.
    - These versions are also unstable and represent the latest work in progress on the `develop` branch.
 
 These versions are great for developing a new SPA frontend feature integration.
