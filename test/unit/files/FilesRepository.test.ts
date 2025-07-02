@@ -1016,6 +1016,7 @@ describe('FilesRepository', () => {
     }
 
     const expectedRequestParams = {
+      includeDeaccessioned: false,
       returnDatasetVersion: false,
       returnOwners: true
     }

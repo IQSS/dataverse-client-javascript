@@ -501,10 +501,13 @@ describe('FilesRepository', () => {
     })
 
     describe('getFile with deaccessioned dataset', () => {
-      test('should return file if dataset is deaccessioned, and includeDeaccessioned is true', async () => {
-        const testTextFile1Name = 'test-file-1.txt'
+      const testTextFile1Name = 'test-file-1.txt'
 
-        const deaccessionedFileTestDatasetIds = await createDataset.execute(
+      let deaccessionedFileTestDatasetIds: CreatedDatasetIdentifiers
+      let deaccessionedTestFileId: number
+
+      beforeAll(async () => {
+        deaccessionedFileTestDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO
         )
 
@@ -513,9 +516,11 @@ describe('FilesRepository', () => {
             throw new Error(`Error while uploading file ${testTextFile1Name}`)
           }
         )
+
         await publishDatasetViaApi(deaccessionedFileTestDatasetIds.numericId).catch(() => {
           throw new Error('Error while publishing test Dataset')
         })
+
         await waitForNoLocks(deaccessionedFileTestDatasetIds.numericId, 10).catch(() => {
           throw new Error('Error while waiting for no locks')
         })
@@ -526,14 +531,37 @@ describe('FilesRepository', () => {
           false,
           FileOrderCriteria.NAME_AZ
         )
-        const deaccessionedTestFileId = datasetFiles.files[0].id
+        deaccessionedTestFileId = datasetFiles.files[0].id
 
-        await deaccessionDatasetViaApi(deaccessionedFileTestDatasetIds.numericId, '1.0')
+        await deaccessionDatasetViaApi(deaccessionedFileTestDatasetIds.numericId, '1.0').catch(
+          () => {
+            throw new Error('Error while deaccessioning the dataset')
+          }
+        )
+      })
 
+      afterAll(async () => {
+        await deletePublishedDatasetViaApi(deaccessionedFileTestDatasetIds.persistentId).catch(
+          () => {
+            throw new Error('Error while deleting the test dataset')
+          }
+        )
+      })
+
+      test('should return file if dataset is deaccessioned, and includeDeaccessioned is true', async () => {
         const actual = (await sut.getFile(deaccessionedTestFileId, '1.0', false, true)) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
-        deletePublishedDatasetViaApi(deaccessionedFileTestDatasetIds.persistentId)
+      })
+
+      test('should throw error if dataset is deaccessioned, and includeDeaccessioned is false', async () => {
+        const expectedError = new ReadError(
+          `[404] "File metadata for file with id ${deaccessionedTestFileId} in dataset version 1.0 not found"`
+        )
+
+        await expect(sut.getFile(deaccessionedTestFileId, '1.0', false, false)).rejects.toThrow(
+          expectedError
+        )
       })
     })
 
