@@ -1007,6 +1007,8 @@ The `fileId` parameter can be a string, for persistent identifiers, or a number,
 
 The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
+
 #### Get a File and its Dataset
 
 Returns a tuple of [FileModel](../src/files/domain/models/FileModel.ts) and [Dataset](../src/datasets/domain/models/Dataset.ts) objects (`[FileModel, Dataset]`), given the search parameters to identify the file.
@@ -1035,6 +1037,8 @@ _See [use case](../src/files/domain/useCases/GetFileAndDataset.ts)_ definition.
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
 
 #### Get File Citation Text
 

@@ -47,7 +47,8 @@ export interface IFilesRepository {
   getFile(
     fileId: number | string,
     datasetVersionId: string,
-    returnDatasetVersion: boolean
+    returnDatasetVersion: boolean,
+    includeDeaccessioned: boolean
   ): Promise<FileModel | [FileModel, Dataset]>
 
   getFileCitation(

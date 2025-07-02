@@ -21,7 +21,8 @@ describe('execute', () => {
     expect(filesRepositoryStub.getFile).toHaveBeenCalledWith(
       1,
       DatasetNotNumberedVersion.LATEST,
-      true
+      true,
+      false
     )
   })
 
@@ -37,7 +38,8 @@ describe('execute', () => {
     expect(filesRepositoryStub.getFile).toHaveBeenCalledWith(
       'doi:10.5072/FK2/J8SJZB',
       DatasetNotNumberedVersion.LATEST,
-      true
+      true,
+      false
     )
   })
 
@@ -50,7 +52,33 @@ describe('execute', () => {
 
     expect(actual[0]).toEqual(testFile)
     expect(actual[1]).toEqual(testDataset)
-    expect(filesRepositoryStub.getFile).toHaveBeenCalledWith('doi:10.5072/FK2/J8SJZB', '2.0', true)
+    expect(filesRepositoryStub.getFile).toHaveBeenCalledWith(
+      'doi:10.5072/FK2/J8SJZB',
+      '2.0',
+      true,
+      false
+    )
+  })
+
+  test('should return file and dataset on repository success when includeDeaccession is true', async () => {
+    const filesRepositoryStub = <IFilesRepository>{}
+    filesRepositoryStub.getFile = jest.fn().mockResolvedValue(testTuple)
+    const sut = new GetFileAndDataset(filesRepositoryStub)
+
+    const actual = await sut.execute(
+      'doi:10.5072/FK2/J8SJZB',
+      DatasetNotNumberedVersion.LATEST,
+      true
+    )
+
+    expect(actual[0]).toEqual(testFile)
+    expect(actual[1]).toEqual(testDataset)
+    expect(filesRepositoryStub.getFile).toHaveBeenCalledWith(
+      'doi:10.5072/FK2/J8SJZB',
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      true
+    )
   })
 
   test('should return error result on repository error', async () => {
