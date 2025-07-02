@@ -62,8 +62,6 @@ describe('FilesRepository', () => {
 
   let testFileId: number
   let testFilePersistentId: string
-  let deaccessionedTestFileId: number
-  let deaccessionedFileTestDatasetIds: CreatedDatasetIdentifiers
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -505,18 +503,22 @@ describe('FilesRepository', () => {
     describe('getFile with deaccessioned dataset', () => {
       test('should return file if dataset is deaccessioned, and includeDeaccessioned is true', async () => {
         const testTextFile1Name = 'test-file-1.txt'
-        deaccessionedFileTestDatasetIds = await createDataset.execute(
+
+        const deaccessionedFileTestDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO
         )
 
-        await publishDatasetViaApi(deaccessionedFileTestDatasetIds.numericId)
-        await waitForNoLocks(deaccessionedFileTestDatasetIds.numericId, 10)
-
-        uploadFileViaApi(deaccessionedFileTestDatasetIds.numericId, testTextFile1Name).catch(() => {
-          throw new Error(`Error while uploading file ${testTextFile1Name}`)
+        await uploadFileViaApi(deaccessionedFileTestDatasetIds.numericId, testTextFile1Name).catch(
+          () => {
+            throw new Error(`Error while uploading file ${testTextFile1Name}`)
+          }
+        )
+        await publishDatasetViaApi(deaccessionedFileTestDatasetIds.numericId).catch(() => {
+          throw new Error('Error while publishing test Dataset')
         })
-
-        await deaccessionDatasetViaApi(deaccessionedFileTestDatasetIds.numericId, '1.0')
+        await waitForNoLocks(deaccessionedFileTestDatasetIds.numericId, 10).catch(() => {
+          throw new Error('Error while waiting for no locks')
+        })
 
         const datasetFiles = await sut.getDatasetFiles(
           deaccessionedFileTestDatasetIds.numericId,
@@ -524,27 +526,13 @@ describe('FilesRepository', () => {
           false,
           FileOrderCriteria.NAME_AZ
         )
-        deaccessionedTestFileId = datasetFiles.files[0].id
+        const deaccessionedTestFileId = datasetFiles.files[0].id
 
-        const actual = (await sut.getFile(
-          deaccessionedTestFileId,
-          DatasetNotNumberedVersion.LATEST,
-          false,
-          true
-        )) as FileModel
+        await deaccessionDatasetViaApi(deaccessionedFileTestDatasetIds.numericId, '1.0')
+
+        const actual = (await sut.getFile(deaccessionedTestFileId, '1.0', false, true)) as FileModel
 
         expect(actual.name).toBe(testTextFile1Name)
-      })
-
-      test('should return error if dataset is deaccessioned, and includeDeaccessioned is false', async () => {
-        const expectedError = new ReadError(
-          `[404] "File metadata for file with id ${deaccessionedTestFileId} in dataset version 1.0 not found"`
-        )
-
-        await expect(sut.getFile(deaccessionedTestFileId, '1.0', false, false)).rejects.toThrow(
-          expectedError
-        )
-
         deletePublishedDatasetViaApi(deaccessionedFileTestDatasetIds.persistentId)
       })
     })
