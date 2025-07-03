@@ -1,4 +1,4 @@
-# Contributing to js-dataverse
+# Contributing to dataverse-client-javascript
 
 First of all thank you very much for your interest in contributing to this project!
 

@@ -117,3 +117,21 @@ Fix linting checks on the code:
 ```bash
 npm run lint:fix
 ```
+
+## Development Versions of this package
+
+Two different versions are being pushed to the GitHub Packages registry:
+
+1. **PR-Generated Versions**:
+
+   - These versions are generated from pull request commits.
+   - They follow the structure `<current_package_version>-pr<pr_number>.<commit_hash>`, where `pr_number` is the number of the pull request, and `commit_hash` is the specific commit hash from the PR branch.
+   - These versions are unstable and correspond to the state of the package during the pull request.
+
+2. **Develop Alpha Versions**:
+   - These versions are generated on every commit made to the `develop` branch, ideally after each pull request is merged.
+   - They follow the structure `<current_package_version>-alpha.<number>`, where `number` is an incremental value that starts at 1 and increases with each build.
+   - These versions are also unstable and represent the latest work in progress on the `develop` branch.
+
+These versions are great for developing a new SPA frontend feature integration.
+For instance, if you create a new use case in this repository and want to integrate the UI in the [dataverse-frontend repository](https://github.com/IQSS/dataverse-frontend), you can use the PR-Generated Version. If the changes have already been merged, the Alpha Version will contain the new use case.
