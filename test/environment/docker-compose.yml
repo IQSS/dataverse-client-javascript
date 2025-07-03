@@ -1,0 +1,140 @@
+version: '2.4'
+
+services:
+  test_dataverse:
+    container_name: 'test_dataverse'
+    hostname: dataverse
+    image: ${DATAVERSE_IMAGE_REGISTRY}/gdcc/dataverse:${DATAVERSE_IMAGE_TAG}
+    restart: on-failure
+    user: payara
+    environment:
+      DATAVERSE_DB_HOST: postgres
+      DATAVERSE_DB_PASSWORD: secret
+      DATAVERSE_DB_USER: ${DATAVERSE_DB_USER}
+      JVM_ARGS: -Ddataverse.files.storage-driver-id=file1
+        -Ddataverse.pid.providers=fake
+        -Ddataverse.pid.default-provider=fake
+        -Ddataverse.pid.fake.type=FAKE
+        -Ddataverse.pid.fake.label=FakeDOIProvider
+        -Ddataverse.pid.fake.authority=10.5072
+        -Ddataverse.pid.fake.shoulder=FK2/
+        -Ddataverse.files.file1.type=file
+        -Ddataverse.files.file1.label=Filesystem
+        -Ddataverse.files.file1.directory=${STORAGE_DIR}/store
+        -Ddataverse.files.localstack1.type=s3
+        -Ddataverse.files.localstack1.label=LocalStack
+        -Ddataverse.files.localstack1.custom-endpoint-url=http://localstack:4566
+        -Ddataverse.files.localstack1.custom-endpoint-region=us-east-2
+        -Ddataverse.files.localstack1.bucket-name=mybucket
+        -Ddataverse.files.localstack1.path-style-access=true
+        -Ddataverse.files.localstack1.upload-redirect=true
+        -Ddataverse.files.localstack1.download-redirect=true
+        -Ddataverse.files.localstack1.access-key=default
+        -Ddataverse.files.localstack1.secret-key=default
+    ports:
+      - '8080:8080'
+    networks:
+      - dataverse
+    depends_on:
+      - test_postgres
+      - test_solr
+      - test_localstack
+    tmpfs:
+      - /dumps:mode=770,size=2052M,uid=1000,gid=1000
+      - /tmp:mode=770,size=2052M,uid=1000,gid=1000
+    mem_limit: 2147483648 # 2 GiB
+    mem_reservation: 1024m
+    privileged: false
+
+  test_localstack:
+    container_name: 'test_localstack'
+    hostname: 'localstack'
+    image: localstack/localstack:2.3.2
+    restart: on-failure
+    ports:
+      - '4566:4566'
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOSTNAME_EXTERNAL=localstack
+    networks:
+      - dataverse
+    volumes:
+      - ./conf/localstack:/etc/localstack/init/ready.d
+    tmpfs:
+      - /localstack:mode=770,size=128M,uid=1000,gid=1000
+
+  test_dataverse_bootstrap:
+    container_name: 'test_dataverse_bootstrap'
+    image: ${DATAVERSE_IMAGE_REGISTRY}/gdcc/configbaker:${DATAVERSE_IMAGE_TAG}
+    restart: 'no'
+    environment:
+      - TIMEOUT=${DATAVERSE_BOOTSTRAP_TIMEOUT}
+    command:
+      - bootstrap.sh
+      - dev
+    networks:
+      - dataverse
+
+  test_postgres:
+    container_name: 'test_postgres'
+    hostname: postgres
+    image: postgres:${POSTGRES_VERSION}
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=${DATAVERSE_DB_USER}
+      - POSTGRES_PASSWORD=secret
+    expose:
+      - '5432'
+    networks:
+      - dataverse
+
+  test_solr_initializer:
+    container_name: 'test_solr_initializer'
+    image: ${DATAVERSE_IMAGE_REGISTRY}/gdcc/configbaker:${DATAVERSE_IMAGE_TAG}
+    restart: 'no'
+    command:
+      - sh
+      - -c
+      - 'fix-fs-perms.sh solr && cp -a /template/* /solr-template'
+    volumes:
+      - ./docker-dev-volumes/solr/data:/var/solr
+      - ./docker-dev-volumes/solr/conf:/solr-template
+
+  test_solr:
+    container_name: 'test_solr'
+    hostname: 'solr'
+    image: solr:${SOLR_VERSION}
+    depends_on:
+      test_solr_initializer:
+        condition: service_completed_successfully
+    restart: on-failure
+    expose:
+      - '8983'
+    networks:
+      - dataverse
+    command:
+      - 'solr-precreate'
+      - 'collection1'
+      - '/template'
+    volumes:
+      - ./docker-dev-volumes/solr/data:/var/solr
+      - ./docker-dev-volumes/solr/conf:/template
+
+  test_smtp:
+    container_name: 'test_smtp'
+    hostname: 'smtp'
+    image: maildev/maildev:2.0.5
+    restart: on-failure
+    expose:
+      - '25' # smtp server
+    environment:
+      - MAILDEV_SMTP_PORT=25
+      - MAILDEV_MAIL_DIRECTORY=/mail
+    networks:
+      - dataverse
+    tmpfs:
+      - /mail:mode=770,size=128M,uid=1000,gid=1000
+
+networks:
+  dataverse:
+    driver: bridge

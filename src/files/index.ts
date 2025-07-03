@@ -1,0 +1,95 @@
+import { FilesRepository } from './infra/repositories/FilesRepository'
+import { GetDatasetFiles } from './domain/useCases/GetDatasetFiles'
+import { GetDatasetFileCounts } from './domain/useCases/GetDatasetFileCounts'
+import { GetFileDownloadCount } from './domain/useCases/GetFileDownloadCount'
+import { GetFileUserPermissions } from './domain/useCases/GetFileUserPermissions'
+import { GetFileDataTables } from './domain/useCases/GetFileDataTables'
+import { GetDatasetFilesTotalDownloadSize } from './domain/useCases/GetDatasetFilesTotalDownloadSize'
+import { GetFile } from './domain/useCases/GetFile'
+import { GetFileCitation } from './domain/useCases/GetFileCitation'
+import { GetFileAndDataset } from './domain/useCases/GetFileAndDataset'
+import { UploadFile } from './domain/useCases/UploadFile'
+import { DirectUploadClient } from './infra/clients/DirectUploadClient'
+import { AddUploadedFilesToDataset } from './domain/useCases/AddUploadedFilesToDataset'
+import { DeleteFile } from './domain/useCases/DeleteFile'
+import { ReplaceFile } from './domain/useCases/ReplaceFile'
+import { RestrictFile } from './domain/useCases/RestrictFile'
+import { UpdateFileMetadata } from './domain/useCases/UpdateFileMetadata'
+import { UpdateFileTabularTags } from './domain/useCases/UpdateFileTabularTags'
+import { UpdateFileCategories } from './domain/useCases/UpdateFileCategories'
+import { GetFileVersionSummaries } from './domain/useCases/GetFileVersionSummaries'
+import { IsFileDeleted } from './domain/useCases/IsFileDeleted'
+
+const filesRepository = new FilesRepository()
+const directUploadClient = new DirectUploadClient(filesRepository)
+
+const getDatasetFiles = new GetDatasetFiles(filesRepository)
+const getDatasetFileCounts = new GetDatasetFileCounts(filesRepository)
+const getFileDownloadCount = new GetFileDownloadCount(filesRepository)
+const getFileUserPermissions = new GetFileUserPermissions(filesRepository)
+const getFileDataTables = new GetFileDataTables(filesRepository)
+const getDatasetFilesTotalDownloadSize = new GetDatasetFilesTotalDownloadSize(filesRepository)
+const getFile = new GetFile(filesRepository)
+const getFileAndDataset = new GetFileAndDataset(filesRepository)
+const getFileCitation = new GetFileCitation(filesRepository)
+const uploadFile = new UploadFile(directUploadClient)
+const addUploadedFilesToDataset = new AddUploadedFilesToDataset(filesRepository)
+const deleteFile = new DeleteFile(filesRepository)
+const replaceFile = new ReplaceFile(filesRepository)
+const restrictFile = new RestrictFile(filesRepository)
+const updateFileMetadata = new UpdateFileMetadata(filesRepository)
+const updateFileTabularTags = new UpdateFileTabularTags(filesRepository)
+const updateFileCategories = new UpdateFileCategories(filesRepository)
+const getFileVersionSummaries = new GetFileVersionSummaries(filesRepository)
+const isFileDeleted = new IsFileDeleted(filesRepository)
+
+export {
+  getDatasetFiles,
+  getFileDownloadCount,
+  getFileUserPermissions,
+  getFileDataTables,
+  getDatasetFileCounts,
+  getDatasetFilesTotalDownloadSize,
+  getFile,
+  getFileAndDataset,
+  getFileCitation,
+  uploadFile,
+  addUploadedFilesToDataset,
+  deleteFile,
+  restrictFile,
+  updateFileMetadata,
+  updateFileTabularTags,
+  updateFileCategories,
+  replaceFile,
+  getFileVersionSummaries,
+  isFileDeleted
+}
+
+export { FileModel as File, FileEmbargo, FileChecksum } from './domain/models/FileModel'
+export { FileUserPermissions } from './domain/models/FileUserPermissions'
+export {
+  FileSearchCriteria,
+  FileOrderCriteria,
+  FileAccessStatus
+} from './domain/models/FileCriteria'
+export {
+  FileCounts,
+  FileContentTypeCount,
+  FileAccessStatusCount,
+  FileCategoryNameCount
+} from './domain/models/FileCounts'
+export {
+  FileDataTable,
+  FileDataVariable,
+  FileDataVariableMetadata,
+  FileDataVariableInvalidRanges,
+  FileDataVariableCategoryMetadata,
+  FileDataVariableCategory,
+  FileDataVariableIntervalType,
+  FileDataVariableFormatType
+} from './domain/models/FileDataTable'
+export { FileDownloadSizeMode } from './domain/models/FileDownloadSizeMode'
+export { FilesSubset } from './domain/models/FilesSubset'
+export { FilePreview, FilePreviewChecksum } from './domain/models/FilePreview'
+export { UploadedFileDTO } from './domain/dtos/UploadedFileDTO'
+export { UpdateFileMetadataDTO } from './domain/dtos/UpdateFileMetadataDTO'

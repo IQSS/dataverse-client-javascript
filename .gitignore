@@ -4,8 +4,12 @@ node_modules
 # intellij
 .idea
 
+# Visual Studio
+/.vscode
+
 # unit tests
 coverage
 
 # ignore npm lock
 package-json.lock
+.npmrc

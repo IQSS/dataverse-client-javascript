@@ -1,7 +1,7 @@
 {
-  "name": "js-dataverse",
-  "version": "1.0.48",
-  "description": "A Dataverse module for JavaScript/TypeScript",
+  "name": "@iqss/dataverse-client-javascript",
+  "version": "2.0.0",
+  "description": "Dataverse API wrapper package for JavaScript/TypeScript-based applications",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -9,15 +9,26 @@
   ],
   "scripts": {
     "build": "tsc",
-    "publish": "tsc && npm publish",
-    "test": "jest --watchAll",
-    "test:coverage": "jest --coverage --watchAll",
-    "test:ci": "jest --ci --maxWorkers=2 --detectOpenHandles --forceExit",
-    "eslint:check": "eslint --ext '.js,.jsx,.ts,.tsx' .",
-    "eslint:fix": "eslint --ext '.js,.jsx,.ts,.tsx' . --fix",
-    "format:check": "tsfmt --verify",
-    "format:fix": "tsfmt --replace"
+    "test": "jest -c jest.config.ts",
+    "test:unit": "jest -c jest.config.unit.ts",
+    "test:integration": "jest -c jest.config.integration.ts",
+    "test:functional": "jest -c jest.config.functional.ts",
+    "test:coverage": "jest --coverage -c jest.config.ts",
+    "test:coverage:check": "jest --coverage --ci --config jest.config.ts",
+    "lint": "npm run lint:eslint && npm run lint:prettier",
+    "lint:fix": "eslint --fix --ext .ts ./src --ignore-path .gitignore .",
+    "lint:eslint": "eslint --ignore-path .gitignore .",
+    "lint:prettier": "prettier --check '**/*.(yml|json|md)'",
+    "format": "prettier --write './**/*.{js,ts,md,json,yml,md}' --config ./.prettierrc",
+    "typecheck": "tsc --noEmit",
+    "git:add": "git add ."
   },
+  "pre-commit": [
+    "format",
+    "typecheck",
+    "lint:fix",
+    "git:add"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/IQSS/dataverse-client-javascript.git"
@@ -32,25 +43,30 @@
   },
   "homepage": "https://github.com/IQSS/dataverse-client-javascript#readme",
   "devDependencies": {
-    "@types/chai": "^4.2.1",
-    "@types/faker": "^4.1.5",
-    "@types/jest": "^24.0.18",
-    "@types/request-promise": "^4.1.44",
-    "@types/sinon": "^7.0.13",
-    "@typescript-eslint/eslint-plugin": "^2.1.0",
-    "@typescript-eslint/parser": "^2.1.0",
-    "chai": "^4.2.0",
-    "eslint": "^6.3.0",
-    "eslint-config-prettier": "^6.2.0",
-    "faker": "^4.1.0",
-    "jest": "^24.9.0",
-    "sinon": "^7.4.2",
-    "ts-jest": "^24.0.2",
-    "typescript": "^3.6.2",
-    "typescript-formatter": "^7.2.2"
+    "@types/jest": "^29.5.12",
+    "@typescript-eslint/eslint-plugin": "5.51.0",
+    "@typescript-eslint/parser": "5.51.0",
+    "@web-std/file": "3.0.3",
+    "eslint": "8.33.0",
+    "eslint-config-prettier": "8.6.0",
+    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-jest": "27.2.1",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-simple-import-sort": "10.0.0",
+    "eslint-plugin-unused-imports": "2.0.0",
+    "jest": "^29.4.3",
+    "jest-environment-jsdom": "29.7.0",
+    "pre-commit": "1.2.2",
+    "prettier": "2.8.4",
+    "testcontainers": "^10.11.0",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.2"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "request-promise": "^4.2.4"
+    "@types/node": "^18.15.11",
+    "@types/turndown": "^5.0.1",
+    "axios": "^1.7.2",
+    "turndown": "^7.1.2",
+    "typescript": "^4.9.5"
   }
 }

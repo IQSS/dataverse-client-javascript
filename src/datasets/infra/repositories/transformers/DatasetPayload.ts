@@ -1,0 +1,71 @@
+import { FilePayload } from '../../../../files/infra/repositories/transformers/FilePayload'
+import { OwnerNodePayload } from '../../../../core/infra/repositories/transformers/OwnerNodePayload'
+
+export interface DatasetPayload {
+  datasetId: number
+  datasetPersistentId: string
+  id: number
+  internalVersionNumber: number
+  versionNumber: number
+  versionMinorNumber: number
+  versionState: string
+  createTime: string
+  lastUpdateTime: string
+  releaseTime: string
+  metadataBlocks: MetadataBlocksPayload
+  license?: LicensePayload
+  alternativePersistentId?: string
+  publicationDate?: string
+  citationDate?: string
+  fileAccessRequest: boolean
+  termsOfAccess?: string
+  dataAccessPlace?: string
+  originalArchive?: string
+  availabilityStatus?: string
+  contactForAccess?: string
+  sizeOfCollection?: string
+  studyCompletion?: string
+  termsOfUse?: string
+  confidentialityDeclaration?: string
+  specialPermissions?: string
+  restrictions?: string
+  citationRequirements?: string
+  depositorRequirements?: string
+  conditions?: string
+  disclaimer?: string
+  files: FilePayload[]
+  isPartOf: OwnerNodePayload
+  deaccessionNote?: string
+}
+
+export interface LicensePayload {
+  name: string
+  uri: string
+  iconUri?: string
+}
+
+export interface MetadataBlocksPayload {
+  [blockName: string]: MetadataBlockPayload
+}
+
+export interface MetadataBlockPayload {
+  name: string
+  fields: MetadataFieldPayload[]
+}
+
+export interface MetadataFieldPayload {
+  typeName: string
+  value: MetadataFieldValuePayload
+  typeClass: string
+  multiple: boolean
+}
+
+export type MetadataFieldValuePayload =
+  | string
+  | string[]
+  | MetadataSubfieldValuePayload
+  | MetadataSubfieldValuePayload[]
+
+export interface MetadataSubfieldValuePayload {
+  [key: string]: { value: string; typeName: string; multiple: boolean; typeClass: string }
+}

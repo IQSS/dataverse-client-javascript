@@ -1,0 +1,441 @@
+import { AxiosResponse } from 'axios'
+import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
+import { IFilesRepository } from '../../domain/repositories/IFilesRepository'
+import { FileModel as FileModel } from '../../domain/models/FileModel'
+import {
+  transformFileResponseToFile,
+  transformFilesResponseToFilesSubset
+} from './transformers/fileTransformers'
+import { FilesSubset } from '../../domain/models/FilesSubset'
+import { FileDataTable } from '../../domain/models/FileDataTable'
+import { transformDataTablesResponseToDataTables } from './transformers/fileDataTableTransformers'
+import { FileUserPermissions } from '../../domain/models/FileUserPermissions'
+import { transformFileUserPermissionsResponseToFileUserPermissions } from './transformers/fileUserPermissionsTransformers'
+import { FileSearchCriteria, FileOrderCriteria } from '../../domain/models/FileCriteria'
+import { FileCounts } from '../../domain/models/FileCounts'
+import { transformFileCountsResponseToFileCounts } from './transformers/fileCountsTransformers'
+import { FileDownloadSizeMode } from '../../domain/models/FileDownloadSizeMode'
+import { Dataset } from '../../../datasets'
+import { FileUploadDestination } from '../../domain/models/FileUploadDestination'
+import { transformUploadDestinationsResponseToUploadDestination } from './transformers/fileUploadDestinationsTransformers'
+import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
+import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
+import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
+import { RestrictFileDTO } from '../../domain/dtos/RestrictFileDTO'
+import { FileVersionSummaryInfo } from '../../domain/models/FileVersionSummaryInfo'
+import { transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo } from './transformers/fileVersionSummaryInfoTransformers'
+
+export interface GetFilesQueryParams {
+  includeDeaccessioned: boolean
+  limit?: number
+  offset?: number
+  orderCriteria?: string
+  contentType?: string
+  accessStatus?: string
+  categoryName?: string
+  tabularTagName?: string
+  searchText?: string
+}
+
+export interface GetFilesTotalDownloadSizeQueryParams {
+  includeDeaccessioned: boolean
+  mode?: string
+  contentType?: string
+  accessStatus?: string
+  categoryName?: string
+  tabularTagName?: string
+  searchText?: string
+}
+
+export interface UploadedFileRequestBody {
+  fileName: string
+  checksum: ChecksumRequestBody
+  mimeType: string
+  storageIdentifier: string
+  description?: string
+  directoryLabel?: string
+  categories?: string[]
+  restrict?: boolean
+  forceReplace?: boolean
+}
+
+export interface ChecksumRequestBody {
+  '@value': string
+  '@type': string
+}
+
+type ReplaceFileResponseMinimal = {
+  files: { dataFile: { id: number } }[]
+}
+
+export class FilesRepository extends ApiRepository implements IFilesRepository {
+  private readonly datasetsResourceName: string = 'datasets'
+  private readonly filesResourceName: string = 'files'
+  private readonly accessResourceName: string = 'access/datafile'
+
+  public async getDatasetFiles(
+    datasetId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+    fileOrderCriteria: FileOrderCriteria,
+    limit?: number,
+    offset?: number,
+    fileSearchCriteria?: FileSearchCriteria
+  ): Promise<FilesSubset> {
+    const queryParams: GetFilesQueryParams = {
+      includeDeaccessioned: includeDeaccessioned,
+      orderCriteria: fileOrderCriteria.toString()
+    }
+    if (limit !== undefined) {
+      queryParams.limit = limit
+    }
+    if (offset !== undefined) {
+      queryParams.offset = offset
+    }
+    if (fileSearchCriteria !== undefined) {
+      this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria)
+    }
+    return this.doGet(
+      this.buildApiEndpoint(
+        this.datasetsResourceName,
+        `versions/${datasetVersionId}/files`,
+        datasetId
+      ),
+      true,
+      queryParams
+    )
+      .then((response) => transformFilesResponseToFilesSubset(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetFileCounts(
+    datasetId: string | number,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+    fileSearchCriteria?: FileSearchCriteria
+  ): Promise<FileCounts> {
+    const queryParams: GetFilesQueryParams = {
+      includeDeaccessioned: includeDeaccessioned
+    }
+    if (fileSearchCriteria !== undefined) {
+      this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria)
+    }
+    return this.doGet(
+      this.buildApiEndpoint(
+        this.datasetsResourceName,
+        `versions/${datasetVersionId}/files/counts`,
+        datasetId
+      ),
+      true,
+      queryParams
+    )
+      .then((response) => transformFileCountsResponseToFileCounts(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetFilesTotalDownloadSize(
+    datasetId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean,
+    fileDownloadSizeMode: FileDownloadSizeMode,
+    fileSearchCriteria?: FileSearchCriteria
+  ): Promise<number> {
+    const queryParams: GetFilesTotalDownloadSizeQueryParams = {
+      includeDeaccessioned: includeDeaccessioned,
+      mode: fileDownloadSizeMode.toString()
+    }
+    if (fileSearchCriteria !== undefined) {
+      this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria)
+    }
+    return this.doGet(
+      this.buildApiEndpoint(
+        this.datasetsResourceName,
+        `versions/${datasetVersionId}/downloadsize`,
+        datasetId
+      ),
+      true,
+      queryParams
+    )
+      .then((response) => response.data.data.storageSize)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFileDownloadCount(fileId: number | string): Promise<number> {
+    return this.doGet(this.buildApiEndpoint(this.filesResourceName, `downloadCount`, fileId), true)
+      .then((response) => parseInt(response.data.data.message))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFileUserPermissions(fileId: number | string): Promise<FileUserPermissions> {
+    return this.doGet(
+      this.buildApiEndpoint(this.accessResourceName, `userPermissions`, fileId),
+      true
+    )
+      .then((response) => transformFileUserPermissionsResponseToFileUserPermissions(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFileDataTables(fileId: string | number): Promise<FileDataTable[]> {
+    return this.doGet(this.buildApiEndpoint(this.filesResourceName, `dataTables`, fileId), true)
+      .then((response) => transformDataTablesResponseToDataTables(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFile(
+    fileId: number | string,
+    datasetVersionId: string,
+    returnDatasetVersion: boolean,
+    includeDeaccessioned: boolean
+  ): Promise<FileModel | [FileModel, Dataset]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.filesResourceName, `versions/${datasetVersionId}`, fileId),
+      true,
+      {
+        returnDatasetVersion: returnDatasetVersion,
+        returnOwners: true,
+        includeDeaccessioned: includeDeaccessioned
+      }
+    )
+      .then((response) => transformFileResponseToFile(response, returnDatasetVersion))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFileCitation(
+    fileId: number | string,
+    datasetVersionId: string,
+    includeDeaccessioned: boolean
+  ): Promise<string> {
+    return this.doGet(
+      this.buildApiEndpoint(
+        this.filesResourceName,
+        `versions/${datasetVersionId}/citation`,
+        fileId
+      ),
+      true,
+      { includeDeaccessioned: includeDeaccessioned }
+    )
+      .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFileUploadDestination(
+    datasetId: number | string,
+    file: File
+  ): Promise<FileUploadDestination> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'uploadurls', datasetId),
+      true,
+      {
+        size: file.size
+      }
+    )
+      .then((response) => transformUploadDestinationsResponseToUploadDestination(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async addUploadedFilesToDataset(
+    datasetId: number | string,
+    uploadedFileDTOs: UploadedFileDTO[]
+  ): Promise<undefined> {
+    const fileArray: UploadedFileRequestBody[] = []
+    uploadedFileDTOs.forEach((uploadedFileDTO) => {
+      fileArray.push({
+        fileName: uploadedFileDTO.fileName,
+        checksum: {
+          '@value': uploadedFileDTO.checksumValue,
+          '@type': uploadedFileDTO.checksumType.toUpperCase()
+        },
+        mimeType: uploadedFileDTO.mimeType,
+        storageIdentifier: uploadedFileDTO.storageId,
+        ...(uploadedFileDTO.description && { description: uploadedFileDTO.description }),
+        ...(uploadedFileDTO.categories && { categories: uploadedFileDTO.categories }),
+        ...(uploadedFileDTO.restrict && { restrict: uploadedFileDTO.restrict }),
+        ...(uploadedFileDTO.directoryLabel && { directoryLabel: uploadedFileDTO.directoryLabel })
+      })
+    })
+    const formData = new FormData()
+    formData.append('jsonData', JSON.stringify(fileArray))
+    return this.doPost(
+      this.buildApiEndpoint(this.datasetsResourceName, 'addFiles', datasetId),
+      formData,
+      {},
+      ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  private applyFileSearchCriteriaToQueryParams(
+    queryParams: GetFilesQueryParams | GetFilesTotalDownloadSizeQueryParams,
+    fileSearchCriteria: FileSearchCriteria
+  ) {
+    if (fileSearchCriteria.accessStatus !== undefined) {
+      queryParams.accessStatus = fileSearchCriteria.accessStatus.toString()
+    }
+    if (fileSearchCriteria.categoryName !== undefined) {
+      queryParams.categoryName = fileSearchCriteria.categoryName
+    }
+    if (fileSearchCriteria.tabularTagName !== undefined) {
+      queryParams.tabularTagName = fileSearchCriteria.tabularTagName
+    }
+    if (fileSearchCriteria.contentType !== undefined) {
+      queryParams.contentType = fileSearchCriteria.contentType
+    }
+    if (fileSearchCriteria.searchText !== undefined) {
+      queryParams.searchText = fileSearchCriteria.searchText
+    }
+  }
+
+  public async deleteFile(fileId: number | string): Promise<undefined> {
+    return this.doDelete(this.buildApiEndpoint(this.filesResourceName, undefined, fileId))
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async replaceFile(
+    fileId: number | string,
+    uploadedFileDTO: UploadedFileDTO
+  ): Promise<number> {
+    const requestBody: UploadedFileRequestBody = {
+      fileName: uploadedFileDTO.fileName,
+      checksum: {
+        '@value': uploadedFileDTO.checksumValue,
+        '@type': uploadedFileDTO.checksumType.toUpperCase()
+      },
+      mimeType: uploadedFileDTO.mimeType,
+      storageIdentifier: uploadedFileDTO.storageId,
+      forceReplace: uploadedFileDTO.forceReplace,
+      ...(uploadedFileDTO.description && { description: uploadedFileDTO.description }),
+      ...(uploadedFileDTO.categories && { categories: uploadedFileDTO.categories }),
+      ...(uploadedFileDTO.restrict && { restrict: uploadedFileDTO.restrict }),
+      ...(uploadedFileDTO.directoryLabel && { directoryLabel: uploadedFileDTO.directoryLabel })
+    }
+
+    const formData = new FormData()
+    formData.append('jsonData', JSON.stringify(requestBody))
+
+    return this.doPost(
+      this.buildApiEndpoint(this.filesResourceName, 'replace', fileId),
+      formData,
+      {},
+      ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
+    )
+      .then((response: AxiosResponse<{ data: ReplaceFileResponseMinimal }>) => {
+        const fileNumber = response.data.data.files[0].dataFile.id
+        return fileNumber
+      })
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async restrictFile(
+    fileId: number | string,
+    restrictFileDTO: RestrictFileDTO
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.filesResourceName, 'restrict', fileId),
+      restrictFileDTO
+    )
+      .then((response) => {
+        return response.data.data.message
+      })
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateFileMetadata(
+    fileId: string | number,
+    updateFileMetadata: UpdateFileMetadataDTO
+  ): Promise<void> {
+    const formData = new FormData()
+    formData.append('jsonData', JSON.stringify(updateFileMetadata))
+
+    return this.doPost(
+      this.buildApiEndpoint(this.filesResourceName, `${fileId}/metadata`),
+      formData,
+      {},
+      ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateFileTabularTags(
+    fileId: number | string,
+    tabularTags: string[],
+    replace?: boolean
+  ): Promise<void> {
+    const queryParams = replace !== undefined ? { replace } : {}
+    return this.doPost(
+      this.buildApiEndpoint(this.filesResourceName, 'metadata/tabularTags', fileId),
+      { tabularTags },
+      queryParams
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateFileCategories(
+    fileId: number | string,
+    categories: string[],
+    replace?: boolean
+  ): Promise<void> {
+    const queryParams = replace !== undefined ? { replace } : {}
+    return this.doPost(
+      this.buildApiEndpoint(this.filesResourceName, 'metadata/categories', fileId),
+      { categories },
+      queryParams
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFileVersionSummaries(fileId: number | string): Promise<FileVersionSummaryInfo[]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.filesResourceName, 'versionDifferences', fileId),
+      true
+    )
+      .then((response) => transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async isFileDeleted(fileId: number | string): Promise<boolean> {
+    return this.doGet(this.buildApiEndpoint(this.filesResourceName, 'hasBeenDeleted', fileId), true)
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+}

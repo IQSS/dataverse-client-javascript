@@ -1,0 +1,36 @@
+import { CollectionItemType } from '../../../collections'
+import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
+
+export interface FilePreview {
+  type: CollectionItemType.FILE
+  name: string
+  url: string
+  imageUrl?: string
+  fileId: number
+  filePersistentId?: string
+  description: string
+  fileType: string
+  fileContentType: string
+  sizeInBytes: number
+  md5?: string
+  checksum?: FilePreviewChecksum
+  unf: string
+  datasetName: string
+  datasetId: number
+  datasetPersistentId: string
+  datasetCitation: string
+  publicationStatuses: PublicationStatus[]
+  releaseOrCreateDate: Date
+  restricted: boolean
+  canDownloadFile: boolean
+  categories?: string[]
+  tabularTags?: string[]
+  variables?: number
+  observations?: number
+  userRoles?: string[]
+}
+
+export interface FilePreviewChecksum {
+  type: string
+  value: string
+}
