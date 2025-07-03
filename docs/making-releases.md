@@ -2,15 +2,17 @@
 
 - [Introduction](#introduction)
 - [Regular or Hotfix?](#regular-or-hotfix)
-- [Github and Git steps](#github-and-git-steps)
-- [Run Tests](#run-tests)
-- [Publish the Dataverse Client Javascript package](#publish-the-dataverse-client-javascript-package)
+- [Create Github Issue and Release Branch](#create-github-issue-and-release-branch)
+- [Update the version](#update-the-version)
 - [Merge "release branch" into "main"](#merge-release-branch-into-main)
-- [Merge "main" into "develop"](#merge-main-into-develop)
+- [Publish the Dataverse Client Javascript package](#publish-the-dataverse-client-javascript-package)
+- [Create a Draft Release on GitHub and Tag the Version](#create-a-draft-release-on-github-and-tag-the-version)
+- [Merge "release branch" into "develop"](#merge-release-branch-into-develop)
+- [Delete "release branch"](#delete-release-branch)
 
 ## Introduction
 
-This document is about releasing a public version of the dataverse-client-javascript package to the npm registry.
+This document is about releasing a new version of dataverse-client-javascript.
 
 ## Regular or Hotfix?
 
@@ -22,17 +24,32 @@ Early on, make sure it’s clear what type of release this is. The steps below d
 - Hotfix
   - e.g. 1.1.1 (patch)
 
-## Github and Git steps
+## Create Github Issue and Release Branch
 
 First of all create an issue on Github to prepare the release, name it Release vX.X.X .
 
 On your local, create the release branch from the latest from develop and name it release/X.X.X .
 
-## Run Tests
+## Update the version
 
-Let's check that all tests are passing by running `npm run test`. If everything is OK you can continue with the next step.
+To update the version run the command `npm version <X.X.X> --no-git-tag-version`. So if we are releasing version `3.5.0` the command will be:
+
+```shell
+npm version 3.5.0 --no-git-tag-version
+```
+
+This command will update the version in the `package.json` and `package-lock.json`.
+
+If everything looks good, you can push the changes to the repository.
+
+## Merge "release branch" into "main"
+
+Create a pull request to merge the `release` branch into the `main` branch.
+Once important tests have passed (unit, functional, integration), merge the pull request (skipping code review is ok).
 
 ## Publish the Dataverse Client Javascript package
+
+Once the release branch has been merged, switch to the `main` branch on your local machine and update it to ensure you have the latest changes.
 
 Dataverse Client Javascript is [published](https://www.npmjs.com/package/@iqss/dataverse-client-javascript) to the npm Package Registry. Below are the steps for publishing a new version.
 
@@ -40,31 +57,9 @@ Dataverse Client Javascript is [published](https://www.npmjs.com/package/@iqss/d
 
     Now we need to build the package by running `npm run build`, after that you will see a `dist` folder in the root of the project. If you are not sure that folder was there already you can delete it and run the build command again.
 
-2.  **Update the version**
+2.  **Publish the package**
 
-    To update the version run the command `npm version <X.X.X> -m "dataverse-client-javascript-v%s"`. So if we are releasing version `3.5.0` the command will be:
-
-    ```shell
-    npm version 3.5.0 -m "dataverse-client-javascript-v%s"
-    ```
-
-    This command will update the version in the `package.json` and `package-lock.json`, create a commit and a tag named `dataverse-client-javascript-v3.5.0`.
-
-    If everything looks good, you can push the changes to the repository.
-
-    ```shell
-    git push && git push --tags
-    ```
-
-3.  **Review the new tag in GitHub**
-
-    After pushing the changes, you can review the new tag in the [GitHub repository](https://github.com/IQSS/dataverse-client-javascript/tags).
-
-    The tag should be created with the new version.
-
-4.  **Publish the package**
-
-    After the version is updated, you can publish the package running the next command:
+    As the version number is already updated and we build the package, now we can publish the package running the next command:
 
     ```shell
     npm publish --access public
@@ -83,19 +78,41 @@ Dataverse Client Javascript is [published](https://www.npmjs.com/package/@iqss/d
     @iqss:registry=https://registry.npmjs.org/
     ```
 
-5.  **Review the new version in the npm registry**
+3.  **Review the new version in the npm registry**
 
     After publishing the package, you can review the new version in the [npm registry](https://www.npmjs.com/package/@iqss/dataverse-client-javascript?activeTab=versions).
 
     The new version should be available in the npm registry.
 
-## Merge "release branch" into "main"
+## Create a Draft Release on GitHub and Tag the Version
 
-Create a pull request to merge the `release` branch into the `main` branch.
-Once important tests have passed (unit, functional, integration), merge the pull request (skipping code review is ok).
+After merging the `release` branch into the `main` branch, you should create a release on GitHub and tag the version.
 
-## Merge "main" into "develop"
+Go to https://github.com/IQSS/dataverse-client-javascript/releases/new to start creating a draft release.
+
+- Under "Choose a tag" you will be creating a new tag. Have it start with a "v" such as v3.5.0. Click "Create new tag on publish".
+
+- Under "Target", choose "main".
+
+- Under "Release title" use the same name as the tag such as v3.5.0.
+
+- Add a description of the changes included in this release. You should include a link to the recently published npm version and summarize the key updates, fixes, or features.
+
+- Click "Save draft" because we do not want to publish the release yet.
+
+At this point you can send around the draft release for any final feedback. Make corrections to the draft, if necessary. Publish once everything is ok.
+
+## Merge "release branch" into "develop"
 
 After merging the release branch into `main`, ensure the develop branch is updated with the latest changes.
 
-Create a pull request to merge the `main` branch into `develop` branch.
+Create a pull request to merge the `release` branch into `develop` branch also.
+
+## Delete "release branch"
+
+Once the release process is complete and the `release` branch has been merged into both `main` and `develop`, you can safely delete the `release` branch to keep the repository clean.
+
+- Delete the branch locally from your repository.
+- Delete the branch remotely from the remote repository.
+
+This ensures that the `release` branch is no longer present in either your local or remote repositories.
