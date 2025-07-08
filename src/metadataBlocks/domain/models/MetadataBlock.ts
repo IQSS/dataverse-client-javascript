@@ -20,6 +20,7 @@ export interface MetadataFieldInfo {
   displayFormat: string
   childMetadataFields?: Record<string, MetadataFieldInfo>
   isRequired: boolean
+  isAdvancedSearchFieldType: boolean
   displayOrder: number
   displayOnCreate: boolean
 }

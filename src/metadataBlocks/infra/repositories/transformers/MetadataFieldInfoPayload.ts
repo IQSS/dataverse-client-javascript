@@ -12,6 +12,7 @@ export interface MetadataFieldInfoPayload {
   displayFormat: string
   displayOrder: number
   isRequired: boolean
+  isAdvancedSearchFieldType: boolean
   controlledVocabularyValues?: string[]
   childMetadataFields?: Record<string, MetadataFieldInfoPayload>
 }
