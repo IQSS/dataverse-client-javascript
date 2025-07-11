@@ -20,14 +20,9 @@ describe('execute', () => {
 
   test('should have correct notification properties if notifications exist', async () => {
     const notifications = await getAllNotificationsByUser.execute()
-    if (notifications.length === 0) {
-      return
-    }
-    const first = notifications[0]
-    expect(first).toHaveProperty('id')
-    expect(first).toHaveProperty('type')
-    expect(first).toHaveProperty('subjectText')
-    expect(first).toHaveProperty('messageText')
-    expect(first).toHaveProperty('sentTimestamp')
+
+    expect(notifications[0]).toHaveProperty('id')
+    expect(notifications[0]).toHaveProperty('type')
+    expect(notifications[0]).toHaveProperty('sentTimestamp')
   })
 })

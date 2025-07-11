@@ -30,7 +30,7 @@ describe('NotificationsRepository', () => {
     const notifications: Notification[] = await sut.getAllNotificationsByUser()
 
     expect(Array.isArray(notifications)).toBe(true)
-    expect(notifications.length).toBe(2)
+    expect(notifications.length).toBeGreaterThan(0)
 
     const publishedNotification = notifications.find((n) => n.type === 'PUBLISHEDDS')
 

@@ -17,11 +17,13 @@ describe('execute', () => {
   })
 
   test('should successfully delete a notification for authenticated user', async () => {
-    const notificationId = 1
+    const notifications = await getAllNotificationsByUser.execute()
+    const notificationId = notifications[notifications.length - 1].id
+
     await deleteNotificationByUser.execute(notificationId)
 
-    const notifications = await getAllNotificationsByUser.execute()
-    expect(notifications.length).toBe(0)
+    const notificationsAfterDelete = await getAllNotificationsByUser.execute()
+    expect(notificationsAfterDelete.length).toBe(notifications.length - 1)
   })
 
   test('should throw an error when the notification id does not exist', async () => {
