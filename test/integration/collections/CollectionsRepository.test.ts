@@ -2,7 +2,6 @@ import { CollectionsRepository } from '../../../src/collections/infra/repositori
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   CollectionDTO,
-  CollectionFeaturedItemsDTO,
   CollectionItemType,
   CollectionPreview,
   CollectionSearchCriteria,
@@ -13,7 +12,10 @@ import {
   WriteError,
   createDataset,
   getCollection,
-  createCollection
+  createCollection,
+  getDatasetFiles,
+  restrictFile,
+  deleteFile
 } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -21,6 +23,7 @@ import {
   createCollectionDTO,
   createCollectionViaApi,
   deleteCollectionViaApi,
+  publishCollectionViaApi,
   ROOT_COLLECTION_ALIAS
 } from '../../testHelpers/collections/collectionHelper'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
@@ -28,7 +31,8 @@ import { updateFileTabularTags, uploadFileViaApi } from '../../testHelpers/files
 import {
   deletePublishedDatasetViaApi,
   deleteUnpublishedDatasetViaApi,
-  publishDatasetViaApi
+  publishDatasetViaApi,
+  waitForNoLocks
 } from '../../testHelpers/datasets/datasetHelper'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
 import { CollectionType } from '../../../src/collections/domain/models/CollectionType'
@@ -38,12 +42,21 @@ import {
 } from '../../../src/collections/domain/models/CollectionSearchCriteria'
 import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
 import {
-  createCollectionFeaturedItemViaApi,
+  createCollectionCustomFeaturedItemViaApi,
+  createCollectionDvObjectFeaturedItemViaApi,
   createImageFile,
   deleteCollectionFeaturedItemsViaApi,
   deleteCollectionFeaturedItemViaApi
 } from '../../testHelpers/collections/collectionFeaturedItemsHelper'
 import { createApiTokenViaApi } from '../../testHelpers/users/apiTokenHelper'
+import {
+  CustomFeaturedItem,
+  FeaturedItemType
+} from '../../../src/collections/domain/models/FeaturedItem'
+import {
+  DvObjectFeaturedItemDTO,
+  FeaturedItemsDTO
+} from '../../../src/collections/domain/dtos/FeaturedItemsDTO'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -1124,33 +1137,6 @@ describe('CollectionsRepository', () => {
   })
 
   describe('getCollectionFeaturedItems', () => {
-    let testFeaturedItemId: number
-
-    beforeAll(async () => {
-      try {
-        const featuredItemCreated = await createCollectionFeaturedItemViaApi(testCollectionAlias, {
-          content: '<p class="rte-paragraph">Test content</p>',
-          displayOrder: 1,
-          withFile: true,
-          fileName: 'featured-item-test-image.png'
-        })
-
-        testFeaturedItemId = featuredItemCreated.id
-      } catch (error) {
-        throw new Error(`Error while creating collection featured item in ${testCollectionAlias}`)
-      }
-    })
-
-    afterAll(async () => {
-      try {
-        await deleteCollectionFeaturedItemViaApi(testFeaturedItemId)
-      } catch (error) {
-        throw new Error(
-          `Tests afterAll(): Error while deleting featured item with id ${testFeaturedItemId}`
-        )
-      }
-    })
-
     test('should return empty featured items array given a valid collection alias when collection has no featured items', async () => {
       const featuredItemsResponse = await sut.getCollectionFeaturedItems(ROOT_COLLECTION_ID)
 
@@ -1158,16 +1144,29 @@ describe('CollectionsRepository', () => {
     })
 
     test('should return featured items array given a valid collection alias when collection has featured items', async () => {
+      const featuredItemCreated = await createCollectionCustomFeaturedItemViaApi(
+        testCollectionAlias,
+        {
+          content: '<p class="rte-paragraph">Test content</p>',
+          displayOrder: 1,
+          withFile: true,
+          fileName: 'featured-item-test-image.png'
+        }
+      )
+
       const featuredItemsResponse = await sut.getCollectionFeaturedItems(testCollectionAlias)
 
       expect(featuredItemsResponse.length).toBe(1)
-      expect(featuredItemsResponse[0].id).toBe(testFeaturedItemId)
-      expect(featuredItemsResponse[0].displayOrder).toBe(1)
-      expect(featuredItemsResponse[0].content).toBe('<p class="rte-paragraph">Test content</p>')
-      expect(featuredItemsResponse[0].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${featuredItemsResponse[0].id}`
+      const firstFeaturedItem = featuredItemsResponse[0] as CustomFeaturedItem
+      expect(firstFeaturedItem.id).toBe(featuredItemCreated.id)
+      expect(firstFeaturedItem.displayOrder).toBe(1)
+      expect(firstFeaturedItem.content).toBe('<p class="rte-paragraph">Test content</p>')
+      expect(firstFeaturedItem.imageFileUrl).toContain(
+        `/api/access/dataverseFeaturedItemImage/${firstFeaturedItem.id}`
       )
-      expect(featuredItemsResponse[0].imageFileName).toBe('featured-item-test-image.png')
+      expect(firstFeaturedItem.imageFileName).toBe('featured-item-test-image.png')
+
+      await deleteCollectionFeaturedItemViaApi(featuredItemCreated.id)
     })
 
     test('should return error when collection does not exist', async () => {
@@ -1179,6 +1178,102 @@ describe('CollectionsRepository', () => {
       await expect(sut.getCollectionFeaturedItems(invalidCollectionAlias)).rejects.toThrow(
         expectedError
       )
+    })
+
+    test('Featured Item type File should not be returned if the file was deleted and the dataset published', async () => {
+      const testFileDeletedCollectionAlias = 'testCollectionFeaturedItemsFileDeletion'
+      await createCollectionViaApi(testFileDeletedCollectionAlias)
+      await publishCollectionViaApi(testFileDeletedCollectionAlias)
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testFileDeletedCollectionAlias
+      )
+      await uploadFileViaApi(testDatasetIds.numericId, 'test-file-1.txt')
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+      const fileId = datasetFiles.files[0].id
+
+      await createCollectionDvObjectFeaturedItemViaApi(testFileDeletedCollectionAlias, {
+        type: 'datafile',
+        dvObjectIdentifier: fileId.toString(),
+        displayOrder: 0
+      })
+
+      const featuredItemsResponse = await sut.getCollectionFeaturedItems(
+        testFileDeletedCollectionAlias
+      )
+
+      expect(featuredItemsResponse.length).toBe(1)
+
+      // Now we delete the file
+      await deleteFile.execute(fileId)
+
+      // If we dont publish the dataset the featured item will still be there
+      const featuredItemsResponseAfterFileDeletion = await sut.getCollectionFeaturedItems(
+        testFileDeletedCollectionAlias
+      )
+
+      expect(featuredItemsResponseAfterFileDeletion.length).toBe(1)
+
+      // Once we publish the dataset the featured item will not be returned anymore
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const featuredItemsResponseAfterDatasetPublish = await sut.getCollectionFeaturedItems(
+        testFileDeletedCollectionAlias
+      )
+
+      expect(featuredItemsResponseAfterDatasetPublish.length).toBe(0)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testFileDeletedCollectionAlias)
+    })
+
+    test('Featured Item type File should not be returned if the file was restricted', async () => {
+      const testFileRestrictedCollectionAlias = 'testCollectionFeaturedItemsFileRestriction'
+      await createCollectionViaApi(testFileRestrictedCollectionAlias)
+      await publishCollectionViaApi(testFileRestrictedCollectionAlias)
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testFileRestrictedCollectionAlias
+      )
+      await uploadFileViaApi(testDatasetIds.numericId, 'test-file-1.txt')
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+      const fileId = datasetFiles.files[0].id
+
+      await createCollectionDvObjectFeaturedItemViaApi(testFileRestrictedCollectionAlias, {
+        type: 'datafile',
+        dvObjectIdentifier: fileId.toString(),
+        displayOrder: 0
+      })
+
+      const featuredItemsResponse = await sut.getCollectionFeaturedItems(
+        testFileRestrictedCollectionAlias
+      )
+
+      expect(featuredItemsResponse.length).toBe(1)
+
+      // Now we restrict the file
+      await restrictFile.execute(fileId, {
+        restrict: true,
+        enableAccessRequest: true,
+        termsOfAccess: 'This file is restricted for testing purposes'
+      })
+
+      // Restricted file should not be returned as featured item once restricted
+      const featuredItemsResponseAfterFileRestriction = await sut.getCollectionFeaturedItems(
+        testFileRestrictedCollectionAlias
+      )
+
+      expect(featuredItemsResponseAfterFileRestriction.length).toBe(0)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testFileRestrictedCollectionAlias)
     })
   })
 
@@ -1194,20 +1289,23 @@ describe('CollectionsRepository', () => {
     })
 
     it('should update collection featured items sending all new items', async () => {
-      const newFeaturedItems: CollectionFeaturedItemsDTO = [
+      const newFeaturedItems: FeaturedItemsDTO = [
         {
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content 1</p>',
           displayOrder: 0,
           file: undefined,
           keepFile: false
         },
         {
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content 2</p>',
           displayOrder: 1,
           file: undefined,
           keepFile: false
         },
         {
+          type: FeaturedItemType.CUSTOM,
           content: '<p class="rte-paragraph">Test content 3</p>',
           displayOrder: 2,
           file: createImageFile('featured-item-test-image-3.png'),
@@ -1222,40 +1320,201 @@ describe('CollectionsRepository', () => {
 
       expect(response).toHaveLength(3)
 
-      expect(response[0].content).toEqual(newFeaturedItems[0].content)
-      expect(response[0].displayOrder).toEqual(newFeaturedItems[0].displayOrder)
-      expect(response[0].imageFileName).toEqual(undefined)
-      expect(response[0].imageFileUrl).toEqual(undefined)
+      const firstFeaturedItem = response[0] as CustomFeaturedItem
+      const secondFeaturedItem = response[1] as CustomFeaturedItem
+      const thirdFeaturedItem = response[2] as CustomFeaturedItem
 
-      expect(response[1].content).toEqual(newFeaturedItems[1].content)
-      expect(response[1].displayOrder).toEqual(newFeaturedItems[1].displayOrder)
-      expect(response[1].imageFileName).toEqual(undefined)
-      expect(response[1].imageFileUrl).toEqual(undefined)
+      expect(firstFeaturedItem.content).toEqual((newFeaturedItems[0] as CustomFeaturedItem).content)
+      expect(firstFeaturedItem.displayOrder).toEqual(newFeaturedItems[0].displayOrder)
+      expect(firstFeaturedItem.imageFileName).toEqual(undefined)
+      expect(firstFeaturedItem.imageFileUrl).toEqual(undefined)
 
-      expect(response[2].content).toEqual(newFeaturedItems[2].content)
-      expect(response[2].displayOrder).toEqual(newFeaturedItems[2].displayOrder)
-      expect(response[2].imageFileName).toEqual('featured-item-test-image-3.png')
-      expect(response[2].imageFileUrl).toBe(
-        `http://localhost:8080/api/access/dataverseFeaturedItemImage/${response[2].id}`
+      expect(secondFeaturedItem.content).toEqual(
+        (newFeaturedItems[1] as CustomFeaturedItem).content
       )
+      expect(secondFeaturedItem.displayOrder).toEqual(newFeaturedItems[1].displayOrder)
+      expect(secondFeaturedItem.imageFileName).toEqual(undefined)
+      expect(secondFeaturedItem.imageFileUrl).toEqual(undefined)
+
+      expect(thirdFeaturedItem.content).toEqual((newFeaturedItems[2] as CustomFeaturedItem).content)
+      expect(thirdFeaturedItem.displayOrder).toEqual(newFeaturedItems[2].displayOrder)
+      expect(thirdFeaturedItem.imageFileName).toEqual('featured-item-test-image-3.png')
+      expect(thirdFeaturedItem.imageFileUrl).toContain(
+        `/api/access/dataverseFeaturedItemImage/${response[2].id}`
+      )
+    })
+
+    it('should return error when the dvObjectIdentifier of a collection does not exist', async () => {
+      const invalidCollectionAlias = 'invalid-collection-alias'
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: FeaturedItemType.COLLECTION,
+          dvObjectIdentifier: invalidCollectionAlias,
+          displayOrder: 0
+        }
+      ]
+
+      const expectedError = new WriteError(
+        `[400] Cant find Collection, Dataset, or Datafile with identifier: ${invalidCollectionAlias}.`
+      )
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+    })
+
+    it('should return error when the dvObjectIdentifier of a dataset does not exist', async () => {
+      const invalidDatasetPersistentId = 'doi:10.5072/FK2/INVALID_DATASET'
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: FeaturedItemType.DATASET,
+          dvObjectIdentifier: invalidDatasetPersistentId,
+          displayOrder: 0
+        }
+      ]
+      const expectedError = new WriteError(
+        `[400] Cant find Collection, Dataset, or Datafile with identifier: ${invalidDatasetPersistentId}.`
+      )
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+    })
+
+    it('should return error when the dvObjectIdentifier of a file does not exist', async () => {
+      const invalidFileId = '99'
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: FeaturedItemType.FILE,
+          dvObjectIdentifier: invalidFileId,
+          displayOrder: 0
+        }
+      ]
+      const expectedError = new WriteError(
+        `[400] Cant find Collection, Dataset, or Datafile with identifier: ${invalidFileId}.`
+      )
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+    })
+
+    it('should return error when the collection to feature is not published', async () => {
+      const unpublishedCollectionAlias = 'unpublished-collection-featured-item-test'
+      await createCollectionViaApi(unpublishedCollectionAlias, testCollectionAlias)
+
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: FeaturedItemType.COLLECTION,
+          dvObjectIdentifier: unpublishedCollectionAlias,
+          displayOrder: 0
+        }
+      ]
+      const expectedError = new WriteError('[400] Dataverse must be published to be featured.')
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+      await deleteCollectionViaApi(unpublishedCollectionAlias)
+    })
+
+    it('should return error when the dataset to feature is not published', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: FeaturedItemType.DATASET,
+          dvObjectIdentifier: testDatasetIds.persistentId,
+          displayOrder: 0
+        }
+      ]
+      const expectedError = new WriteError('[400] Dataset must be published to be featured.')
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    it('should return error when the file to feature is not published', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      await uploadFileViaApi(testDatasetIds.numericId, 'test-file-1.txt')
+
+      const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+
+      const fileId = datasetFiles.files[0].id
+
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: FeaturedItemType.FILE,
+          dvObjectIdentifier: fileId.toString(),
+          displayOrder: 0
+        }
+      ]
+
+      const expectedError = new WriteError('[400] Dataset must be published to be featured.')
+
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    it('should return error when the file to feature is restricted', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+      await uploadFileViaApi(testDatasetIds.numericId, 'test-file-1.txt')
+
+      const datasetFiles = await getDatasetFiles.execute(testDatasetIds.numericId)
+
+      const fileId = datasetFiles.files[0].id
+
+      await restrictFile.execute(fileId, {
+        restrict: true,
+        enableAccessRequest: true,
+        termsOfAccess: 'This file is restricted for testing purposes'
+      })
+
+      const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
+        {
+          type: FeaturedItemType.FILE,
+          dvObjectIdentifier: fileId.toString(),
+          displayOrder: 0
+        }
+      ]
+
+      const expectedError = new WriteError('[400] Datafile must not be restricted to be featured.')
+
+      await expect(
+        sut.updateCollectionFeaturedItems(testCollectionAlias, newFeaturedItems)
+      ).rejects.toThrow(expectedError)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
   })
 
   describe('deleteCollectionFeaturedItems', () => {
     beforeAll(async () => {
       try {
-        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+        await createCollectionCustomFeaturedItemViaApi(testCollectionAlias, {
           content: '<p class="rte-paragraph">Test content</p>',
           displayOrder: 1,
           withFile: true,
           fileName: 'featured-item-test-image.png'
         })
-        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+        await createCollectionCustomFeaturedItemViaApi(testCollectionAlias, {
           content: '<p class="rte-paragraph">Test content 2</p>',
           displayOrder: 2,
           withFile: false
         })
-        await createCollectionFeaturedItemViaApi(testCollectionAlias, {
+        await createCollectionCustomFeaturedItemViaApi(testCollectionAlias, {
           content: '<p class="rte-paragraph">Test content 3</p>',
           displayOrder: 3,
           withFile: false
@@ -1293,6 +1552,43 @@ describe('CollectionsRepository', () => {
       expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
     })
   })
+
+  describe('deleteCollectionFeaturedItem', () => {
+    let featuredItemTestId: number
+
+    beforeAll(async () => {
+      try {
+        const featuredItem = await createCollectionCustomFeaturedItemViaApi(testCollectionAlias, {
+          content: '<p class="rte-paragraph">Test content</p>',
+          displayOrder: 1,
+          withFile: true,
+          fileName: 'featured-item-test-image.png'
+        })
+        featuredItemTestId = featuredItem.id
+      } catch (error) {
+        throw new Error(
+          `Tests afterAll(): Error while creating test featured items for collection: ${testCollectionAlias}`
+        )
+      }
+    })
+
+    it('should delete a collection featured item', async () => {
+      const featuredItemsResponseBeforeDeletion = await sut.getCollectionFeaturedItems(
+        testCollectionAlias
+      )
+
+      expect(featuredItemsResponseBeforeDeletion).toHaveLength(1)
+
+      await sut.deleteCollectionFeaturedItem(featuredItemTestId)
+
+      const featuredItemsResponseAfterDeletion = await sut.getCollectionFeaturedItems(
+        testCollectionAlias
+      )
+
+      expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
+    })
+  })
+
   describe('getMyDataCollectionItems', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 

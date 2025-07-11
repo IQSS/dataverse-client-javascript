@@ -23,9 +23,9 @@ import {
 } from '../../../src/files/domain/models/FileCriteria'
 import {
   DatasetNotNumberedVersion,
-  Dataset,
   CreatedDatasetIdentifiers,
-  createDataset
+  createDataset,
+  Dataset
 } from '../../../src/datasets'
 import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
@@ -474,6 +474,7 @@ describe('FilesRepository', () => {
         const actual: FileModel = (await sut.getFile(
           testFileId,
           DatasetNotNumberedVersion.LATEST,
+          false,
           false
         )) as FileModel
 
@@ -484,6 +485,7 @@ describe('FilesRepository', () => {
         const actual: FileModel = (await sut.getFile(
           testFileId,
           DatasetNotNumberedVersion.DRAFT,
+          false,
           false
         )) as FileModel
 
@@ -491,10 +493,12 @@ describe('FilesRepository', () => {
       })
 
       test('should return file and dataset when providing id, version, and returnDatasetVersion is true', async () => {
-        const actual = (await sut.getFile(testFileId, DatasetNotNumberedVersion.DRAFT, true)) as [
-          FileModel,
-          Dataset
-        ]
+        const actual = (await sut.getFile(
+          testFileId,
+          DatasetNotNumberedVersion.DRAFT,
+          true,
+          false
+        )) as [FileModel, Dataset]
 
         expect(actual[0].name).toBe(testTextFile1Name)
         expect(actual[1].id).toBe(testDatasetIds.numericId)
@@ -504,15 +508,82 @@ describe('FilesRepository', () => {
         const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
         await expect(
-          sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
+          sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false, false)
         ).rejects.toThrow(expectedError)
       })
     })
+
+    describe('getFile with deaccessioned dataset', () => {
+      const testTextFile1Name = 'test-file-1.txt'
+
+      let deaccessionedFileTestDatasetIds: CreatedDatasetIdentifiers
+      let deaccessionedTestFileId: number
+
+      beforeAll(async () => {
+        deaccessionedFileTestDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO
+        )
+
+        await uploadFileViaApi(deaccessionedFileTestDatasetIds.numericId, testTextFile1Name).catch(
+          () => {
+            throw new Error(`Error while uploading file ${testTextFile1Name}`)
+          }
+        )
+
+        await publishDatasetViaApi(deaccessionedFileTestDatasetIds.numericId).catch(() => {
+          throw new Error('Error while publishing test Dataset')
+        })
+
+        await waitForNoLocks(deaccessionedFileTestDatasetIds.numericId, 10).catch(() => {
+          throw new Error('Error while waiting for no locks')
+        })
+
+        const datasetFiles = await sut.getDatasetFiles(
+          deaccessionedFileTestDatasetIds.numericId,
+          latestDatasetVersionId,
+          false,
+          FileOrderCriteria.NAME_AZ
+        )
+        deaccessionedTestFileId = datasetFiles.files[0].id
+
+        await deaccessionDatasetViaApi(deaccessionedFileTestDatasetIds.numericId, '1.0').catch(
+          () => {
+            throw new Error('Error while deaccessioning the dataset')
+          }
+        )
+      })
+
+      afterAll(async () => {
+        await deletePublishedDatasetViaApi(deaccessionedFileTestDatasetIds.persistentId).catch(
+          () => {
+            throw new Error('Error while deleting the test dataset')
+          }
+        )
+      })
+
+      test('should return file if dataset is deaccessioned, and includeDeaccessioned is true', async () => {
+        const actual = (await sut.getFile(deaccessionedTestFileId, '1.0', false, true)) as FileModel
+
+        expect(actual.name).toBe(testTextFile1Name)
+      })
+
+      test('should throw error if dataset is deaccessioned, and includeDeaccessioned is false', async () => {
+        const expectedError = new ReadError(
+          `[404] "File metadata for file with id ${deaccessionedTestFileId} in dataset version 1.0 not found"`
+        )
+
+        await expect(sut.getFile(deaccessionedTestFileId, '1.0', false, false)).rejects.toThrow(
+          expectedError
+        )
+      })
+    })
+
     describe('by persistent id', () => {
       test('should return file when providing a valid persistent id', async () => {
         const actual = (await sut.getFile(
           testFilePersistentId,
           DatasetNotNumberedVersion.LATEST,
+          false,
           false
         )) as FileModel
 
@@ -523,6 +594,7 @@ describe('FilesRepository', () => {
         const actual = (await sut.getFile(
           testFilePersistentId,
           DatasetNotNumberedVersion.DRAFT,
+          false,
           false
         )) as FileModel
 
@@ -536,7 +608,7 @@ describe('FilesRepository', () => {
         )
 
         await expect(
-          sut.getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST, false)
+          sut.getFile(nonExistentFiledPersistentId, DatasetNotNumberedVersion.LATEST, false, false)
         ).rejects.toThrow(expectedError)
       })
     })
@@ -672,6 +744,7 @@ describe('FilesRepository', () => {
       const fileInfo: FileModel = (await sut.getFile(
         testFileId,
         DatasetNotNumberedVersion.LATEST,
+        false,
         false
       )) as FileModel
 

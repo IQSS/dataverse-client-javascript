@@ -30,7 +30,7 @@ export const buildRequestConfig = (
       /*
         We set { withCredentials: true } to send the JSESSIONID cookie in the requests for API authentication.
         This is required, along with the session auth feature flag enabled in the backend, to be able to authenticate using the JSESSIONID cookie.
-        Auth mechanisms like this are configurable to set the one that fits the particular use case of js-dataverse. (For the SPA MVP, it is the session cookie API auth).
+        Auth mechanisms like this are configurable to set the one that fits the particular use case of dataverse-client-javascript. (For the SPA MVP, it is the session cookie API auth).
       */
       requestConfig.withCredentials = true
       break

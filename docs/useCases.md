@@ -23,6 +23,7 @@ The different use cases currently available in the package are classified below,
     - [Delete a Collection](#delete-a-collection)
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
+    - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -74,6 +75,9 @@ The different use cases currently available in the package are classified below,
     - [Delete Current API Token](#delete-current-api-token)
     - [Recreate Current API Token](#recreate-current-api-token)
     - [Register User](#register-user)
+- [Roles](#Roles)
+  - [Roles read use cases](#roles-read-use-cases)
+    - [Get User Selectable Roles](#get-user-selectable-roles)
 - [Info](#Info)
   - [Get Dataverse Backend Version](#get-dataverse-backend-version)
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
@@ -277,7 +281,7 @@ The `CollectionItemSubset`returned instance contains a property called `totalIte
 
 #### Get Collection Featured Items
 
-Returns a [CollectionFeaturedItem](../src/collections/domain/models/CollectionFeaturedItem.ts) array containing the featured items of the requested collection, given the collection identifier or alias.
+Returns a [FeaturedItem](../src/collections/domain/models/CollectionFeaturedItem.ts) array containing the featured items of the requested collection, given the collection identifier or alias.
 
 ##### Example call:
 
@@ -288,7 +292,7 @@ const collectionIdOrAlias = 12345
 
 getCollectionFeaturedItems
   .execute(collectionId)
-  .then((featuredItems: CollectionFeaturedItem[]) => {
+  .then((featuredItems: FeaturedItem[]) => {
     /* ... */
   })
   .catch((error: Error) => {
@@ -405,7 +409,7 @@ _See [use case](../src/collections/domain/useCases/DeleteCollection.ts)_ definit
 
 #### Update Collection Featured Items
 
-Updates all featured items, given a collection identifier and a CollectionFeaturedItemsDTO.
+Updates all featured items, given a collection identifier and a FeaturedItemsDTO.
 
 ##### Example call:
 
@@ -416,11 +420,9 @@ import { updateCollectionFeaturedItems } from '@iqss/dataverse-client-javascript
 
 const collectionIdOrAlias = 12345
 
-updateCollectionFeaturedItems
-  .execute(collectionIdOrAlias)
-  .then((collectionFeaturedItems: CollectionFeaturedItem[]) => {
-    /* ... */
-  })
+updateCollectionFeaturedItems.execute(collectionIdOrAlias).then((featuredItems: FeaturedItem[]) => {
+  /* ... */
+})
 
 /* ... */
 ```
@@ -450,6 +452,26 @@ deleteCollectionFeaturedItems.execute(collectionIdOrAlias)
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItems.ts)_ definition.
+
+#### Delete A Collection Featured Item
+
+Deletes a single featured item, given a featured item id.
+
+##### Example call:
+
+```typescript
+import { deleteCollectionFeaturedItem } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const featuredItemId = 12345
+
+deleteCollectionFeaturedItem.execute(featuredItemId)
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
 ## Datasets
 
@@ -985,6 +1007,8 @@ The `fileId` parameter can be a string, for persistent identifiers, or a number,
 
 The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
+
 #### Get a File and its Dataset
 
 Returns a tuple of [FileModel](../src/files/domain/models/FileModel.ts) and [Dataset](../src/datasets/domain/models/Dataset.ts) objects (`[FileModel, Dataset]`), given the search parameters to identify the file.
@@ -1013,6 +1037,8 @@ _See [use case](../src/files/domain/useCases/GetFileAndDataset.ts)_ definition.
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
 
 #### Get File Citation Text
 
@@ -1822,6 +1848,28 @@ registerUser.execute(userDTO)
 ```
 
 _See [use case](../src/users/domain/useCases/RegisterUser.ts) implementation_.
+
+## Roles
+
+### Get User Selectable Roles
+
+Returns a [Role](../src/roles/domain/models/Role.ts) array that the calling user can use as filters when searching within their data.
+
+##### Example call:
+
+```typescript
+import { getUserSelectableRoles } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getUserSelectableRoles.execute().then((roles: Role[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/roles/domain/useCases/GetUserSelectableRoles.ts) implementation_.
 
 ## Info
 

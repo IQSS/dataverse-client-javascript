@@ -1016,6 +1016,7 @@ describe('FilesRepository', () => {
     }
 
     const expectedRequestParams = {
+      includeDeaccessioned: false,
       returnDatasetVersion: false,
       returnOwners: true
     }
@@ -1043,13 +1044,13 @@ describe('FilesRepository', () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testGetFileResponse)
 
         // API Key auth
-        let actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false)
+        let actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false, false)
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(actual).toEqual(createFileModel())
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
-        actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false)
+        actual = await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false, false)
         expect(axios.get).toHaveBeenCalledWith(
           expectedApiEndpoint,
           expectedRequestConfigSessionCookie
@@ -1061,7 +1062,7 @@ describe('FilesRepository', () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
         await expect(
-          sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false)
+          sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false, false)
         ).rejects.toThrow(ReadError)
       })
     })
@@ -1076,6 +1077,7 @@ describe('FilesRepository', () => {
         let actual = await sut.getFile(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           DatasetNotNumberedVersion.LATEST,
+          false,
           false
         )
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
@@ -1086,6 +1088,7 @@ describe('FilesRepository', () => {
         actual = await sut.getFile(
           TestConstants.TEST_DUMMY_PERSISTENT_ID,
           DatasetNotNumberedVersion.LATEST,
+          false,
           false
         )
         expect(axios.get).toHaveBeenCalledWith(
@@ -1102,6 +1105,7 @@ describe('FilesRepository', () => {
           sut.getFile(
             TestConstants.TEST_DUMMY_PERSISTENT_ID,
             DatasetNotNumberedVersion.LATEST,
+            false,
             false
           )
         ).rejects.toThrow(ReadError)
