@@ -85,6 +85,9 @@ The different use cases currently available in the package are classified below,
   - [Get Application Terms of Use](#get-application-terms-of-use)
 - [Contact](#Contact)
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
+- [Notifications](#Notifications)
+  - [Get All Notifications by User](#get-all-notifications-by-user)
+  - [Delete Notification by User](#delete-notification-by-user)
 
 ## Collections
 
@@ -1991,3 +1994,47 @@ In ContactDTO, it takes the following information:
 - **subject**: the email subject line.
 - **body**: the email body to send.
 - **fromEmail**: the email to list in the reply-to field.
+
+## Notifications
+
+#### Get All Notifications by User
+
+Returns a [Notification](../src/notifications/domain/models/Notification.ts) array containing all notifications for the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getAllNotificationsByUser } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAllNotificationsByUser.execute().then((notifications: Notification[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/GetAllNotificationsByUser.ts) implementation_.
+
+#### Delete Notification by User
+
+Deletes a specific notification for the current authenticated user by its ID.
+
+##### Example call:
+
+```typescript
+import { deleteNotificationByUser } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const notificationId = 123
+
+deleteNotificationByUser.execute(notificationId: number).then(() => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/DeleteNotificationByUser.ts) implementation_.
