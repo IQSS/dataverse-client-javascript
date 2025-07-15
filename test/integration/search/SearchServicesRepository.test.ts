@@ -6,7 +6,7 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 describe('SearchServicesRepository', () => {
   const sut: SearchServicesRepository = new SearchServicesRepository()
 
-  afterAll(async () => {
+  beforeAll(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,

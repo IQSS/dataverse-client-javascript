@@ -5,7 +5,6 @@ import { SearchServicePayload } from './SearchServicePayload'
 export const transformSearchServicesResponseToSearchServices = (
   response: AxiosResponse
 ): SearchService[] => {
-  console.log(response)
   const searchServicesPayload = response.data.data
   const searchServices: SearchService[] = []
   searchServicesPayload.forEach(function (searchServicePayload: SearchServicePayload) {
