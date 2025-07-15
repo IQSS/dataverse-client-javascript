@@ -17,7 +17,9 @@ describe('SearchServicesRepository', () => {
   describe('getSearchServices', () => {
     test('should return search services', async () => {
       const actual = await sut.getSearchServices()
-      expect(actual.length).toEqual(2)
+      expect(actual.length).toEqual(1)
+      expect(actual[0].name).toEqual('solr')
+      expect(actual[0].displayName).toEqual('Dataverse Standard Search')
     })
   })
 })
