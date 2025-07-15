@@ -222,6 +222,8 @@ This use case supports the following optional parameters depending on the search
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
 - **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
+- **searchServiceName**: The search service name on which to execute the search (Optional).
+- **showTypeCounts**: If true, the response will include the count per object type (Optional).
 
 #### List My Data Collection Items
 
