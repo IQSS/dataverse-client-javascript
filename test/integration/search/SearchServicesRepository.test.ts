@@ -3,8 +3,7 @@ import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/
 import { SearchServicesRepository } from '../../../src/search/infra/repositories/SearchServicesRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 
-// TODO
-describe.skip('SearchServicesRepository', () => {
+describe('SearchServicesRepository', () => {
   const sut: SearchServicesRepository = new SearchServicesRepository()
 
   afterAll(async () => {
