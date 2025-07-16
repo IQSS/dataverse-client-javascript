@@ -42,6 +42,8 @@ The different use cases currently available in the package are classified below,
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
     - [Delete a Draft Dataset](#delete-a-draft-dataset)
+    - [Link a Dataset](#link-a-dataset)
+    - [Unlink a Dataset](#unlink-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -943,6 +945,48 @@ _See [use case](../src/datasets/domain/useCases/DeleteDatasetDraft.ts) implement
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
 If you try to delete a dataset without draft version, you will get a not found error.
+
+#### Link a Dataset
+
+Creates a link between a Dataset and a Collection.
+
+##### Example call:
+
+```typescript
+import { linkDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const collectionIdOrAlias = 12345
+
+linkDataset.execute(datasetId, collectionIdOrAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/LinkDataset.ts) implementation_.
+
+#### Unlink a Dataset
+
+Removes a link between a Dataset and a Collection.
+
+##### Example call:
+
+```typescript
+import { unlinkDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const collectionIdOrAlias = 12345
+
+unlinkDataset.execute(datasetId, collectionIdOrAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/UnlinkDataset.ts) implementation_.
 
 #### Get Download Count of a Dataset
 

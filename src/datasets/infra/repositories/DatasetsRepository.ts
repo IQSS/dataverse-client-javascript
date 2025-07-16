@@ -287,4 +287,28 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error
       })
   }
+
+  public async linkDataset(
+    datasetId: number | string,
+    collectionIdOrAlias: number | string
+  ): Promise<void> {
+    return this.doPut(`/${this.datasetsResourceName}/${datasetId}/link/${collectionIdOrAlias}`, {})
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async unlinkDataset(
+    datasetId: number | string,
+    collectionIdOrAlias: number | string
+  ): Promise<void> {
+    return this.doDelete(
+      `/${this.datasetsResourceName}/${datasetId}/deleteLink/${collectionIdOrAlias}`
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }

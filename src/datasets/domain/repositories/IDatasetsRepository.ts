@@ -61,4 +61,6 @@ export interface IDatasetsRepository {
   ): Promise<DatasetDownloadCount>
   getDatasetVersionsSummaries(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]>
   deleteDatasetDraft(datasetId: number | string): Promise<void>
+  linkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
+  unlinkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
 }
