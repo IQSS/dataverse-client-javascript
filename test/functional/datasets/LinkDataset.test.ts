@@ -49,7 +49,7 @@ describe('execute', () => {
 
   it('should throw an error when trying to link a dataset that does not exist', async () => {
     await createCollectionViaApi(testCollectionAlias)
-    const nonExistentDatasetId = 'nonExistentDatasetId'
+    const nonExistentDatasetId = 999999
     await expect(
       linkDataset.execute(nonExistentDatasetId, testCollectionAlias)
     ).rejects.toBeInstanceOf(WriteError)
