@@ -20,6 +20,7 @@ import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
+import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -288,25 +289,27 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async linkDataset(
-    datasetId: number | string,
-    collectionIdOrAlias: number | string
-  ): Promise<void> {
-    return this.doPut(`/${this.datasetsResourceName}/${datasetId}/link/${collectionIdOrAlias}`, {})
+  public async linkDataset(datasetId: number, collectionAlias: string): Promise<void> {
+    return this.doPut(`/${this.datasetsResourceName}/${datasetId}/link/${collectionAlias}`, {})
       .then(() => undefined)
       .catch((error) => {
         throw error
       })
   }
 
-  public async unlinkDataset(
-    datasetId: number | string,
-    collectionIdOrAlias: number | string
-  ): Promise<void> {
-    return this.doDelete(
-      `/${this.datasetsResourceName}/${datasetId}/deleteLink/${collectionIdOrAlias}`
-    )
+  public async unlinkDataset(datasetId: number, collectionAlias: string): Promise<void> {
+    return this.doDelete(`/${this.datasetsResourceName}/${datasetId}/deleteLink/${collectionAlias}`)
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetLinkedCollections(
+    datasetId: number | string
+  ): Promise<DatasetLinkedCollection[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'links', datasetId), true)
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })

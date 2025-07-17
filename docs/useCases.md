@@ -958,9 +958,9 @@ import { linkDataset } from '@iqss/dataverse-client-javascript'
 /* ... */
 
 const datasetId = 1
-const collectionIdOrAlias = 12345
+const collectionAlias = 'collection-alias'
 
-linkDataset.execute(datasetId, collectionIdOrAlias)
+linkDataset.execute(datasetId, collectionAlias)
 
 /* ... */
 ```
@@ -979,9 +979,9 @@ import { unlinkDataset } from '@iqss/dataverse-client-javascript'
 /* ... */
 
 const datasetId = 1
-const collectionIdOrAlias = 12345
+const collectionAlias = 'collection-alias'
 
-unlinkDataset.execute(datasetId, collectionIdOrAlias)
+unlinkDataset.execute(datasetId, collectionAlias)
 
 /* ... */
 ```
