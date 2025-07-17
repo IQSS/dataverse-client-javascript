@@ -36,6 +36,7 @@ The different use cases currently available in the package are classified below,
     - [Get Differences between Two Dataset Versions](#get-differences-between-two-dataset-versions)
     - [List All Datasets](#list-all-datasets)
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
+    - [Get Dataset Linked Collections](#get-dataset-linked-collections)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -736,6 +737,30 @@ getDatasetVersionsSummaries
 _See [use case](../src/datasets/domain/useCases/GetDatasetVersionsSummaries.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Get Dataset Linked Collections
+
+Returns an array of [DatasetLinkedCollection](../src/datasets/domain/models/DatasetLinkedCollection.ts) that contains the collections linked to a dataset.
+
+##### Example call:
+
+```typescript
+import { getDatasetLinkedCollections } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetLinkedCollections
+  .execute(datasetId)
+  .then((datasetLinkedCollections: DatasetLinkedCollection[]) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetLinkedCollections.ts) implementation_.
 
 ### Datasets Write Use Cases
 

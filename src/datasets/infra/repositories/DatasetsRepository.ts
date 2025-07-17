@@ -21,6 +21,7 @@ import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './trans
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
+import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -309,7 +310,9 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     datasetId: number | string
   ): Promise<DatasetLinkedCollection[]> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'links', datasetId), true)
-      .then((response) => response.data.data)
+      .then((response) =>
+        transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection(response.data.data)
+      )
       .catch((error) => {
         throw error
       })

@@ -22,6 +22,7 @@ import { GetDatasetVersionsSummaries } from './domain/useCases/GetDatasetVersion
 import { DeleteDatasetDraft } from './domain/useCases/DeleteDatasetDraft'
 import { LinkDataset } from './domain/useCases/LinkDataset'
 import { UnlinkDataset } from './domain/useCases/UnlinkDataset'
+import { GetDatasetLinkedCollections } from './domain/useCases/GetDatasetLinkedCollections'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -58,6 +59,7 @@ const getDatasetVersionsSummaries = new GetDatasetVersionsSummaries(datasetsRepo
 const deleteDatasetDraft = new DeleteDatasetDraft(datasetsRepository)
 const linkDataset = new LinkDataset(datasetsRepository)
 const unlinkDataset = new UnlinkDataset(datasetsRepository)
+const getDatasetLinkedCollections = new GetDatasetLinkedCollections(datasetsRepository)
 
 export {
   getDataset,
@@ -77,7 +79,8 @@ export {
   getDatasetVersionsSummaries,
   deleteDatasetDraft,
   linkDataset,
-  unlinkDataset
+  unlinkDataset,
+  getDatasetLinkedCollections
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -111,3 +114,4 @@ export {
   DatasetVersionSummaryInfo,
   DatasetVersionSummaryStringValues
 } from './domain/models/DatasetVersionSummaryInfo'
+export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
