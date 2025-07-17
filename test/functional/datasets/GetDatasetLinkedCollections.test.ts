@@ -3,7 +3,7 @@ import {
   createDataset,
   getDatasetLinkedCollections,
   linkDataset,
-  WriteError
+  ReadError
 } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import {
@@ -56,7 +56,7 @@ describe('execute', () => {
     const nonExistentDatasetId = 99999
 
     await expect(getDatasetLinkedCollections.execute(nonExistentDatasetId)).rejects.toBeInstanceOf(
-      WriteError
+      ReadError
     )
   })
 })
