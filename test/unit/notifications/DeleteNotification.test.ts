@@ -1,4 +1,4 @@
-import { DeleteNotificationByUser } from '../../../src/notifications/domain/useCases/DeleteNotificationByUser'
+import { DeleteNotification } from '../../../src/notifications/domain/useCases/DeleteNotification'
 import { INotificationsRepository } from '../../../src/notifications/domain/repositories/INotificationsRepository'
 import { Notification } from '../../../src/notifications/domain/models/Notification'
 
@@ -23,23 +23,21 @@ describe('execute', () => {
   test('should delete notification from repository', async () => {
     const notificationsRepositoryStub: INotificationsRepository = {} as INotificationsRepository
     notificationsRepositoryStub.getAllNotificationsByUser = jest.fn().mockResolvedValue([])
-    notificationsRepositoryStub.deleteNotificationByUser = jest
-      .fn()
-      .mockResolvedValue(mockNotifications)
-    const sut = new DeleteNotificationByUser(notificationsRepositoryStub)
+    notificationsRepositoryStub.deleteNotification = jest.fn().mockResolvedValue(mockNotifications)
+    const sut = new DeleteNotification(notificationsRepositoryStub)
 
     await sut.execute(123)
 
-    expect(notificationsRepositoryStub.deleteNotificationByUser).toHaveBeenCalledWith(123)
+    expect(notificationsRepositoryStub.deleteNotification).toHaveBeenCalledWith(123)
   })
 
   test('should throw error when repository throws error', async () => {
     const notificationsRepositoryStub: INotificationsRepository = {} as INotificationsRepository
     notificationsRepositoryStub.getAllNotificationsByUser = jest.fn().mockResolvedValue([])
-    notificationsRepositoryStub.deleteNotificationByUser = jest
+    notificationsRepositoryStub.deleteNotification = jest
       .fn()
       .mockRejectedValue(new Error('Repository error'))
-    const sut = new DeleteNotificationByUser(notificationsRepositoryStub)
+    const sut = new DeleteNotification(notificationsRepositoryStub)
 
     await expect(sut.execute(123)).rejects.toThrow('Repository error')
   })

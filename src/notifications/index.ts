@@ -1,12 +1,12 @@
 import { NotificationsRepository } from './infra/repositories/NotificationsRepository'
 import { GetAllNotificationsByUser } from './domain/useCases/GetAllNotificationsByUser'
-import { DeleteNotificationByUser } from './domain/useCases/DeleteNotificationByUser'
+import { DeleteNotification } from './domain/useCases/DeleteNotification'
 
 const notificationsRepository = new NotificationsRepository()
 
 const getAllNotificationsByUser = new GetAllNotificationsByUser(notificationsRepository)
-const deleteNotificationByUser = new DeleteNotificationByUser(notificationsRepository)
+const deleteNotification = new DeleteNotification(notificationsRepository)
 
-export { getAllNotificationsByUser, deleteNotificationByUser }
+export { getAllNotificationsByUser, deleteNotification }
 
 export { Notification } from './domain/models/Notification'

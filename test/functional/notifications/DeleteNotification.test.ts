@@ -1,9 +1,4 @@
-import {
-  ApiConfig,
-  deleteNotificationByUser,
-  getAllNotificationsByUser,
-  WriteError
-} from '../../../src'
+import { ApiConfig, deleteNotification, getAllNotificationsByUser, WriteError } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 
@@ -20,13 +15,13 @@ describe('execute', () => {
     const notifications = await getAllNotificationsByUser.execute()
     const notificationId = notifications[notifications.length - 1].id
 
-    await deleteNotificationByUser.execute(notificationId)
+    await deleteNotification.execute(notificationId)
 
     const notificationsAfterDelete = await getAllNotificationsByUser.execute()
     expect(notificationsAfterDelete.length).toBe(notifications.length - 1)
   })
 
   test('should throw an error when the notification id does not exist', async () => {
-    await expect(deleteNotificationByUser.execute(123)).rejects.toThrow(WriteError)
+    await expect(deleteNotification.execute(123)).rejects.toThrow(WriteError)
   })
 })

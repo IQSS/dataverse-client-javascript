@@ -13,7 +13,7 @@ export class NotificationsRepository extends ApiRepository implements INotificat
       })
   }
 
-  public async deleteNotificationByUser(notificationId: number): Promise<void> {
+  public async deleteNotification(notificationId: number): Promise<void> {
     return this.doDelete(
       this.buildApiEndpoint(this.notificationsResourceName, notificationId.toString())
     )

@@ -7,10 +7,10 @@ import { INotificationsRepository } from '../repositories/INotificationsReposito
  * @param notificationId - The ID of the notification to delete.
  * @returns {Promise<void>} - A promise that resolves when the notification is deleted.
  */
-export class DeleteNotificationByUser implements UseCase<void> {
+export class DeleteNotification implements UseCase<void> {
   constructor(private readonly notificationsRepository: INotificationsRepository) {}
 
   async execute(notificationId: number): Promise<void> {
-    return this.notificationsRepository.deleteNotificationByUser(notificationId)
+    return this.notificationsRepository.deleteNotification(notificationId)
   }
 }

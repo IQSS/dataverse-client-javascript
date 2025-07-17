@@ -87,7 +87,7 @@ The different use cases currently available in the package are classified below,
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
 - [Notifications](#Notifications)
   - [Get All Notifications by User](#get-all-notifications-by-user)
-  - [Delete Notification by User](#delete-notification-by-user)
+  - [Delete Notification](#delete-notification)
 
 ## Collections
 
@@ -2017,24 +2017,24 @@ getAllNotificationsByUser.execute().then((notifications: Notification[]) => {
 
 _See [use case](../src/notifications/domain/useCases/GetAllNotificationsByUser.ts) implementation_.
 
-#### Delete Notification by User
+#### Delete Notification
 
 Deletes a specific notification for the current authenticated user by its ID.
 
 ##### Example call:
 
 ```typescript
-import { deleteNotificationByUser } from '@iqss/dataverse-client-javascript'
+import { deleteNotification } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const notificationId = 123
 
-deleteNotificationByUser.execute(notificationId: number).then(() => {
+deleteNotification.execute(notificationId: number).then(() => {
   /* ... */
 })
 
 /* ... */
 ```
 
-_See [use case](../src/notifications/domain/useCases/DeleteNotificationByUser.ts) implementation_.
+_See [use case](../src/notifications/domain/useCases/DeleteNotification.ts) implementation_.

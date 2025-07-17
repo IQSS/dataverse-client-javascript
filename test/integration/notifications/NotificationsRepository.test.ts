@@ -55,7 +55,7 @@ describe('NotificationsRepository', () => {
 
     const notificationToDelete = notifications[0]
 
-    await sut.deleteNotificationByUser(notificationToDelete.id)
+    await sut.deleteNotification(notificationToDelete.id)
 
     const notificationsAfterDelete: Notification[] = await sut.getAllNotificationsByUser()
     const deletedNotification = notificationsAfterDelete.find(
@@ -65,14 +65,12 @@ describe('NotificationsRepository', () => {
   })
 
   test('should throw error when trying to delete notification with wrong ID', async () => {
-    const nonExistentMetadataBlockName = 99999
+    const nonExistentNotificationId = 99999
 
     const expectedError = new WriteError(
-      `[404] Notification ${nonExistentMetadataBlockName} not found.`
+      `[404] Notification ${nonExistentNotificationId} not found.`
     )
 
-    await expect(sut.deleteNotificationByUser(nonExistentMetadataBlockName)).rejects.toThrow(
-      expectedError
-    )
+    await expect(sut.deleteNotification(nonExistentNotificationId)).rejects.toThrow(expectedError)
   })
 })
