@@ -85,6 +85,8 @@ The different use cases currently available in the package are classified below,
   - [Get Application Terms of Use](#get-application-terms-of-use)
 - [Contact](#Contact)
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
+- [Search](#Search)
+  - [Get Search Services](#get-search-services)
 
 ## Collections
 
@@ -222,6 +224,8 @@ This use case supports the following optional parameters depending on the search
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
 - **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
+- **searchServiceName**: The search service name on which to execute the search (Optional).
+- **showTypeCounts**: If true, the response will include the count per object type (Optional).
 
 #### List My Data Collection Items
 
@@ -1991,3 +1995,25 @@ In ContactDTO, it takes the following information:
 - **subject**: the email subject line.
 - **body**: the email body to send.
 - **fromEmail**: the email to list in the reply-to field.
+
+## Search
+
+#### Get Search Services
+
+Returns all [Search Services](../src/search/domain/models/SearchService.ts) available in the installation.
+
+##### Example call:
+
+```typescript
+import { getSearchServices } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getSearchServices.execute().then((searchServices: SearchService[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/search/domain/useCases/GetSearchServices.ts) implementation_.

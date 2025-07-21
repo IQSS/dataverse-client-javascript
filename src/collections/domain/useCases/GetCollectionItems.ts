@@ -18,6 +18,7 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
    * @param {number} [limit] - Limit for pagination (optional).
    * @param {number} [offset] - Offset for pagination (optional).
    * @param {CollectionSearchCriteria} [collectionSearchCriteria] - Supports filtering the collection items by different properties (optional).
+   * @param {string} [searchServiceName] - The search service name on which to execute the search (optional).
    * @param {boolean} [showTypeCounts] - If true, the response will include the count per object type (optional).
    * @returns {Promise<CollectionItemSubset>}
    */
@@ -26,6 +27,7 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
     limit?: number,
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria,
+    searchServiceName?: string,
     showTypeCounts = false
   ): Promise<CollectionItemSubset> {
     return await this.collectionsRepository.getCollectionItems(
@@ -33,6 +35,7 @@ export class GetCollectionItems implements UseCase<CollectionItemSubset> {
       limit,
       offset,
       collectionSearchCriteria,
+      searchServiceName,
       showTypeCounts
     )
   }
