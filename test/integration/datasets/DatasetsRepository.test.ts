@@ -1388,4 +1388,117 @@ describe('DatasetsRepository', () => {
       await expect(sut.deleteDatasetDraft(nonExistentTestDatasetId)).rejects.toThrow(expectedError)
     })
   })
+
+  describe('linkDataset', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testCollectionAlias = 'testLinkDatasetCollection'
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await createCollectionViaApi(testCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should link a dataset to another collection', async () => {
+      const actual = await sut.linkDataset(testDatasetIds.numericId, testCollectionAlias)
+
+      expect(actual).toBeUndefined()
+
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+      expect(linkedCollections[0].alias).toBe(testCollectionAlias)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.linkDataset(nonExistentTestDatasetId, testCollectionAlias)).rejects.toThrow()
+    })
+
+    test('should return error when collection does not exist', async () => {
+      await expect(
+        sut.linkDataset(testDatasetIds.numericId, 'nonExistentCollectionAlias')
+      ).rejects.toThrow()
+    })
+  })
+
+  describe('unlinkDataset', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testCollectionAlias = 'testUnlinkDatasetCollection'
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await createCollectionViaApi(testCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should unlink a dataset from a collection', async () => {
+      await sut.linkDataset(testDatasetIds.numericId, testCollectionAlias)
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+      expect(linkedCollections[0].alias).toBe(testCollectionAlias)
+
+      const actual = await sut.unlinkDataset(testDatasetIds.numericId, testCollectionAlias)
+
+      expect(actual).toBeUndefined()
+      const updatedLinkedCollections = await sut.getDatasetLinkedCollections(
+        testDatasetIds.numericId
+      )
+      expect(updatedLinkedCollections.length).toBe(0)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.linkDataset(nonExistentTestDatasetId, testCollectionAlias)).rejects.toThrow()
+    })
+
+    test('should return error when collection does not exist', async () => {
+      await expect(
+        sut.linkDataset(testDatasetIds.numericId, 'nonExistentCollectionAlias')
+      ).rejects.toThrow()
+    })
+
+    test('should return error when dataset is not linked to the collection', async () => {
+      await expect(
+        sut.unlinkDataset(testDatasetIds.numericId, testCollectionAlias)
+      ).rejects.toThrow()
+    })
+  })
+
+  describe('getDatasetLinkedCollections', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testCollectionAlias = 'testGetLinkedCollections'
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await createCollectionViaApi(testCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should return empty array when no collections are linked', async () => {
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+
+      expect(linkedCollections.length).toBe(0)
+    })
+
+    test('should return linked collections for a dataset', async () => {
+      await sut.linkDataset(testDatasetIds.numericId, testCollectionAlias)
+
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+
+      expect(linkedCollections.length).toBe(1)
+      expect(linkedCollections[0].alias).toBe(testCollectionAlias)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetLinkedCollections(nonExistentTestDatasetId)).rejects.toThrow()
+    })
+  })
 })

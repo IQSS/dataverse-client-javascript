@@ -36,12 +36,15 @@ The different use cases currently available in the package are classified below,
     - [Get Differences between Two Dataset Versions](#get-differences-between-two-dataset-versions)
     - [List All Datasets](#list-all-datasets)
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
+    - [Get Dataset Linked Collections](#get-dataset-linked-collections)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
     - [Delete a Draft Dataset](#delete-a-draft-dataset)
+    - [Link a Dataset](#link-a-dataset)
+    - [Unlink a Dataset](#unlink-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -739,6 +742,30 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetVersionsSummaries.ts) 
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
+#### Get Dataset Linked Collections
+
+Returns an array of [DatasetLinkedCollection](../src/datasets/domain/models/DatasetLinkedCollection.ts) that contains the collections linked to a dataset.
+
+##### Example call:
+
+```typescript
+import { getDatasetLinkedCollections } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetLinkedCollections
+  .execute(datasetId)
+  .then((datasetLinkedCollections: DatasetLinkedCollection[]) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetLinkedCollections.ts) implementation_.
+
 ### Datasets Write Use Cases
 
 #### Create a Dataset
@@ -947,6 +974,48 @@ _See [use case](../src/datasets/domain/useCases/DeleteDatasetDraft.ts) implement
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
 If you try to delete a dataset without draft version, you will get a not found error.
+
+#### Link a Dataset
+
+Creates a link between a Dataset and a Collection.
+
+##### Example call:
+
+```typescript
+import { linkDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const collectionAlias = 'collection-alias'
+
+linkDataset.execute(datasetId, collectionAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/LinkDataset.ts) implementation_.
+
+#### Unlink a Dataset
+
+Removes a link between a Dataset and a Collection.
+
+##### Example call:
+
+```typescript
+import { unlinkDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const collectionAlias = 'collection-alias'
+
+unlinkDataset.execute(datasetId, collectionAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/UnlinkDataset.ts) implementation_.
 
 #### Get Download Count of a Dataset
 
