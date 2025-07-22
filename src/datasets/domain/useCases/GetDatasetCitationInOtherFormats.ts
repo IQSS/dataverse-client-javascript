@@ -1,0 +1,36 @@
+import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
+import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion'
+import { CitationResponse } from '../models/CitationResponse'
+import { CitationFormats } from '../models/CitationFormats'
+
+export class GetDatasetCitationInOtherFormats implements UseCase<CitationResponse> {
+  private datasetsRepository: IDatasetsRepository
+
+  constructor(datasetsRepository: IDatasetsRepository) {
+    this.datasetsRepository = datasetsRepository
+  }
+
+  /**
+   * Returns the dataset citation in the specified format.
+   *
+   * @param {number} datasetId - The dataset identifier.
+   * @param {string | DatasetNotNumberedVersion} [datasetVersionId=DatasetNotNumberedVersion.LATEST] - The dataset version identifier, which can be a version-specific string (e.g., '1.0') or a DatasetNotNumberedVersion enum value. Defaults to LATEST.
+   * @param {CitationFormats} format - The citation format to return. One of: 'EndNote', 'RIS', 'BibTeX', 'CSLJson', 'Internal'.
+   * @param {boolean} [includeDeaccessioned=false] - Whether to include deaccessioned versions in the search. Defaults to false.
+   * @returns {Promise<CitationResponse>} The citation content, format, and content type.
+   */
+  async execute(
+    datasetId: number,
+    datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
+    format: CitationFormats,
+    includeDeaccessioned = false
+  ): Promise<CitationResponse> {
+    return await this.datasetsRepository.getDatasetCitationInOtherFormats(
+      datasetId,
+      datasetVersionId,
+      format,
+      includeDeaccessioned
+    )
+  }
+}

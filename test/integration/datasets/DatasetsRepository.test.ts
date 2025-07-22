@@ -51,6 +51,7 @@ import {
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
+import { CitationFormats } from '../../../src/datasets/domain/models/CitationFormats'
 
 const TEST_DIFF_DATASET_DTO: DatasetDTO = {
   license: {
@@ -489,6 +490,108 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof actualDatasetCitation).toBe('string')
+    })
+  })
+
+  describe('getDatasetCitationInOtherFormats', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return citation in BibTeX format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormats.BibTeX
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.format).toBe(CitationFormats.BibTeX)
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
+    test('should return citation in RIS format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormats.RIS
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.format).toBe(CitationFormats.RIS)
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
+    test('should return citation in CSLJson format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormats.CSLJson
+      )
+
+      expect(typeof citation.content).toBe('object')
+      expect(citation.format).toBe(CitationFormats.CSLJson)
+      expect(citation.contentType).toMatch(/application\/json/)
+    })
+
+    test('should return citation in EndNote format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormats.EndNote
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.format).toBe(CitationFormats.EndNote)
+      expect(citation.contentType).toMatch('text/xml;charset=UTF-8')
+    })
+
+    test('should return citation in Internal format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormats.Internal
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.format).toBe(CitationFormats.Internal)
+      expect(citation.contentType).toMatch(/text\/html/)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const nonExistentId = 9999999
+      const expectedError = new ReadError(`[404] Dataset with ID ${nonExistentId} not found.`)
+
+      await expect(
+        sut.getDatasetCitationInOtherFormats(
+          nonExistentId,
+          DatasetNotNumberedVersion.LATEST,
+          CitationFormats.RIS
+        )
+      ).rejects.toThrow(expectedError)
+    })
+
+    test('should return citation for deaccessioned dataset when includeDeaccessioned = true', async () => {
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
+
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormats.RIS,
+        true
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.format).toBe(CitationFormats.RIS)
+      expect(citation.contentType).toMatch(/text\/plain/)
     })
   })
 

@@ -21,7 +21,9 @@ import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './trans
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
+import { CitationFormats } from '../../domain/models/CitationFormats'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
+import { CitationResponse } from '../../domain/models/CitationResponse'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -93,6 +95,34 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .catch((error) => {
         throw error
       })
+  }
+
+  public async getDatasetCitationInOtherFormats(
+    datasetId: number,
+    datasetVersionId: string | 'LATEST' = 'LATEST',
+    format: CitationFormats,
+    includeDeaccessioned = false
+  ): Promise<CitationResponse> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `versions/${datasetVersionId}/citation/${format}`,
+      datasetId
+    )
+
+    const queryParams = { includeDeaccessioned }
+
+    try {
+      const response = await this.doGet(endpoint, true, queryParams)
+
+      return {
+        content: response.data,
+        format,
+        contentType: response.headers['content-type'] ?? 'text/plain'
+      }
+    } catch (error) {
+      console.error(`[DatasetsRepository] Error fetching citation:`, error)
+      throw error
+    }
   }
 
   public async getPrivateUrlDatasetCitation(token: string): Promise<string> {
