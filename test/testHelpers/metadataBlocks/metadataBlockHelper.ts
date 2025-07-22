@@ -26,6 +26,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
         isRequired: true,
+        isAdvancedSearchFieldType: false,
         displayOrder: 0,
         typeClass: MetadataFieldTypeClass.Primitive,
         displayOnCreate: true
@@ -41,6 +42,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: '',
         isRequired: true,
+        isAdvancedSearchFieldType: false,
         displayOrder: 0,
         typeClass: MetadataFieldTypeClass.Compound,
         displayOnCreate: true,
@@ -56,6 +58,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
+            isAdvancedSearchFieldType: false,
             displayOrder: 0,
             typeClass: MetadataFieldTypeClass.Primitive,
             displayOnCreate: true
@@ -71,6 +74,7 @@ export const createMetadataBlockModel = (): MetadataBlock => {
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
+            isAdvancedSearchFieldType: false,
             displayOrder: 0,
             typeClass: MetadataFieldTypeClass.Primitive,
             displayOnCreate: true
@@ -99,6 +103,7 @@ export const createMetadataBlockPayload = (): MetadataBlockPayload => {
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
         isRequired: true,
+        isAdvancedSearchFieldType: false,
         displayOrder: 0,
         typeClass: 'primitive',
         displayOnCreate: true
@@ -114,6 +119,7 @@ export const createMetadataBlockPayload = (): MetadataBlockPayload => {
         isControlledVocabulary: false,
         displayFormat: '',
         isRequired: true,
+        isAdvancedSearchFieldType: false,
         displayOrder: 0,
         typeClass: 'compound',
         displayOnCreate: true,
@@ -129,6 +135,7 @@ export const createMetadataBlockPayload = (): MetadataBlockPayload => {
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
+            isAdvancedSearchFieldType: false,
             displayOrder: 0,
             typeClass: 'primitive',
             displayOnCreate: true
@@ -144,6 +151,7 @@ export const createMetadataBlockPayload = (): MetadataBlockPayload => {
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
+            isAdvancedSearchFieldType: false,
             displayOrder: 0,
             typeClass: 'primitive',
             displayOnCreate: true
@@ -166,6 +174,7 @@ export const createMetadataFieldInfoModel = (): MetadataFieldInfo => {
     isControlledVocabulary: false,
     displayFormat: '#VALUE',
     isRequired: true,
+    isAdvancedSearchFieldType: false,
     displayOrder: 0,
     typeClass: MetadataFieldTypeClass.Primitive,
     displayOnCreate: true
@@ -184,6 +193,7 @@ export const createMetadataFieldInfoPayload = (): MetadataFieldInfoPayload => {
     isControlledVocabulary: false,
     displayFormat: '#VALUE',
     isRequired: true,
+    isAdvancedSearchFieldType: false,
     displayOrder: 0,
     typeClass: 'primitive',
     displayOnCreate: true
