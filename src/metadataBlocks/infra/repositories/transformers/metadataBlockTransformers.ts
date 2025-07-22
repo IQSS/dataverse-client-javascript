@@ -98,6 +98,7 @@ const transformPayloadMetadataFieldInfo = (
     }),
     displayFormat: metadataFieldInfoPayload.displayFormat,
     isRequired: metadataFieldInfoPayload.isRequired,
+    isAdvancedSearchFieldType: metadataFieldInfoPayload.isAdvancedSearchFieldType,
     displayOrder: metadataFieldInfoPayload.displayOrder,
     typeClass: metadataFieldInfoPayload.typeClass as MetadataFieldTypeClass,
     displayOnCreate: metadataFieldInfoPayload.displayOnCreate
