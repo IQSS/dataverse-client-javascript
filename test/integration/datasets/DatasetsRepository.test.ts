@@ -512,7 +512,6 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof citation.content).toBe('string')
-      expect(citation.format).toBe(CitationFormats.BibTeX)
       expect(citation.contentType).toMatch(/text\/plain/)
     })
 
@@ -524,7 +523,6 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof citation.content).toBe('string')
-      expect(citation.format).toBe(CitationFormats.RIS)
       expect(citation.contentType).toMatch(/text\/plain/)
     })
 
@@ -536,7 +534,6 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof citation.content).toBe('object')
-      expect(citation.format).toBe(CitationFormats.CSLJson)
       expect(citation.contentType).toMatch(/application\/json/)
     })
 
@@ -548,7 +545,6 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof citation.content).toBe('string')
-      expect(citation.format).toBe(CitationFormats.EndNote)
       expect(citation.contentType).toMatch('text/xml;charset=UTF-8')
     })
 
@@ -560,7 +556,6 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof citation.content).toBe('string')
-      expect(citation.format).toBe(CitationFormats.Internal)
       expect(citation.contentType).toMatch(/text\/html/)
     })
 
@@ -590,7 +585,6 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof citation.content).toBe('string')
-      expect(citation.format).toBe(CitationFormats.RIS)
       expect(citation.contentType).toMatch(/text\/plain/)
     })
   })

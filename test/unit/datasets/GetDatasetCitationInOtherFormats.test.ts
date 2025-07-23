@@ -13,7 +13,6 @@ describe('GetDatasetCitationInOtherFormats.execute', () => {
   test('should return citation response on repository success', async () => {
     const expectedCitation: CitationResponse = {
       content: '@data{example, ...}',
-      format: CitationFormats.BibTeX,
       contentType: 'text/plain'
     }
 

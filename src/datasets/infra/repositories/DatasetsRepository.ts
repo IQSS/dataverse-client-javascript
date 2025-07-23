@@ -108,20 +108,11 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       `versions/${datasetVersionId}/citation/${format}`,
       datasetId
     )
+    const response = await this.doGet(endpoint, true, { includeDeaccessioned })
 
-    const queryParams = { includeDeaccessioned }
-
-    try {
-      const response = await this.doGet(endpoint, true, queryParams)
-
-      return {
-        content: response.data,
-        format,
-        contentType: response.headers['content-type'] ?? 'text/plain'
-      }
-    } catch (error) {
-      console.error(`[DatasetsRepository] Error fetching citation:`, error)
-      throw error
+    return {
+      content: response.data,
+      contentType: response.headers['content-type']
     }
   }
 
