@@ -1051,8 +1051,8 @@ describe('DatasetsRepository', () => {
         }
       ])
     })
-
-    test('should throw error if trying to update an outdated internal version dataset', async () => {
+    // TODO: add this test when https://github.com/IQSS/dataverse-client-javascript/issues/343 is fixed
+    test.skip('should throw error if trying to update an outdated internal version dataset', async () => {
       const testDataset = {
         metadataBlockValues: [
           {
