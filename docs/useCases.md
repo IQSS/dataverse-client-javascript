@@ -65,6 +65,8 @@ The different use cases currently available in the package are classified below,
     - [Replace a File](#replace-a-file)
     - [Restrict or Unrestrict a File](#restrict-or-unrestrict-a-file)
     - [Update File Metadata](#update-file-metadata)
+    - [Update File Categories](#update-file-categories)
+    - [Update File Tabular Tags](#update-file-tabular-tags)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
