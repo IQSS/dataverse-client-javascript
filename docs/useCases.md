@@ -37,6 +37,7 @@ The different use cases currently available in the package are classified below,
     - [List All Datasets](#list-all-datasets)
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
+    - [Get Dataset Available Categories](#get-dataset-available-categories)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -1048,6 +1049,28 @@ The `includeMDC` parameter is optional.
 - Setting `includeMDC` to True will ignore the `MDCStartDate` setting and return a total count.
 - If MDC isn't enabled, the download count will return a total count, without `MDCStartDate`.
 - If MDC is enabled but the `includeMDC` is false, the count will be limited to the time before `MDCStartDate`
+
+#### Get Dataset Available Categories
+
+Returns a list of available file categories that may be applied to the files of a given dataset.
+
+###### Example call:
+
+```typescript
+import { getDatasetAvailableCategories } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+
+getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/files/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
+
+The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
 ## Files
 

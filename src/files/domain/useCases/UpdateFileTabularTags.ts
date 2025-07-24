@@ -10,7 +10,7 @@ export class UpdateFileTabularTags implements UseCase<void> {
 
   /**
    * Updates the tabular tabular Tags for a particular File.
-   * More detailed information about updating a file's tabularTags behavior can be found in https://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata
+   * More detailed information about updating a file's tabularTags behavior can be found in https://guides.dataverse.org/en/latest/api/native-api.html#updating-file-tabular-tags
    *
    * @param {number | string} [fileId] - The file identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {string[]} [tabularTags] - The tabular tags to be added to the file.

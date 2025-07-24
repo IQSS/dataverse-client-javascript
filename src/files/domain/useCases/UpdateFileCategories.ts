@@ -10,7 +10,7 @@ export class UpdateFileCategories implements UseCase<void> {
 
   /**
    * Updates the  categories for a particular File.
-   * More detailed information about updating a file's categories behavior can be found in https://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata
+   * More detailed information about updating a file's categories behavior can be found in https://guides.dataverse.org/en/latest/api/native-api.html#updating-file-metadata-categories
    *
    * @param {number | string} [fileId] - The file identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {string[]} [categories] - The categories to be added to the file.
