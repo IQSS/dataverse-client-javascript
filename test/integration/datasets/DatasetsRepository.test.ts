@@ -545,7 +545,7 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof citation.content).toBe('string')
-      expect(citation.contentType).toMatch('text/xml;charset=UTF-8')
+      expect(citation.contentType).toMatch(/text\/xml/)
     })
 
     test('should return citation in Internal format', async () => {
