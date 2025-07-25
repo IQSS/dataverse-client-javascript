@@ -1505,11 +1505,12 @@ describe('DatasetsRepository', () => {
   describe('getDatasetAvailableCategories', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
-    beforeEach(async () => {
+    beforeAll(async () => {
       testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      // Dataset is in draft, so we need to publish it first
-      await sut.publishDataset(testDatasetIds.numericId, VersionUpdateType.MAJOR)
-      await waitForNoLocks(testDatasetIds.numericId, 10)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
 
     test('should get available categories', async () => {
