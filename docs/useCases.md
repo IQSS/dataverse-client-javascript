@@ -1070,7 +1070,7 @@ getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => 
 })
 ```
 
-_See [use case](../src/files/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
+_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
