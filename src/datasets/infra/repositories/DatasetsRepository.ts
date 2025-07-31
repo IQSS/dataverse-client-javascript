@@ -21,9 +21,9 @@ import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './trans
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
-import { CitationFormats } from '../../domain/models/CitationFormats'
+import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
-import { CitationResponse } from '../../domain/models/CitationResponse'
+import { FormattedCitation } from '../../domain/models/FormattedCitation'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -100,9 +100,9 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async getDatasetCitationInOtherFormats(
     datasetId: number,
     datasetVersionId: string | 'LATEST' = 'LATEST',
-    format: CitationFormats,
+    format: CitationFormat,
     includeDeaccessioned = false
-  ): Promise<CitationResponse> {
+  ): Promise<FormattedCitation> {
     const endpoint = this.buildApiEndpoint(
       this.datasetsResourceName,
       `versions/${datasetVersionId}/citation/${format}`,
@@ -110,9 +110,17 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     )
     const response = await this.doGet(endpoint, true, { includeDeaccessioned })
 
+    const contentType = response.headers['content-type']
+    let content: string
+    if (contentType && contentType.includes('application/json')) {
+      content = JSON.stringify(response.data)
+    } else {
+      content = response.data
+    }
+
     return {
-      content: response.data,
-      contentType: response.headers['content-type']
+      content,
+      contentType
     }
   }
 

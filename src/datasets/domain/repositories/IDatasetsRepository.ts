@@ -10,8 +10,8 @@ import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 import { DatasetDownloadCount } from '../models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
-import { CitationFormats } from '../models/CitationFormats'
-import { CitationResponse } from '../models/CitationResponse'
+import { CitationFormat } from '../models/CitationFormat'
+import { FormattedCitation } from '../models/FormattedCitation'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -70,7 +70,7 @@ export interface IDatasetsRepository {
   getDatasetCitationInOtherFormats(
     datasetId: number,
     datasetVersionId: string,
-    format: CitationFormats,
+    format: CitationFormat,
     includeDeaccessioned?: boolean
-  ): Promise<CitationResponse>
+  ): Promise<FormattedCitation>
 }

@@ -51,7 +51,7 @@ import {
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
-import { CitationFormats } from '../../../src/datasets/domain/models/CitationFormats'
+import { CitationFormat } from '../../../src/datasets/domain/models/CitationFormat'
 
 const TEST_DIFF_DATASET_DTO: DatasetDTO = {
   license: {
@@ -508,7 +508,7 @@ describe('DatasetsRepository', () => {
       const citation = await sut.getDatasetCitationInOtherFormats(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
-        CitationFormats.BibTeX
+        CitationFormat.BibTeX
       )
 
       expect(typeof citation.content).toBe('string')
@@ -519,7 +519,7 @@ describe('DatasetsRepository', () => {
       const citation = await sut.getDatasetCitationInOtherFormats(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
-        CitationFormats.RIS
+        CitationFormat.RIS
       )
 
       expect(typeof citation.content).toBe('string')
@@ -530,10 +530,10 @@ describe('DatasetsRepository', () => {
       const citation = await sut.getDatasetCitationInOtherFormats(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
-        CitationFormats.CSLJson
+        CitationFormat.CSLJson
       )
 
-      expect(typeof citation.content).toBe('object')
+      expect(typeof citation.content).toBe('string')
       expect(citation.contentType).toMatch(/application\/json/)
     })
 
@@ -541,7 +541,7 @@ describe('DatasetsRepository', () => {
       const citation = await sut.getDatasetCitationInOtherFormats(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
-        CitationFormats.EndNote
+        CitationFormat.EndNote
       )
 
       expect(typeof citation.content).toBe('string')
@@ -552,7 +552,7 @@ describe('DatasetsRepository', () => {
       const citation = await sut.getDatasetCitationInOtherFormats(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
-        CitationFormats.Internal
+        CitationFormat.Internal
       )
 
       expect(typeof citation.content).toBe('string')
@@ -567,7 +567,7 @@ describe('DatasetsRepository', () => {
         sut.getDatasetCitationInOtherFormats(
           nonExistentId,
           DatasetNotNumberedVersion.LATEST,
-          CitationFormats.RIS
+          CitationFormat.RIS
         )
       ).rejects.toThrow(expectedError)
     })
@@ -580,7 +580,7 @@ describe('DatasetsRepository', () => {
       const citation = await sut.getDatasetCitationInOtherFormats(
         testDatasetIds.numericId,
         DatasetNotNumberedVersion.LATEST,
-        CitationFormats.RIS,
+        CitationFormat.RIS,
         true
       )
 

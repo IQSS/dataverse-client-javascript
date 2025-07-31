@@ -580,7 +580,7 @@ const datasetVersionId = '1.0'
 
 getDatasetCitationInOtherFormats
   .execute(datasetId, datasetVersionId, format)
-  .then((citationText: CitationResponse) => {
+  .then((citationText: FormattedCitation) => {
     /* ... */
   })
 
