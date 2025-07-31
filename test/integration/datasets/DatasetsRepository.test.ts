@@ -1526,6 +1526,17 @@ describe('DatasetsRepository', () => {
       expect(actual.sort()).toEqual(fileMetadata.categories.sort())
     })
 
+    test('should get available categorie if dataset id is persistent id', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2', 'Documentation', 'Data', 'Code']
+      }
+
+      const actual = await sut.getDatasetAvailableCategories(testDatasetIds.persistentId)
+      expect(actual.sort()).toEqual(fileMetadata.categories.sort())
+    })
+
     test('should return error when dataset does not exist', async () => {
       await expect(sut.getDatasetAvailableCategories(nonExistentTestDatasetId)).rejects.toThrow()
     })
