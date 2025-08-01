@@ -50,4 +50,5 @@ export interface ICollectionsRepository {
   ): Promise<FeaturedItem[]>
   deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void>
   deleteCollectionFeaturedItem(featuredItemId: number): Promise<void>
+  getDatasetTemplates(collectionIdOrAlias: number | string): Promise<unknown>
 }

@@ -446,4 +446,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
+
+  public async getDatasetTemplates(collectionIdOrAlias: number | string): Promise<unknown> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/templates`, true)
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
 }
