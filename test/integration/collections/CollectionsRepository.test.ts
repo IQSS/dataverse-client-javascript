@@ -1911,4 +1911,84 @@ describe('CollectionsRepository', () => {
       ).rejects.toThrow(expectedError)
     })
   })
+  describe('linkCollection', () => {
+    const firstCollectionAlias = 'linkCollectionFirst'
+    const secondCollectionAlias = 'linkCollectionSecond'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(firstCollectionAlias)
+      await createCollectionViaApi(secondCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(firstCollectionAlias)
+      await deleteCollectionViaApi(secondCollectionAlias)
+    })
+
+    test('should link a collection successfully', async () => {
+      const firstCollection = await sut.getCollection(firstCollectionAlias)
+      await sut.getCollection(secondCollectionAlias)
+
+      await sut.linkCollection(secondCollectionAlias, firstCollectionAlias)
+
+      await sut.getCollection(secondCollectionAlias)
+      await new Promise((res) => setTimeout(res, 2000))
+      const collectionItemSubset = await sut.getCollectionItems(firstCollection.alias)
+      expect(collectionItemSubset.items.length).toBe(1)
+    })
+
+    test('should throw error when linking a non-existent collection', async () => {
+      const invalidCollectionId = 99999
+      const firstCollection = await sut.getCollection(firstCollectionAlias)
+
+      const expectedError = new WriteError("[404] Can't find dataverse with identifier='99999'")
+
+      await expect(sut.linkCollection(invalidCollectionId, firstCollection.id)).rejects.toThrow(
+        expectedError
+      )
+    })
+  })
+
+  describe('unlinkCollection', () => {
+    const firstCollectionAlias = 'unlinkCollectionFirst'
+    const secondCollectionAlias = 'unlinkCollectionSecond'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(firstCollectionAlias)
+      await createCollectionViaApi(secondCollectionAlias)
+
+      const firstCollection = await sut.getCollection(firstCollectionAlias)
+      const secondCollection = await sut.getCollection(secondCollectionAlias)
+
+      await sut.linkCollection(secondCollection.id, firstCollection.id)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(firstCollectionAlias)
+      await deleteCollectionViaApi(secondCollectionAlias)
+    })
+
+    test('should unlink a collection successfully', async () => {
+      const firstCollection = await sut.getCollection(firstCollectionAlias)
+      const secondCollection = await sut.getCollection(secondCollectionAlias)
+
+      await sut.unlinkCollection(secondCollection.id, firstCollection.id)
+      await new Promise((res) => setTimeout(res, 2000))
+
+      await sut.getCollection(secondCollectionAlias)
+      const collectionItemSubset = await sut.getCollectionItems(firstCollection.alias)
+      expect(collectionItemSubset.items).toStrictEqual([])
+    })
+
+    test('should throw error when unlinking a non-existent collection', async () => {
+      const invalidCollectionId = 99999
+      const firstCollection = await sut.getCollection(firstCollectionAlias)
+
+      const expectedError = new WriteError("[404] Can't find dataverse with identifier='99999'")
+
+      await expect(sut.unlinkCollection(invalidCollectionId, firstCollection.id)).rejects.toThrow(
+        expectedError
+      )
+    })
+  })
 })

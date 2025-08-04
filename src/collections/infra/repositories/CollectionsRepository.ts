@@ -446,4 +446,30 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
+  public async linkCollection(
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
+  ): Promise<void> {
+    console.log(linkedCollectionIdOrAlias, linkingCollectionIdOrAlias)
+    return this.doPut(
+      `/dataverses/${linkedCollectionIdOrAlias}` + `/link/${linkingCollectionIdOrAlias}`,
+      {} // No data is needed for this operation
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+  public async unlinkCollection(
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
+  ): Promise<void> {
+    return this.doDelete(
+      `/dataverses/${linkedCollectionIdOrAlias}` + `/deleteLink/${linkingCollectionIdOrAlias}`
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }

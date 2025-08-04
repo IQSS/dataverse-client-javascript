@@ -50,4 +50,12 @@ export interface ICollectionsRepository {
   ): Promise<FeaturedItem[]>
   deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void>
   deleteCollectionFeaturedItem(featuredItemId: number): Promise<void>
+  linkCollection(
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
+  ): Promise<void>
+  unlinkCollection(
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
+  ): Promise<void>
 }
