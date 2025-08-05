@@ -78,7 +78,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetCitation(
-    datasetId: number,
+    datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean
   ): Promise<string> {
@@ -98,7 +98,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetCitationInOtherFormats(
-    datasetId: number,
+    datasetId: number | string,
     datasetVersionId: string | 'LATEST' = 'LATEST',
     format: CitationFormat,
     includeDeaccessioned = false

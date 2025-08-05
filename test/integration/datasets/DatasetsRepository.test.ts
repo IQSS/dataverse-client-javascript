@@ -515,6 +515,17 @@ describe('DatasetsRepository', () => {
       expect(citation.contentType).toMatch(/text\/plain/)
     })
 
+    test('should return citation in BibTeX format using persistent id', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.persistentId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.BibTeX
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
     test('should return citation in RIS format', async () => {
       const citation = await sut.getDatasetCitationInOtherFormats(
         testDatasetIds.numericId,
