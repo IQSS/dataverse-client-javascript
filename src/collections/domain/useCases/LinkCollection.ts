@@ -16,8 +16,8 @@ export class LinkCollection implements UseCase<void> {
    * @returns {Promise<void>} -This method does not return anything upon successful completion.
    */
   async execute(
-    linkedCollectionIdOrAlias: string,
-    linkingCollectionIdOrAlias: string
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
   ): Promise<void> {
     return await this.collectionsRepository.linkCollection(
       linkedCollectionIdOrAlias,

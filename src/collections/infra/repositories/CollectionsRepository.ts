@@ -450,7 +450,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     linkedCollectionIdOrAlias: number | string,
     linkingCollectionIdOrAlias: number | string
   ): Promise<void> {
-    console.log(linkedCollectionIdOrAlias, linkingCollectionIdOrAlias)
     return this.doPut(
       `/dataverses/${linkedCollectionIdOrAlias}` + `/link/${linkingCollectionIdOrAlias}`,
       {} // No data is needed for this operation
