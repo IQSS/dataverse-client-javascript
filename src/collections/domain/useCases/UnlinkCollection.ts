@@ -1,7 +1,7 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 
-export class UnLinkCollection implements UseCase<void> {
+export class UnlinkCollection implements UseCase<void> {
   private collectionsRepository: ICollectionsRepository
 
   constructor(collectionsRepository: ICollectionsRepository) {

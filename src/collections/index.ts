@@ -13,7 +13,7 @@ import { DeleteCollection } from './domain/useCases/DeleteCollection'
 import { GetMyDataCollectionItems } from './domain/useCases/GetMyDataCollectionItems'
 import { DeleteCollectionFeaturedItem } from './domain/useCases/DeleteCollectionFeaturedItem'
 import { LinkCollection } from './domain/useCases/LinkCollection'
-import { UnLinkCollection } from './domain/useCases/UnLinkCollection'
+import { UnlinkCollection } from './domain/useCases/UnLinkCollection'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -31,7 +31,7 @@ const deleteCollectionFeaturedItems = new DeleteCollectionFeaturedItems(collecti
 const deleteCollection = new DeleteCollection(collectionsRepository)
 const deleteCollectionFeaturedItem = new DeleteCollectionFeaturedItem(collectionsRepository)
 const linkCollection = new LinkCollection(collectionsRepository)
-const unlinkCollection = new UnLinkCollection(collectionsRepository)
+const unlinkCollection = new UnlinkCollection(collectionsRepository)
 
 export {
   getCollection,
