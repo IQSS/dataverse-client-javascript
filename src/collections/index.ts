@@ -13,7 +13,7 @@ import { DeleteCollection } from './domain/useCases/DeleteCollection'
 import { GetMyDataCollectionItems } from './domain/useCases/GetMyDataCollectionItems'
 import { DeleteCollectionFeaturedItem } from './domain/useCases/DeleteCollectionFeaturedItem'
 import { LinkCollection } from './domain/useCases/LinkCollection'
-import { UnlinkCollection } from './domain/useCases/UnLinkCollection'
+import { UnlinkCollection } from './domain/useCases/UnlinkCollection'
 
 const collectionsRepository = new CollectionsRepository()
 
