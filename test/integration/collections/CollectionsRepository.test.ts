@@ -15,7 +15,8 @@ import {
   createCollection,
   getDatasetFiles,
   restrictFile,
-  deleteFile
+  deleteFile,
+  linkDataset
 } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -1989,6 +1990,59 @@ describe('CollectionsRepository', () => {
       await expect(sut.unlinkCollection(invalidCollectionId, firstCollection.id)).rejects.toThrow(
         expectedError
       )
+    })
+  })
+  describe('getCollectionLinks', () => {
+    const firstCollectionAlias = 'getCollectionLinksFirst'
+    const secondCollectionAlias = 'getCollectionLinksSecond'
+    const thirdCollectionAlias = 'getCollectionLinksThird'
+    const fourthCollectionAlias = 'getCollectionLinksFourth'
+    let childDatasetNumericId: number
+    beforeAll(async () => {
+      await createCollectionViaApi(firstCollectionAlias)
+      await createCollectionViaApi(secondCollectionAlias)
+      await createCollectionViaApi(thirdCollectionAlias)
+      await createCollectionViaApi(fourthCollectionAlias)
+      const { numericId: createdId } = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        fourthCollectionAlias
+      )
+      childDatasetNumericId = createdId
+      await sut.linkCollection(secondCollectionAlias, firstCollectionAlias)
+      await sut.linkCollection(firstCollectionAlias, thirdCollectionAlias)
+      await sut.linkCollection(firstCollectionAlias, fourthCollectionAlias)
+      await linkDataset.execute(childDatasetNumericId, firstCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(childDatasetNumericId)
+      await deleteCollectionViaApi(firstCollectionAlias)
+      await deleteCollectionViaApi(secondCollectionAlias)
+      await deleteCollectionViaApi(thirdCollectionAlias)
+      await deleteCollectionViaApi(fourthCollectionAlias)
+    })
+
+    test('should return collection links successfully', async () => {
+      const firstCollection = await sut.getCollection(firstCollectionAlias)
+      const collectionLinks = await sut.getCollectionLinks(firstCollection.id)
+
+      expect(collectionLinks.linkedCollections).toHaveLength(1)
+
+      expect(collectionLinks.linkedCollections[0].alias).toBe(secondCollectionAlias)
+      expect(collectionLinks.collectionsLinkingToThis).toHaveLength(2)
+      expect(collectionLinks.collectionsLinkingToThis[0].alias).toBe(thirdCollectionAlias)
+      expect(collectionLinks.collectionsLinkingToThis[1].alias).toBe(fourthCollectionAlias)
+      expect(collectionLinks.linkedDatasets).toHaveLength(1)
+      expect(collectionLinks.linkedDatasets[0].title).toBe(
+        'Dataset created using the createDataset use case'
+      )
+    })
+
+    test('should return error when collection does not exist', async () => {
+      const invalidCollectionId = 99999
+      const expectedError = new ReadError("[404] Can't find dataverse with identifier='99999'")
+
+      await expect(sut.getCollectionLinks(invalidCollectionId)).rejects.toThrow(expectedError)
     })
   })
 })

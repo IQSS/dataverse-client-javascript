@@ -3,6 +3,7 @@ import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRe
 import {
   transformCollectionFacetsResponseToCollectionFacets,
   transformCollectionItemsResponseToCollectionItemSubset,
+  transformCollectionLinksResponseToCollectionLinks,
   transformCollectionResponseToCollection,
   transformMyDataResponseToCollectionItemSubset
 } from './transformers/collectionTransformers'
@@ -36,6 +37,7 @@ import {
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
+import { CollectionLinks } from '../../domain/models/CollectionLinks'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -467,6 +469,16 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       `/dataverses/${linkedCollectionIdOrAlias}` + `/deleteLink/${linkingCollectionIdOrAlias}`
     )
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+  public async getCollectionLinks(collectionIdOrAlias: number | string): Promise<CollectionLinks> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/links`, true)
+      .then((response) => {
+        console.log('getCollectionLinks response:', response.data.data) // Print the response
+        return transformCollectionLinksResponseToCollectionLinks(response)
+      })
       .catch((error) => {
         throw error
       })

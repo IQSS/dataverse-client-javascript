@@ -44,6 +44,7 @@ import {
   PublicationStatusCount
 } from '../../../domain/models/MyDataCollectionItemSubset'
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
+import { CollectionLinks } from '../../../domain/models/CollectionLinks'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -152,7 +153,22 @@ export const transformCollectionItemsResponseToCollectionItemSubset = (
     ...(countPerObjectType && { countPerObjectType })
   }
 }
-
+export const transformCollectionLinksResponseToCollectionLinks = (
+  response: AxiosResponse
+): CollectionLinks => {
+  const responseDataPayload = response.data.data
+  const linkedCollections = responseDataPayload.linkedDataverses
+  const collectionsLinkingToThis = responseDataPayload.dataversesLinkingToThis
+  const linkedDatasets = responseDataPayload.linkedDatasets
+  console.log('linkedCollections', linkedCollections)
+  console.log('collectionsLinkedToThis', collectionsLinkingToThis)
+  console.log('linkedDatasets', linkedDatasets)
+  return {
+    linkedCollections,
+    collectionsLinkingToThis,
+    linkedDatasets
+  }
+}
 export const transformMyDataResponseToCollectionItemSubset = (
   response: AxiosResponse
 ): MyDataCollectionItemSubset => {
