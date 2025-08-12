@@ -160,9 +160,6 @@ export const transformCollectionLinksResponseToCollectionLinks = (
   const linkedCollections = responseDataPayload.linkedDataverses
   const collectionsLinkingToThis = responseDataPayload.dataversesLinkingToThis
   const linkedDatasets = responseDataPayload.linkedDatasets
-  console.log('linkedCollections', linkedCollections)
-  console.log('collectionsLinkedToThis', collectionsLinkingToThis)
-  console.log('linkedDatasets', linkedDatasets)
   return {
     linkedCollections,
     collectionsLinkingToThis,

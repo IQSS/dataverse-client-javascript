@@ -476,7 +476,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   public async getCollectionLinks(collectionIdOrAlias: number | string): Promise<CollectionLinks> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/links`, true)
       .then((response) => {
-        console.log('getCollectionLinks response:', response.data.data) // Print the response
         return transformCollectionLinksResponseToCollectionLinks(response)
       })
       .catch((error) => {
