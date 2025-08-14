@@ -42,7 +42,9 @@ export const createSuperAdminRoleArray = (): Role[] => {
         'ManageDatasetPermissions',
         'ManageFilePermissions',
         'PublishDataverse',
+        'LinkDataverse',
         'PublishDataset',
+        'LinkDataset',
         'DeleteDataverse',
         'DeleteDatasetDraft'
       ],
@@ -99,10 +101,11 @@ export const createSuperAdminRoleArray = (): Role[] => {
         'ManageDatasetPermissions',
         'ManageFilePermissions',
         'PublishDataset',
+        'LinkDataset',
         'DeleteDatasetDraft'
       ],
       description:
-        'For datasets, a person who can edit License + Terms, edit Permissions, and publish datasets.',
+        'For datasets, a person who can edit License + Terms, edit Permissions, and publish and link datasets.',
       id: 7
     },
     {
