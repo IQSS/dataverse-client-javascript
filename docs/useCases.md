@@ -36,12 +36,15 @@ The different use cases currently available in the package are classified below,
     - [Get Differences between Two Dataset Versions](#get-differences-between-two-dataset-versions)
     - [List All Datasets](#list-all-datasets)
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
+    - [Get Dataset Linked Collections](#get-dataset-linked-collections)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
     - [Delete a Draft Dataset](#delete-a-draft-dataset)
+    - [Link a Dataset](#link-a-dataset)
+    - [Unlink a Dataset](#unlink-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -88,6 +91,8 @@ The different use cases currently available in the package are classified below,
 - [Notifications](#Notifications)
   - [Get All Notifications by User](#get-all-notifications-by-user)
   - [Delete Notification](#delete-notification)
+- [Search](#Search)
+  - [Get Search Services](#get-search-services)
 
 ## Collections
 
@@ -225,6 +230,8 @@ This use case supports the following optional parameters depending on the search
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
 - **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
+- **searchServiceName**: The search service name on which to execute the search (Optional).
+- **showTypeCounts**: If true, the response will include the count per object type (Optional).
 
 #### List My Data Collection Items
 
@@ -560,6 +567,37 @@ The `datasetId` parameter can be a string, for persistent identifiers, or a numb
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
+#### Get Dataset Citation In Other Formats
+
+Retrieves the citation for a dataset in a specified bibliographic format.
+
+##### Example call:
+
+```typescript
+import { getDatasetCitationInOtherFormats } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 2
+const datasetVersionId = '1.0'
+
+getDatasetCitationInOtherFormats
+  .execute(datasetId, datasetVersionId, format)
+  .then((citationText: FormattedCitation) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetCitationInOtherFormats.ts) implementation_.
+
+Supported formats include 'EndNote' (XML), 'RIS' (plain text), 'BibTeX' (plain text), 'CSLJson' (JSON), and 'Internal' (HTML). The response contains the raw citation content in the requested format, the format type, and the content type (MIME type).
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
 #### Get Dataset Citation Text By Private URL Token
 
 Returns the Dataset citation text, given an associated Private URL Token.
@@ -737,6 +775,30 @@ getDatasetVersionsSummaries
 _See [use case](../src/datasets/domain/useCases/GetDatasetVersionsSummaries.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Get Dataset Linked Collections
+
+Returns an array of [DatasetLinkedCollection](../src/datasets/domain/models/DatasetLinkedCollection.ts) that contains the collections linked to a dataset.
+
+##### Example call:
+
+```typescript
+import { getDatasetLinkedCollections } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetLinkedCollections
+  .execute(datasetId)
+  .then((datasetLinkedCollections: DatasetLinkedCollection[]) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetLinkedCollections.ts) implementation_.
 
 ### Datasets Write Use Cases
 
@@ -946,6 +1008,48 @@ _See [use case](../src/datasets/domain/useCases/DeleteDatasetDraft.ts) implement
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
 If you try to delete a dataset without draft version, you will get a not found error.
+
+#### Link a Dataset
+
+Creates a link between a Dataset and a Collection.
+
+##### Example call:
+
+```typescript
+import { linkDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const collectionAlias = 'collection-alias'
+
+linkDataset.execute(datasetId, collectionAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/LinkDataset.ts) implementation_.
+
+#### Unlink a Dataset
+
+Removes a link between a Dataset and a Collection.
+
+##### Example call:
+
+```typescript
+import { unlinkDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const collectionAlias = 'collection-alias'
+
+unlinkDataset.execute(datasetId, collectionAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/UnlinkDataset.ts) implementation_.
 
 #### Get Download Count of a Dataset
 
@@ -2038,3 +2142,25 @@ deleteNotification.execute(notificationId: number).then(() => {
 ```
 
 _See [use case](../src/notifications/domain/useCases/DeleteNotification.ts) implementation_.
+
+## Search
+
+#### Get Search Services
+
+Returns all [Search Services](../src/search/domain/models/SearchService.ts) available in the installation.
+
+##### Example call:
+
+```typescript
+import { getSearchServices } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getSearchServices.execute().then((searchServices: SearchService[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/search/domain/useCases/GetSearchServices.ts) implementation_.

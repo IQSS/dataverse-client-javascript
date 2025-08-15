@@ -784,6 +784,7 @@ describe('CollectionsRepository', () => {
         undefined,
         undefined,
         undefined,
+        undefined,
         true
       )
       expect(actual.countPerObjectType?.collections).toBe(1)
