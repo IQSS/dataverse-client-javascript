@@ -43,6 +43,8 @@ export const createSuperAdminRoleArray = (): Role[] => {
         'ManageFilePermissions',
         'PublishDataverse',
         'PublishDataset',
+        'LinkDataverse',
+        'LinkDataset',
         'DeleteDataverse',
         'DeleteDatasetDraft'
       ],
