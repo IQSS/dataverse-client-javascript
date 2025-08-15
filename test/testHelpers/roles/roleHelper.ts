@@ -105,7 +105,7 @@ export const createSuperAdminRoleArray = (): Role[] => {
         'DeleteDatasetDraft'
       ],
       description:
-        'For datasets, a person who can edit License + Terms, edit Permissions, and publish datasets and link datasets.',
+        'For datasets, a person who can edit License + Terms, edit Permissions, and publish and link datasets.',
       id: 7
     },
     {
