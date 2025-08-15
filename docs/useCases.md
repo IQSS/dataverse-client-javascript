@@ -564,6 +564,37 @@ The `datasetId` parameter can be a string, for persistent identifiers, or a numb
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
+#### Get Dataset Citation In Other Formats
+
+Retrieves the citation for a dataset in a specified bibliographic format.
+
+##### Example call:
+
+```typescript
+import { getDatasetCitationInOtherFormats } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 2
+const datasetVersionId = '1.0'
+
+getDatasetCitationInOtherFormats
+  .execute(datasetId, datasetVersionId, format)
+  .then((citationText: FormattedCitation) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetCitationInOtherFormats.ts) implementation_.
+
+Supported formats include 'EndNote' (XML), 'RIS' (plain text), 'BibTeX' (plain text), 'CSLJson' (JSON), and 'Internal' (HTML). The response contains the raw citation content in the requested format, the format type, and the content type (MIME type).
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
 #### Get Dataset Citation Text By Private URL Token
 
 Returns the Dataset citation text, given an associated Private URL Token.
