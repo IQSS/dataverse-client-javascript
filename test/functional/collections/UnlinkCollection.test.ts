@@ -51,7 +51,7 @@ describe('execute', () => {
     expect(collectionItemSubset2.items.length).toBe(0)
   })
 
-  test('should throw an error when linking a non-existent collection', async () => {
+  test('should throw an error when unlinking a non-existent collection', async () => {
     const invalidCollectionId = 99999
 
     expect.assertions(2)
