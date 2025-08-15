@@ -2,7 +2,7 @@ import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 import { CollectionLinks } from '../models/CollectionLinks'
 
-export class GetCollectionItems implements UseCase<CollectionLinks> {
+export class GetCollectionLinks implements UseCase<CollectionLinks> {
   private collectionsRepository: ICollectionsRepository
 
   constructor(collectionsRepository: ICollectionsRepository) {
