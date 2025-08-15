@@ -85,7 +85,7 @@ export {
   linkDataset,
   unlinkDataset,
   getDatasetLinkedCollections,
-  getDatasetAvailableCategories
+  getDatasetAvailableCategories,
   getDatasetCitationInOtherFormats
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
