@@ -25,4 +25,20 @@ describe('execute', () => {
     expect(notifications[0]).toHaveProperty('type')
     expect(notifications[0]).toHaveProperty('sentTimestamp')
   })
+
+  test('should have correct in-app notification properties when inAppNotificationFormat is true', async () => {
+    const notifications = await getAllNotificationsByUser.execute(true)
+
+    expect(notifications[0]).toHaveProperty('id')
+    expect(notifications[0]).toHaveProperty('type')
+    expect(notifications[0]).toHaveProperty('sentTimestamp')
+    expect(notifications[0]).toHaveProperty('displayAsRead')
+    expect(notifications[0]).toHaveProperty('roleAssignments')
+    expect(notifications[0].roleAssignments).toBeDefined()
+    expect(notifications[0].roleAssignments?.length).toBeGreaterThan(0)
+    expect(notifications[0].roleAssignments?.[0]).toHaveProperty('roleName', 'Admin')
+    expect(notifications[0].roleAssignments?.[0]).toHaveProperty('assignee', '@dataverseAdmin')
+    expect(notifications[0].roleAssignments?.[0]).toHaveProperty('roleId', 1)
+    expect(notifications[0].roleAssignments?.[0]).toHaveProperty('definitionPointId', 1)
+  })
 })

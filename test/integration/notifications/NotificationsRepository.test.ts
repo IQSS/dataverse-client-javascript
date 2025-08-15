@@ -4,13 +4,21 @@ import {
 } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { NotificationsRepository } from '../../../src/notifications/infra/repositories/NotificationsRepository'
-import { Notification } from '../../../src/notifications/domain/models/Notification'
-import { createDataset } from '../../../src/datasets'
-import { publishDatasetViaApi, waitForNoLocks } from '../../testHelpers/datasets/datasetHelper'
+import {
+  Notification,
+  NotificationType
+} from '../../../src/notifications/domain/models/Notification'
+import { createDataset, CreatedDatasetIdentifiers } from '../../../src/datasets'
+import {
+  deletePublishedDatasetViaApi,
+  publishDatasetViaApi,
+  waitForNoLocks
+} from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
 
 describe('NotificationsRepository', () => {
   const sut: NotificationsRepository = new NotificationsRepository()
+  let testDatasetIds: CreatedDatasetIdentifiers
 
   beforeEach(() => {
     ApiConfig.init(
@@ -20,9 +28,13 @@ describe('NotificationsRepository', () => {
     )
   })
 
+  afterAll(async () => {
+    await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+  })
+
   test('should return notifications after creating and publishing a dataset', async () => {
     // Create a dataset and publish it so that a notification of Dataset published is created
-    const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
 
     await publishDatasetViaApi(testDatasetIds.numericId)
     await waitForNoLocks(testDatasetIds.numericId, 10)
@@ -32,7 +44,9 @@ describe('NotificationsRepository', () => {
     expect(Array.isArray(notifications)).toBe(true)
     expect(notifications.length).toBeGreaterThan(0)
 
-    const publishedNotification = notifications.find((n) => n.type === 'PUBLISHEDDS')
+    const publishedNotification = notifications.find(
+      (n) => n.type === NotificationType.PUBLISHEDDS
+    ) as Notification
 
     expect(publishedNotification).toBeDefined()
 
@@ -72,5 +86,31 @@ describe('NotificationsRepository', () => {
     )
 
     await expect(sut.deleteNotification(nonExistentNotificationId)).rejects.toThrow(expectedError)
+  })
+
+  test('should return notifications with basic properties when inAppNotificationFormat is true', async () => {
+    const notifications: Notification[] = await sut.getAllNotificationsByUser(true)
+
+    const notification = notifications[0]
+    expect(notification).toHaveProperty('id')
+    expect(notification).toHaveProperty('type')
+    expect(notification.type).toBe(NotificationType.ASSIGNROLE)
+    expect(notification).toHaveProperty('sentTimestamp')
+    expect(notification).toHaveProperty('displayAsRead')
+    expect(notification).toHaveProperty('dataverseDisplayName')
+
+    expect(notification).toHaveProperty('roleAssignments')
+    expect(notification.roleAssignments).toBeDefined()
+    expect(notification.roleAssignments?.length).toBeGreaterThan(0)
+    expect(notification.roleAssignments?.[0]).toHaveProperty('roleName', 'Admin')
+    expect(notification.roleAssignments?.[0]).toHaveProperty('assignee', '@dataverseAdmin')
+    expect(notification.roleAssignments?.[0]).toHaveProperty('roleId', 1)
+    expect(notification.roleAssignments?.[0]).toHaveProperty('definitionPointId', 1)
+  })
+
+  test('should return array when inAppNotificationFormat is false', async () => {
+    const notifications: Notification[] = await sut.getAllNotificationsByUser(false)
+
+    expect(Array.isArray(notifications)).toBe(true)
   })
 })

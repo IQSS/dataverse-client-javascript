@@ -5,8 +5,15 @@ import { Notification } from '../../domain/models/Notification'
 export class NotificationsRepository extends ApiRepository implements INotificationsRepository {
   private readonly notificationsResourceName: string = 'notifications'
 
-  public async getAllNotificationsByUser(): Promise<Notification[]> {
-    return this.doGet(this.buildApiEndpoint(this.notificationsResourceName, 'all'), true)
+  public async getAllNotificationsByUser(
+    inAppNotificationFormat?: boolean
+  ): Promise<Notification[]> {
+    const queryParams = inAppNotificationFormat ? { inAppNotificationFormat: 'true' } : undefined
+    return this.doGet(
+      this.buildApiEndpoint(this.notificationsResourceName, 'all'),
+      true,
+      queryParams
+    )
       .then((response) => response.data.data.notifications as Notification[])
       .catch((error) => {
         throw error

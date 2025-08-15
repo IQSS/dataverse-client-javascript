@@ -9,4 +9,4 @@ const deleteNotification = new DeleteNotification(notificationsRepository)
 
 export { getAllNotificationsByUser, deleteNotification }
 
-export { Notification } from './domain/models/Notification'
+export { Notification, NotificationType, RoleAssignment } from './domain/models/Notification'

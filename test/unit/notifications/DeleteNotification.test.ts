@@ -1,21 +1,26 @@
 import { DeleteNotification } from '../../../src/notifications/domain/useCases/DeleteNotification'
 import { INotificationsRepository } from '../../../src/notifications/domain/repositories/INotificationsRepository'
-import { Notification } from '../../../src/notifications/domain/models/Notification'
+import {
+  Notification,
+  NotificationType
+} from '../../../src/notifications/domain/models/Notification'
 
 const mockNotifications: Notification[] = [
   {
     id: 1,
-    type: 'PUBLISHEDDS',
+    type: NotificationType.PUBLISHEDDS,
     subjectText: 'Test notification',
     messageText: 'Test message',
-    sentTimestamp: '2025-01-01T00:00:00Z'
+    sentTimestamp: '2025-01-01T00:00:00Z',
+    displayAsRead: false
   },
   {
     id: 2,
-    type: 'ASSIGNROLE',
+    type: NotificationType.ASSIGNROLE,
     subjectText: 'Role assignment',
     messageText: 'Role assigned',
-    sentTimestamp: '2025-01-01T00:00:00Z'
+    sentTimestamp: '2025-01-01T00:00:00Z',
+    displayAsRead: false
   }
 ]
 
