@@ -453,7 +453,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     linkingCollectionIdOrAlias: number | string
   ): Promise<void> {
     return this.doPut(
-      `/dataverses/${linkedCollectionIdOrAlias}` + `/link/${linkingCollectionIdOrAlias}`,
+      `/dataverses/${linkedCollectionIdOrAlias}/link/${linkingCollectionIdOrAlias}`,
       {} // No data is needed for this operation
     )
       .then(() => undefined)
@@ -466,7 +466,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     linkingCollectionIdOrAlias: number | string
   ): Promise<void> {
     return this.doDelete(
-      `/dataverses/${linkedCollectionIdOrAlias}` + `/deleteLink/${linkingCollectionIdOrAlias}`
+      `/dataverses/${linkedCollectionIdOrAlias}/deleteLink/${linkingCollectionIdOrAlias}`
     )
       .then(() => undefined)
       .catch((error) => {

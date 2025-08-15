@@ -2,7 +2,6 @@ import {
   ApiConfig,
   WriteError,
   createCollection,
-  getCollection,
   linkCollection,
   deleteCollection,
   getCollectionItems,
@@ -16,43 +15,37 @@ describe('execute', () => {
   const firstCollectionAlias = 'unlinkCollection-functional-test-first'
   const secondCollectionAlias = 'unlinkCollection-functional-test-second'
 
+  let firstCollectionId: number
+  let secondCollectionId: number
   beforeEach(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
-    const firstCollection = createCollectionDTO(firstCollectionAlias)
-    const secondCollection = createCollectionDTO(secondCollectionAlias)
-    await createCollection.execute(firstCollection)
-    await createCollection.execute(secondCollection)
-    await linkCollection.execute(secondCollection.alias, firstCollection.alias)
+    const firstCollectionDTO = createCollectionDTO(firstCollectionAlias)
+    const secondCollectionDTO = createCollectionDTO(secondCollectionAlias)
+    firstCollectionId = await createCollection.execute(firstCollectionDTO)
+    secondCollectionId = await createCollection.execute(secondCollectionDTO)
+    await linkCollection.execute(secondCollectionAlias, firstCollectionAlias)
+    // Give enough time to Solr for indexing
+    await new Promise((resolve) => setTimeout(resolve, 5000))
   })
 
   afterEach(async () => {
     await Promise.all([
-      getCollection
-        .execute(firstCollectionAlias)
-        .then((collection) =>
-          collection && collection.id ? deleteCollection.execute(collection.id) : null
-        ),
-      getCollection
-        .execute(secondCollectionAlias)
-        .then((collection) =>
-          collection && collection.id ? deleteCollection.execute(collection.id) : null
-        )
+      deleteCollection.execute(firstCollectionId),
+      deleteCollection.execute(secondCollectionId)
     ])
   })
 
   test('should successfully unlink two collections', async () => {
-    const firstCollection = await getCollection.execute(firstCollectionAlias)
-    const secondCollection = await getCollection.execute(secondCollectionAlias)
-    // Give enough time to Solr for indexing
-    await new Promise((resolve) => setTimeout(resolve, 5000))
+    // Verify that the collections are linked
     const collectionItemSubset = await getCollectionItems.execute(firstCollectionAlias)
     expect(collectionItemSubset.items.length).toBe(1)
 
-    await unlinkCollection.execute(secondCollection.alias, firstCollection.alias)
+    await unlinkCollection.execute(secondCollectionAlias, firstCollectionAlias)
+    // Wait for the unlinking to be processed by Solr
     await new Promise((resolve) => setTimeout(resolve, 5000))
     const collectionItemSubset2 = await getCollectionItems.execute(firstCollectionAlias)
     expect(collectionItemSubset2.items.length).toBe(0)
@@ -60,12 +53,11 @@ describe('execute', () => {
 
   test('should throw an error when linking a non-existent collection', async () => {
     const invalidCollectionId = 99999
-    const firstCollection = await getCollection.execute(firstCollectionAlias)
 
     expect.assertions(2)
     let writeError: WriteError | undefined = undefined
     try {
-      await unlinkCollection.execute(invalidCollectionId, firstCollection.id)
+      await unlinkCollection.execute(invalidCollectionId, firstCollectionId)
       throw new Error('Use case should throw an error')
     } catch (error) {
       writeError = error as WriteError
