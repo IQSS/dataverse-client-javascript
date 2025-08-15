@@ -14,7 +14,8 @@ import { createCollectionDTO } from '../../testHelpers/collections/collectionHel
 describe('execute', () => {
   const firstCollectionAlias = 'linkCollection-functional-test-first'
   const secondCollectionAlias = 'linkCollection-functional-test-second'
-
+  let firstCollectionId: number
+  let secondCollectionId: number
   beforeEach(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
@@ -23,34 +24,25 @@ describe('execute', () => {
     )
     const firstCollection = createCollectionDTO(firstCollectionAlias)
     const secondCollection = createCollectionDTO(secondCollectionAlias)
-    await createCollection.execute(firstCollection)
-    await createCollection.execute(secondCollection)
+    firstCollectionId = await createCollection.execute(firstCollection)
+    secondCollectionId = await createCollection.execute(secondCollection)
   })
 
   afterEach(async () => {
     await Promise.all([
-      getCollection
-        .execute(firstCollectionAlias)
-        .then((collection) =>
-          collection && collection.id ? deleteCollection.execute(collection.id) : null
-        ),
-      getCollection
-        .execute(secondCollectionAlias)
-        .then((collection) =>
-          collection && collection.id ? deleteCollection.execute(collection.id) : null
-        )
+      deleteCollection.execute(firstCollectionId),
+      deleteCollection.execute(secondCollectionId)
     ])
   })
 
   test('should successfully link two collections', async () => {
-    const firstCollection = await getCollection.execute(firstCollectionAlias)
-    const secondCollection = await getCollection.execute(secondCollectionAlias)
     expect.assertions(1)
     try {
-      await linkCollection.execute(secondCollection.alias, firstCollection.alias)
+      await linkCollection.execute(secondCollectionAlias, firstCollectionAlias)
     } catch (error) {
       throw new Error('Collections should be linked successfully')
     } finally {
+      // Wait for the linking to be processed by Solr
       await new Promise((resolve) => setTimeout(resolve, 5000))
       const collectionItemSubset = await getCollectionItems.execute(firstCollectionAlias)
 
