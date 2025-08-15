@@ -1609,4 +1609,44 @@ describe('DatasetsRepository', () => {
       await expect(sut.getDatasetLinkedCollections(nonExistentTestDatasetId)).rejects.toThrow()
     })
   })
+
+  describe('getDatasetAvailableCategories', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should get available categories', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2', 'Documentation', 'Data', 'Code']
+      }
+
+      await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name, fileMetadata)
+
+      const actual = await sut.getDatasetAvailableCategories(testDatasetIds.numericId)
+      expect(actual.sort()).toEqual(fileMetadata.categories.sort())
+    })
+
+    test('should get available categorie if dataset id is persistent id', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2', 'Documentation', 'Data', 'Code']
+      }
+
+      const actual = await sut.getDatasetAvailableCategories(testDatasetIds.persistentId)
+      expect(actual.sort()).toEqual(fileMetadata.categories.sort())
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetAvailableCategories(nonExistentTestDatasetId)).rejects.toThrow()
+    })
+  })
 })

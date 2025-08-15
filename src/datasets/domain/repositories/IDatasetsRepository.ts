@@ -67,6 +67,7 @@ export interface IDatasetsRepository {
   linkDataset(datasetId: number, collectionAlias: string): Promise<void>
   unlinkDataset(datasetId: number, collectionAlias: string): Promise<void>
   getDatasetLinkedCollections(datasetId: number | string): Promise<DatasetLinkedCollection[]>
+  getDatasetAvailableCategories(datasetId: number | string): Promise<string[]>
   getDatasetCitationInOtherFormats(
     datasetId: number | string,
     datasetVersionId: string,

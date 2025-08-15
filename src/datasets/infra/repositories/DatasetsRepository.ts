@@ -346,4 +346,15 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error
       })
   }
+
+  public async getDatasetAvailableCategories(datasetId: number | string): Promise<string[]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'availableFileCategories', datasetId),
+      true
+    )
+      .then((response) => response.data.data as string[])
+      .catch((error) => {
+        throw error
+      })
+  }
 }
