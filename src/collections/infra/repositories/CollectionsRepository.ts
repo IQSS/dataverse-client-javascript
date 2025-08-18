@@ -3,6 +3,7 @@ import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRe
 import {
   transformCollectionFacetsResponseToCollectionFacets,
   transformCollectionItemsResponseToCollectionItemSubset,
+  transformCollectionLinksResponseToCollectionLinks,
   transformCollectionResponseToCollection,
   transformMyDataResponseToCollectionItemSubset
 } from './transformers/collectionTransformers'
@@ -36,6 +37,7 @@ import {
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
+import { CollectionLinks } from '../../domain/models/CollectionLinks'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -442,6 +444,40 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   public async deleteCollectionFeaturedItem(featuredItemId: number): Promise<void> {
     return this.doDelete(`/dataverseFeaturedItems/${featuredItemId}`)
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+  public async linkCollection(
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
+  ): Promise<void> {
+    return this.doPut(
+      `/dataverses/${linkedCollectionIdOrAlias}/link/${linkingCollectionIdOrAlias}`,
+      {} // No data is needed for this operation
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+  public async unlinkCollection(
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
+  ): Promise<void> {
+    return this.doDelete(
+      `/dataverses/${linkedCollectionIdOrAlias}/deleteLink/${linkingCollectionIdOrAlias}`
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+  public async getCollectionLinks(collectionIdOrAlias: number | string): Promise<CollectionLinks> {
+    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/links`, true)
+      .then((response) => {
+        return transformCollectionLinksResponseToCollectionLinks(response)
+      })
       .catch((error) => {
         throw error
       })
