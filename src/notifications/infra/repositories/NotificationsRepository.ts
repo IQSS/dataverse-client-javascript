@@ -24,9 +24,23 @@ export class NotificationsRepository extends ApiRepository implements INotificat
     return this.doDelete(
       this.buildApiEndpoint(this.notificationsResourceName, notificationId.toString())
     )
-      .then(() => {})
+      .then(() => undefined)
       .catch((error) => {
         throw error
       })
+  }
+
+  public async getUnreadCount(): Promise<number> {
+    return this.doGet(
+      this.buildApiEndpoint(this.notificationsResourceName, 'unreadCount'),
+      true
+    ).then((response) => response.data.data.unreadCount as number)
+  }
+
+  public async markAsRead(notificationId: number): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.notificationsResourceName, 'markAsRead', notificationId),
+      {}
+    ).then(() => undefined)
   }
 }

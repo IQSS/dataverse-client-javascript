@@ -91,6 +91,8 @@ The different use cases currently available in the package are classified below,
 - [Notifications](#Notifications)
   - [Get All Notifications by User](#get-all-notifications-by-user)
   - [Delete Notification](#delete-notification)
+  - [Get Unread Count](#get-unread-count)
+  - [Mark As Read](#mark-as-read)
 - [Search](#Search)
   - [Get Search Services](#get-search-services)
 
@@ -2142,6 +2144,48 @@ deleteNotification.execute(notificationId: number).then(() => {
 ```
 
 _See [use case](../src/notifications/domain/useCases/DeleteNotification.ts) implementation_.
+
+#### Get Unread Count
+
+Returns the number of unread notifications for the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getUnreadCount } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getUnreadCount.execute().then((count: number) => {
+  console.log(`You have ${count} unread notifications`)
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/GetUnreadCount.ts) implementation_.
+
+#### Mark As Read
+
+Marks a specific notification as read for the current authenticated user. This operation is idempotent - marking an already-read notification as read will not cause an error.
+
+##### Example call:
+
+```typescript
+import { markAsRead } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const notificationId = 123
+
+markAsRead.execute(notificationId).then(() => {
+  console.log('Notification marked as read')
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/MarkAsRead.ts) implementation_.
 
 ## Search
 

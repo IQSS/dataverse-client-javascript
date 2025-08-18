@@ -48,7 +48,7 @@ export interface Notification {
   subjectText?: string
   messageText?: string
   sentTimestamp: string
-  displayAsRead?: boolean
+  displayAsRead: boolean
   installationBrandName?: string
   userGuidesBaseUrl?: string
   userGuidesVersion?: string

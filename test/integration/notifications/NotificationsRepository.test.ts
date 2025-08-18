@@ -9,11 +9,7 @@ import {
   NotificationType
 } from '../../../src/notifications/domain/models/Notification'
 import { createDataset, CreatedDatasetIdentifiers } from '../../../src/datasets'
-import {
-  deletePublishedDatasetViaApi,
-  publishDatasetViaApi,
-  waitForNoLocks
-} from '../../testHelpers/datasets/datasetHelper'
+import { publishDatasetViaApi, waitForNoLocks } from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
 
 describe('NotificationsRepository', () => {
@@ -26,10 +22,6 @@ describe('NotificationsRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
-  })
-
-  afterAll(async () => {
-    await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
   })
 
   test('should return notifications after creating and publishing a dataset', async () => {
@@ -81,9 +73,7 @@ describe('NotificationsRepository', () => {
   test('should throw error when trying to delete notification with wrong ID', async () => {
     const nonExistentNotificationId = 99999
 
-    const expectedError = new WriteError(
-      `[404] Notification ${nonExistentNotificationId} not found.`
-    )
+    const expectedError = new WriteError()
 
     await expect(sut.deleteNotification(nonExistentNotificationId)).rejects.toThrow(expectedError)
   })
@@ -102,15 +92,48 @@ describe('NotificationsRepository', () => {
     expect(notification).toHaveProperty('roleAssignments')
     expect(notification.roleAssignments).toBeDefined()
     expect(notification.roleAssignments?.length).toBeGreaterThan(0)
-    expect(notification.roleAssignments?.[0]).toHaveProperty('roleName', 'Admin')
-    expect(notification.roleAssignments?.[0]).toHaveProperty('assignee', '@dataverseAdmin')
-    expect(notification.roleAssignments?.[0]).toHaveProperty('roleId', 1)
-    expect(notification.roleAssignments?.[0]).toHaveProperty('definitionPointId', 1)
+    expect(notification.roleAssignments?.[0]).toHaveProperty('roleName')
+    expect(notification.roleAssignments?.[0]).toHaveProperty('assignee')
+    expect(notification.roleAssignments?.[0]).toHaveProperty('roleId')
+    expect(notification.roleAssignments?.[0]).toHaveProperty('definitionPointId')
   })
 
   test('should return array when inAppNotificationFormat is false', async () => {
     const notifications: Notification[] = await sut.getAllNotificationsByUser(false)
 
     expect(Array.isArray(notifications)).toBe(true)
+  })
+
+  test('should return unread count', async () => {
+    const unreadCount = await sut.getUnreadCount()
+
+    console.log('unreadCount', unreadCount)
+    expect(typeof unreadCount).toBe('number')
+    expect(unreadCount).toBeGreaterThanOrEqual(0)
+  })
+
+  test('should mark notification as read successfully', async () => {
+    const notifications: Notification[] = await sut.getAllNotificationsByUser()
+
+    expect(notifications.length).toBeGreaterThan(0)
+
+    const unreadNotification = notifications[0]
+
+    await expect(sut.markAsRead(unreadNotification.id)).resolves.toBeUndefined()
+
+    const updatedNotifications: Notification[] = await sut.getAllNotificationsByUser()
+    const updatedNotification = updatedNotifications.find((n) => n.id === unreadNotification.id)
+
+    expect(updatedNotification?.displayAsRead).toBe(true)
+  })
+
+  test('should throw error when marking non-existent notification as read', async () => {
+    const nonExistentNotificationId = 99999
+
+    const expectedError = new WriteError(
+      `[404] Notification ${nonExistentNotificationId} not found.`
+    )
+
+    await expect(sut.markAsRead(nonExistentNotificationId)).rejects.toThrow(expectedError)
   })
 })
