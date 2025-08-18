@@ -8,6 +8,11 @@ export class GetUnreadCount implements UseCase<number> {
     this.notificationsRepository = notificationsRepository
   }
 
+  /**
+   * Use case for retrieving the number of unread notifications for the current user.
+   *
+   * @returns {Promise<number>} - A promise that resolves to the number of unread notifications.
+   */
   async execute(): Promise<number> {
     return await this.notificationsRepository.getUnreadCount()
   }

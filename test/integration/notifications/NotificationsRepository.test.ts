@@ -73,7 +73,9 @@ describe('NotificationsRepository', () => {
   test('should throw error when trying to delete notification with wrong ID', async () => {
     const nonExistentNotificationId = 99999
 
-    const expectedError = new WriteError()
+    const expectedError = new WriteError(
+      `[404] Notification ${nonExistentNotificationId} not found.`
+    )
 
     await expect(sut.deleteNotification(nonExistentNotificationId)).rejects.toThrow(expectedError)
   })
@@ -84,18 +86,28 @@ describe('NotificationsRepository', () => {
     const notification = notifications[0]
     expect(notification).toHaveProperty('id')
     expect(notification).toHaveProperty('type')
-    expect(notification.type).toBe(NotificationType.ASSIGNROLE)
     expect(notification).toHaveProperty('sentTimestamp')
     expect(notification).toHaveProperty('displayAsRead')
-    expect(notification).toHaveProperty('dataverseDisplayName')
+  })
 
-    expect(notification).toHaveProperty('roleAssignments')
-    expect(notification.roleAssignments).toBeDefined()
-    expect(notification.roleAssignments?.length).toBeGreaterThan(0)
-    expect(notification.roleAssignments?.[0]).toHaveProperty('roleName')
-    expect(notification.roleAssignments?.[0]).toHaveProperty('assignee')
-    expect(notification.roleAssignments?.[0]).toHaveProperty('roleId')
-    expect(notification.roleAssignments?.[0]).toHaveProperty('definitionPointId')
+  test('should find notification with ASSIGNROLE type', async () => {
+    const notifications: Notification[] = await sut.getAllNotificationsByUser(true)
+
+    // Find a notification with ASSIGNROLE type
+    const assignRoleNotification = notifications.find((n) => n.type === NotificationType.ASSIGNROLE)
+
+    expect(assignRoleNotification).toBeDefined()
+    expect(assignRoleNotification?.type).toBe(NotificationType.ASSIGNROLE)
+    expect(assignRoleNotification?.sentTimestamp).toBeDefined()
+    expect(assignRoleNotification?.displayAsRead).toBeDefined()
+    expect(assignRoleNotification?.dataverseDisplayName).toBeDefined()
+
+    expect(assignRoleNotification?.roleAssignments).toBeDefined()
+    expect(assignRoleNotification?.roleAssignments?.length).toBeGreaterThan(0)
+    expect(assignRoleNotification?.roleAssignments?.[0]).toHaveProperty('roleName')
+    expect(assignRoleNotification?.roleAssignments?.[0]).toHaveProperty('assignee')
+    expect(assignRoleNotification?.roleAssignments?.[0]).toHaveProperty('roleId')
+    expect(assignRoleNotification?.roleAssignments?.[0]).toHaveProperty('definitionPointId')
   })
 
   test('should return array when inAppNotificationFormat is false', async () => {
@@ -107,7 +119,6 @@ describe('NotificationsRepository', () => {
   test('should return unread count', async () => {
     const unreadCount = await sut.getUnreadCount()
 
-    console.log('unreadCount', unreadCount)
     expect(typeof unreadCount).toBe('number')
     expect(unreadCount).toBeGreaterThanOrEqual(0)
   })

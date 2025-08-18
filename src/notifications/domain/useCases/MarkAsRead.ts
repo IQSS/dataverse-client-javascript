@@ -8,6 +8,12 @@ export class MarkAsRead implements UseCase<void> {
     this.notificationsRepository = notificationsRepository
   }
 
+  /**
+   * Use case for marking a notification as read.
+   *
+   * @param notificationId - The ID of the notification to mark as read.
+   * @returns {Promise<void>} - A promise that resolves when the notification is marked as read.
+   */
   async execute(notificationId: number): Promise<void> {
     return await this.notificationsRepository.markAsRead(notificationId)
   }
