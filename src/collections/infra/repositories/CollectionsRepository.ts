@@ -357,10 +357,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     if (collectionSearchCriteria?.filterQueries) {
       collectionSearchCriteria.filterQueries.forEach((filterQuery) => {
-        const [filterQueryKey, filterQueryValue] = filterQuery.split(':')
+        const idx = filterQuery.indexOf(':')
+        if (idx === -1) return // Invalid filter query, skip it
+
+        const filterQueryKey = filterQuery.substring(0, idx).trim()
+        const filterQueryValue = filterQuery.substring(idx + 1).trim()
 
         const filterQueryValueWithQuotes = `"${filterQueryValue}"`
-
         const filterQueryToSet = `${filterQueryKey}:${filterQueryValueWithQuotes}`
 
         queryParams.append(GetCollectionItemsQueryParams.FILTERQUERY, filterQueryToSet)
