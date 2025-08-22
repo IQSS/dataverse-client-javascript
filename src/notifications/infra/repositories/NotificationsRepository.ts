@@ -1,6 +1,7 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { INotificationsRepository } from '../../domain/repositories/INotificationsRepository'
 import { Notification } from '../../domain/models/Notification'
+import { NotificationPayload } from '../transformers/NotificationPayload'
 
 export class NotificationsRepository extends ApiRepository implements INotificationsRepository {
   private readonly notificationsResourceName: string = 'notifications'
@@ -14,7 +15,17 @@ export class NotificationsRepository extends ApiRepository implements INotificat
       true,
       queryParams
     )
-      .then((response) => response.data.data.notifications as Notification[])
+      .then((response) => {
+        const notifications = response.data.data.notifications
+        return notifications.map((notification: NotificationPayload) => {
+          const { dataverseDisplayName, dataverseAlias, ...restNotification } = notification
+          return {
+            ...restNotification,
+            ...(dataverseDisplayName && { collectionDisplayName: dataverseDisplayName }),
+            ...(dataverseAlias && { collectionAlias: dataverseAlias })
+          }
+        }) as Notification[]
+      })
       .catch((error) => {
         throw error
       })
@@ -30,14 +41,14 @@ export class NotificationsRepository extends ApiRepository implements INotificat
       })
   }
 
-  public async getUnreadCount(): Promise<number> {
+  public async getUnreadNotificationsCount(): Promise<number> {
     return this.doGet(
       this.buildApiEndpoint(this.notificationsResourceName, 'unreadCount'),
       true
     ).then((response) => response.data.data.unreadCount as number)
   }
 
-  public async markAsRead(notificationId: number): Promise<void> {
+  public async markNotificationAsRead(notificationId: number): Promise<void> {
     return this.doPut(
       this.buildApiEndpoint(this.notificationsResourceName, 'markAsRead', notificationId),
       {}

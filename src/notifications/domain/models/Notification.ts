@@ -54,8 +54,8 @@ export interface Notification {
   userGuidesVersion?: string
   userGuidesSectionPath?: string
   roleAssignments?: RoleAssignment[]
-  dataverseAlias?: string
-  dataverseDisplayName?: string
+  collectionAlias?: string
+  collectionDisplayName?: string
   datasetPersistentIdentifier?: string
   datasetDisplayName?: string
   ownerPersistentIdentifier?: string

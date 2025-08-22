@@ -2152,18 +2152,18 @@ Returns the number of unread notifications for the current authenticated user.
 ##### Example call:
 
 ```typescript
-import { getUnreadCount } from '@iqss/dataverse-client-javascript'
+import { getUnreadNotificationsCount } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
-getUnreadCount.execute().then((count: number) => {
+getUnreadNotificationsCount.execute().then((count: number) => {
   console.log(`You have ${count} unread notifications`)
 })
 
 /* ... */
 ```
 
-_See [use case](../src/notifications/domain/useCases/GetUnreadCount.ts) implementation_.
+_See [use case](../src/notifications/domain/useCases/GetUnreadNotificationsCount.ts) implementation_.
 
 #### Mark As Read
 
@@ -2172,20 +2172,20 @@ Marks a specific notification as read for the current authenticated user. This o
 ##### Example call:
 
 ```typescript
-import { markAsRead } from '@iqss/dataverse-client-javascript'
+import { markNotificationAsRead } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const notificationId = 123
 
-markAsRead.execute(notificationId).then(() => {
+markNotificationAsRead.execute(notificationId).then(() => {
   console.log('Notification marked as read')
 })
 
 /* ... */
 ```
 
-_See [use case](../src/notifications/domain/useCases/MarkAsRead.ts) implementation_.
+_See [use case](../src/notifications/domain/useCases/MarkNotificationAsRead.ts) implementation_.
 
 ## Search
 

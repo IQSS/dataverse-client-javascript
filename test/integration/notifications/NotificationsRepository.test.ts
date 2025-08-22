@@ -11,6 +11,11 @@ import {
 import { createDataset, CreatedDatasetIdentifiers } from '../../../src/datasets'
 import { publishDatasetViaApi, waitForNoLocks } from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
+import { createCollection } from '../../../src/collections'
+import {
+  createCollectionDTO,
+  deleteCollectionViaApi
+} from '../../testHelpers/collections/collectionHelper'
 
 describe('NotificationsRepository', () => {
   const sut: NotificationsRepository = new NotificationsRepository()
@@ -90,17 +95,18 @@ describe('NotificationsRepository', () => {
     expect(notification).toHaveProperty('displayAsRead')
   })
 
-  test('should find notification with ASSIGNROLE type', async () => {
+  test('should find notification with ASSIGNROLE type that has not been deleted', async () => {
     const notifications: Notification[] = await sut.getAllNotificationsByUser(true)
 
-    // Find a notification with ASSIGNROLE type
-    const assignRoleNotification = notifications.find((n) => n.type === NotificationType.ASSIGNROLE)
+    const assignRoleNotification = notifications.find(
+      (n) => n.type === NotificationType.ASSIGNROLE && !n.objectDeleted
+    )
 
     expect(assignRoleNotification).toBeDefined()
     expect(assignRoleNotification?.type).toBe(NotificationType.ASSIGNROLE)
     expect(assignRoleNotification?.sentTimestamp).toBeDefined()
     expect(assignRoleNotification?.displayAsRead).toBeDefined()
-    expect(assignRoleNotification?.dataverseDisplayName).toBeDefined()
+    expect(assignRoleNotification?.collectionDisplayName).toBeDefined()
 
     expect(assignRoleNotification?.roleAssignments).toBeDefined()
     expect(assignRoleNotification?.roleAssignments?.length).toBeGreaterThan(0)
@@ -110,6 +116,34 @@ describe('NotificationsRepository', () => {
     expect(assignRoleNotification?.roleAssignments?.[0]).toHaveProperty('definitionPointId')
   })
 
+  test('should create a collection and find the notification with CREATEDV type', async () => {
+    const testCollectionAlias = 'test-notification-collection'
+    const createdCollectionId = await createCollection.execute(
+      createCollectionDTO(testCollectionAlias)
+    )
+
+    expect(createdCollectionId).toBeDefined()
+    expect(createdCollectionId).toBeGreaterThan(0)
+
+    const notifications: Notification[] = await sut.getAllNotificationsByUser(true)
+    expect(Array.isArray(notifications)).toBe(true)
+    expect(notifications.length).toBeGreaterThan(0)
+
+    const createdvNotification = notifications.find(
+      (n) => n.collectionAlias === testCollectionAlias
+    )
+
+    expect(createdvNotification).toBeDefined()
+    expect(createdvNotification?.type).toBe(NotificationType.CREATEDV)
+    expect(createdvNotification?.collectionAlias).toBe(testCollectionAlias)
+    expect(createdvNotification?.sentTimestamp).toBeDefined()
+    expect(createdvNotification?.displayAsRead).toBe(false)
+    expect(createdvNotification?.collectionDisplayName).toBe('Test Collection')
+    expect(createdvNotification?.collectionAlias).toBe(testCollectionAlias)
+
+    await deleteCollectionViaApi(testCollectionAlias)
+  })
+
   test('should return array when inAppNotificationFormat is false', async () => {
     const notifications: Notification[] = await sut.getAllNotificationsByUser(false)
 
@@ -117,7 +151,7 @@ describe('NotificationsRepository', () => {
   })
 
   test('should return unread count', async () => {
-    const unreadCount = await sut.getUnreadCount()
+    const unreadCount = await sut.getUnreadNotificationsCount()
 
     expect(typeof unreadCount).toBe('number')
     expect(unreadCount).toBeGreaterThanOrEqual(0)
@@ -130,7 +164,7 @@ describe('NotificationsRepository', () => {
 
     const unreadNotification = notifications[0]
 
-    await expect(sut.markAsRead(unreadNotification.id)).resolves.toBeUndefined()
+    await expect(sut.markNotificationAsRead(unreadNotification.id)).resolves.toBeUndefined()
 
     const updatedNotifications: Notification[] = await sut.getAllNotificationsByUser()
     const updatedNotification = updatedNotifications.find((n) => n.id === unreadNotification.id)
@@ -145,6 +179,8 @@ describe('NotificationsRepository', () => {
       `[404] Notification ${nonExistentNotificationId} not found.`
     )
 
-    await expect(sut.markAsRead(nonExistentNotificationId)).rejects.toThrow(expectedError)
+    await expect(sut.markNotificationAsRead(nonExistentNotificationId)).rejects.toThrow(
+      expectedError
+    )
   })
 })
