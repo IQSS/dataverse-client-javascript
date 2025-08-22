@@ -91,6 +91,11 @@ The different use cases currently available in the package are classified below,
   - [Get Application Terms of Use](#get-application-terms-of-use)
 - [Contact](#Contact)
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
+- [Notifications](#Notifications)
+  - [Get All Notifications by User](#get-all-notifications-by-user)
+  - [Delete Notification](#delete-notification)
+  - [Get Unread Count](#get-unread-count)
+  - [Mark As Read](#mark-as-read)
 - [Search](#Search)
   - [Get Search Services](#get-search-services)
 
@@ -2120,6 +2125,92 @@ In ContactDTO, it takes the following information:
 - **subject**: the email subject line.
 - **body**: the email body to send.
 - **fromEmail**: the email to list in the reply-to field.
+
+## Notifications
+
+#### Get All Notifications by User
+
+Returns a [Notification](../src/notifications/domain/models/Notification.ts) array containing all notifications for the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getAllNotificationsByUser } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAllNotificationsByUser.execute().then((notifications: Notification[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/GetAllNotificationsByUser.ts) implementation_.
+
+#### Delete Notification
+
+Deletes a specific notification for the current authenticated user by its ID.
+
+##### Example call:
+
+```typescript
+import { deleteNotification } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const notificationId = 123
+
+deleteNotification.execute(notificationId: number).then(() => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/DeleteNotification.ts) implementation_.
+
+#### Get Unread Count
+
+Returns the number of unread notifications for the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getUnreadNotificationsCount } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getUnreadNotificationsCount.execute().then((count: number) => {
+  console.log(`You have ${count} unread notifications`)
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/GetUnreadNotificationsCount.ts) implementation_.
+
+#### Mark As Read
+
+Marks a specific notification as read for the current authenticated user. This operation is idempotent - marking an already-read notification as read will not cause an error.
+
+##### Example call:
+
+```typescript
+import { markNotificationAsRead } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const notificationId = 123
+
+markNotificationAsRead.execute(notificationId).then(() => {
+  console.log('Notification marked as read')
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/MarkNotificationAsRead.ts) implementation_.
 
 ## Search
 
