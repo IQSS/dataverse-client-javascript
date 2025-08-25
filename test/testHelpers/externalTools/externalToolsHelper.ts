@@ -13,8 +13,7 @@ const DATAVERSE_API_REQUEST_HEADERS = {
   headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
 }
 
-const CREATE_FILE_EXTERNAL_TOOL_PAYLOAD: ISetExternalToolViaApi = {
-  id: 80,
+export const CREATE_FILE_EXTERNAL_TOOL_PAYLOAD: ISetExternalToolViaApi = {
   displayName: 'Text File Tool',
   toolName: 'textFileTool',
   description: 'Text File Tool',
@@ -39,6 +38,18 @@ const CREATE_FILE_EXTERNAL_TOOL_PAYLOAD: ISetExternalToolViaApi = {
       timeOut: 3600
     }
   ]
+}
+
+export const CREATE_DATASET_EXTERNAL_TOOL_PAYLOAD: ISetExternalToolViaApi = {
+  displayName: 'Dataset Tool',
+  toolName: 'datasetFileTool',
+  description: 'Dataset Explore Tool',
+  types: [ToolType.Explore],
+  scope: ToolScope.Dataset,
+  toolUrl: 'http://example.org/dataset-tool',
+  toolParameters: {
+    queryParameters: [{ datasetPid: '{datasetPid}' }]
+  }
 }
 
 export const createExternalToolsModel = (): ExternalTool[] => {
@@ -79,7 +90,6 @@ export const createDatasetExternalToolUrlModel = (): DatasetExternalToolUrl => {
 }
 
 interface ISetExternalToolViaApi {
-  id: number
   displayName: string
   toolName: string
   description: string
@@ -89,8 +99,8 @@ interface ISetExternalToolViaApi {
   toolParameters: {
     queryParameters: { [key: string]: string }[]
   }
-  contentType: string
-  allowedApiCalls: {
+  contentType?: string
+  allowedApiCalls?: {
     name: string
     httpMethod: 'GET' | 'POST' | 'PUT' | 'DELETE'
     urlTemplate: string
@@ -98,13 +108,13 @@ interface ISetExternalToolViaApi {
   }[]
 }
 
-export async function setExternalToolViaApi(
-  externalTool: ISetExternalToolViaApi = CREATE_FILE_EXTERNAL_TOOL_PAYLOAD
+export async function createExternalToolViaApi(
+  type: 'dataset' | 'file'
 ): Promise<AxiosResponse<{ data: ExternalToolPayload }>> {
   try {
     return await axios.post(
       `${TestConstants.TEST_API_URL}/admin/externalTools`,
-      externalTool,
+      type === 'dataset' ? CREATE_DATASET_EXTERNAL_TOOL_PAYLOAD : CREATE_FILE_EXTERNAL_TOOL_PAYLOAD,
       DATAVERSE_API_REQUEST_HEADERS
     )
   } catch (error) {
