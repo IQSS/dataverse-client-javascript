@@ -3,14 +3,14 @@ import { DatasetExternalToolUrl } from '../../domain/models/ExternalTool'
 
 export const datasetExternalToolTransformer = (
   response: AxiosResponse<{
-    data: { toolUrl: string; toolName: string; datasetId: number; preview: boolean }
+    data: { toolUrl: string; displayName: string; datasetId: number; preview: boolean }
   }>
 ): DatasetExternalToolUrl => {
   const datasetExtTool = response.data.data
 
   return {
     toolUrlResolved: datasetExtTool.toolUrl,
-    displayName: datasetExtTool.toolName, // TODO:ME - Maybe the API changes to displayName, keep an eye on it
+    displayName: datasetExtTool.displayName,
     datasetId: datasetExtTool.datasetId,
     preview: datasetExtTool.preview
   }
