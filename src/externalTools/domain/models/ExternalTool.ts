@@ -18,14 +18,14 @@ export enum ToolScope {
   File = 'file'
 }
 
-export interface DatasetExternalToolUrl {
+export interface DatasetExternalToolResolved {
   toolUrlResolved: string
   displayName: string
   datasetId: number
   preview: boolean
 }
 
-export interface FileExternalToolUrl {
+export interface FileExternalToolResolved {
   toolUrlResolved: string
   displayName: string
   fileId: number

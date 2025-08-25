@@ -1,28 +1,28 @@
 import { WriteError } from '../../../src'
 import { IExternalToolsRepository } from '../../../src/externalTools/domain/repositories/IExternalToolsRepository'
-import { GetDatasetExternalToolUrl } from '../../../src/externalTools/domain/useCases/GetDatasetExternalToolUrl'
-import { createFileExternalToolUrlModel } from '../../testHelpers/externalTools/externalToolsHelper'
+import { GetDatasetExternalToolResolved } from '../../../src/externalTools/domain/useCases/GetDatasetExternalToolResolved'
+import { createDatasetExternalToolResolvedModel } from '../../testHelpers/externalTools/externalToolsHelper'
 
 describe('execute', () => {
-  test('should return dataset external tool url on repository success', async () => {
-    const testFileExternalToolUrl = createFileExternalToolUrlModel()
+  test('should return dataset external tool resolved on repository success', async () => {
+    const testDatasetExternalToolResolved = createDatasetExternalToolResolvedModel()
     const externalToolsRepositoryStub: IExternalToolsRepository = {} as IExternalToolsRepository
-    externalToolsRepositoryStub.getDatasetExternalToolUrl = jest
+    externalToolsRepositoryStub.getDatasetExternalToolResolved = jest
       .fn()
-      .mockResolvedValue(testFileExternalToolUrl)
-    const sut = new GetDatasetExternalToolUrl(externalToolsRepositoryStub)
+      .mockResolvedValue(testDatasetExternalToolResolved)
+    const sut = new GetDatasetExternalToolResolved(externalToolsRepositoryStub)
 
     const actual = await sut.execute(123, 3, { preview: true, locale: 'en' })
 
-    expect(actual).toEqual(testFileExternalToolUrl)
+    expect(actual).toEqual(testDatasetExternalToolResolved)
   })
 
   test('should return error result on repository error', async () => {
     const externalToolsRepositoryStub: IExternalToolsRepository = {} as IExternalToolsRepository
-    externalToolsRepositoryStub.getDatasetExternalToolUrl = jest
+    externalToolsRepositoryStub.getDatasetExternalToolResolved = jest
       .fn()
       .mockRejectedValue(new WriteError())
-    const sut = new GetDatasetExternalToolUrl(externalToolsRepositoryStub)
+    const sut = new GetDatasetExternalToolResolved(externalToolsRepositoryStub)
 
     await expect(sut.execute(123, 3, { preview: true, locale: 'en' })).rejects.toThrow(WriteError)
   })

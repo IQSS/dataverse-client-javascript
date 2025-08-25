@@ -96,8 +96,8 @@ The different use cases currently available in the package are classified below,
 - [External Tools](#external-tools)
   - [External Tools read use cases](#external-tools-read-use-cases)
     - [Get External Tools](#get-external-tools)
-    - [Get Dataset External Tool Url](#get-dataset-external-tool-url)
-    - [Get File External Tool Url](#get-file-external-tool-url)
+    - [Get Dataset External Tool Resolved](#get-dataset-external-tool-resolved)
+    - [Get File External Tool Resolved](#get-file-external-tool-resolved)
 
 ## Collections
 
@@ -2172,14 +2172,14 @@ getExternalTools.execute().then((externalTools: ExternalTool[]) => {
 
 _See [use case](../src/externalTools/domain/useCases/GetExternalTools.ts) implementation_.
 
-#### Get Dataset External Tool Url
+#### Get Dataset External Tool Resolved
 
-Returns an instance of [DatasetExternalToolUrl](../src/externalTools/domain/models/ExternalTool.ts), which contains the resolved URL for accessing an external tool that operates at the dataset level.
+Returns an instance of [DatasetExternalToolResolved](../src/externalTools/domain/models/ExternalTool.ts), which contains the resolved URL for accessing an external tool that operates at the dataset level.
 
 ##### Example call:
 
 ```typescript
-import { getDatasetExternalToolUrl } from '@iqss/dataverse-client-javascript'
+import { getDatasetExternalToolResolved } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 const toolId = 1
@@ -2189,24 +2189,24 @@ const getExternalToolDTO: GetExternalToolDTO = {
   locale: 'en'
 }
 
-getDatasetExternalToolUrl
+getDatasetExternalToolResolved
   .execute(toolId, datasetId, getExternalToolDTO)
-  .then((datasetExternalToolUrl: DatasetExternalToolUrl) => {
+  .then((datasetExternalToolResolved: DatasetExternalToolResolved) => {
     /* ... */
   })
 /* ... */
 ```
 
-_See [use case](../src/externalTools/domain/useCases/GetDatasetExternalToolUrl.ts) implementation_.
+_See [use case](../src/externalTools/domain/useCases/GetDatasetExternalToolResolved.ts) implementation_.
 
-#### Get File External Tool Url
+#### Get File External Tool Resolved
 
-Returns an instance of [FileExternalToolUrl](../src/externalTools/domain/models/ExternalTool.ts), which contains the resolved URL for accessing an external tool that operates at the file level.
+Returns an instance of [FileExternalToolResolved](../src/externalTools/domain/models/ExternalTool.ts), which contains the resolved URL for accessing an external tool that operates at the file level.
 
 ##### Example call:
 
 ```typescript
-import { getFileExternalToolUrl } from '@iqss/dataverse-client-javascript'
+import { getFileExternalToolResolved } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 const toolId = 1
@@ -2216,12 +2216,12 @@ const getExternalToolDTO: GetExternalToolDTO = {
   locale: 'en'
 }
 
-getFileExternalToolUrl
+getFileExternalToolResolved
   .execute(toolId, fileId, getExternalToolDTO)
-  .then((fileExternalToolUrl: FileExternalToolUrl) => {
+  .then((fileExternalToolResolved: FileExternalToolResolved) => {
     /* ... */
   })
 /* ... */
 ```
 
-_See [use case](../src/externalTools/domain/useCases/GetfileExternalToolUrl.ts) implementation_.
+_See [use case](../src/externalTools/domain/useCases/GetfileExternalToolResolved.ts) implementation_.

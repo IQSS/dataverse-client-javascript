@@ -1,11 +1,11 @@
 import { AxiosResponse } from 'axios'
-import { FileExternalToolUrl } from '../../domain/models/ExternalTool'
+import { FileExternalToolResolved } from '../../domain/models/ExternalTool'
 
 export const fileExternalToolTransformer = (
   response: AxiosResponse<{
     data: { toolUrl: string; displayName: string; fileId: number; preview: boolean }
   }>
-): FileExternalToolUrl => {
+): FileExternalToolResolved => {
   const fileExtTool = response.data.data
 
   return {

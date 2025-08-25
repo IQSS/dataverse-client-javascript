@@ -1,16 +1,20 @@
 import { GetExternalToolDTO } from '../dtos/GetExternalToolDTO'
-import { DatasetExternalToolUrl, ExternalTool, FileExternalToolUrl } from '../models/ExternalTool'
+import {
+  DatasetExternalToolResolved,
+  ExternalTool,
+  FileExternalToolResolved
+} from '../models/ExternalTool'
 
 export interface IExternalToolsRepository {
   getExternalTools(): Promise<ExternalTool[]>
-  getDatasetExternalToolUrl(
+  getDatasetExternalToolResolved(
     datasetId: number | string,
     toolId: number,
     getExternalToolDTO: GetExternalToolDTO
-  ): Promise<DatasetExternalToolUrl>
-  getFileExternalToolUrl(
+  ): Promise<DatasetExternalToolResolved>
+  getFileExternalToolResolved(
     fileId: number | string,
     toolId: number,
     getExternalToolDTO: GetExternalToolDTO
-  ): Promise<FileExternalToolUrl>
+  ): Promise<FileExternalToolResolved>
 }

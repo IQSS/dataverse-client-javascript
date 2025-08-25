@@ -1,18 +1,18 @@
-import { GetDatasetExternalToolUrl } from './domain/useCases/GetDatasetExternalToolUrl'
+import { GetDatasetExternalToolResolved } from './domain/useCases/GetDatasetExternalToolResolved'
 import { GetExternalTools } from './domain/useCases/GetExternalTools'
-import { GetFileExternalToolUrl } from './domain/useCases/GetFileExternalToolUrl'
+import { GetFileExternalToolResolved } from './domain/useCases/GetFileExternalToolResolved'
 import { ExternalToolsRepository } from './infra/ExternalToolsRepository'
 
 const externalToolsRepository = new ExternalToolsRepository()
 
 const getExternalTools = new GetExternalTools(externalToolsRepository)
-const getDatasetExternalToolUrl = new GetDatasetExternalToolUrl(externalToolsRepository)
-const getFileExternalToolUrl = new GetFileExternalToolUrl(externalToolsRepository)
+const getDatasetExternalToolResolved = new GetDatasetExternalToolResolved(externalToolsRepository)
+const getFileExternalToolResolved = new GetFileExternalToolResolved(externalToolsRepository)
 
 export {
   getExternalTools,
-  getDatasetExternalToolUrl,
-  getFileExternalToolUrl,
+  getDatasetExternalToolResolved,
+  getFileExternalToolResolved,
   externalToolsRepository
 }
 
@@ -20,6 +20,6 @@ export {
   ExternalTool,
   ToolScope,
   ToolType,
-  DatasetExternalToolUrl,
-  FileExternalToolUrl
+  DatasetExternalToolResolved,
+  FileExternalToolResolved
 } from './domain/models/ExternalTool'

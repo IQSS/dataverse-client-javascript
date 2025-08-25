@@ -1,11 +1,11 @@
 import { AxiosResponse } from 'axios'
-import { DatasetExternalToolUrl } from '../../domain/models/ExternalTool'
+import { DatasetExternalToolResolved } from '../../domain/models/ExternalTool'
 
 export const datasetExternalToolTransformer = (
   response: AxiosResponse<{
     data: { toolUrl: string; displayName: string; datasetId: number; preview: boolean }
   }>
-): DatasetExternalToolUrl => {
+): DatasetExternalToolResolved => {
   const datasetExtTool = response.data.data
 
   return {

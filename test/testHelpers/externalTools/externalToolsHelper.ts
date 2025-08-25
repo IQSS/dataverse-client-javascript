@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios'
 import {
-  DatasetExternalToolUrl,
+  DatasetExternalToolResolved,
   ExternalTool,
-  FileExternalToolUrl,
+  FileExternalToolResolved,
   ToolScope,
   ToolType
 } from '../../../src'
@@ -71,7 +71,7 @@ export const createExternalToolsModel = (): ExternalTool[] => {
   ]
 }
 
-export const createFileExternalToolUrlModel = (): FileExternalToolUrl => {
+export const createFileExternalToolResolvedModel = (): FileExternalToolResolved => {
   return {
     toolUrlResolved: 'https://example.com/text-tool?fileId=123',
     displayName: 'Test File External Tool',
@@ -80,7 +80,7 @@ export const createFileExternalToolUrlModel = (): FileExternalToolUrl => {
   }
 }
 
-export const createDatasetExternalToolUrlModel = (): DatasetExternalToolUrl => {
+export const createDatasetExternalToolResolvedModel = (): DatasetExternalToolResolved => {
   return {
     toolUrlResolved: 'https://example.com/dataset-tool?datasetId=456',
     displayName: 'Test Dataset External Tool',

@@ -49,8 +49,8 @@ describe('ExternalToolsRepository', () => {
   })
 
   // TODO:ME - Skip for now until Backend PR is merged to develop.
-  describe.skip('getFileExternalToolUrl', () => {
-    const testCollectionAlias = 'getFileExternalToolUrlFunctionalTestCollection'
+  describe.skip('getFileExternalToolResolved', () => {
+    const testCollectionAlias = 'getFileExternalToolResolvedFunctionalTestCollection'
     let testDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'
     let testFileId: number
@@ -93,8 +93,8 @@ describe('ExternalToolsRepository', () => {
       }
     })
 
-    test('should return file external tool url', async () => {
-      const fileExternalToolUrl = await sut.getFileExternalToolUrl(
+    test('should return file external tool resolved', async () => {
+      const fileExternalToolResolved = await sut.getFileExternalToolResolved(
         testFileId,
         testFileExternalToolId,
         {
@@ -102,18 +102,20 @@ describe('ExternalToolsRepository', () => {
           locale: 'en'
         }
       )
-      expect(fileExternalToolUrl.fileId).toBe(testFileId)
-      expect(fileExternalToolUrl.displayName).toBe(CREATE_FILE_EXTERNAL_TOOL_PAYLOAD.displayName)
-      expect(fileExternalToolUrl.toolUrlResolved).toContain(
+      expect(fileExternalToolResolved.fileId).toBe(testFileId)
+      expect(fileExternalToolResolved.displayName).toBe(
+        CREATE_FILE_EXTERNAL_TOOL_PAYLOAD.displayName
+      )
+      expect(fileExternalToolResolved.toolUrlResolved).toContain(
         CREATE_FILE_EXTERNAL_TOOL_PAYLOAD.toolUrl
       )
-      expect(fileExternalToolUrl.toolUrlResolved).toContain(`preview=true`)
-      expect(fileExternalToolUrl.preview).toBe(true)
+      expect(fileExternalToolResolved.toolUrlResolved).toContain(`preview=true`)
+      expect(fileExternalToolResolved.preview).toBe(true)
     })
 
     test('should return error if file external tool id does not exist', async () => {
       await expect(
-        sut.getFileExternalToolUrl(testFileId, 999999, {
+        sut.getFileExternalToolResolved(testFileId, 999999, {
           preview: true,
           locale: 'en'
         })
@@ -122,7 +124,7 @@ describe('ExternalToolsRepository', () => {
 
     test('should return error if toolId is not for a file-level external tool', async () => {
       await expect(
-        sut.getFileExternalToolUrl(testFileId, testDatasetExternalToolId, {
+        sut.getFileExternalToolResolved(testFileId, testDatasetExternalToolId, {
           preview: true,
           locale: 'en'
         })
@@ -131,7 +133,7 @@ describe('ExternalToolsRepository', () => {
 
     test('should return error if file id does not exist', async () => {
       await expect(
-        sut.getFileExternalToolUrl(56565656, testFileExternalToolId, {
+        sut.getFileExternalToolResolved(56565656, testFileExternalToolId, {
           preview: true,
           locale: 'en'
         })
@@ -140,8 +142,8 @@ describe('ExternalToolsRepository', () => {
   })
 
   // TODO:ME - Skip for now until Backend PR is merged to develop.
-  describe.skip('getDatasetExternalToolUrl', () => {
-    const testCollectionAlias = 'getDatasetExternalToolUrlFunctionalTestCollection'
+  describe.skip('getDatasetExternalToolResolved', () => {
+    const testCollectionAlias = 'getDatasetExternalToolResolvedFunctionalTestCollection'
     let testDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'
     let testDatasetExternalToolId: number
@@ -180,8 +182,8 @@ describe('ExternalToolsRepository', () => {
       }
     })
 
-    test('should return dataset external tool url', async () => {
-      const datasetfileExternalToolUrl = await sut.getDatasetExternalToolUrl(
+    test('should return dataset external tool resolved', async () => {
+      const datasetfileExternalToolResolved = await sut.getDatasetExternalToolResolved(
         testDatasetIds.numericId,
         testDatasetExternalToolId,
         {
@@ -189,20 +191,20 @@ describe('ExternalToolsRepository', () => {
           locale: 'en'
         }
       )
-      expect(datasetfileExternalToolUrl.datasetId).toBe(testDatasetIds.numericId)
-      expect(datasetfileExternalToolUrl.displayName).toBe(
+      expect(datasetfileExternalToolResolved.datasetId).toBe(testDatasetIds.numericId)
+      expect(datasetfileExternalToolResolved.displayName).toBe(
         CREATE_DATASET_EXTERNAL_TOOL_PAYLOAD.displayName
       )
-      expect(datasetfileExternalToolUrl.toolUrlResolved).toContain(
+      expect(datasetfileExternalToolResolved.toolUrlResolved).toContain(
         CREATE_DATASET_EXTERNAL_TOOL_PAYLOAD.toolUrl
       )
-      expect(datasetfileExternalToolUrl.toolUrlResolved).toContain(`preview=true`)
-      expect(datasetfileExternalToolUrl.preview).toBe(true)
+      expect(datasetfileExternalToolResolved.toolUrlResolved).toContain(`preview=true`)
+      expect(datasetfileExternalToolResolved.preview).toBe(true)
     })
 
     test('should return error if dataset external tool id does not exist', async () => {
       await expect(
-        sut.getDatasetExternalToolUrl(testDatasetIds.numericId, 999999, {
+        sut.getDatasetExternalToolResolved(testDatasetIds.numericId, 999999, {
           preview: true,
           locale: 'en'
         })
@@ -211,7 +213,7 @@ describe('ExternalToolsRepository', () => {
 
     test('should return error if toolId is not for a dataset-level external tool', async () => {
       await expect(
-        sut.getDatasetExternalToolUrl(testDatasetIds.numericId, testFileExternalToolId, {
+        sut.getDatasetExternalToolResolved(testDatasetIds.numericId, testFileExternalToolId, {
           preview: true,
           locale: 'en'
         })
@@ -220,7 +222,7 @@ describe('ExternalToolsRepository', () => {
 
     test('should return error if dataset id does not exist', async () => {
       await expect(
-        sut.getDatasetExternalToolUrl(56565656, testDatasetExternalToolId, {
+        sut.getDatasetExternalToolResolved(56565656, testDatasetExternalToolId, {
           preview: true,
           locale: 'en'
         })
