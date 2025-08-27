@@ -105,7 +105,8 @@ export const transformDatasetModelToNewDatasetRequestPayload = (
         dataset.metadataBlockValues,
         metadataBlocks
       )
-    }
+    },
+    ...(dataset.datasetType && { datasetType: dataset.datasetType })
   }
 }
 
