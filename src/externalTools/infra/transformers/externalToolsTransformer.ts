@@ -14,6 +14,7 @@ export const externalToolsTransformer = (
     displayName: tool.displayName,
     description: tool.description,
     types: tool.types as unknown as ExternalTool['types'],
-    scope: tool.scope as unknown as ExternalTool['scope']
+    scope: tool.scope as unknown as ExternalTool['scope'],
+    contentType: tool.contentType
   }))
 }

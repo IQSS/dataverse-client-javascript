@@ -4,6 +4,7 @@ export interface ExternalToolPayload {
   description: string
   types: ToolTypePayload[]
   scope: ToolScopePayload
+  contentType?: string // Only present when scope is 'file'
 }
 
 enum ToolTypePayload {
