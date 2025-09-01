@@ -21,7 +21,9 @@ import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './trans
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
+import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
+import { FormattedCitation } from '../../domain/models/FormattedCitation'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -76,7 +78,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetCitation(
-    datasetId: number,
+    datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean
   ): Promise<string> {
@@ -93,6 +95,33 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .catch((error) => {
         throw error
       })
+  }
+
+  public async getDatasetCitationInOtherFormats(
+    datasetId: number | string,
+    datasetVersionId: string | 'LATEST' = 'LATEST',
+    format: CitationFormat,
+    includeDeaccessioned = false
+  ): Promise<FormattedCitation> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `versions/${datasetVersionId}/citation/${format}`,
+      datasetId
+    )
+    const response = await this.doGet(endpoint, true, { includeDeaccessioned })
+
+    const contentType = response.headers['content-type']
+    let content: string
+    if (contentType && contentType.includes('application/json')) {
+      content = JSON.stringify(response.data)
+    } else {
+      content = response.data
+    }
+
+    return {
+      content,
+      contentType
+    }
   }
 
   public async getPrivateUrlDatasetCitation(token: string): Promise<string> {
@@ -313,6 +342,17 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .then((response) =>
         transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection(response.data.data)
       )
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetAvailableCategories(datasetId: number | string): Promise<string[]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'availableFileCategories', datasetId),
+      true
+    )
+      .then((response) => response.data.data as string[])
       .catch((error) => {
         throw error
       })

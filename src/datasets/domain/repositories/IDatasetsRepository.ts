@@ -10,6 +10,8 @@ import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 import { DatasetDownloadCount } from '../models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
+import { CitationFormat } from '../models/CitationFormat'
+import { FormattedCitation } from '../models/FormattedCitation'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -65,4 +67,11 @@ export interface IDatasetsRepository {
   linkDataset(datasetId: number, collectionAlias: string): Promise<void>
   unlinkDataset(datasetId: number, collectionAlias: string): Promise<void>
   getDatasetLinkedCollections(datasetId: number | string): Promise<DatasetLinkedCollection[]>
+  getDatasetAvailableCategories(datasetId: number | string): Promise<string[]>
+  getDatasetCitationInOtherFormats(
+    datasetId: number | string,
+    datasetVersionId: string,
+    format: CitationFormat,
+    includeDeaccessioned?: boolean
+  ): Promise<FormattedCitation>
 }

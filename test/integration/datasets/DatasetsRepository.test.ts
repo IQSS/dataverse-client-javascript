@@ -51,6 +51,7 @@ import {
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
+import { CitationFormat } from '../../../src/datasets/domain/models/CitationFormat'
 
 const TEST_DIFF_DATASET_DTO: DatasetDTO = {
   license: {
@@ -489,6 +490,113 @@ describe('DatasetsRepository', () => {
       )
 
       expect(typeof actualDatasetCitation).toBe('string')
+    })
+  })
+
+  describe('getDatasetCitationInOtherFormats', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return citation in BibTeX format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.BibTeX
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
+    test('should return citation in BibTeX format using persistent id', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.persistentId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.BibTeX
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
+    test('should return citation in RIS format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.RIS
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
+    test('should return citation in CSLJson format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.CSLJson
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/application\/json/)
+    })
+
+    test('should return citation in EndNote format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.EndNote
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/xml/)
+    })
+
+    test('should return citation in Internal format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.Internal
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/html/)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const nonExistentId = 9999999
+      const expectedError = new ReadError(`[404] Dataset with ID ${nonExistentId} not found.`)
+
+      await expect(
+        sut.getDatasetCitationInOtherFormats(
+          nonExistentId,
+          DatasetNotNumberedVersion.LATEST,
+          CitationFormat.RIS
+        )
+      ).rejects.toThrow(expectedError)
+    })
+
+    test('should return citation for deaccessioned dataset when includeDeaccessioned = true', async () => {
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
+
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.RIS,
+        true
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
     })
   })
 
@@ -1499,6 +1607,46 @@ describe('DatasetsRepository', () => {
 
     test('should return error when dataset does not exist', async () => {
       await expect(sut.getDatasetLinkedCollections(nonExistentTestDatasetId)).rejects.toThrow()
+    })
+  })
+
+  describe('getDatasetAvailableCategories', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should get available categories', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2', 'Documentation', 'Data', 'Code']
+      }
+
+      await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name, fileMetadata)
+
+      const actual = await sut.getDatasetAvailableCategories(testDatasetIds.numericId)
+      expect(actual.sort()).toEqual(fileMetadata.categories.sort())
+    })
+
+    test('should get available categorie if dataset id is persistent id', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2', 'Documentation', 'Data', 'Code']
+      }
+
+      const actual = await sut.getDatasetAvailableCategories(testDatasetIds.persistentId)
+      expect(actual.sort()).toEqual(fileMetadata.categories.sort())
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetAvailableCategories(nonExistentTestDatasetId)).rejects.toThrow()
     })
   })
 })

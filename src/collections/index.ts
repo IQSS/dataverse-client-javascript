@@ -12,6 +12,9 @@ import { DeleteCollectionFeaturedItems } from './domain/useCases/DeleteCollectio
 import { DeleteCollection } from './domain/useCases/DeleteCollection'
 import { GetMyDataCollectionItems } from './domain/useCases/GetMyDataCollectionItems'
 import { DeleteCollectionFeaturedItem } from './domain/useCases/DeleteCollectionFeaturedItem'
+import { LinkCollection } from './domain/useCases/LinkCollection'
+import { UnlinkCollection } from './domain/useCases/UnlinkCollection'
+import { GetCollectionLinks } from './domain/useCases/GetCollectionLinks'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -28,6 +31,9 @@ const updateCollectionFeaturedItems = new UpdateCollectionFeaturedItems(collecti
 const deleteCollectionFeaturedItems = new DeleteCollectionFeaturedItems(collectionsRepository)
 const deleteCollection = new DeleteCollection(collectionsRepository)
 const deleteCollectionFeaturedItem = new DeleteCollectionFeaturedItem(collectionsRepository)
+const linkCollection = new LinkCollection(collectionsRepository)
+const unlinkCollection = new UnlinkCollection(collectionsRepository)
+const getCollectionLinks = new GetCollectionLinks(collectionsRepository)
 
 export {
   getCollection,
@@ -42,7 +48,10 @@ export {
   updateCollectionFeaturedItems,
   deleteCollectionFeaturedItems,
   deleteCollection,
-  deleteCollectionFeaturedItem
+  deleteCollectionFeaturedItem,
+  linkCollection,
+  unlinkCollection,
+  getCollectionLinks
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'

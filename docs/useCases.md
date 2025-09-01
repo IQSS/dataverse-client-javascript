@@ -37,6 +37,7 @@ The different use cases currently available in the package are classified below,
     - [List All Datasets](#list-all-datasets)
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
+    - [Get Dataset Available Categories](#get-dataset-available-categories)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -64,6 +65,8 @@ The different use cases currently available in the package are classified below,
     - [Replace a File](#replace-a-file)
     - [Restrict or Unrestrict a File](#restrict-or-unrestrict-a-file)
     - [Update File Metadata](#update-file-metadata)
+    - [Update File Categories](#update-file-categories)
+    - [Update File Tabular Tags](#update-file-tabular-tags)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
@@ -88,6 +91,11 @@ The different use cases currently available in the package are classified below,
   - [Get Application Terms of Use](#get-application-terms-of-use)
 - [Contact](#Contact)
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
+- [Notifications](#Notifications)
+  - [Get All Notifications by User](#get-all-notifications-by-user)
+  - [Delete Notification](#delete-notification)
+  - [Get Unread Count](#get-unread-count)
+  - [Mark As Read](#mark-as-read)
 - [Search](#Search)
   - [Get Search Services](#get-search-services)
 
@@ -559,6 +567,37 @@ getDatasetCitation.execute(datasetId, datasetVersionId).then((citationText: stri
 ```
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetCitation.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
+#### Get Dataset Citation In Other Formats
+
+Retrieves the citation for a dataset in a specified bibliographic format.
+
+##### Example call:
+
+```typescript
+import { getDatasetCitationInOtherFormats } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 2
+const datasetVersionId = '1.0'
+
+getDatasetCitationInOtherFormats
+  .execute(datasetId, datasetVersionId, format)
+  .then((citationText: FormattedCitation) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetCitationInOtherFormats.ts) implementation_.
+
+Supported formats include 'EndNote' (XML), 'RIS' (plain text), 'BibTeX' (plain text), 'CSLJson' (JSON), and 'Internal' (HTML). The response contains the raw citation content in the requested format, the format type, and the content type (MIME type).
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
@@ -1048,6 +1087,28 @@ The `includeMDC` parameter is optional.
 - Setting `includeMDC` to True will ignore the `MDCStartDate` setting and return a total count.
 - If MDC isn't enabled, the download count will return a total count, without `MDCStartDate`.
 - If MDC is enabled but the `includeMDC` is false, the count will be limited to the time before `MDCStartDate`
+
+#### Get Dataset Available Categories
+
+Returns a list of available file categories that may be applied to the files of a given dataset.
+
+###### Example call:
+
+```typescript
+import { getDatasetAvailableCategories } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+
+getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
+
+The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
 ## Files
 
@@ -2064,6 +2125,92 @@ In ContactDTO, it takes the following information:
 - **subject**: the email subject line.
 - **body**: the email body to send.
 - **fromEmail**: the email to list in the reply-to field.
+
+## Notifications
+
+#### Get All Notifications by User
+
+Returns a [Notification](../src/notifications/domain/models/Notification.ts) array containing all notifications for the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getAllNotificationsByUser } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAllNotificationsByUser.execute().then((notifications: Notification[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/GetAllNotificationsByUser.ts) implementation_.
+
+#### Delete Notification
+
+Deletes a specific notification for the current authenticated user by its ID.
+
+##### Example call:
+
+```typescript
+import { deleteNotification } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const notificationId = 123
+
+deleteNotification.execute(notificationId: number).then(() => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/DeleteNotification.ts) implementation_.
+
+#### Get Unread Count
+
+Returns the number of unread notifications for the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getUnreadNotificationsCount } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getUnreadNotificationsCount.execute().then((count: number) => {
+  console.log(`You have ${count} unread notifications`)
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/GetUnreadNotificationsCount.ts) implementation_.
+
+#### Mark As Read
+
+Marks a specific notification as read for the current authenticated user. This operation is idempotent - marking an already-read notification as read will not cause an error.
+
+##### Example call:
+
+```typescript
+import { markNotificationAsRead } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const notificationId = 123
+
+markNotificationAsRead.execute(notificationId).then(() => {
+  console.log('Notification marked as read')
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/MarkNotificationAsRead.ts) implementation_.
 
 ## Search
 
