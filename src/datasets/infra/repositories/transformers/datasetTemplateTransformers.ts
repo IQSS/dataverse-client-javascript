@@ -8,7 +8,7 @@ export const transformDatasetTemplatePayloadToDatasetTemplate = (
     const datasetTemplate: DatasetTemplate = {
       id: payload.id,
       name: payload.name,
-      alias: payload.dataverseAlias,
+      collectionAlias: payload.dataverseAlias,
       isDefault: payload.isDefault,
       usageCount: payload.usageCount,
       createTime: payload.createTime,

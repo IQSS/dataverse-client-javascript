@@ -3,7 +3,7 @@ import { DatasetLicense, DatasetMetadataFieldValue, TermsOfUse } from './Dataset
 export interface DatasetTemplate {
   id: number
   name: string
-  alias: string
+  collectionAlias: string
   isDefault: boolean
   usageCount: number
   createTime: string
