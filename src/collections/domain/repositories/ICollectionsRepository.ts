@@ -10,6 +10,7 @@ import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
 import { CollectionLinks } from '../models/CollectionLinks'
+import { CollectionDatasetTemplate } from '../models/CollectionDatasetTemplate'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -60,5 +61,7 @@ export interface ICollectionsRepository {
     linkingCollectionIdOrAlias: number | string
   ): Promise<void>
   getCollectionLinks(collectionIdOrAlias: number | string): Promise<CollectionLinks>
-  getDatasetTemplates(collectionIdOrAlias: number | string): Promise<unknown>
+  getCollectionDatasetTemplates(
+    collectionIdOrAlias: number | string
+  ): Promise<CollectionDatasetTemplate[]>
 }

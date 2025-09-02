@@ -1,0 +1,53 @@
+import { CollectionDatasetTemplate } from '../../../domain/models/CollectionDatasetTemplate'
+import { CollectionDatasetTemplatePayload } from './CollectionDatasetTemplatePayload'
+
+export const transformCollectionDatasetTemplatePayloadToCollectionDatasetTemplate = (
+  collectionDatasetTemplatePayload: CollectionDatasetTemplatePayload[]
+): CollectionDatasetTemplate[] => {
+  return collectionDatasetTemplatePayload.map((payload) => {
+    const collectionDatasetTemplate: CollectionDatasetTemplate = {
+      id: payload.id,
+      name: payload.name,
+      alias: payload.dataverseAlias,
+      isDefault: payload.isDefault,
+      usageCount: payload.usageCount,
+      createTime: payload.createTime,
+      createDate: payload.createDate,
+      datasetFields: payload.datasetFields as unknown as CollectionDatasetTemplate['datasetFields'],
+      instructions: payload.instructions.map((instruction) => ({
+        instructionField: instruction.instructionField,
+        instructionText: instruction.instructionText
+      })),
+      termsOfUse: {
+        termsOfAccess: {
+          fileAccessRequest: payload.termsOfUseAndAccess.fileAccessRequest,
+          termsOfAccessForRestrictedFiles: payload.termsOfUseAndAccess.termsOfAccess,
+          dataAccessPlace: payload.termsOfUseAndAccess.dataAccessPlace,
+          originalArchive: payload.termsOfUseAndAccess.originalArchive,
+          availabilityStatus: payload.termsOfUseAndAccess.availabilityStatus,
+          contactForAccess: payload.termsOfUseAndAccess.contactForAccess,
+          sizeOfCollection: payload.termsOfUseAndAccess.sizeOfCollection,
+          studyCompletion: payload.termsOfUseAndAccess.studyCompletion
+        }
+      }
+    }
+
+    if (payload.termsOfUseAndAccess.license) {
+      collectionDatasetTemplate.license = payload.termsOfUseAndAccess.license
+    } else {
+      collectionDatasetTemplate.termsOfUse.customTerms = {
+        termsOfUse: payload.termsOfUseAndAccess.termsOfUse as string,
+        confidentialityDeclaration: payload.termsOfUseAndAccess
+          .confidentialityDeclaration as string,
+        specialPermissions: payload.termsOfUseAndAccess.specialPermissions as string,
+        restrictions: payload.termsOfUseAndAccess.restrictions as string,
+        citationRequirements: payload.termsOfUseAndAccess.citationRequirements as string,
+        depositorRequirements: payload.termsOfUseAndAccess.depositorRequirements as string,
+        conditions: payload.termsOfUseAndAccess.conditions as string,
+        disclaimer: payload.termsOfUseAndAccess.disclaimer as string
+      }
+    }
+
+    return collectionDatasetTemplate
+  })
+}
