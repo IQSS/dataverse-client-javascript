@@ -33,7 +33,11 @@ export const transformCollectionDatasetTemplatePayloadToCollectionDatasetTemplat
     }
 
     if (payload.termsOfUseAndAccess.license) {
-      collectionDatasetTemplate.license = payload.termsOfUseAndAccess.license
+      collectionDatasetTemplate.license = {
+        name: payload.termsOfUseAndAccess.license.name,
+        uri: payload.termsOfUseAndAccess.license.uri,
+        iconUri: payload.termsOfUseAndAccess.license.iconUrl
+      }
     } else {
       collectionDatasetTemplate.termsOfUse.customTerms = {
         termsOfUse: payload.termsOfUseAndAccess.termsOfUse as string,
