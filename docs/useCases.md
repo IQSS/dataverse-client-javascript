@@ -16,7 +16,6 @@ The different use cases currently available in the package are classified below,
     - [List All Collection Items](#list-all-collection-items)
     - [List My Data Collection Items](#list-my-data-collection-items)
     - [Get Collection Featured Items](#get-collection-featured-items)
-    - [Get Collection Dataset Templates](#get-collection-dataset-templates)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
     - [Update a Collection](#update-a-collection)
@@ -39,6 +38,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
     - [Get Dataset Available Categories](#get-dataset-available-categories)
+    - [Get Dataset Templates](#get-dataset-templates)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -321,26 +321,6 @@ _See [use case](../src/collections/domain/useCases/GetCollectionFeaturedItems.ts
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
-
-#### Get Collection Dataset Templates
-
-Returns a [CollectionDatasetTemplate](../src/collections/domain/models/CollectionDatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
-
-##### Example call:
-
-```typescript
-import { getCollectionDatasetTemplates } from '@iqss/dataverse-client-javascript'
-
-const collectionIdOrAlias = 12345
-
-getCollectionDatasetTemplates
-  .execute(collectionIdOrAlias)
-  .then((datasetTemplates: CollectionDatasetTemplate[]) => {
-    /* ... */
-  })
-```
-
-_See [use case](../src/collections/domain/useCases/GetCollectionDatasetTemplates.ts)_ definition.
 
 ### Collections Write Use Cases
 
@@ -1130,6 +1110,24 @@ getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
+
+#### Get Dataset Templates
+
+Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
+
+##### Example call:
+
+```typescript
+import { getDatasetTemplates } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 12345
+
+getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: DatasetTemplate[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definition.
 
 ## Files
 

@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { ICollectionsRepository } from '../../domain/repositories/ICollectionsRepository'
 import {
@@ -39,9 +38,6 @@ import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
 import { CollectionLinks } from '../../domain/models/CollectionLinks'
-import { CollectionDatasetTemplatePayload } from './transformers/CollectionDatasetTemplatePayload'
-import { transformCollectionDatasetTemplatePayloadToCollectionDatasetTemplate } from './transformers/collectionDatasetTemplateTransformer'
-import { CollectionDatasetTemplate } from '../../domain/models/CollectionDatasetTemplate'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -488,18 +484,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       .then((response) => {
         return transformCollectionLinksResponseToCollectionLinks(response)
       })
-      .catch((error) => {
-        throw error
-      })
-  }
-
-  public async getCollectionDatasetTemplates(
-    collectionIdOrAlias: number | string
-  ): Promise<CollectionDatasetTemplate[]> {
-    return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/templates`, true)
-      .then((response: AxiosResponse<{ data: CollectionDatasetTemplatePayload[] }>) =>
-        transformCollectionDatasetTemplatePayloadToCollectionDatasetTemplate(response.data.data)
-      )
       .catch((error) => {
         throw error
       })

@@ -1,11 +1,11 @@
-import { CollectionDatasetTemplate } from '../../../domain/models/CollectionDatasetTemplate'
-import { CollectionDatasetTemplatePayload } from './CollectionDatasetTemplatePayload'
+import { DatasetTemplate } from '../../../domain/models/DatasetTemplate'
+import { DatasetTemplatePayload } from './DatasetTemplatePayload'
 
-export const transformCollectionDatasetTemplatePayloadToCollectionDatasetTemplate = (
-  collectionDatasetTemplatePayload: CollectionDatasetTemplatePayload[]
-): CollectionDatasetTemplate[] => {
+export const transformDatasetTemplatePayloadToDatasetTemplate = (
+  collectionDatasetTemplatePayload: DatasetTemplatePayload[]
+): DatasetTemplate[] => {
   return collectionDatasetTemplatePayload.map((payload) => {
-    const collectionDatasetTemplate: CollectionDatasetTemplate = {
+    const datasetTemplate: DatasetTemplate = {
       id: payload.id,
       name: payload.name,
       alias: payload.dataverseAlias,
@@ -13,7 +13,7 @@ export const transformCollectionDatasetTemplatePayloadToCollectionDatasetTemplat
       usageCount: payload.usageCount,
       createTime: payload.createTime,
       createDate: payload.createDate,
-      datasetFields: payload.datasetFields as unknown as CollectionDatasetTemplate['datasetFields'],
+      datasetFields: payload.datasetFields as unknown as DatasetTemplate['datasetFields'],
       instructions: payload.instructions.map((instruction) => ({
         instructionField: instruction.instructionField,
         instructionText: instruction.instructionText
@@ -33,13 +33,13 @@ export const transformCollectionDatasetTemplatePayloadToCollectionDatasetTemplat
     }
 
     if (payload.termsOfUseAndAccess.license) {
-      collectionDatasetTemplate.license = {
+      datasetTemplate.license = {
         name: payload.termsOfUseAndAccess.license.name,
         uri: payload.termsOfUseAndAccess.license.uri,
         iconUri: payload.termsOfUseAndAccess.license.iconUrl
       }
     } else {
-      collectionDatasetTemplate.termsOfUse.customTerms = {
+      datasetTemplate.termsOfUse.customTerms = {
         termsOfUse: payload.termsOfUseAndAccess.termsOfUse as string,
         confidentialityDeclaration: payload.termsOfUseAndAccess
           .confidentialityDeclaration as string,
@@ -52,6 +52,6 @@ export const transformCollectionDatasetTemplatePayloadToCollectionDatasetTemplat
       }
     }
 
-    return collectionDatasetTemplate
+    return datasetTemplate
   })
 }

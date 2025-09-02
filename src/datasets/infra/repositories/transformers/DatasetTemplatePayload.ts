@@ -1,6 +1,6 @@
-import { MetadataFieldPayload } from '../../../../datasets/infra/repositories/transformers/DatasetPayload'
+import { MetadataFieldPayload } from './DatasetPayload'
 
-export interface CollectionDatasetTemplatePayload {
+export interface DatasetTemplatePayload {
   id: number
   name: string
   dataverseAlias: string

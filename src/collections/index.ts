@@ -15,7 +15,6 @@ import { DeleteCollectionFeaturedItem } from './domain/useCases/DeleteCollection
 import { LinkCollection } from './domain/useCases/LinkCollection'
 import { UnlinkCollection } from './domain/useCases/UnlinkCollection'
 import { GetCollectionLinks } from './domain/useCases/GetCollectionLinks'
-import { GetCollectionDatasetTemplates } from './domain/useCases/GetCollectionDatasetTemplates'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -35,7 +34,6 @@ const deleteCollectionFeaturedItem = new DeleteCollectionFeaturedItem(collection
 const linkCollection = new LinkCollection(collectionsRepository)
 const unlinkCollection = new UnlinkCollection(collectionsRepository)
 const getCollectionLinks = new GetCollectionLinks(collectionsRepository)
-const getCollectionDatasetTemplates = new GetCollectionDatasetTemplates(collectionsRepository)
 
 export {
   getCollection,
@@ -53,8 +51,7 @@ export {
   deleteCollectionFeaturedItem,
   linkCollection,
   unlinkCollection,
-  getCollectionLinks,
-  getCollectionDatasetTemplates
+  getCollectionLinks
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'

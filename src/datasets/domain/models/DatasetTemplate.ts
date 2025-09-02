@@ -1,6 +1,6 @@
-import { DatasetLicense, DatasetMetadataFieldValue, TermsOfUse } from '../../../datasets'
+import { DatasetLicense, DatasetMetadataFieldValue, TermsOfUse } from './Dataset'
 
-export interface CollectionDatasetTemplate {
+export interface DatasetTemplate {
   id: number
   name: string
   alias: string
