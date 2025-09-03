@@ -13,8 +13,8 @@ export const externalToolsTransformer = (
     id: tool.id,
     displayName: tool.displayName,
     description: tool.description,
-    types: tool.types as unknown as ExternalTool['types'],
-    scope: tool.scope as unknown as ExternalTool['scope'],
+    types: tool.types,
+    scope: tool.scope,
     contentType: tool.contentType
   }))
 }
