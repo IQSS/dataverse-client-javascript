@@ -1,4 +1,4 @@
-import { DatasetLicense, DatasetMetadataFieldValue, TermsOfUse } from './Dataset'
+import { DatasetLicense, DatasetMetadataBlocks, TermsOfUse } from './Dataset'
 
 export interface DatasetTemplate {
   id: number
@@ -9,19 +9,13 @@ export interface DatasetTemplate {
   createTime: string
   createDate: string
   // 👇 From Edit Template Metadata
-  datasetFields: DatasetFields
+  datasetMetadataBlocks: DatasetMetadataBlocks
   instructions: DatasetTemplateInstruction[]
   // 👇 From Edit Template Terms
   termsOfUse: TermsOfUse
   license?: DatasetLicense // This license property is going to be present if not custom terms are added in the UI
 }
 
-type DatasetFields = Record<string, DatasetFieldInfo>
-interface DatasetFieldInfo {
-  displayName: string
-  name: string
-  fields: DatasetMetadataFieldValue[]
-}
 export interface DatasetTemplateInstruction {
   instructionField: string
   instructionText: string

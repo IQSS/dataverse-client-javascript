@@ -325,7 +325,7 @@ const transformPayloadText = (
   return keepRawFields ? text : transformHtmlToMarkdown(text)
 }
 
-const transformPayloadToDatasetMetadataBlocks = (
+export const transformPayloadToDatasetMetadataBlocks = (
   metadataBlocksPayload: MetadataBlocksPayload,
   keepRawFields: boolean
 ): DatasetMetadataBlocks => {

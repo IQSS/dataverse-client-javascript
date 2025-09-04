@@ -1,5 +1,6 @@
 import { DatasetTemplate } from '../../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './DatasetTemplatePayload'
+import { transformPayloadToDatasetMetadataBlocks } from './datasetTransformers'
 
 export const transformDatasetTemplatePayloadToDatasetTemplate = (
   collectionDatasetTemplatePayload: DatasetTemplatePayload[]
@@ -13,7 +14,7 @@ export const transformDatasetTemplatePayloadToDatasetTemplate = (
       usageCount: payload.usageCount,
       createTime: payload.createTime,
       createDate: payload.createDate,
-      datasetFields: payload.datasetFields as unknown as DatasetTemplate['datasetFields'],
+      datasetMetadataBlocks: transformPayloadToDatasetMetadataBlocks(payload.datasetFields, false),
       instructions: payload.instructions.map((instruction) => ({
         instructionField: instruction.instructionField,
         instructionText: instruction.instructionText
