@@ -48,7 +48,8 @@ describe('ExternalToolsRepository', () => {
     })
   })
 
-  describe('getFileExternalToolResolved', () => {
+  // Skipping until related backed PR is merged
+  describe.skip('getFileExternalToolResolved', () => {
     const testCollectionAlias = 'getFileExternalToolResolvedFunctionalTestCollection'
     let testDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'
@@ -140,7 +141,7 @@ describe('ExternalToolsRepository', () => {
     })
   })
 
-  describe('getDatasetExternalToolResolved', () => {
+  describe.skip('getDatasetExternalToolResolved', () => {
     const testCollectionAlias = 'getDatasetExternalToolResolvedFunctionalTestCollection'
     let testDatasetIds: CreatedDatasetIdentifiers
     const testTextFile1Name = 'test-file-1.txt'
