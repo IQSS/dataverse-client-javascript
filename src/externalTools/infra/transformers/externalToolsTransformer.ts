@@ -15,6 +15,9 @@ export const externalToolsTransformer = (
     description: tool.description,
     types: tool.types,
     scope: tool.scope,
-    contentType: tool.contentType
+    contentType: tool.contentType,
+    toolParameters: tool.toolParameters,
+    allowedApiCalls: tool.allowedApiCalls,
+    requirements: tool.requirements
   }))
 }
