@@ -451,7 +451,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
-
   public async linkCollection(
     linkedCollectionIdOrAlias: number | string,
     linkingCollectionIdOrAlias: number | string
@@ -465,7 +464,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
-
   public async unlinkCollection(
     linkedCollectionIdOrAlias: number | string,
     linkingCollectionIdOrAlias: number | string
@@ -478,7 +476,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         throw error
       })
   }
-
   public async getCollectionLinks(collectionIdOrAlias: number | string): Promise<CollectionLinks> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/links`, true)
       .then((response) => {

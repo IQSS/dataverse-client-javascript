@@ -1,4 +1,4 @@
-import { DatasetLicense, DatasetMetadataBlocks, TermsOfUse } from './Dataset'
+import { DatasetLicense, DatasetMetadataBlock, TermsOfUse } from './Dataset'
 
 export interface DatasetTemplate {
   id: number
@@ -9,7 +9,7 @@ export interface DatasetTemplate {
   createTime: string
   createDate: string
   // 👇 From Edit Template Metadata
-  datasetMetadataBlocks: DatasetMetadataBlocks
+  datasetMetadataBlocks: DatasetMetadataBlock[]
   instructions: DatasetTemplateInstruction[]
   // 👇 From Edit Template Terms
   termsOfUse: TermsOfUse
