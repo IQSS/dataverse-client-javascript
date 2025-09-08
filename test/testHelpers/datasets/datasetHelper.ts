@@ -694,9 +694,11 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
 }
 
 export const createNewDatasetRequestPayload = (
-  license?: DatasetLicense
+  license?: DatasetLicense,
+  datasetType?: string
 ): NewDatasetRequestPayload => {
   return {
+    datasetType: datasetType,
     datasetVersion: {
       ...(license && { license }),
       metadataBlocks: {

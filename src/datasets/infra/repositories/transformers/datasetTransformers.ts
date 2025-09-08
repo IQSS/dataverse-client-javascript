@@ -35,6 +35,7 @@ export interface NewDatasetRequestPayload {
     license?: DatasetLicense
     metadataBlocks: Record<string, MetadataBlockRequestPayload>
   }
+  datasetType?: string
 }
 
 export interface MetadataBlockRequestPayload {
@@ -96,9 +97,11 @@ export const transformDatasetModelToUpdateDatasetRequestPayload = (
 
 export const transformDatasetModelToNewDatasetRequestPayload = (
   dataset: DatasetDTO,
-  metadataBlocks: MetadataBlock[]
+  metadataBlocks: MetadataBlock[],
+  datasetType?: string
 ): NewDatasetRequestPayload => {
   return {
+    datasetType: datasetType,
     datasetVersion: {
       ...(dataset.license && { license: dataset.license }),
       metadataBlocks: transformMetadataBlockModelsToRequestPayload(

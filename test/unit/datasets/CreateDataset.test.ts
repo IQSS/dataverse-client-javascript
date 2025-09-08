@@ -51,7 +51,8 @@ describe('execute', () => {
     expect(datasetsRepositoryStub.createDataset).toHaveBeenCalledWith(
       testDataset,
       testMetadataBlocks,
-      ROOT_COLLECTION_ID
+      ROOT_COLLECTION_ID,
+      undefined
     )
   })
 
@@ -111,7 +112,8 @@ describe('execute', () => {
     expect(datasetsRepositoryStub.createDataset).toHaveBeenCalledWith(
       testDataset,
       testMetadataBlocks,
-      ROOT_COLLECTION_ID
+      ROOT_COLLECTION_ID,
+      undefined
     )
   })
 

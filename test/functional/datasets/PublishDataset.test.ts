@@ -12,6 +12,10 @@ import {
   waitForNoLocks,
   deletePublishedDatasetViaApi
 } from '../../testHelpers/datasets/datasetHelper'
+import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
+
+// "dataset" is the default so this is equivalent to not passing a datasetType
+const datasetType = 'dataset'
 
 const testNewDataset = {
   license: {
@@ -61,7 +65,11 @@ describe('execute', () => {
   })
 
   test('should successfully publish a dataset', async () => {
-    const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
+    const createdDatasetIdentifiers = await createDataset.execute(
+      testNewDataset,
+      ROOT_COLLECTION_ID,
+      datasetType
+    )
 
     const response = await publishDataset.execute(
       createdDatasetIdentifiers.persistentId,
@@ -74,7 +82,11 @@ describe('execute', () => {
   })
 
   test('should successfully publish a dataset with update current version', async () => {
-    const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
+    const createdDatasetIdentifiers = await createDataset.execute(
+      testNewDataset,
+      ROOT_COLLECTION_ID,
+      datasetType
+    )
 
     const firstPublishResponse = await publishDataset.execute(
       createdDatasetIdentifiers.persistentId,

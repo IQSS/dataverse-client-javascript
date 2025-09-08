@@ -27,10 +27,16 @@ export class CreateDataset extends DatasetWriteUseCase<CreatedDatasetIdentifiers
    */
   async execute(
     newDataset: DatasetDTO,
-    collectionId = ROOT_COLLECTION_ID
+    collectionId = ROOT_COLLECTION_ID,
+    datasetType?: string
   ): Promise<CreatedDatasetIdentifiers> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(newDataset)
     this.getNewDatasetValidator().validate(newDataset, metadataBlocks)
-    return this.getDatasetsRepository().createDataset(newDataset, metadataBlocks, collectionId)
+    return this.getDatasetsRepository().createDataset(
+      newDataset,
+      metadataBlocks,
+      collectionId,
+      datasetType
+    )
   }
 }
