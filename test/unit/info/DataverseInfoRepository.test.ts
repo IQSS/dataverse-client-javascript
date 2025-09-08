@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { DataverseInfoRepository } from '../../../src/info/infra/repositories/DataverseInfoRepository'
-import { ApiConfig, ReadError } from '../../../src'
+import { ApiConfig, DatasetMetadataExportFormats, ReadError } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 
@@ -183,6 +183,58 @@ describe('DataverseInfoRepository', () => {
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/info/applicationTermsOfUse`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('getAvailableDatasetMetadataExportFormats', () => {
+    test('should return available dataset metadata export formats on successful response', async () => {
+      const formats: DatasetMetadataExportFormats = {
+        OAI_ORE: {
+          displayName: 'OAI_ORE',
+          mediaType: 'application/json',
+          isHarvestable: false,
+          isVisibleInUserInterface: true
+        },
+        Datacite: {
+          displayName: 'DataCite',
+          mediaType: 'application/xml',
+          isHarvestable: true,
+          isVisibleInUserInterface: true,
+          XMLNameSpace: 'http://datacite.org/schema/kernel-4',
+          XMLSchemaLocation:
+            'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.5/metadata.xsd',
+          XMLSchemaVersion: '4.5'
+        }
+      }
+
+      const testSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: formats
+        }
+      }
+      jest.spyOn(axios, 'get').mockResolvedValue(testSuccessfulResponse)
+
+      const actual = await sut.getAvailableDatasetMetadataExportFormats()
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/exportFormats`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(actual).toEqual(formats)
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: ReadError | undefined
+      await sut.getAvailableDatasetMetadataExportFormats().catch((e) => (error = e))
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/exportFormats`,
         TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
       )
       expect(error).toBeInstanceOf(Error)
