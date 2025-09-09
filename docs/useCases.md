@@ -90,6 +90,8 @@ The different use cases currently available in the package are classified below,
   - [Get ZIP Download Limit](#get-zip-download-limit)
   - [Get Application Terms of Use](#get-application-terms-of-use)
   - [Get Available Dataset Metadata Export Formats](#get-available-dataset-metadata-export-formats)
+- [Licenses](#Licenses)
+  - [Get Available Standard License Terms](#get-available-standard-license-terms)
 - [Contact](#Contact)
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
 - [Notifications](#Notifications)
@@ -2114,6 +2116,26 @@ getAvailableDatasetMetadataExportFormats
 ```
 
 _See [use case](../src/info/domain/useCases/GetAvailableDatasetMetadataExportFormats.ts) implementation_.
+
+## Licenses
+
+### Get Available Standard License Terms
+
+Returns a list of available standard licenses that can be selected for a dataset.
+
+##### Example call:
+
+```typescript
+import { getAvailableStandardLicenses, License } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAvailableStandardLicenses.execute().then((licenses: License[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/licenses/domain/useCases/GetAvailableStandardLicenses.ts) implementation_.
 
 ## Contact
 
