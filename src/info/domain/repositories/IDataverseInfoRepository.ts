@@ -1,3 +1,4 @@
+import { DatasetMetadataExportFormats } from '../models/DatasetMetadataExportFormats'
 import { DataverseVersion } from '../models/DataverseVersion'
 
 export interface IDataverseInfoRepository {
@@ -5,4 +6,5 @@ export interface IDataverseInfoRepository {
   getZipDownloadLimit(): Promise<number>
   getMaxEmbargoDurationInMonths(): Promise<number>
   getApplicationTermsOfUse(lang?: string): Promise<string>
+  getAvailableDatasetMetadataExportFormats(): Promise<DatasetMetadataExportFormats>
 }
