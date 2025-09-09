@@ -90,6 +90,9 @@ The different use cases currently available in the package are classified below,
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
   - [Get ZIP Download Limit](#get-zip-download-limit)
   - [Get Application Terms of Use](#get-application-terms-of-use)
+  - [Get Available Dataset Metadata Export Formats](#get-available-dataset-metadata-export-formats)
+- [Licenses](#Licenses)
+  - [Get Available Standard License Terms](#get-available-standard-license-terms)
 - [Contact](#Contact)
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
 - [Notifications](#Notifications)
@@ -2107,6 +2110,51 @@ getApplicationTermsOfUse.execute().then((termsOfUse: string) => {
 ```
 
 _See [use case](../src/info/domain/useCases/GetApplicationTermsOfUse.ts) implementation_.
+
+#### Get Available Dataset Metadata Export Formats
+
+Returns a [DatasetMetadataExportFormats](../src/info/domain/models/DatasetMetadataExportFormats.ts) object containing the available dataset metadata export formats.
+
+##### Example call:
+
+```typescript
+import {
+  getAvailableDatasetMetadataExportFormats,
+  DatasetMetadataExportFormats
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAvailableDatasetMetadataExportFormats
+  .execute()
+  .then((datasetMetadataExportFormats: DatasetMetadataExportFormats) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/info/domain/useCases/GetAvailableDatasetMetadataExportFormats.ts) implementation_.
+
+## Licenses
+
+### Get Available Standard License Terms
+
+Returns a list of available standard licenses that can be selected for a dataset.
+
+##### Example call:
+
+```typescript
+import { getAvailableStandardLicenses, License } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAvailableStandardLicenses.execute().then((licenses: License[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/licenses/domain/useCases/GetAvailableStandardLicenses.ts) implementation_.
 
 ## Contact
 
