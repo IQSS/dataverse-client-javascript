@@ -56,6 +56,47 @@ describe('execute', () => {
     )
   })
 
+  test('should return a dataset type', async () => {
+    const testCreatedDatasetIdentifiers: CreatedDatasetIdentifiers = {
+      persistentId: 'test',
+      numericId: 1
+    }
+
+    const datasetsRepositoryStub = <IDatasetsRepository>{}
+    datasetsRepositoryStub.createDataset = jest
+      .fn()
+      .mockResolvedValue(testCreatedDatasetIdentifiers)
+
+    const datasetValidatorStub = <ResourceValidator>{}
+    datasetValidatorStub.validate = jest.fn().mockResolvedValue(undefined)
+
+    const metadataBlocksRepositoryStub = <IMetadataBlocksRepository>{}
+    metadataBlocksRepositoryStub.getMetadataBlockByName = jest
+      .fn()
+      .mockResolvedValue(testMetadataBlocks[0])
+
+    const sut = new CreateDataset(
+      datasetsRepositoryStub,
+      metadataBlocksRepositoryStub,
+      datasetValidatorStub
+    )
+
+    const actual = await sut.execute(testDataset, ROOT_COLLECTION_ID, 'software')
+
+    expect(actual).toEqual(testCreatedDatasetIdentifiers)
+
+    expect(metadataBlocksRepositoryStub.getMetadataBlockByName).toHaveBeenCalledWith(
+      testMetadataBlocks[0].name
+    )
+    expect(datasetValidatorStub.validate).toHaveBeenCalledWith(testDataset, testMetadataBlocks)
+    expect(datasetsRepositoryStub.createDataset).toHaveBeenCalledWith(
+      testDataset,
+      testMetadataBlocks,
+      ROOT_COLLECTION_ID,
+      'software'
+    )
+  })
+
   test('should throw ResourceValidationError and not call repository when validation is unsuccessful', async () => {
     const datasetsRepositoryMock = <IDatasetsRepository>{}
     datasetsRepositoryMock.createDataset = jest.fn().mockResolvedValue(undefined)
