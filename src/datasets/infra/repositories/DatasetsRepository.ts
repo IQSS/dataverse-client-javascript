@@ -24,6 +24,7 @@ import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollec
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
 import { FormattedCitation } from '../../domain/models/FormattedCitation'
+import { DatasetType } from '../../domain/models/DatasetType'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -353,6 +354,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true
     )
       .then((response) => response.data.data as string[])
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetAvailableDatasetTypes(): Promise<DatasetType[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'))
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })

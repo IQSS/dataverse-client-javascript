@@ -38,6 +38,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
     - [Get Dataset Available Categories](#get-dataset-available-categories)
+    - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -1112,6 +1113,24 @@ getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
+
+#### Get Dataset Available Dataset Types
+
+Returns a list of available dataset types that can be used at dataset creation. By default, only the type "dataset" is returned.
+
+###### Example call:
+
+```typescript
+import { getDatasetAvailableDatasetTypes } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getDatasetAvailableDatasetTypes.execute().then((categories: String[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetTypes.ts) implementation_.
 
 ## Files
 
