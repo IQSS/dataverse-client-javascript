@@ -810,6 +810,24 @@ getDatasetLinkedCollections
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetLinkedCollections.ts) implementation_.
 
+#### Get Dataset Available Dataset Types
+
+Returns a list of available dataset types that can be used at dataset creation. By default, only the type "dataset" is returned.
+
+###### Example call:
+
+```typescript
+import { getDatasetAvailableDatasetTypes } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getDatasetAvailableDatasetTypes.execute().then((datasetTypes: DatasetType[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetTypes.ts) implementation_.
+
 ### Datasets Write Use Cases
 
 #### Create a Dataset
@@ -1132,24 +1150,6 @@ getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: Dataset
 ```
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definition.
-
-#### Get Dataset Available Dataset Types
-
-Returns a list of available dataset types that can be used at dataset creation. By default, only the type "dataset" is returned.
-
-###### Example call:
-
-```typescript
-import { getDatasetAvailableDatasetTypes } from '@iqss/dataverse-client-javascript'
-
-/* ... */
-
-getDatasetAvailableDatasetTypes.execute().then((datasetTypes: DatasetType[]) => {
-  /* ... */
-})
-```
-
-_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetTypes.ts) implementation_.
 
 ## Files
 
