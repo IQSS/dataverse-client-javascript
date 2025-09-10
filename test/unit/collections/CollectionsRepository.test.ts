@@ -567,6 +567,55 @@ describe('CollectionsRepository', () => {
     })
   })
 
+  describe('getCollectionsForLinking', () => {
+    test('should call dataverse variant with numeric id and search term', async () => {
+      const payload = {
+        data: {
+          status: 'OK',
+          data: [
+            { id: 1, alias: 'dv1', name: 'DV 1' },
+            { id: 2, alias: 'dv2', name: 'DV 2' }
+          ]
+        }
+      }
+      jest.spyOn(axios, 'get').mockResolvedValue(payload)
+
+      const actual = await sut.getCollectionsForLinking('collection', 99, 'abc')
+      const expectedEndpoint = `${TestConstants.TEST_API_URL}/dataverses/99/dataverse/linkingDataverses`
+      const expectedParams = new URLSearchParams({ searchTerm: 'abc' })
+      const expectedConfig = {
+        params: expectedParams,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+      expect(axios.get).toHaveBeenCalledWith(expectedEndpoint, expectedConfig)
+      expect(actual).toEqual([
+        { id: 1, alias: 'dv1', displayName: 'DV 1' },
+        { id: 2, alias: 'dv2', displayName: 'DV 2' }
+      ])
+    })
+
+    test('should call dataset variant using persistentId and map results', async () => {
+      const payload = {
+        data: {
+          status: 'OK',
+          data: [{ id: 3, alias: 'dv3', name: 'DV 3' }]
+        }
+      }
+      jest.spyOn(axios, 'get').mockResolvedValue(payload)
+
+      const pid = 'doi:10.5072/FK2/J8SJZB'
+      const actual = await sut.getCollectionsForLinking('dataset', pid, '')
+      const expectedEndpoint = `${TestConstants.TEST_API_URL}/dataverses/:persistentId/dataset/linkingDataverses`
+      const expectedParams = new URLSearchParams({ persistentId: pid })
+      const expectedConfig = {
+        params: expectedParams,
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+      expect(axios.get).toHaveBeenCalledWith(expectedEndpoint, expectedConfig)
+      expect(actual).toEqual([{ id: 3, alias: 'dv3', displayName: 'DV 3' }])
+    })
+  })
+
   describe('deleteCollection', () => {
     const deleteTestCollectionAlias = 'deleteCollection-unit-test'
     const deleteTestCollectionId = 123

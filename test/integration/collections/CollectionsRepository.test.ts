@@ -804,6 +804,63 @@ describe('CollectionsRepository', () => {
     })
   })
 
+  describe('getCollectionsForLinking', () => {
+    const linkingTargetAlias = 'collectionsRepositoryLinkTarget'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(linkingTargetAlias)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(linkingTargetAlias)
+    })
+
+    test('should list collections for linking for a given collection alias', async () => {
+      const results = await sut.getCollectionsForLinking(
+        'collection',
+        testCollectionAlias,
+        'Scientific'
+      )
+
+      expect(Array.isArray(results)).toBe(true)
+      // Should contain the newly created linking target collection among candidates
+      const found = results.find((c) => c.alias === linkingTargetAlias)
+      expect(found).toBeDefined()
+      expect(found?.id).toBeGreaterThan(0)
+      expect(found?.displayName).toBe('Scientific Research')
+    })
+
+    test('should list collections for linking for a given dataset persistentId', async () => {
+      // Create a temporary dataset to query linking candidates
+      const { persistentId, numericId } = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+
+      const results = await sut.getCollectionsForLinking('dataset', persistentId, 'Scientific')
+
+      // Cleanup dataset (unpublished)
+      await deleteUnpublishedDatasetViaApi(numericId)
+
+      expect(Array.isArray(results)).toBe(true)
+      const found = results.find((c) => c.alias === linkingTargetAlias)
+      expect(found).toBeDefined()
+      expect(found?.displayName).toBe('Scientific Research')
+    })
+
+    it('should return error when collection does not exist', async () => {
+      await expect(
+        sut.getCollectionsForLinking('collection', TestConstants.TEST_DUMMY_COLLECTION_ALIAS, '')
+      ).rejects.toThrow(ReadError)
+    })
+
+    it('should return error when dataset does not exist', async () => {
+      await expect(
+        sut.getCollectionsForLinking('dataset', TestConstants.TEST_DUMMY_PERSISTENT_ID, '')
+      ).rejects.toThrow(ReadError)
+    })
+  })
+
   describe('getCollectionItems for published tabular file', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
     const testTextFile4Name = 'test-file-4.tab'
