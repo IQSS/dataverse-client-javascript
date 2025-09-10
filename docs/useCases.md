@@ -16,6 +16,7 @@ The different use cases currently available in the package are classified below,
     - [List All Collection Items](#list-all-collection-items)
     - [List My Data Collection Items](#list-my-data-collection-items)
     - [Get Collection Featured Items](#get-collection-featured-items)
+    - [Get Collections for Linking](#get-collections-for-linking)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
     - [Update a Collection](#update-a-collection)
@@ -323,6 +324,56 @@ _See [use case](../src/collections/domain/useCases/GetCollectionFeaturedItems.ts
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+#### Get Collections for Linking
+
+Returns an array of [CollectionSummary](../src/collections/domain/models/CollectionSummary.ts) (id, alias, displayName) representing the Dataverse collections to which a given Dataverse collection or Dataset may be linked.
+
+This use case supports an optional `searchTerm` to filter by collection name.
+
+##### Example calls:
+
+```typescript
+import { getCollectionsForLinking } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+// Case 1: For a given Dataverse collection (by numeric id or alias)
+const collectionIdOrAlias: number | string = 'collectionAlias' // or 123
+const searchTerm = 'searchOn'
+
+getCollectionsForLinking
+  .execute('dataverse', collectionIdOrAlias, searchTerm)
+  .then((collections) => {
+    // collections: CollectionSummary[]
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+
+/* ... */
+
+// Case 2: For a given Dataset (by persistent identifier)
+const persistentId = 'doi:10.5072/FK2/J8SJZB'
+
+getCollectionsForLinking
+  .execute('dataset', persistentId, searchTerm)
+  .then((collections) => {
+    // collections: CollectionSummary[]
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionsForLinking.ts) implementation_.
+
+Notes:
+
+- When the first argument is `'collection'`, the second argument can be a numeric collection id or a collection alias.
+- When the first argument is `'dataset'`, the second argument must be the dataset persistent identifier string (e.g., `doi:...`).
 
 ### Collections Write Use Cases
 
