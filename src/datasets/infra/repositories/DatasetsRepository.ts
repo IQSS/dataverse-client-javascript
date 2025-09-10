@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
@@ -24,6 +25,9 @@ import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollec
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
 import { FormattedCitation } from '../../domain/models/FormattedCitation'
+import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
+import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
+import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -353,6 +357,18 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true
     )
       .then((response) => response.data.data as string[])
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetTemplates(
+    collectionIdOrAlias: number | string
+  ): Promise<DatasetTemplate[]> {
+    return this.doGet(`/dataverses/${collectionIdOrAlias}/templates`, true)
+      .then((response: AxiosResponse<{ data: DatasetTemplatePayload[] }>) =>
+        transformDatasetTemplatePayloadToDatasetTemplate(response.data.data)
+      )
       .catch((error) => {
         throw error
       })
