@@ -20,7 +20,9 @@ import {
   CreatedDatasetIdentifiers,
   DatasetDTO,
   DatasetDeaccessionDTO,
-  publishDataset
+  publishDataset,
+  DatasetType,
+  getDatasetAvailableDatasetTypes
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -1647,6 +1649,22 @@ describe('DatasetsRepository', () => {
 
     test('should return error when dataset does not exist', async () => {
       await expect(sut.getDatasetAvailableCategories(nonExistentTestDatasetId)).rejects.toThrow()
+    })
+  })
+
+  describe('getDatasetAvailableDatasetTypes', () => {
+    test('should return available dataset types', async () => {
+      const actualDatasetTypes: DatasetType[] = await getDatasetAvailableDatasetTypes.execute()
+      const expectedDatasetTypes = [
+        {
+          id: 1,
+          name: 'dataset',
+          linkedMetadataBlocks: [],
+          availableLicenses: []
+        }
+      ]
+
+      expect(actualDatasetTypes).toEqual(expectedDatasetTypes)
     })
   })
 })
