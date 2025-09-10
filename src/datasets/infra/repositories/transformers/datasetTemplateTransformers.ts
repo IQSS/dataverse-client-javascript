@@ -1,3 +1,4 @@
+import { transformPayloadLicenseToLicense } from '../../../../licenses/domain/repositories/transformers/licenseTransformers'
 import { DatasetTemplate } from '../../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './DatasetTemplatePayload'
 import { transformPayloadToDatasetMetadataBlocks } from './datasetTransformers'
@@ -34,11 +35,9 @@ export const transformDatasetTemplatePayloadToDatasetTemplate = (
     }
 
     if (payload.termsOfUseAndAccess.license) {
-      datasetTemplate.license = {
-        name: payload.termsOfUseAndAccess.license.name,
-        uri: payload.termsOfUseAndAccess.license.uri,
-        iconUri: payload.termsOfUseAndAccess.license.iconUrl
-      }
+      datasetTemplate.license = transformPayloadLicenseToLicense(
+        payload.termsOfUseAndAccess.license
+      )
     } else {
       datasetTemplate.termsOfUse.customTerms = {
         termsOfUse: payload.termsOfUseAndAccess.termsOfUse as string,

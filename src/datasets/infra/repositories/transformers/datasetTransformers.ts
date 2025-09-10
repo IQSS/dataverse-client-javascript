@@ -11,7 +11,7 @@ import {
 import { AxiosResponse } from 'axios'
 import {
   DatasetPayload,
-  LicensePayload,
+  DatasetLicensePayload,
   MetadataFieldPayload,
   MetadataBlocksPayload,
   MetadataFieldValuePayload,
@@ -261,7 +261,7 @@ export const transformVersionPayloadToDataset = (
   }
   if ('license' in versionPayload) {
     datasetModel.license = transformPayloadToDatasetLicense(
-      versionPayload.license as LicensePayload
+      versionPayload.license as DatasetLicensePayload
     )
   } else {
     datasetModel.termsOfUse.customTerms = {
@@ -297,7 +297,7 @@ export const transformVersionPayloadToDataset = (
 }
 
 const transformPayloadToDatasetLicense = (
-  licensePayload: LicensePayload
+  licensePayload: DatasetLicensePayload
 ): DatasetLicense | undefined => {
   if (!licensePayload) {
     return undefined

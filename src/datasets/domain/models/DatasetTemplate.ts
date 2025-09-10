@@ -1,4 +1,5 @@
-import { DatasetLicense, DatasetMetadataBlock, TermsOfUse } from './Dataset'
+import { DatasetMetadataBlock, TermsOfUse } from './Dataset'
+import { License } from '../../../licenses/domain/models/License'
 
 export interface DatasetTemplate {
   id: number
@@ -13,7 +14,7 @@ export interface DatasetTemplate {
   instructions: DatasetTemplateInstruction[]
   // 👇 From Edit Template Terms
   termsOfUse: TermsOfUse
-  license?: DatasetLicense // This license property is going to be present if not custom terms are added in the UI
+  license?: License // This license property is going to be present if not custom terms are added in the UI
 }
 
 export interface DatasetTemplateInstruction {

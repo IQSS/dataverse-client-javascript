@@ -1,3 +1,4 @@
+import { LicensePayload } from '../../../../licenses/domain/repositories/transformers/LicensePayload'
 import { MetadataFieldPayload } from './DatasetPayload'
 
 export interface DatasetTemplatePayload {
@@ -16,20 +17,7 @@ export interface DatasetTemplatePayload {
     id: number
     fileAccessRequest: boolean
     // This license property is going to be present if not custom terms are added in the UI
-    license?: {
-      id: number
-      name: string
-      shortDescription: string
-      uri: string
-      iconUrl?: string
-      active: boolean
-      isDefault: boolean
-      sortOrder: number
-      rightsIdentifier: string
-      rightsIdentifierScheme?: string
-      schemeUri: string
-      languageCode: string
-    }
+    license?: LicensePayload
     // Below fields are going to be present if are added in "Restricted Files + Terms of Access"
     termsOfAccess?: string // This is terms of access for restricted files in the JSF UI
     dataAccessPlace?: string
