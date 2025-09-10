@@ -2,6 +2,7 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDataverseInfoRepository } from '../../domain/repositories/IDataverseInfoRepository'
 import { DataverseVersion } from '../../domain/models/DataverseVersion'
 import { AxiosResponse } from 'axios'
+import { DatasetMetadataExportFormats } from '../../domain/models/DatasetMetadataExportFormats'
 
 export class DataverseInfoRepository extends ApiRepository implements IDataverseInfoRepository {
   private readonly infoResourceName: string = 'info'
@@ -50,6 +51,16 @@ export class DataverseInfoRepository extends ApiRepository implements IDataverse
     )
       .then((response: AxiosResponse<{ data: { message: string } }>) => {
         return response.data.data.message
+      })
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getAvailableDatasetMetadataExportFormats(): Promise<DatasetMetadataExportFormats> {
+    return this.doGet(this.buildApiEndpoint(this.infoResourceName, `exportFormats`))
+      .then((response: AxiosResponse<{ data: DatasetMetadataExportFormats }>) => {
+        return response.data.data
       })
       .catch((error) => {
         throw error

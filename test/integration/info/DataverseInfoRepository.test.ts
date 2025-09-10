@@ -73,4 +73,12 @@ describe('DataverseInfoRepository', () => {
       await deleteApplicationTermsOfUseViaApi()
     })
   })
+
+  describe('getAvailableDatasetMetadataExportFormats', () => {
+    test('should return available dataset metadata export formats', async () => {
+      const actual = await sut.getAvailableDatasetMetadataExportFormats()
+
+      expect(actual).toBeDefined()
+    })
+  })
 })
