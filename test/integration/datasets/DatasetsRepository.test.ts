@@ -52,6 +52,10 @@ import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepo
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
 import { CitationFormat } from '../../../src/datasets/domain/models/CitationFormat'
+import {
+  createDatasetTemplateViaApi,
+  deleteDatasetTemplateViaApi
+} from '../../testHelpers/datasets/datasetTemplatesHelper'
 
 const TEST_DIFF_DATASET_DTO: DatasetDTO = {
   license: {
@@ -1647,6 +1651,41 @@ describe('DatasetsRepository', () => {
 
     test('should return error when dataset does not exist', async () => {
       await expect(sut.getDatasetAvailableCategories(nonExistentTestDatasetId)).rejects.toThrow()
+    })
+  })
+
+  describe('getDatasetTemplates', () => {
+    const testCollectionAlias = 'testGetDatasetTemplates'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should return empty dataset templates', async () => {
+      const actual = await sut.getDatasetTemplates(testCollectionAlias)
+
+      expect(actual.length).toBe(0)
+    })
+
+    test('should return dataset templates for a collection', async () => {
+      const templateCreated = await createDatasetTemplateViaApi(testCollectionAlias)
+
+      const actual = await sut.getDatasetTemplates(testCollectionAlias)
+
+      expect(actual.length).toBe(1)
+
+      expect(actual[0].name).toBe(templateCreated.name)
+      expect(actual[0].isDefault).toBe(templateCreated.isDefault)
+      expect(actual[0].datasetMetadataBlocks.length).toBe(1)
+      expect(actual[0].datasetMetadataBlocks[0].name).toBe('citation')
+      expect(actual[0].datasetMetadataBlocks[0].fields.author.length).toBe(1)
+      expect(actual[0].instructions.length).toBe(templateCreated.instructions.length)
+
+      await deleteDatasetTemplateViaApi(actual[0].id)
     })
   })
 })

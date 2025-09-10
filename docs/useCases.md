@@ -39,6 +39,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
     - [Get Dataset Available Categories](#get-dataset-available-categories)
+    - [Get Dataset Templates](#get-dataset-templates)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -1163,6 +1164,24 @@ getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
+
+#### Get Dataset Templates
+
+Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
+
+##### Example call:
+
+```typescript
+import { getDatasetTemplates } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 12345
+
+getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: DatasetTemplate[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definition.
 
 ## Files
 

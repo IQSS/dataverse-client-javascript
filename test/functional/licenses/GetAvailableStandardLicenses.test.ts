@@ -14,13 +14,13 @@ describe('getAvailableStandardLicenses', () => {
 
     test('should return available standard license terms', async () => {
       const actualLicenses: License[] = await getAvailableStandardLicenses.execute()
-      const expectedLicenses = [
+      const expectedLicenses: License[] = [
         {
           id: 1,
           name: 'CC0 1.0',
           shortDescription: 'Creative Commons CC0 1.0 Universal Public Domain Dedication.',
           uri: 'http://creativecommons.org/publicdomain/zero/1.0',
-          iconUrl: 'https://licensebuttons.net/p/zero/1.0/88x31.png',
+          iconUri: 'https://licensebuttons.net/p/zero/1.0/88x31.png',
           active: true,
           isDefault: true,
           sortOrder: 0,
@@ -34,7 +34,7 @@ describe('getAvailableStandardLicenses', () => {
           name: 'CC BY 4.0',
           shortDescription: 'Creative Commons Attribution 4.0 International License.',
           uri: 'http://creativecommons.org/licenses/by/4.0',
-          iconUrl: 'https://licensebuttons.net/l/by/4.0/88x31.png',
+          iconUri: 'https://licensebuttons.net/l/by/4.0/88x31.png',
           active: true,
           isDefault: false,
           sortOrder: 2,
