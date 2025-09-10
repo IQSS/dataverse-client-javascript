@@ -12,6 +12,7 @@ import { DatasetVersionSummaryInfo } from '../models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
 import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
+import { DatasetTemplate } from '../models/DatasetTemplate'
 import { DatasetType } from '../models/DatasetType'
 
 export interface IDatasetsRepository {
@@ -75,5 +76,6 @@ export interface IDatasetsRepository {
     format: CitationFormat,
     includeDeaccessioned?: boolean
   ): Promise<FormattedCitation>
+  getDatasetTemplates(collectionIdOrAlias: number | string): Promise<DatasetTemplate[]>
   getDatasetAvailableDatasetTypes(): Promise<DatasetType[]>
 }

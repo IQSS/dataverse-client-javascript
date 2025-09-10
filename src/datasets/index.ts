@@ -26,6 +26,7 @@ import { GetDatasetLinkedCollections } from './domain/useCases/GetDatasetLinkedC
 import { GetDatasetAvailableCategories } from './domain/useCases/GetDatasetAvailableCategories'
 import { GetDatasetAvailableDatasetTypes } from './domain/useCases/GetDatasetAvailableDatasetTypes'
 import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
+import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -66,6 +67,7 @@ const getDatasetLinkedCollections = new GetDatasetLinkedCollections(datasetsRepo
 const getDatasetAvailableCategories = new GetDatasetAvailableCategories(datasetsRepository)
 const getDatasetAvailableDatasetTypes = new GetDatasetAvailableDatasetTypes(datasetsRepository)
 const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
+const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
 
 export {
   getDataset,
@@ -88,8 +90,9 @@ export {
   unlinkDataset,
   getDatasetLinkedCollections,
   getDatasetAvailableCategories,
-  getDatasetAvailableDatasetTypes,
-  getDatasetCitationInOtherFormats
+  getDatasetCitationInOtherFormats,
+  getDatasetTemplates,
+  getDatasetAvailableDatasetTypes
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
