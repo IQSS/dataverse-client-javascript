@@ -1125,7 +1125,7 @@ import { getDatasetAvailableDatasetTypes } from '@iqss/dataverse-client-javascri
 
 /* ... */
 
-getDatasetAvailableDatasetTypes.execute().then((categories: String[]) => {
+getDatasetAvailableDatasetTypes.execute().then((datasetTypes: DatasetType[]) => {
   /* ... */
 })
 ```
