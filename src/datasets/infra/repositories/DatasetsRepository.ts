@@ -28,6 +28,7 @@ import { FormattedCitation } from '../../domain/models/FormattedCitation'
 import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
 import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
+import { DatasetType } from '../../domain/models/DatasetType'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -369,6 +370,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .then((response: AxiosResponse<{ data: DatasetTemplatePayload[] }>) =>
         transformDatasetTemplatePayloadToDatasetTemplate(response.data.data)
       )
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetAvailableDatasetTypes(): Promise<DatasetType[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'))
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })

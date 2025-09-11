@@ -20,7 +20,9 @@ import {
   CreatedDatasetIdentifiers,
   DatasetDTO,
   DatasetDeaccessionDTO,
-  publishDataset
+  publishDataset,
+  DatasetType,
+  getDatasetAvailableDatasetTypes
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -1686,6 +1688,22 @@ describe('DatasetsRepository', () => {
       expect(actual[0].instructions.length).toBe(templateCreated.instructions.length)
 
       await deleteDatasetTemplateViaApi(actual[0].id)
+    })
+  })
+
+  describe('getDatasetAvailableDatasetTypes', () => {
+    test('should return available dataset types', async () => {
+      const actualDatasetTypes: DatasetType[] = await getDatasetAvailableDatasetTypes.execute()
+      const expectedDatasetTypes = [
+        {
+          id: 1,
+          name: 'dataset',
+          linkedMetadataBlocks: [],
+          availableLicenses: []
+        }
+      ]
+
+      expect(actualDatasetTypes).toEqual(expectedDatasetTypes)
     })
   })
 })
