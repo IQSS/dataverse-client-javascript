@@ -4,6 +4,7 @@
 - [Regular or Hotfix?](#regular-or-hotfix)
 - [Create Github Issue and Release Branch](#create-github-issue-and-release-branch)
 - [Update the version](#update-the-version)
+- [Update the changelog](#update-the-changelog)
 - [Merge "release branch" into "main"](#merge-release-branch-into-main)
 - [Publish the Dataverse Client Javascript package](#publish-the-dataverse-client-javascript-package)
 - [Create a Draft Release on GitHub and Tag the Version](#create-a-draft-release-on-github-and-tag-the-version)
@@ -41,6 +42,52 @@ npm version 3.5.0 --no-git-tag-version
 This command will update the version in the `package.json` and `package-lock.json`.
 
 If everything looks good, you can push the changes to the repository.
+
+## Update the changelog
+
+**Note**: Contributors should have already added their changes to the `[Unreleased]` section as part of their pull requests (see [CONTRIBUTING.md](../.github/CONTRIBUTING.md#changelog-guidelines) for details).
+
+Before releasing, ensure the changelog is properly prepared:
+
+1. **Review the [Unreleased] section** in `CHANGELOG.md` and `packages/design-system/CHANGELOG.md`
+2. **Move entries from [Unreleased] to the new version section**:
+
+   ```markdown
+   ## [vX.X.X] -- YYYY-MM-DD
+
+   ### Added
+
+   - Feature descriptions from unreleased section
+
+   ### Changed
+
+   - Changes from unreleased section
+
+   ### Fixed
+
+   - Bug fixes from unreleased section
+
+   ### Removed
+
+   - Removals from unreleased section
+   ```
+
+3. **Clear the [Unreleased] section** but keep the structure:
+
+   ```markdown
+   ## [Unreleased]
+
+   ### Added
+
+   ### Changed
+
+   ### Fixed
+
+   ### Removed
+   ```
+
+4. **Update the version links** at the bottom of the changelog files
+5. **Commit the changelog updates** as part of the release preparation
 
 ## Merge "release branch" into "main"
 
@@ -96,7 +143,7 @@ Go to https://github.com/IQSS/dataverse-client-javascript/releases/new to start 
 
 - Under "Release title" use the same name as the tag such as v3.5.0.
 
-- Add a description of the changes included in this release. You should include a link to the recently published npm version and summarize the key updates, fixes, or features.
+- Add a description of the changes included in this release. You should include a link to the recently published npm version and summarize the key updates, fixes, or features. You can copy the content from the corresponding version section in `CHANGELOG.md` for consistency.
 
 - Click "Save draft" because we do not want to publish the release yet.
 

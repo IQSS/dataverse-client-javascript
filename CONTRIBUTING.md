@@ -16,6 +16,20 @@ First of all thank you very much for your interest in contributing to this proje
 - Unit and integration tests pass
 - Unit and integration tests for new functionality/fix are added
 - Documentation is updated (Any new use case added or modified should be documented in the [Use Cases](./docs/useCases.md) section)
+- Changelog is updated with your changes in the `[Unreleased]` section of [CHANGELOG.md](./CHANGELOG.md)
+
+## Maintaining the Changelog
+
+We follow the [Keep a Changelog](https://keepachangelog.com/) format for our changelog. When contributing:
+
+1. **Add your changes to the `[Unreleased]` section** at the top of `CHANGELOG.md`
+2. **Categorize your changes** under the appropriate headings:
+   - **Added** for new features
+   - **Changed** for changes in existing functionality
+   - **Removed** for now removed features
+   - **Fixed** for any bug fixes
+3. **Write clear, concise descriptions** that help users understand the impact of changes
+4. **Include relevant issue numbers** when applicable
 
 ## Code of Conduct
 
