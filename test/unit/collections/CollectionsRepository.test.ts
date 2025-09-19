@@ -580,7 +580,7 @@ describe('CollectionsRepository', () => {
       }
       jest.spyOn(axios, 'get').mockResolvedValue(payload)
 
-      const actual = await sut.getCollectionsForLinking('collection', 99, 'abc')
+      const actual = await sut.getCollectionsForLinking('collection', 99, 'abc', false)
       const expectedEndpoint = `${TestConstants.TEST_API_URL}/dataverses/99/dataverse/linkingDataverses`
       const expectedParams = new URLSearchParams({ searchTerm: 'abc' })
       const expectedConfig = {
@@ -604,7 +604,7 @@ describe('CollectionsRepository', () => {
       jest.spyOn(axios, 'get').mockResolvedValue(payload)
 
       const pid = 'doi:10.5072/FK2/J8SJZB'
-      const actual = await sut.getCollectionsForLinking('dataset', pid, '')
+      const actual = await sut.getCollectionsForLinking('dataset', pid, '', false)
       const expectedEndpoint = `${TestConstants.TEST_API_URL}/dataverses/:persistentId/dataset/linkingDataverses`
       const expectedParams = new URLSearchParams({ persistentId: pid })
       const expectedConfig = {

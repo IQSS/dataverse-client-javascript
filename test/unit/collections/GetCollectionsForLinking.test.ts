@@ -14,7 +14,7 @@ describe('GetCollectionsForLinking', () => {
 
     const uc = new GetCollectionsForLinking(repo)
     await expect(uc.execute('collection', 123, 'foo')).resolves.toEqual(sample)
-    expect(repo.getCollectionsForLinking).toHaveBeenCalledWith('collection', 123, 'foo')
+    expect(repo.getCollectionsForLinking).toHaveBeenCalledWith('collection', 123, 'foo', false)
   })
 
   test('should return error result on repository error', async () => {
@@ -23,6 +23,11 @@ describe('GetCollectionsForLinking', () => {
 
     const uc = new GetCollectionsForLinking(repo)
     await expect(uc.execute('dataset', 'doi:10.123/ABC')).rejects.toThrow(ReadError)
-    expect(repo.getCollectionsForLinking).toHaveBeenCalledWith('dataset', 'doi:10.123/ABC', '')
+    expect(repo.getCollectionsForLinking).toHaveBeenCalledWith(
+      'dataset',
+      'doi:10.123/ABC',
+      '',
+      false
+    )
   })
 })
