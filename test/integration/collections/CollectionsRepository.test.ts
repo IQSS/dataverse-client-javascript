@@ -858,6 +858,8 @@ describe('CollectionsRepository', () => {
       // Link the test collection with the linking target collection
       await sut.linkCollection(testCollectionAlias, linkingTargetAlias)
 
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
       const collectionsForLinking = await sut.getCollectionsForLinking(
         'collection',
         testCollectionAlias,
