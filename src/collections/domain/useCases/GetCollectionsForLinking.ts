@@ -4,6 +4,9 @@ import { CollectionSummary } from '../models/CollectionSummary'
 
 export type LinkingObjectType = 'collection' | 'dataset'
 
+// TODO:ME - Add to the interface and here the alreadyLinking param to get collections for unlinking
+// @param alreadyLinking - Optional flag. When true, returns collections currently linked (candidates to unlink). Defaults to false.
+
 export class GetCollectionsForLinking implements UseCase<CollectionSummary[]> {
   private collectionsRepository: ICollectionsRepository
 
@@ -16,12 +19,19 @@ export class GetCollectionsForLinking implements UseCase<CollectionSummary[]> {
    * @param objectType - 'dataverse' when providing a collection identifier/alias; 'dataset' when providing a dataset persistentId.
    * @param id - For objectType 'dataverse', a numeric id or alias string. For 'dataset', the persistentId string (e.g., doi:...)
    * @param searchTerm - Optional search term to filter by collection name. Defaults to empty string (no filtering).
+   * @param alreadyLinked - Optional flag. When true, returns collections currently linked (candidates to unlink). Defaults to false.
    */
   async execute(
     objectType: LinkingObjectType,
     id: number | string,
-    searchTerm = ''
+    searchTerm = '',
+    alreadyLinked = false
   ): Promise<CollectionSummary[]> {
-    return await this.collectionsRepository.getCollectionsForLinking(objectType, id, searchTerm)
+    return await this.collectionsRepository.getCollectionsForLinking(
+      objectType,
+      id,
+      searchTerm,
+      alreadyLinked
+    )
   }
 }

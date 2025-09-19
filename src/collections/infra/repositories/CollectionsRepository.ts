@@ -490,7 +490,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
   public async getCollectionsForLinking(
     objectType: LinkingObjectType,
     id: number | string,
-    searchTerm: string
+    searchTerm: string,
+    alreadyLinked: boolean
   ): Promise<CollectionSummary[]> {
     let path: string
     const queryParams = new URLSearchParams()
@@ -503,6 +504,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     if (searchTerm) {
       queryParams.set('searchTerm', searchTerm)
+    }
+
+    if (alreadyLinked) {
+      queryParams.set('alreadyLinking', 'true')
     }
 
     return this.doGet(path, true, queryParams)

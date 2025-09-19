@@ -367,6 +367,19 @@ getCollectionsForLinking
   .catch((error: Error) => {
     /* ... */
   })
+
+// Case 3: [alreadyLinked] Optional flag. When true, returns collections currently linked (candidates to unlink). Defaults to false.
+const alreadyLinked = true
+
+getCollectionsForLinking
+  .execute('dataset', persistentId, searchTerm, alreadyLinked)
+  .then((collections) => {
+    // collections: CollectionSummary[]
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
 ```
 
 _See [use case](../src/collections/domain/useCases/GetCollectionsForLinking.ts) implementation_.

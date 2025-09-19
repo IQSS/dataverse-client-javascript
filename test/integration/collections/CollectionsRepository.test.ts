@@ -819,7 +819,8 @@ describe('CollectionsRepository', () => {
       const results = await sut.getCollectionsForLinking(
         'collection',
         testCollectionAlias,
-        'Scientific'
+        'Scientific',
+        false
       )
 
       expect(Array.isArray(results)).toBe(true)
@@ -837,7 +838,12 @@ describe('CollectionsRepository', () => {
         testCollectionAlias
       )
 
-      const results = await sut.getCollectionsForLinking('dataset', persistentId, 'Scientific')
+      const results = await sut.getCollectionsForLinking(
+        'dataset',
+        persistentId,
+        'Scientific',
+        false
+      )
 
       // Cleanup dataset (unpublished)
       await deleteUnpublishedDatasetViaApi(numericId)
@@ -848,15 +854,44 @@ describe('CollectionsRepository', () => {
       expect(found?.displayName).toBe('Scientific Research')
     })
 
+    test('should return collections for unlking when sending alreadyLinked param to true', async () => {
+      // Link the test collection with the linking target collection
+      await sut.linkCollection(testCollectionAlias, linkingTargetAlias)
+
+      const collectionsForLinking = await sut.getCollectionsForLinking(
+        'collection',
+        testCollectionAlias,
+        '',
+        false
+      )
+
+      const collectionsForUnlinking = await sut.getCollectionsForLinking(
+        'collection',
+        testCollectionAlias,
+        '',
+        true
+      )
+
+      expect(collectionsForLinking.length).toBe(0)
+      expect(collectionsForUnlinking.length).toBeGreaterThan(0)
+      expect(collectionsForUnlinking[0].alias).toBe(linkingTargetAlias)
+      expect(collectionsForUnlinking[0].displayName).toBe('Scientific Research')
+    })
+
     it('should return error when collection does not exist', async () => {
       await expect(
-        sut.getCollectionsForLinking('collection', TestConstants.TEST_DUMMY_COLLECTION_ALIAS, '')
+        sut.getCollectionsForLinking(
+          'collection',
+          TestConstants.TEST_DUMMY_COLLECTION_ALIAS,
+          '',
+          false
+        )
       ).rejects.toThrow(ReadError)
     })
 
     it('should return error when dataset does not exist', async () => {
       await expect(
-        sut.getCollectionsForLinking('dataset', TestConstants.TEST_DUMMY_PERSISTENT_ID, '')
+        sut.getCollectionsForLinking('dataset', TestConstants.TEST_DUMMY_PERSISTENT_ID, '', false)
       ).rejects.toThrow(ReadError)
     })
   })

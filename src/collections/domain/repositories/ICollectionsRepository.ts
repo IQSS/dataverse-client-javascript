@@ -65,6 +65,7 @@ export interface ICollectionsRepository {
   getCollectionsForLinking(
     objectType: LinkingObjectType,
     id: number | string,
-    searchTerm: string
+    searchTerm: string,
+    alreadyLinked: boolean
   ): Promise<CollectionSummary[]>
 }
