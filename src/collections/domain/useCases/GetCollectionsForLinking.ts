@@ -4,9 +4,6 @@ import { CollectionSummary } from '../models/CollectionSummary'
 
 export type LinkingObjectType = 'collection' | 'dataset'
 
-// TODO:ME - Add to the interface and here the alreadyLinking param to get collections for unlinking
-// @param alreadyLinking - Optional flag. When true, returns collections currently linked (candidates to unlink). Defaults to false.
-
 export class GetCollectionsForLinking implements UseCase<CollectionSummary[]> {
   private collectionsRepository: ICollectionsRepository
 
