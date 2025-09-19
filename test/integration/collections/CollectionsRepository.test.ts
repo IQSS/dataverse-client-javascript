@@ -805,20 +805,23 @@ describe('CollectionsRepository', () => {
   })
 
   describe('getCollectionsForLinking', () => {
+    const linkingParentCollection = 'collectionsRepositoryLinkingTestParentCollection'
     const linkingTargetAlias = 'collectionsRepositoryLinkTarget'
 
     beforeAll(async () => {
-      await createCollectionViaApi(linkingTargetAlias)
+      await createCollectionViaApi(linkingParentCollection)
+      await createCollectionViaApi(linkingTargetAlias, linkingParentCollection)
     })
 
     afterAll(async () => {
       await deleteCollectionViaApi(linkingTargetAlias)
+      await deleteCollectionViaApi(linkingParentCollection)
     })
 
     test('should list collections for linking for a given collection alias', async () => {
       const results = await sut.getCollectionsForLinking(
         'collection',
-        testCollectionAlias,
+        linkingParentCollection,
         'Scientific',
         false
       )
@@ -835,7 +838,7 @@ describe('CollectionsRepository', () => {
       // Create a temporary dataset to query linking candidates
       const { persistentId, numericId } = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,
-        testCollectionAlias
+        linkingParentCollection
       )
 
       const results = await sut.getCollectionsForLinking(
@@ -854,30 +857,28 @@ describe('CollectionsRepository', () => {
       expect(found?.displayName).toBe('Scientific Research')
     })
 
-    test('should return collections for unlking when sending alreadyLinked param to true', async () => {
-      // Link the test collection with the linking target collection
-      await sut.linkCollection(testCollectionAlias, linkingTargetAlias)
-
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      const collectionsForLinking = await sut.getCollectionsForLinking(
+    test('should return collections for unlinking when sending alreadyLinked param to true', async () => {
+      const collectionsForUnlinkingBefore = await sut.getCollectionsForLinking(
         'collection',
-        testCollectionAlias,
-        '',
-        false
-      )
-
-      const collectionsForUnlinking = await sut.getCollectionsForLinking(
-        'collection',
-        testCollectionAlias,
+        linkingParentCollection,
         '',
         true
       )
 
-      expect(collectionsForLinking.length).toBe(0)
-      expect(collectionsForUnlinking.length).toBeGreaterThan(0)
-      expect(collectionsForUnlinking[0].alias).toBe(linkingTargetAlias)
-      expect(collectionsForUnlinking[0].displayName).toBe('Scientific Research')
+      // Link the test collection with the linking target collection
+      await sut.linkCollection(linkingParentCollection, linkingTargetAlias)
+
+      const collectionsForUnlinkingAfter = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        '',
+        true
+      )
+
+      expect(collectionsForUnlinkingBefore.length).toBe(0)
+      expect(collectionsForUnlinkingAfter.length).toBeGreaterThan(0)
+      expect(collectionsForUnlinkingAfter[0].alias).toBe(linkingTargetAlias)
+      expect(collectionsForUnlinkingAfter[0].displayName).toBe('Scientific Research')
     })
 
     it('should return error when collection does not exist', async () => {
