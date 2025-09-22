@@ -382,4 +382,70 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error
       })
   }
+
+  public async getDatasetAvailableDatasetType(
+    datasetTypeId: number | string
+  ): Promise<DatasetType> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      'datasetTypes/' + datasetTypeId
+    )
+    return this.doGet(endpoint)
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async addDatasetType(datasetType: DatasetType): Promise<DatasetType> {
+    return this.doPost(
+      this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'),
+      datasetType
+    )
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async linkDatasetTypeWithMetadataBlocks(
+    datasetTypeId: number | string,
+    metadataBlocks: string[]
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes/' + datasetTypeId),
+      metadataBlocks
+    )
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async setAvailableLicensesForDatasetType(
+    datasetTypeId: number | string,
+    licenses: string[]
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(
+        this.datasetsResourceName,
+        'datasetTypes/' + datasetTypeId + '/licenses'
+      ),
+      licenses
+    )
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deleteDatasetType(datasetTypeId: number): Promise<void> {
+    return this.doDelete(
+      this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes/' + datasetTypeId)
+    )
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
 }

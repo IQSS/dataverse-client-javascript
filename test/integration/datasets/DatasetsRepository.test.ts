@@ -22,7 +22,12 @@ import {
   DatasetDeaccessionDTO,
   publishDataset,
   DatasetType,
-  getDatasetAvailableDatasetTypes
+  getDatasetAvailableDatasetTypes,
+  getDatasetAvailableDatasetType,
+  addDatasetType,
+  deleteDatasetType,
+  linkDatasetTypeWithMetadataBlocks,
+  setAvailableLicensesForDatasetType
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -1704,6 +1709,95 @@ describe('DatasetsRepository', () => {
       ]
 
       expect(actualDatasetTypes).toEqual(expectedDatasetTypes)
+    })
+  })
+
+  describe('getDatasetAvailableDatasetType', () => {
+    test('should return available the default dataset type', async () => {
+      const defaultDatasetType = 'dataset'
+      const actualDatasetType: DatasetType = await getDatasetAvailableDatasetType.execute(
+        defaultDatasetType
+      )
+      const expectedDatasetType = {
+        id: 1,
+        name: 'dataset',
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      }
+
+      expect(actualDatasetType).toEqual(expectedDatasetType)
+    })
+  })
+
+  describe('addDatasetType', () => {
+    test('should add a dataset type', async () => {
+      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const actual: DatasetType = await addDatasetType.execute({
+        name: randomName,
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      })
+
+      expect(actual.name).toEqual(randomName)
+    })
+  })
+
+  describe('deleteDatasetType', () => {
+    test('should delete a dataset type (after adding it)', async () => {
+      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const actual: DatasetType = await addDatasetType.execute({
+        name: randomName,
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      })
+      expect(actual.name).toEqual(randomName)
+
+      const deleted: void = await deleteDatasetType.execute(actual.id as number)
+      expect(deleted).toEqual({ message: 'deleted' })
+    })
+  })
+
+  describe('linkDatasetTypeWithMetadataBlocks', () => {
+    test('should allow for linking a dataset type to metadata blocks', async () => {
+      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const actual: DatasetType = await addDatasetType.execute({
+        name: randomName,
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      })
+      expect(actual.name).toEqual(randomName)
+
+      const linked: void = await linkDatasetTypeWithMetadataBlocks.execute(actual.id as number, [
+        'geospatial'
+      ])
+      expect(linked).toEqual({
+        linkedMetadataBlocks: {
+          before: [],
+          after: ['geospatial']
+        }
+      })
+    })
+  })
+
+  describe('setAvailableLicensesForDatasetType', () => {
+    test('should allow for setting available licenses for a dataset type', async () => {
+      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const actual: DatasetType = await addDatasetType.execute({
+        name: randomName,
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      })
+      expect(actual.name).toEqual(randomName)
+
+      const linked: void = await setAvailableLicensesForDatasetType.execute(actual.id as number, [
+        'CC BY 4.0'
+      ])
+      expect(linked).toEqual({
+        availableLicenses: {
+          before: [],
+          after: ['CC BY 4.0']
+        }
+      })
     })
   })
 })

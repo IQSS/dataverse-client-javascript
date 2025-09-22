@@ -78,4 +78,15 @@ export interface IDatasetsRepository {
   ): Promise<FormattedCitation>
   getDatasetTemplates(collectionIdOrAlias: number | string): Promise<DatasetTemplate[]>
   getDatasetAvailableDatasetTypes(): Promise<DatasetType[]>
+  getDatasetAvailableDatasetType(datasetTypeId: number | string): Promise<DatasetType>
+  addDatasetType(datasetType: DatasetType): Promise<DatasetType>
+  linkDatasetTypeWithMetadataBlocks(
+    datasetTypeId: number | string,
+    metadataBlocks: string[]
+  ): Promise<void>
+  setAvailableLicensesForDatasetType(
+    datasetTypeId: number | string,
+    licenses: string[]
+  ): Promise<void>
+  deleteDatasetType(datasetTypeId: number): Promise<void>
 }
