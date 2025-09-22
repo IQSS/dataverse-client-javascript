@@ -2093,16 +2093,18 @@ describe('CollectionsRepository', () => {
     const thirdCollectionAlias = 'getCollectionLinksThird'
     const fourthCollectionAlias = 'getCollectionLinksFourth'
     let childDatasetNumericId: number
+    let childDatasetPersistentId: string
     beforeAll(async () => {
       await createCollectionViaApi(firstCollectionAlias)
       await createCollectionViaApi(secondCollectionAlias)
       await createCollectionViaApi(thirdCollectionAlias)
       await createCollectionViaApi(fourthCollectionAlias)
-      const { numericId: createdId } = await createDataset.execute(
+      const { numericId: createdId, persistentId: createdPid } = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,
         fourthCollectionAlias
       )
       childDatasetNumericId = createdId
+      childDatasetPersistentId = createdPid
       await sut.linkCollection(secondCollectionAlias, firstCollectionAlias)
       await sut.linkCollection(firstCollectionAlias, thirdCollectionAlias)
       await sut.linkCollection(firstCollectionAlias, fourthCollectionAlias)
@@ -2131,6 +2133,7 @@ describe('CollectionsRepository', () => {
       expect(collectionLinks.linkedDatasets[0].title).toBe(
         'Dataset created using the createDataset use case'
       )
+      expect(collectionLinks.linkedDatasets[0].persistentId).toBe(childDatasetPersistentId)
     })
 
     test('should return error when collection does not exist', async () => {
