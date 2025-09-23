@@ -1208,7 +1208,7 @@ import { linkDatasetTypeWithMetadataBlocks } from '@iqss/dataverse-client-javasc
 
 /* ... */
 
-linkDatasetTypeWithMetadataBlocks.execute(datasetTypeId, ["geospatial"]).then(() => {
+linkDatasetTypeWithMetadataBlocks.execute(datasetTypeId, ['geospatial']).then(() => {
   /* ... */
 })
 ```
@@ -1226,7 +1226,7 @@ import { setAvailableLicensesForDatasetType } from '@iqss/dataverse-client-javas
 
 /* ... */
 
-setAvailableLicensesForDatasetType.execute(datasetTypeId, ["CC BY 4.0"]).then(() => {
+setAvailableLicensesForDatasetType.execute(datasetTypeId, ['CC BY 4.0']).then(() => {
   /* ... */
 })
 ```
