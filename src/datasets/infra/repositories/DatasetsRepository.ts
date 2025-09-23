@@ -208,11 +208,16 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async createDataset(
     newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    collectionId: string
+    collectionId: string,
+    datasetType?: string
   ): Promise<CreatedDatasetIdentifiers> {
     return this.doPost(
       `/dataverses/${collectionId}/datasets`,
-      transformDatasetModelToNewDatasetRequestPayload(newDataset, datasetMetadataBlocks)
+      transformDatasetModelToNewDatasetRequestPayload(
+        newDataset,
+        datasetMetadataBlocks,
+        datasetType
+      )
     )
       .then((response) => {
         const responseData = response.data.data

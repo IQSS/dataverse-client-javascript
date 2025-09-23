@@ -860,7 +860,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetType.t
 
 #### Create a Dataset
 
-Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object and an optional collection identifier, which defaults to `:root`.
+Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object, an optional collection identifier, which defaults to `:root`, and an optional dataset type.
 
 This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
 
@@ -915,7 +915,7 @@ createDataset.execute(datasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers
 
 _See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
 
-The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call.
+The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call. If you want the dataset type to be anything other than dataset, first [check available dataset types](#get-dataset-available-dataset-types) and then add the name of the dataset type as the third parameter.
 
 The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 

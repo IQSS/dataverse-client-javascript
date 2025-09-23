@@ -46,7 +46,8 @@ export interface IDatasetsRepository {
   createDataset(
     newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    collectionId: string
+    collectionId: string,
+    datasetType?: string
   ): Promise<CreatedDatasetIdentifiers>
   publishDataset(datasetId: number | string, versionUpdateType: VersionUpdateType): Promise<void>
   updateDataset(

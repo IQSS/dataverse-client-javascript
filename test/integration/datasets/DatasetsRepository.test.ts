@@ -110,6 +110,7 @@ describe('DatasetsRepository', () => {
 
   const filesRepositorySut = new FilesRepository()
   const directUploadSut: DirectUploadClient = new DirectUploadClient(filesRepositorySut)
+  const defaultDatasetType = 'dataset'
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -827,6 +828,64 @@ describe('DatasetsRepository', () => {
       expect(actualCreatedDataset.metadataBlocks[0].fields.subject).toContain(
         'Medicine, Health and Life Sciences'
       )
+      // even though we didn't provide a dataset type, it should be created with the default one
+      expect(actualCreatedDataset.datasetType).toBe(defaultDatasetType)
+    })
+  })
+
+  describe('createDatasetWithDatasetType', () => {
+    test('should create a dataset with the provided dataset type', async () => {
+      const testNewDataset = {
+        metadataBlockValues: [
+          {
+            name: 'citation',
+            fields: {
+              title: 'Dataset created using the createDataset use case',
+              author: [
+                {
+                  authorName: 'Admin, Dataverse',
+                  authorAffiliation: 'Dataverse.org'
+                },
+                {
+                  authorName: 'Owner, Dataverse',
+                  authorAffiliation: 'Dataversedemo.org'
+                }
+              ],
+              datasetContact: [
+                {
+                  datasetContactEmail: 'finch@mailinator.com',
+                  datasetContactName: 'Finch, Fiona'
+                }
+              ],
+              dsDescription: [
+                {
+                  dsDescriptionValue: 'This is the description of the dataset.'
+                }
+              ],
+              subject: ['Medicine, Health and Life Sciences']
+            }
+          }
+        ]
+      }
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+      const createdDataset = await sut.createDataset(
+        testNewDataset,
+        [citationMetadataBlock],
+        ROOT_COLLECTION_ALIAS,
+        defaultDatasetType
+      )
+      const actualCreatedDataset = await sut.getDataset(
+        createdDataset.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(actualCreatedDataset.datasetType).toBe(defaultDatasetType)
     })
   })
 
