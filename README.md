@@ -40,6 +40,10 @@ For detailed information about available use cases see [Use Cases Docs](https://
 
 For detailed information about usage see [Usage Docs](https://github.com/IQSS/dataverse-client-javascript/blob/main/docs/usage.md).
 
+## Changelog
+
+See [CHANGELOG.md](https://github.com/IQSS/dataverse-client-javascript/blob/main/CHANGELOG.md) for a detailed history of changes to this project.
+
 ## Contributing
 
 Want to add a new use case or improve an existing one? Please check the [Contributing](https://github.com/IQSS/dataverse-client-javascript/blob/main/CONTRIBUTING.md) section.
