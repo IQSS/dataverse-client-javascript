@@ -2,6 +2,7 @@ import {
   ApiConfig,
   DatasetType,
   addDatasetType,
+  deleteDatasetType,
   setAvailableLicensesForDatasetType
 } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -35,6 +36,9 @@ describe('SetAvailableLicensesForDatasetType', () => {
           after: ['CC BY 4.0']
         }
       })
+
+      const deleted: void = await deleteDatasetType.execute(actual.id as number)
+      expect(deleted).toEqual({ message: 'deleted' })
     })
   })
 })

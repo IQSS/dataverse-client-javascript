@@ -2,6 +2,7 @@ import {
   ApiConfig,
   DatasetType,
   addDatasetType,
+  deleteDatasetType,
   linkDatasetTypeWithMetadataBlocks
 } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -35,6 +36,9 @@ describe('LinkDatasetTypeWithMetadataBlocks', () => {
           after: ['geospatial']
         }
       })
+
+      const deleted: void = await deleteDatasetType.execute(actual.id as number)
+      expect(deleted).toEqual({ message: 'deleted' })
     })
   })
 })
