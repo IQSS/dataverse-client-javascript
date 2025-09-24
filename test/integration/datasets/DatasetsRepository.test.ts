@@ -1944,5 +1944,15 @@ describe('DatasetsRepository', () => {
 
       await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
+
+    test('should return error when payload is empty', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await expect(
+        sut.updateDatasetLicense(testDatasetIds.numericId, {} as unknown as never)
+      ).rejects.toBeInstanceOf(WriteError)
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
   })
 })
