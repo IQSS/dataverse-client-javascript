@@ -1540,6 +1540,21 @@ describe('DatasetsRepository', () => {
         sut.linkDataset(testDatasetIds.numericId, 'nonExistentCollectionAlias')
       ).rejects.toThrow()
     })
+
+    test('should link a dataset to another collection using persistent id', async () => {
+      const persistentCollectionAlias = 'testLinkDatasetCollectionPersistent'
+      await createCollectionViaApi(persistentCollectionAlias)
+
+      const actual = await sut.linkDataset(testDatasetIds.persistentId, persistentCollectionAlias)
+
+      expect(actual).toBeUndefined()
+
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+      const aliases = linkedCollections.map((c) => c.alias)
+      expect(aliases).toContain(persistentCollectionAlias)
+
+      await deleteCollectionViaApi(persistentCollectionAlias)
+    })
   })
 
   describe('unlinkDataset', () => {
@@ -1584,6 +1599,27 @@ describe('DatasetsRepository', () => {
       await expect(
         sut.unlinkDataset(testDatasetIds.numericId, testCollectionAlias)
       ).rejects.toThrow()
+    })
+
+    test('should unlink a dataset from a collection using persistent id', async () => {
+      const persistentCollectionAlias = 'testUnlinkDatasetCollectionPersistent'
+      await createCollectionViaApi(persistentCollectionAlias)
+
+      await sut.linkDataset(testDatasetIds.persistentId, persistentCollectionAlias)
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+      const aliases = linkedCollections.map((c) => c.alias)
+      expect(aliases).toContain(persistentCollectionAlias)
+
+      const actual = await sut.unlinkDataset(testDatasetIds.persistentId, persistentCollectionAlias)
+
+      expect(actual).toBeUndefined()
+      const updatedLinkedCollections = await sut.getDatasetLinkedCollections(
+        testDatasetIds.numericId
+      )
+      const updatedAliases = updatedLinkedCollections.map((c) => c.alias)
+      expect(updatedAliases).not.toContain(persistentCollectionAlias)
+
+      await deleteCollectionViaApi(persistentCollectionAlias)
     })
   })
 
