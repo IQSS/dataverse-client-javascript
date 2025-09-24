@@ -14,6 +14,7 @@ import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
 import { DatasetTemplate } from '../models/DatasetTemplate'
 import { DatasetType } from '../models/DatasetType'
+import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -89,4 +90,8 @@ export interface IDatasetsRepository {
     licenses: string[]
   ): Promise<void>
   deleteDatasetType(datasetTypeId: number): Promise<void>
+  updateDatasetLicense(
+    datasetId: number | string,
+    payload: DatasetLicenseUpdateRequest
+  ): Promise<void>
 }

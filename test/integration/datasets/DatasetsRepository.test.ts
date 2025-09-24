@@ -27,7 +27,8 @@ import {
   addDatasetType,
   deleteDatasetType,
   linkDatasetTypeWithMetadataBlocks,
-  setAvailableLicensesForDatasetType
+  setAvailableLicensesForDatasetType,
+  DatasetLicenseUpdateRequest
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -1798,6 +1799,150 @@ describe('DatasetsRepository', () => {
           after: ['CC BY 4.0']
         }
       })
+    })
+  })
+
+  describe('updateDatasetLicense', () => {
+    test('should update the license of a published dataset', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const DatasetBefore = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+      expect(DatasetBefore.license?.name).toBe('CC0 1.0') // default license
+
+      const payload: DatasetLicenseUpdateRequest = { name: 'CC BY 4.0' }
+      await sut.updateDatasetLicense(testDatasetIds.numericId, payload)
+
+      const DatasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+      expect(DatasetAfter.license?.name).toBe('CC BY 4.0')
+    })
+
+    test('should update the license of a draft dataset', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      const DatasetBefore = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+      expect(DatasetBefore.license?.name).toBe('CC0 1.0') // default license
+      const predefined: DatasetLicenseUpdateRequest = { name: 'CC BY 4.0' }
+      await sut.updateDatasetLicense(testDatasetIds.numericId, predefined)
+
+      const datasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.DRAFT,
+        false,
+        false
+      )
+
+      expect(datasetAfter.license?.name).toBe('CC BY 4.0')
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should set custom terms of use and access on the draft version', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      const custom: DatasetLicenseUpdateRequest = {
+        customTerms: {
+          termsOfUse: 'Your terms of use',
+          confidentialityDeclaration: 'Your confidentiality declaration',
+          specialPermissions: 'Your special permissions',
+          restrictions: 'Your restrictions',
+          citationRequirements: 'Your citation requirements',
+          depositorRequirements: 'Your depositor requirements',
+          conditions: 'Your conditions',
+          disclaimer: 'Your disclaimer'
+        }
+      }
+      const actual = await sut.updateDatasetLicense(testDatasetIds.numericId, custom)
+
+      expect(actual).toBeUndefined()
+
+      const datasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.DRAFT,
+        false,
+        false
+      )
+
+      expect(datasetAfter.license).toBeUndefined()
+      expect(datasetAfter.termsOfUse.customTerms?.termsOfUse).toBe('Your terms of use')
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should set custom terms of use and access on the published version', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const custom: DatasetLicenseUpdateRequest = {
+        customTerms: {
+          termsOfUse: 'Your terms of use',
+          confidentialityDeclaration: 'Your confidentiality declaration',
+          specialPermissions: 'Your special permissions',
+          restrictions: 'Your restrictions',
+          citationRequirements: 'Your citation requirements',
+          depositorRequirements: 'Your depositor requirements',
+          conditions: 'Your conditions',
+          disclaimer: 'Your disclaimer'
+        }
+      }
+      const actual = await sut.updateDatasetLicense(testDatasetIds.numericId, custom)
+
+      expect(actual).toBeUndefined()
+
+      const datasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.DRAFT,
+        false,
+        false
+      )
+
+      expect(datasetAfter.license).toBeUndefined()
+      expect(datasetAfter.termsOfUse.customTerms?.termsOfUse).toBe('Your terms of use')
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(
+        sut.updateDatasetLicense(nonExistentTestDatasetId, { name: 'CC BY 4.0' })
+      ).rejects.toThrow(expectedError)
+    })
+
+    test('should accept persistent id when updating license on draft dataset', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await sut.updateDatasetLicense(testDatasetIds.persistentId, { name: 'CC BY 4.0' })
+
+      const draftAfter = await sut.getDataset(
+        testDatasetIds.persistentId,
+        DatasetNotNumberedVersion.DRAFT,
+        false,
+        false
+      )
+      expect(draftAfter.license?.name).toBe('CC BY 4.0')
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
   })
 })

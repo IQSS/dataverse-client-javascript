@@ -44,6 +44,7 @@ The different use cases currently available in the package are classified below,
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
+    - [Update a Dataset License](#update-a-dataset-license)
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
     - [Delete a Draft Dataset](#delete-a-draft-dataset)
@@ -976,6 +977,43 @@ updateDataset.execute(datasetId, datasetDTO)
 ```
 
 _See [use case](../src/datasets/domain/useCases/UpdateDataset.ts) implementation_.
+
+#### Update a Dataset License
+
+Updates the license of a dataset by applying it to the draft version. If no draft exists, a new one is automatically created by the API. Supports predefined licenses (by name) or custom terms of use and access.
+
+##### Example calls:
+
+```typescript
+import {
+  updateDatasetLicense,
+  DatasetLicenseUpdateRequest
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+
+const predefinedPayload: DatasetLicenseUpdateRequest = { name: 'CC BY 4.0' }
+await updateDatasetLicense.execute(datasetId, predefinedPayload)
+
+const customPayload: DatasetLicenseUpdateRequest = {
+  customTerms: {
+    termsOfUse: 'Your terms of use',
+    confidentialityDeclaration: 'Your confidentiality declaration',
+    specialPermissions: 'Your special permissions',
+    restrictions: 'Your restrictions',
+    citationRequirements: 'Your citation requirements',
+    depositorRequirements: 'Your depositor requirements',
+    conditions: 'Your conditions',
+    disclaimer: 'Your disclaimer'
+  }
+}
+
+updateDatasetLicense.execute(datasetId, customPayload)
+```
+
+_See [use case](../src/datasets/domain/useCases/UpdateDatasetLicense.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
