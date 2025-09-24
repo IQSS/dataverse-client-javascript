@@ -13,8 +13,8 @@ export class GetCollectionsForLinking implements UseCase<CollectionSummary[]> {
 
   /**
    * Returns an array of CollectionSummary (id, alias, displayName) to which the given Dataverse collection or Dataset may be linked.
-   * @param objectType - 'dataverse' when providing a collection identifier/alias; 'dataset' when providing a dataset persistentId.
-   * @param id - For objectType 'dataverse', a numeric id or alias string. For 'dataset', the persistentId string (e.g., doi:...)
+   * @param objectType - 'collection' when providing a collection identifier/alias; 'dataset' when providing a dataset persistentId.
+   * @param id - For objectType 'collection', a numeric id or alias string. For 'dataset', the persistentId string (e.g., doi:...)
    * @param searchTerm - Optional search term to filter by collection name. Defaults to empty string (no filtering).
    * @param alreadyLinked - Optional flag. When true, returns collections currently linked (candidates to unlink). Defaults to false.
    */

@@ -344,7 +344,7 @@ const collectionIdOrAlias: number | string = 'collectionAlias' // or 123
 const searchTerm = 'searchOn'
 
 getCollectionsForLinking
-  .execute('dataverse', collectionIdOrAlias, searchTerm)
+  .execute('collection', collectionIdOrAlias, searchTerm)
   .then((collections) => {
     // collections: CollectionSummary[]
     /* ... */
