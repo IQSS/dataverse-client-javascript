@@ -40,6 +40,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Available Categories](#get-dataset-available-categories)
     - [Get Dataset Templates](#get-dataset-templates)
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
+    - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -48,6 +49,10 @@ The different use cases currently available in the package are classified below,
     - [Delete a Draft Dataset](#delete-a-draft-dataset)
     - [Link a Dataset](#link-a-dataset)
     - [Unlink a Dataset](#unlink-a-dataset)
+    - [Add a Dataset Type](#add-a-dataset-type)
+    - [Link Dataset Type with Metadata Blocks](#link-dataset-type-with-metadata-blocks)
+    - [Set Available Licenses For Dataset Type](#set-available-licenses-for-dataset-type)
+    - [Delete a Dataset Type](#delete-a-dataset-type)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -833,6 +838,24 @@ getDatasetAvailableDatasetTypes.execute().then((datasetTypes: DatasetType[]) => 
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetTypes.ts) implementation_.
 
+#### Get Dataset Available Dataset Type
+
+Returns an available dataset types that can be used at dataset creation.
+
+###### Example call:
+
+```typescript
+import { getDatasetAvailableDatasetType } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getDatasetAvailableDatasetType.execute().then((datasetType: DatasetType) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetType.ts) implementation_.
+
 ### Datasets Write Use Cases
 
 #### Create a Dataset
@@ -1155,6 +1178,78 @@ getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: Dataset
 ```
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definition.
+
+#### Add a Dataset Type
+
+Adds a dataset types that can be used at dataset creation.
+
+###### Example call:
+
+```typescript
+import { addDatasetType } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+addDatasetType.execute(datasetType).then((datasetType: DatasetType) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/AddDatasetType.ts) implementation_.
+
+#### Link Dataset Type with Metadata Blocks
+
+Link a dataset type with metadata blocks.
+
+###### Example call:
+
+```typescript
+import { linkDatasetTypeWithMetadataBlocks } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+linkDatasetTypeWithMetadataBlocks.execute(datasetTypeId, ['geospatial']).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/LinkDatasetTypeWithMetadataBlocks.ts) implementation_.
+
+#### Set Available Licenses For Dataset Type
+
+Set available licenses for dataset type.
+
+###### Example call:
+
+```typescript
+import { setAvailableLicensesForDatasetType } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+setAvailableLicensesForDatasetType.execute(datasetTypeId, ['CC BY 4.0']).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/SetAvailableLicensesForDatasetType.ts) implementation_.
+
+#### Delete a Dataset Type
+
+Delete a dataset type.
+
+###### Example call:
+
+```typescript
+import { deleteDatasetType } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+deleteDatasetType.execute(datasetTypeId).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/DeleteDatasetType.ts) implementation_.
 
 ## Files
 

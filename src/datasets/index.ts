@@ -25,6 +25,11 @@ import { UnlinkDataset } from './domain/useCases/UnlinkDataset'
 import { GetDatasetLinkedCollections } from './domain/useCases/GetDatasetLinkedCollections'
 import { GetDatasetAvailableCategories } from './domain/useCases/GetDatasetAvailableCategories'
 import { GetDatasetAvailableDatasetTypes } from './domain/useCases/GetDatasetAvailableDatasetTypes'
+import { GetDatasetAvailableDatasetType } from './domain/useCases/GetDatasetAvailableDatasetType'
+import { AddDatasetType } from './domain/useCases/AddDatasetType'
+import { LinkDatasetTypeWithMetadataBlocks } from './domain/useCases/LinkDatasetTypeWithMetadataBlocks'
+import { SetAvailableLicensesForDatasetType } from './domain/useCases/SetAvailableLicensesForDatasetType'
+import { DeleteDatasetType } from './domain/useCases/DeleteDatasetType'
 import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
 import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
 
@@ -66,6 +71,13 @@ const unlinkDataset = new UnlinkDataset(datasetsRepository)
 const getDatasetLinkedCollections = new GetDatasetLinkedCollections(datasetsRepository)
 const getDatasetAvailableCategories = new GetDatasetAvailableCategories(datasetsRepository)
 const getDatasetAvailableDatasetTypes = new GetDatasetAvailableDatasetTypes(datasetsRepository)
+const getDatasetAvailableDatasetType = new GetDatasetAvailableDatasetType(datasetsRepository)
+const addDatasetType = new AddDatasetType(datasetsRepository)
+const linkDatasetTypeWithMetadataBlocks = new LinkDatasetTypeWithMetadataBlocks(datasetsRepository)
+const setAvailableLicensesForDatasetType = new SetAvailableLicensesForDatasetType(
+  datasetsRepository
+)
+const deleteDatasetType = new DeleteDatasetType(datasetsRepository)
 const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
 const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
 
@@ -92,7 +104,12 @@ export {
   getDatasetAvailableCategories,
   getDatasetCitationInOtherFormats,
   getDatasetTemplates,
-  getDatasetAvailableDatasetTypes
+  getDatasetAvailableDatasetTypes,
+  getDatasetAvailableDatasetType,
+  addDatasetType,
+  linkDatasetTypeWithMetadataBlocks,
+  setAvailableLicensesForDatasetType,
+  deleteDatasetType
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
