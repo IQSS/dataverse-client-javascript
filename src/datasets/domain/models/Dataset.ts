@@ -14,6 +14,7 @@ export interface Dataset {
   citationDate?: string
   metadataBlocks: DatasetMetadataBlocks
   isPartOf: DvObjectOwnerNode
+  datasetType?: string
 }
 
 export interface DatasetVersionInfo {

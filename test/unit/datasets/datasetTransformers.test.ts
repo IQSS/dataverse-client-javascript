@@ -33,4 +33,28 @@ describe('transformNewDatasetModelToRequestPayload', () => {
 
     expect(actual).toEqual(expectedNewDatasetRequestPayload)
   })
+
+  it('should correctly transform a new dataset model to a new dataset request payload when it contains a license and a datasetType', () => {
+    const testDataset = createDatasetDTO(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      createDatasetLicenseModel()
+    )
+    const testMetadataBlocks = [createDatasetMetadataBlockModel()]
+    const datasetType = 'software'
+    const expectedNewDatasetRequestPayload = createNewDatasetRequestPayload(
+      createDatasetLicenseModel(),
+      datasetType
+    )
+    const actual = transformDatasetModelToNewDatasetRequestPayload(
+      testDataset,
+      testMetadataBlocks,
+      datasetType
+    )
+
+    expect(actual).toEqual(expectedNewDatasetRequestPayload)
+  })
 })
