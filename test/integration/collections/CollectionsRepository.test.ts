@@ -804,6 +804,101 @@ describe('CollectionsRepository', () => {
     })
   })
 
+  describe('getCollectionsForLinking', () => {
+    const linkingParentCollection = 'collectionsRepositoryLinkingTestParentCollection'
+    const linkingTargetAlias = 'collectionsRepositoryLinkTarget'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(linkingParentCollection)
+      await createCollectionViaApi(linkingTargetAlias, linkingParentCollection)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(linkingTargetAlias)
+      await deleteCollectionViaApi(linkingParentCollection)
+    })
+
+    test('should list collections for linking for a given collection alias', async () => {
+      const results = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        'Scientific',
+        false
+      )
+
+      expect(Array.isArray(results)).toBe(true)
+      // Should contain the newly created linking target collection among candidates
+      const found = results.find((c) => c.alias === linkingTargetAlias)
+      expect(found).toBeDefined()
+      expect(found?.id).toBeGreaterThan(0)
+      expect(found?.displayName).toBe('Scientific Research')
+    })
+
+    test('should list collections for linking for a given dataset persistentId', async () => {
+      // Create a temporary dataset to query linking candidates
+      const { persistentId, numericId } = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        linkingParentCollection
+      )
+
+      const results = await sut.getCollectionsForLinking(
+        'dataset',
+        persistentId,
+        'Scientific',
+        false
+      )
+
+      // Cleanup dataset (unpublished)
+      await deleteUnpublishedDatasetViaApi(numericId)
+
+      expect(Array.isArray(results)).toBe(true)
+      const found = results.find((c) => c.alias === linkingTargetAlias)
+      expect(found).toBeDefined()
+      expect(found?.displayName).toBe('Scientific Research')
+    })
+
+    test('should return collections for unlinking when sending alreadyLinked param to true', async () => {
+      const collectionsForUnlinkingBefore = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        '',
+        true
+      )
+
+      // Link the test collection with the linking target collection
+      await sut.linkCollection(linkingParentCollection, linkingTargetAlias)
+
+      const collectionsForUnlinkingAfter = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        '',
+        true
+      )
+
+      expect(collectionsForUnlinkingBefore.length).toBe(0)
+      expect(collectionsForUnlinkingAfter.length).toBeGreaterThan(0)
+      expect(collectionsForUnlinkingAfter[0].alias).toBe(linkingTargetAlias)
+      expect(collectionsForUnlinkingAfter[0].displayName).toBe('Scientific Research')
+    })
+
+    it('should return error when collection does not exist', async () => {
+      await expect(
+        sut.getCollectionsForLinking(
+          'collection',
+          TestConstants.TEST_DUMMY_COLLECTION_ALIAS,
+          '',
+          false
+        )
+      ).rejects.toThrow(ReadError)
+    })
+
+    it('should return error when dataset does not exist', async () => {
+      await expect(
+        sut.getCollectionsForLinking('dataset', TestConstants.TEST_DUMMY_PERSISTENT_ID, '', false)
+      ).rejects.toThrow(ReadError)
+    })
+  })
+
   describe('getCollectionItems for published tabular file', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
     const testTextFile4Name = 'test-file-4.tab'
@@ -1998,16 +2093,18 @@ describe('CollectionsRepository', () => {
     const thirdCollectionAlias = 'getCollectionLinksThird'
     const fourthCollectionAlias = 'getCollectionLinksFourth'
     let childDatasetNumericId: number
+    let childDatasetPersistentId: string
     beforeAll(async () => {
       await createCollectionViaApi(firstCollectionAlias)
       await createCollectionViaApi(secondCollectionAlias)
       await createCollectionViaApi(thirdCollectionAlias)
       await createCollectionViaApi(fourthCollectionAlias)
-      const { numericId: createdId } = await createDataset.execute(
+      const { numericId: createdId, persistentId: createdPid } = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,
         fourthCollectionAlias
       )
       childDatasetNumericId = createdId
+      childDatasetPersistentId = createdPid
       await sut.linkCollection(secondCollectionAlias, firstCollectionAlias)
       await sut.linkCollection(firstCollectionAlias, thirdCollectionAlias)
       await sut.linkCollection(firstCollectionAlias, fourthCollectionAlias)
@@ -2036,6 +2133,7 @@ describe('CollectionsRepository', () => {
       expect(collectionLinks.linkedDatasets[0].title).toBe(
         'Dataset created using the createDataset use case'
       )
+      expect(collectionLinks.linkedDatasets[0].persistentId).toBe(childDatasetPersistentId)
     })
 
     test('should return error when collection does not exist', async () => {
