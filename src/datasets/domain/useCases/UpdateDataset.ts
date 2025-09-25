@@ -18,7 +18,7 @@ export class UpdateDataset extends DatasetWriteUseCase<void> {
    *
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {DatasetDTO} [updatedDataset] - DatasetDTO object including the updated dataset metadata field values for each metadata block.
-   * @param {string} [sourceLastUpdateTime] - The lastUpdateTime value from the dataset. Provide it to ensure optimistic concurrency: if the dataset was updated since you retrieved it, the backend can reject the update to prevent overwriting newer changes.
+   * @param {string} [sourceLastUpdateTime] - The lastUpdateTime value from the dataset. If another user updates the dataset version metadata before you send the update request, data inconsistencies may occur. To prevent this, you can use the optional sourceLastUpdateTime parameter. This parameter must include the lastUpdateTime value corresponding to the dataset version being updated.
    * @returns {Promise<void>} - This method does not return anything upon successful completion.
    * @throws {ResourceValidationError} - If there are validation errors related to the provided information.
    * @throws {ReadError} - If there are errors while reading data.
