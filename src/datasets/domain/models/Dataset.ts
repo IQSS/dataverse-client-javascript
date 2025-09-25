@@ -22,7 +22,7 @@ export interface DatasetVersionInfo {
   minorNumber: number
   state: DatasetVersionState
   createTime: Date
-  lastUpdateTime: Date
+  lastUpdateTime: string
   releaseTime?: Date
   deaccessionNote?: string
 }

@@ -39,7 +39,7 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
       minorNumber: datasetPreviewPayload.minorVersion,
       state: datasetPreviewPayload.versionState as DatasetVersionState,
       createTime: new Date(datasetPreviewPayload.createdAt),
-      lastUpdateTime: new Date(datasetPreviewPayload.updatedAt),
+      lastUpdateTime: datasetPreviewPayload.updatedAt,
       ...(datasetPreviewPayload.published_at && {
         releaseTime: new Date(datasetPreviewPayload.published_at)
       })
@@ -72,7 +72,7 @@ export const transformMyDataDatasetPreviewPayloadToDatasetPreview = (
       minorNumber: datasetPreviewPayload.minorVersion,
       state: datasetPreviewPayload.versionState as DatasetVersionState,
       createTime: new Date(datasetPreviewPayload.createdAt),
-      lastUpdateTime: new Date(datasetPreviewPayload.updatedAt),
+      lastUpdateTime: datasetPreviewPayload.updatedAt,
       ...(datasetPreviewPayload.published_at && {
         releaseTime: new Date(datasetPreviewPayload.published_at)
       })
