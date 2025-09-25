@@ -159,13 +159,7 @@ export const transformCollectionLinksResponseToCollectionLinks = (
   const responseDataPayload = response.data.data
   const linkedCollections = responseDataPayload.linkedDataverses
   const collectionsLinkingToThis = responseDataPayload.dataversesLinkingToThis
-  const linkedDatasets = responseDataPayload.linkedDatasets.map(
-    (ld: { identifier: string; title: string }) => ({
-      persistentId: ld.identifier,
-      title: ld.title
-    })
-  )
-
+  const linkedDatasets = responseDataPayload.linkedDatasets
   return {
     linkedCollections,
     collectionsLinkingToThis,

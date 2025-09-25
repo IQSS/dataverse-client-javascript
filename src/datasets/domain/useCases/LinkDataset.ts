@@ -11,11 +11,11 @@ export class LinkDataset implements UseCase<void> {
   /**
    * Creates a link between a Dataset and a Collection.
    *
-   * @param {number | string} [datasetId] - The dataset id (numeric) or persistent identifier string.
-   * @param {number | string} [collectionIdOrAlias] - The collection identifier (numeric id) or alias.
+   * @param {number} [datasetId] - The dataset id.
+   * @param {string} [collectionAlias] - The collection alias.
    * @returns {Promise<void>} - This method does not return anything upon successful completion.
    */
-  async execute(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void> {
-    return await this.datasetsRepository.linkDataset(datasetId, collectionIdOrAlias)
+  async execute(datasetId: number, collectionAlias: string): Promise<void> {
+    return await this.datasetsRepository.linkDataset(datasetId, collectionAlias)
   }
 }

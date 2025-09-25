@@ -329,32 +329,16 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async linkDataset(
-    datasetId: number | string,
-    collectionIdOrAlias: number | string
-  ): Promise<void> {
-    const endpoint = this.buildApiEndpoint(
-      this.datasetsResourceName,
-      `link/${collectionIdOrAlias}`,
-      datasetId
-    )
-    return this.doPut(endpoint, {})
+  public async linkDataset(datasetId: number, collectionAlias: string): Promise<void> {
+    return this.doPut(`/${this.datasetsResourceName}/${datasetId}/link/${collectionAlias}`, {})
       .then(() => undefined)
       .catch((error) => {
         throw error
       })
   }
 
-  public async unlinkDataset(
-    datasetId: number | string,
-    collectionIdOrAlias: number | string
-  ): Promise<void> {
-    const endpoint = this.buildApiEndpoint(
-      this.datasetsResourceName,
-      `deleteLink/${collectionIdOrAlias}`,
-      datasetId
-    )
-    return this.doDelete(endpoint)
+  public async unlinkDataset(datasetId: number, collectionAlias: string): Promise<void> {
+    return this.doDelete(`/${this.datasetsResourceName}/${datasetId}/deleteLink/${collectionAlias}`)
       .then(() => undefined)
       .catch((error) => {
         throw error
