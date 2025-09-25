@@ -54,7 +54,7 @@ export interface IDatasetsRepository {
     datasetId: number | string,
     dataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    internalVersionNumber?: number
+    sourceLastUpdateTime?: string
   ): Promise<void>
   deaccessionDataset(
     datasetId: number | string,
