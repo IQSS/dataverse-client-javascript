@@ -38,8 +38,6 @@ import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { ReadError } from '../../../core/domain/repositories/ReadError'
 import { CollectionLinks } from '../../domain/models/CollectionLinks'
-import { CollectionSummary } from '../../domain/models/CollectionSummary'
-import { LinkingObjectType } from '../../domain/useCases/GetCollectionsForLinking'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -95,6 +93,7 @@ export enum GetMyDataCollectionItemsQueryParams {
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
   private readonly collectionsResourceName: string = 'dataverses'
+
   public async getCollection(
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<Collection> {
@@ -481,48 +480,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/links`, true)
       .then((response) => {
         return transformCollectionLinksResponseToCollectionLinks(response)
-      })
-      .catch((error) => {
-        throw error
-      })
-  }
-
-  public async getCollectionsForLinking(
-    objectType: LinkingObjectType,
-    id: number | string,
-    searchTerm: string,
-    alreadyLinked: boolean
-  ): Promise<CollectionSummary[]> {
-    let path: string
-    const queryParams = new URLSearchParams()
-    if (objectType === 'collection') {
-      path = `/${this.collectionsResourceName}/${id}/dataverse/linkingDataverses`
-    } else {
-      path = `/${this.collectionsResourceName}/:persistentId/dataset/linkingDataverses`
-      queryParams.set('persistentId', String(id))
-    }
-
-    if (searchTerm) {
-      queryParams.set('searchTerm', searchTerm)
-    }
-
-    if (alreadyLinked) {
-      queryParams.set('alreadyLinking', 'true')
-    }
-
-    return this.doGet(path, true, queryParams)
-      .then((response) => {
-        const payload = response.data.data as {
-          id: number
-          alias: string
-          name: string
-        }[]
-
-        return payload.map((item) => ({
-          id: item.id,
-          alias: item.alias,
-          displayName: item.name
-        }))
       })
       .catch((error) => {
         throw error
