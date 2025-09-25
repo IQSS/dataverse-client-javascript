@@ -1882,7 +1882,7 @@ describe('DatasetsRepository', () => {
       expect(datasetAfter.license).toBeUndefined()
       expect(datasetAfter.termsOfUse.customTerms?.termsOfUse).toBe('Your terms of use')
 
-      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
 
     test('should set custom terms of use and access on the published version', async () => {
