@@ -60,7 +60,8 @@ export const createFileModel = (): FileModel => {
     originalSize: 127426,
     originalName: 'originalName',
     tabularTags: ['tag1', 'tag2'],
-    publicationDate: '2023-07-11'
+    publicationDate: '2023-07-11',
+    lastUpdateTime: '2023-07-11'
   }
 }
 
@@ -122,7 +123,8 @@ export const createFilePayload = (): FilePayload => {
       originalSize: 127426,
       originalName: 'originalName',
       tabularTags: ['tag1', 'tag2'],
-      publicationDate: '2023-07-11'
+      publicationDate: '2023-07-11',
+      lastUpdateTime: '2023-07-11'
     }
   }
 }
