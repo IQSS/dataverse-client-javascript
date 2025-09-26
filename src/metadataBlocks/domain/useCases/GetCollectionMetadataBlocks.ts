@@ -16,15 +16,18 @@ export class GetCollectionMetadataBlocks implements UseCase<MetadataBlock[]> {
    * @param {number | string} [collectionIdOrAlias = ':root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
    * If this parameter is not set, the default value is: ':root'
    * @param {boolean} [onlyDisplayedOnCreate=false] - Indicates whether or not to return only the metadata blocks that are displayed on dataset creation. The default value is false.
+   * @param {string} [datasetType] - The name of the dataset type. If provided, additional fields from metadata blocks linked to this dataset type will be returned.
    * @returns {Promise<MetadataBlock[]>}
    */
   async execute(
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID,
-    onlyDisplayedOnCreate = false
+    onlyDisplayedOnCreate = false,
+    datasetType?: string
   ): Promise<MetadataBlock[]> {
     return await this.metadataBlocksRepository.getCollectionMetadataBlocks(
       collectionIdOrAlias,
-      onlyDisplayedOnCreate
+      onlyDisplayedOnCreate,
+      datasetType
     )
   }
 }
