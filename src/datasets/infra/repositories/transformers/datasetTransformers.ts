@@ -11,7 +11,7 @@ import {
 import { AxiosResponse } from 'axios'
 import {
   DatasetPayload,
-  LicensePayload,
+  DatasetLicensePayload,
   MetadataFieldPayload,
   MetadataBlocksPayload,
   MetadataFieldValuePayload,
@@ -31,6 +31,7 @@ import { MetadataBlock, MetadataFieldInfo } from '../../../../metadataBlocks'
 const turndownService = new TurndownService()
 
 export interface NewDatasetRequestPayload {
+  datasetType?: string
   datasetVersion: {
     license?: DatasetLicense
     metadataBlocks: Record<string, MetadataBlockRequestPayload>
@@ -96,9 +97,11 @@ export const transformDatasetModelToUpdateDatasetRequestPayload = (
 
 export const transformDatasetModelToNewDatasetRequestPayload = (
   dataset: DatasetDTO,
-  metadataBlocks: MetadataBlock[]
+  metadataBlocks: MetadataBlock[],
+  datasetType?: string
 ): NewDatasetRequestPayload => {
   return {
+    datasetType,
     datasetVersion: {
       ...(dataset.license && { license: dataset.license }),
       metadataBlocks: transformMetadataBlockModelsToRequestPayload(
@@ -261,7 +264,7 @@ export const transformVersionPayloadToDataset = (
   }
   if ('license' in versionPayload) {
     datasetModel.license = transformPayloadToDatasetLicense(
-      versionPayload.license as LicensePayload
+      versionPayload.license as DatasetLicensePayload
     )
   } else {
     datasetModel.termsOfUse.customTerms = {
@@ -293,11 +296,14 @@ export const transformVersionPayloadToDataset = (
   if ('citationDate' in versionPayload) {
     datasetModel.citationDate = versionPayload.citationDate
   }
+  if ('datasetType' in versionPayload) {
+    datasetModel.datasetType = versionPayload.datasetType
+  }
   return datasetModel
 }
 
 const transformPayloadToDatasetLicense = (
-  licensePayload: LicensePayload
+  licensePayload: DatasetLicensePayload
 ): DatasetLicense | undefined => {
   if (!licensePayload) {
     return undefined
@@ -325,7 +331,7 @@ const transformPayloadText = (
   return keepRawFields ? text : transformHtmlToMarkdown(text)
 }
 
-const transformPayloadToDatasetMetadataBlocks = (
+export const transformPayloadToDatasetMetadataBlocks = (
   metadataBlocksPayload: MetadataBlocksPayload,
   keepRawFields: boolean
 ): DatasetMetadataBlocks => {

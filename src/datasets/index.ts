@@ -20,6 +20,18 @@ import { DeaccessionDataset } from './domain/useCases/DeaccessionDataset'
 import { GetDatasetDownloadCount } from './domain/useCases/GetDatasetDownloadCount'
 import { GetDatasetVersionsSummaries } from './domain/useCases/GetDatasetVersionsSummaries'
 import { DeleteDatasetDraft } from './domain/useCases/DeleteDatasetDraft'
+import { LinkDataset } from './domain/useCases/LinkDataset'
+import { UnlinkDataset } from './domain/useCases/UnlinkDataset'
+import { GetDatasetLinkedCollections } from './domain/useCases/GetDatasetLinkedCollections'
+import { GetDatasetAvailableCategories } from './domain/useCases/GetDatasetAvailableCategories'
+import { GetDatasetAvailableDatasetTypes } from './domain/useCases/GetDatasetAvailableDatasetTypes'
+import { GetDatasetAvailableDatasetType } from './domain/useCases/GetDatasetAvailableDatasetType'
+import { AddDatasetType } from './domain/useCases/AddDatasetType'
+import { LinkDatasetTypeWithMetadataBlocks } from './domain/useCases/LinkDatasetTypeWithMetadataBlocks'
+import { SetAvailableLicensesForDatasetType } from './domain/useCases/SetAvailableLicensesForDatasetType'
+import { DeleteDatasetType } from './domain/useCases/DeleteDatasetType'
+import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
+import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -54,6 +66,20 @@ const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
 const getDatasetDownloadCount = new GetDatasetDownloadCount(datasetsRepository)
 const getDatasetVersionsSummaries = new GetDatasetVersionsSummaries(datasetsRepository)
 const deleteDatasetDraft = new DeleteDatasetDraft(datasetsRepository)
+const linkDataset = new LinkDataset(datasetsRepository)
+const unlinkDataset = new UnlinkDataset(datasetsRepository)
+const getDatasetLinkedCollections = new GetDatasetLinkedCollections(datasetsRepository)
+const getDatasetAvailableCategories = new GetDatasetAvailableCategories(datasetsRepository)
+const getDatasetAvailableDatasetTypes = new GetDatasetAvailableDatasetTypes(datasetsRepository)
+const getDatasetAvailableDatasetType = new GetDatasetAvailableDatasetType(datasetsRepository)
+const addDatasetType = new AddDatasetType(datasetsRepository)
+const linkDatasetTypeWithMetadataBlocks = new LinkDatasetTypeWithMetadataBlocks(datasetsRepository)
+const setAvailableLicensesForDatasetType = new SetAvailableLicensesForDatasetType(
+  datasetsRepository
+)
+const deleteDatasetType = new DeleteDatasetType(datasetsRepository)
+const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
+const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
 
 export {
   getDataset,
@@ -71,7 +97,19 @@ export {
   deaccessionDataset,
   getDatasetDownloadCount,
   getDatasetVersionsSummaries,
-  deleteDatasetDraft
+  deleteDatasetDraft,
+  linkDataset,
+  unlinkDataset,
+  getDatasetLinkedCollections,
+  getDatasetAvailableCategories,
+  getDatasetCitationInOtherFormats,
+  getDatasetTemplates,
+  getDatasetAvailableDatasetTypes,
+  getDatasetAvailableDatasetType,
+  addDatasetType,
+  linkDatasetTypeWithMetadataBlocks,
+  setAvailableLicensesForDatasetType,
+  deleteDatasetType
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -105,3 +143,5 @@ export {
   DatasetVersionSummaryInfo,
   DatasetVersionSummaryStringValues
 } from './domain/models/DatasetVersionSummaryInfo'
+export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
+export { DatasetType } from './domain/models/DatasetType'

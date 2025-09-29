@@ -514,6 +514,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
         isRequired: true,
+        isAdvancedSearchFieldType: true,
         displayOrder: 0,
         displayOnCreate: true,
         typeClass: MetadataFieldTypeClass.Primitive
@@ -529,6 +530,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: '#VALUE',
         isRequired: true,
+        isAdvancedSearchFieldType: false,
         displayOrder: 1,
         typeClass: MetadataFieldTypeClass.Compound,
         displayOnCreate: true,
@@ -544,6 +546,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
+            isAdvancedSearchFieldType: true,
             displayOrder: 2,
             displayOnCreate: true,
             typeClass: MetadataFieldTypeClass.Primitive
@@ -559,6 +562,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: false,
+            isAdvancedSearchFieldType: true,
             displayOrder: 3,
             displayOnCreate: true,
             typeClass: MetadataFieldTypeClass.Primitive
@@ -577,6 +581,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: '',
         isRequired: true,
+        isAdvancedSearchFieldType: false,
         displayOrder: 4,
         displayOnCreate: true,
         typeClass: MetadataFieldTypeClass.Primitive
@@ -592,6 +597,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: '#NAME: #VALUE ',
         isRequired: false,
+        isAdvancedSearchFieldType: false,
         displayOrder: 5,
         displayOnCreate: true,
         typeClass: MetadataFieldTypeClass.Primitive
@@ -607,6 +613,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: '#NAME: #VALUE ',
         isRequired: false,
+        isAdvancedSearchFieldType: false,
         displayOrder: 5,
         displayOnCreate: true,
         typeClass: MetadataFieldTypeClass.Primitive
@@ -623,6 +630,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
         isControlledVocabulary: false,
         displayFormat: ':',
         isRequired: false,
+        isAdvancedSearchFieldType: false,
         displayOrder: 6,
         typeClass: MetadataFieldTypeClass.Compound,
         displayOnCreate: true,
@@ -638,6 +646,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
             isControlledVocabulary: true,
             displayFormat: '#VALUE ',
             isRequired: false,
+            isAdvancedSearchFieldType: false,
             displayOrder: 7,
             displayOnCreate: true,
             controlledVocabularyValues: [
@@ -673,6 +682,7 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
             isControlledVocabulary: false,
             displayFormat: '#VALUE',
             isRequired: true,
+            isAdvancedSearchFieldType: false,
             displayOrder: 8,
             typeClass: MetadataFieldTypeClass.Primitive,
             displayOnCreate: true
@@ -684,9 +694,11 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
 }
 
 export const createNewDatasetRequestPayload = (
-  license?: DatasetLicense
+  license?: DatasetLicense,
+  datasetType?: string
 ): NewDatasetRequestPayload => {
   return {
+    datasetType,
     datasetVersion: {
       ...(license && { license }),
       metadataBlocks: {

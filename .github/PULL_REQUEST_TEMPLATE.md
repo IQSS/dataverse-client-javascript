@@ -12,6 +12,6 @@
 
 ## Suggestions on how to test this:
 
-## Is there a release notes update needed for this change?:
+## Is there a release notes or changelog update needed for this change?:
 
 ## Additional documentation:

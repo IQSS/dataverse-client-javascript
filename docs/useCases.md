@@ -36,12 +36,23 @@ The different use cases currently available in the package are classified below,
     - [Get Differences between Two Dataset Versions](#get-differences-between-two-dataset-versions)
     - [List All Datasets](#list-all-datasets)
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
+    - [Get Dataset Linked Collections](#get-dataset-linked-collections)
+    - [Get Dataset Available Categories](#get-dataset-available-categories)
+    - [Get Dataset Templates](#get-dataset-templates)
+    - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
+    - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
     - [Delete a Draft Dataset](#delete-a-draft-dataset)
+    - [Link a Dataset](#link-a-dataset)
+    - [Unlink a Dataset](#unlink-a-dataset)
+    - [Add a Dataset Type](#add-a-dataset-type)
+    - [Link Dataset Type with Metadata Blocks](#link-dataset-type-with-metadata-blocks)
+    - [Set Available Licenses For Dataset Type](#set-available-licenses-for-dataset-type)
+    - [Delete a Dataset Type](#delete-a-dataset-type)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -61,6 +72,8 @@ The different use cases currently available in the package are classified below,
     - [Replace a File](#replace-a-file)
     - [Restrict or Unrestrict a File](#restrict-or-unrestrict-a-file)
     - [Update File Metadata](#update-file-metadata)
+    - [Update File Categories](#update-file-categories)
+    - [Update File Tabular Tags](#update-file-tabular-tags)
 - [Metadata Blocks](#metadata-blocks)
   - [Metadata Blocks read use cases](#metadata-blocks-read-use-cases)
     - [Get All Facetable Metadata Fields](#get-all-facetable-metadata-fields)
@@ -83,8 +96,23 @@ The different use cases currently available in the package are classified below,
   - [Get Maximum Embargo Duration In Months](#get-maximum-embargo-duration-in-months)
   - [Get ZIP Download Limit](#get-zip-download-limit)
   - [Get Application Terms of Use](#get-application-terms-of-use)
+  - [Get Available Dataset Metadata Export Formats](#get-available-dataset-metadata-export-formats)
+- [Licenses](#Licenses)
+  - [Get Available Standard License Terms](#get-available-standard-license-terms)
 - [Contact](#Contact)
   - [Send Feedback to Object Contacts](#send-feedback-to-object-contacts)
+- [Notifications](#Notifications)
+  - [Get All Notifications by User](#get-all-notifications-by-user)
+  - [Delete Notification](#delete-notification)
+  - [Get Unread Count](#get-unread-count)
+  - [Mark As Read](#mark-as-read)
+- [Search](#Search)
+  - [Get Search Services](#get-search-services)
+- [External Tools](#external-tools)
+  - [External Tools read use cases](#external-tools-read-use-cases)
+    - [Get External Tools](#get-external-tools)
+    - [Get Dataset External Tool Resolved](#get-dataset-external-tool-resolved)
+    - [Get File External Tool Resolved](#get-file-external-tool-resolved)
 
 ## Collections
 
@@ -222,6 +250,8 @@ This use case supports the following optional parameters depending on the search
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
 - **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
+- **searchServiceName**: The search service name on which to execute the search (Optional).
+- **showTypeCounts**: If true, the response will include the count per object type (Optional).
 
 #### List My Data Collection Items
 
@@ -557,6 +587,37 @@ The `datasetId` parameter can be a string, for persistent identifiers, or a numb
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
+#### Get Dataset Citation In Other Formats
+
+Retrieves the citation for a dataset in a specified bibliographic format.
+
+##### Example call:
+
+```typescript
+import { getDatasetCitationInOtherFormats } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 2
+const datasetVersionId = '1.0'
+
+getDatasetCitationInOtherFormats
+  .execute(datasetId, datasetVersionId, format)
+  .then((citationText: FormattedCitation) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetCitationInOtherFormats.ts) implementation_.
+
+Supported formats include 'EndNote' (XML), 'RIS' (plain text), 'BibTeX' (plain text), 'CSLJson' (JSON), and 'Internal' (HTML). The response contains the raw citation content in the requested format, the format type, and the content type (MIME type).
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
 #### Get Dataset Citation Text By Private URL Token
 
 Returns the Dataset citation text, given an associated Private URL Token.
@@ -735,11 +796,71 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetVersionsSummaries.ts) 
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
+#### Get Dataset Linked Collections
+
+Returns an array of [DatasetLinkedCollection](../src/datasets/domain/models/DatasetLinkedCollection.ts) that contains the collections linked to a dataset.
+
+##### Example call:
+
+```typescript
+import { getDatasetLinkedCollections } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetLinkedCollections
+  .execute(datasetId)
+  .then((datasetLinkedCollections: DatasetLinkedCollection[]) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetLinkedCollections.ts) implementation_.
+
+#### Get Dataset Available Dataset Types
+
+Returns a list of available dataset types that can be used at dataset creation. By default, only the type "dataset" is returned.
+
+###### Example call:
+
+```typescript
+import { getDatasetAvailableDatasetTypes } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getDatasetAvailableDatasetTypes.execute().then((datasetTypes: DatasetType[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetTypes.ts) implementation_.
+
+#### Get Dataset Available Dataset Type
+
+Returns an available dataset types that can be used at dataset creation.
+
+###### Example call:
+
+```typescript
+import { getDatasetAvailableDatasetType } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getDatasetAvailableDatasetType.execute().then((datasetType: DatasetType) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetType.ts) implementation_.
+
 ### Datasets Write Use Cases
 
 #### Create a Dataset
 
-Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object and an optional collection identifier, which defaults to `:root`.
+Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object, an optional collection identifier, which defaults to `:root`, and an optional dataset type.
 
 This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
 
@@ -794,7 +915,7 @@ createDataset.execute(datasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers
 
 _See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
 
-The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call.
+The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call. If you want the dataset type to be anything other than dataset, first [check available dataset types](#get-dataset-available-dataset-types) and then add the name of the dataset type as the third parameter.
 
 The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 
@@ -944,6 +1065,48 @@ The `datasetId` parameter is a number for numeric identifiers or string for pers
 
 If you try to delete a dataset without draft version, you will get a not found error.
 
+#### Link a Dataset
+
+Creates a link between a Dataset and a Collection.
+
+##### Example call:
+
+```typescript
+import { linkDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const collectionAlias = 'collection-alias'
+
+linkDataset.execute(datasetId, collectionAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/LinkDataset.ts) implementation_.
+
+#### Unlink a Dataset
+
+Removes a link between a Dataset and a Collection.
+
+##### Example call:
+
+```typescript
+import { unlinkDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const collectionAlias = 'collection-alias'
+
+unlinkDataset.execute(datasetId, collectionAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/UnlinkDataset.ts) implementation_.
+
 #### Get Download Count of a Dataset
 
 Total number of downloads requested for a dataset, given a dataset numeric identifier,
@@ -975,6 +1138,118 @@ The `includeMDC` parameter is optional.
 - Setting `includeMDC` to True will ignore the `MDCStartDate` setting and return a total count.
 - If MDC isn't enabled, the download count will return a total count, without `MDCStartDate`.
 - If MDC is enabled but the `includeMDC` is false, the count will be limited to the time before `MDCStartDate`
+
+#### Get Dataset Available Categories
+
+Returns a list of available file categories that may be applied to the files of a given dataset.
+
+###### Example call:
+
+```typescript
+import { getDatasetAvailableCategories } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+
+getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
+
+The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
+
+#### Get Dataset Templates
+
+Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
+
+##### Example call:
+
+```typescript
+import { getDatasetTemplates } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 12345
+
+getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: DatasetTemplate[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definition.
+
+#### Add a Dataset Type
+
+Adds a dataset types that can be used at dataset creation.
+
+###### Example call:
+
+```typescript
+import { addDatasetType } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+addDatasetType.execute(datasetType).then((datasetType: DatasetType) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/AddDatasetType.ts) implementation_.
+
+#### Link Dataset Type with Metadata Blocks
+
+Link a dataset type with metadata blocks.
+
+###### Example call:
+
+```typescript
+import { linkDatasetTypeWithMetadataBlocks } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+linkDatasetTypeWithMetadataBlocks.execute(datasetTypeId, ['geospatial']).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/LinkDatasetTypeWithMetadataBlocks.ts) implementation_.
+
+#### Set Available Licenses For Dataset Type
+
+Set available licenses for dataset type.
+
+###### Example call:
+
+```typescript
+import { setAvailableLicensesForDatasetType } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+setAvailableLicensesForDatasetType.execute(datasetTypeId, ['CC BY 4.0']).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/SetAvailableLicensesForDatasetType.ts) implementation_.
+
+#### Delete a Dataset Type
+
+Delete a dataset type.
+
+###### Example call:
+
+```typescript
+import { deleteDatasetType } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+deleteDatasetType.execute(datasetTypeId).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/DeleteDatasetType.ts) implementation_.
 
 ## Files
 
@@ -1737,6 +2012,8 @@ The `collectionIdOrAlias` is a generic collection identifier, which can be eithe
 
 There is a second optional parameter called `onlyDisplayedOnCreate` which indicates whether or not to return only the metadata blocks that are displayed on dataset creation. The default value is false.
 
+There is a third optional parameter called `datasetType` which will include additional fields from metadata blocks linked to the provided type, if any. Before using this parameter, you will probably want to [list available dataset types](#get-dataset-available-dataset-types) for your installation.
+
 ## Users
 
 ### Users read use cases
@@ -1955,6 +2232,51 @@ getApplicationTermsOfUse.execute().then((termsOfUse: string) => {
 
 _See [use case](../src/info/domain/useCases/GetApplicationTermsOfUse.ts) implementation_.
 
+#### Get Available Dataset Metadata Export Formats
+
+Returns a [DatasetMetadataExportFormats](../src/info/domain/models/DatasetMetadataExportFormats.ts) object containing the available dataset metadata export formats.
+
+##### Example call:
+
+```typescript
+import {
+  getAvailableDatasetMetadataExportFormats,
+  DatasetMetadataExportFormats
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAvailableDatasetMetadataExportFormats
+  .execute()
+  .then((datasetMetadataExportFormats: DatasetMetadataExportFormats) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/info/domain/useCases/GetAvailableDatasetMetadataExportFormats.ts) implementation_.
+
+## Licenses
+
+### Get Available Standard License Terms
+
+Returns a list of available standard licenses that can be selected for a dataset.
+
+##### Example call:
+
+```typescript
+import { getAvailableStandardLicenses, License } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAvailableStandardLicenses.execute().then((licenses: License[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/licenses/domain/useCases/GetAvailableStandardLicenses.ts) implementation_.
+
 ## Contact
 
 #### Send Feedback to Object Contacts
@@ -1991,3 +2313,189 @@ In ContactDTO, it takes the following information:
 - **subject**: the email subject line.
 - **body**: the email body to send.
 - **fromEmail**: the email to list in the reply-to field.
+
+## Notifications
+
+#### Get All Notifications by User
+
+Returns a [Notification](../src/notifications/domain/models/Notification.ts) array containing all notifications for the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getAllNotificationsByUser } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getAllNotificationsByUser.execute().then((notifications: Notification[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/GetAllNotificationsByUser.ts) implementation_.
+
+#### Delete Notification
+
+Deletes a specific notification for the current authenticated user by its ID.
+
+##### Example call:
+
+```typescript
+import { deleteNotification } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const notificationId = 123
+
+deleteNotification.execute(notificationId: number).then(() => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/DeleteNotification.ts) implementation_.
+
+#### Get Unread Count
+
+Returns the number of unread notifications for the current authenticated user.
+
+##### Example call:
+
+```typescript
+import { getUnreadNotificationsCount } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getUnreadNotificationsCount.execute().then((count: number) => {
+  console.log(`You have ${count} unread notifications`)
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/GetUnreadNotificationsCount.ts) implementation_.
+
+#### Mark As Read
+
+Marks a specific notification as read for the current authenticated user. This operation is idempotent - marking an already-read notification as read will not cause an error.
+
+##### Example call:
+
+```typescript
+import { markNotificationAsRead } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const notificationId = 123
+
+markNotificationAsRead.execute(notificationId).then(() => {
+  console.log('Notification marked as read')
+})
+
+/* ... */
+```
+
+_See [use case](../src/notifications/domain/useCases/MarkNotificationAsRead.ts) implementation_.
+
+## Search
+
+#### Get Search Services
+
+Returns all [Search Services](../src/search/domain/models/SearchService.ts) available in the installation.
+
+##### Example call:
+
+```typescript
+import { getSearchServices } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getSearchServices.execute().then((searchServices: SearchService[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/search/domain/useCases/GetSearchServices.ts) implementation_.
+
+## External Tools
+
+### External Tools Read Use Cases
+
+#### Get External Tools
+
+Returns an array of [ExternalTool](../src/externalTools/domain/models/ExternalTool.ts) objects, which represent the external tools available in the installation.
+
+##### Example call:
+
+```typescript
+import { getExternalTools } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getExternalTools.execute().then((externalTools: ExternalTool[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/externalTools/domain/useCases/GetExternalTools.ts) implementation_.
+
+#### Get Dataset External Tool Resolved
+
+Returns an instance of [DatasetExternalToolResolved](../src/externalTools/domain/models/ExternalTool.ts), which contains the resolved URL for accessing an external tool that operates at the dataset level.
+
+##### Example call:
+
+```typescript
+import { getDatasetExternalToolResolved } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+const toolId = 1
+const datasetId = 2
+const getExternalToolDTO: GetExternalToolDTO = {
+  preview: true,
+  locale: 'en'
+}
+
+getDatasetExternalToolResolved
+  .execute(toolId, datasetId, getExternalToolDTO)
+  .then((datasetExternalToolResolved: DatasetExternalToolResolved) => {
+    /* ... */
+  })
+/* ... */
+```
+
+_See [use case](../src/externalTools/domain/useCases/GetDatasetExternalToolResolved.ts) implementation_.
+
+#### Get File External Tool Resolved
+
+Returns an instance of [FileExternalToolResolved](../src/externalTools/domain/models/ExternalTool.ts), which contains the resolved URL for accessing an external tool that operates at the file level.
+
+##### Example call:
+
+```typescript
+import { getFileExternalToolResolved } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+const toolId = 1
+const fileId = 2
+const getExternalToolDTO: GetExternalToolDTO = {
+  preview: true,
+  locale: 'en'
+}
+
+getFileExternalToolResolved
+  .execute(toolId, fileId, getExternalToolDTO)
+  .then((fileExternalToolResolved: FileExternalToolResolved) => {
+    /* ... */
+  })
+/* ... */
+```
+
+_See [use case](../src/externalTools/domain/useCases/GetfileExternalToolResolved.ts) implementation_.

@@ -9,6 +9,11 @@ import { MetadataBlock } from '../../../metadataBlocks'
 import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 import { DatasetDownloadCount } from '../models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../models/DatasetVersionSummaryInfo'
+import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
+import { CitationFormat } from '../models/CitationFormat'
+import { FormattedCitation } from '../models/FormattedCitation'
+import { DatasetTemplate } from '../models/DatasetTemplate'
+import { DatasetType } from '../models/DatasetType'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -41,7 +46,8 @@ export interface IDatasetsRepository {
   createDataset(
     newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    collectionId: string
+    collectionId: string,
+    datasetType?: string
   ): Promise<CreatedDatasetIdentifiers>
   publishDataset(datasetId: number | string, versionUpdateType: VersionUpdateType): Promise<void>
   updateDataset(
@@ -61,4 +67,27 @@ export interface IDatasetsRepository {
   ): Promise<DatasetDownloadCount>
   getDatasetVersionsSummaries(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]>
   deleteDatasetDraft(datasetId: number | string): Promise<void>
+  linkDataset(datasetId: number, collectionAlias: string): Promise<void>
+  unlinkDataset(datasetId: number, collectionAlias: string): Promise<void>
+  getDatasetLinkedCollections(datasetId: number | string): Promise<DatasetLinkedCollection[]>
+  getDatasetAvailableCategories(datasetId: number | string): Promise<string[]>
+  getDatasetCitationInOtherFormats(
+    datasetId: number | string,
+    datasetVersionId: string,
+    format: CitationFormat,
+    includeDeaccessioned?: boolean
+  ): Promise<FormattedCitation>
+  getDatasetTemplates(collectionIdOrAlias: number | string): Promise<DatasetTemplate[]>
+  getDatasetAvailableDatasetTypes(): Promise<DatasetType[]>
+  getDatasetAvailableDatasetType(datasetTypeId: number | string): Promise<DatasetType>
+  addDatasetType(datasetType: DatasetType): Promise<DatasetType>
+  linkDatasetTypeWithMetadataBlocks(
+    datasetTypeId: number | string,
+    metadataBlocks: string[]
+  ): Promise<void>
+  setAvailableLicensesForDatasetType(
+    datasetTypeId: number | string,
+    licenses: string[]
+  ): Promise<void>
+  deleteDatasetType(datasetTypeId: number): Promise<void>
 }

@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
@@ -20,6 +21,14 @@ import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
+import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
+import { CitationFormat } from '../../domain/models/CitationFormat'
+import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
+import { FormattedCitation } from '../../domain/models/FormattedCitation'
+import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
+import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
+import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
+import { DatasetType } from '../../domain/models/DatasetType'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -74,7 +83,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetCitation(
-    datasetId: number,
+    datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean
   ): Promise<string> {
@@ -91,6 +100,33 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .catch((error) => {
         throw error
       })
+  }
+
+  public async getDatasetCitationInOtherFormats(
+    datasetId: number | string,
+    datasetVersionId: string | 'LATEST' = 'LATEST',
+    format: CitationFormat,
+    includeDeaccessioned = false
+  ): Promise<FormattedCitation> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `versions/${datasetVersionId}/citation/${format}`,
+      datasetId
+    )
+    const response = await this.doGet(endpoint, true, { includeDeaccessioned })
+
+    const contentType = response.headers['content-type']
+    let content: string
+    if (contentType && contentType.includes('application/json')) {
+      content = JSON.stringify(response.data)
+    } else {
+      content = response.data
+    }
+
+    return {
+      content,
+      contentType
+    }
   }
 
   public async getPrivateUrlDatasetCitation(token: string): Promise<string> {
@@ -172,11 +208,16 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async createDataset(
     newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    collectionId: string
+    collectionId: string,
+    datasetType?: string
   ): Promise<CreatedDatasetIdentifiers> {
     return this.doPost(
       `/dataverses/${collectionId}/datasets`,
-      transformDatasetModelToNewDatasetRequestPayload(newDataset, datasetMetadataBlocks)
+      transformDatasetModelToNewDatasetRequestPayload(
+        newDataset,
+        datasetMetadataBlocks,
+        datasetType
+      )
     )
       .then((response) => {
         const responseData = response.data.data
@@ -283,6 +324,131 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       this.buildApiEndpoint(this.datasetsResourceName, 'versions/:draft', datasetId)
     )
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async linkDataset(datasetId: number, collectionAlias: string): Promise<void> {
+    return this.doPut(`/${this.datasetsResourceName}/${datasetId}/link/${collectionAlias}`, {})
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async unlinkDataset(datasetId: number, collectionAlias: string): Promise<void> {
+    return this.doDelete(`/${this.datasetsResourceName}/${datasetId}/deleteLink/${collectionAlias}`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetLinkedCollections(
+    datasetId: number | string
+  ): Promise<DatasetLinkedCollection[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'links', datasetId), true)
+      .then((response) =>
+        transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection(response.data.data)
+      )
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetAvailableCategories(datasetId: number | string): Promise<string[]> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'availableFileCategories', datasetId),
+      true
+    )
+      .then((response) => response.data.data as string[])
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetTemplates(
+    collectionIdOrAlias: number | string
+  ): Promise<DatasetTemplate[]> {
+    return this.doGet(`/dataverses/${collectionIdOrAlias}/templates`, true)
+      .then((response: AxiosResponse<{ data: DatasetTemplatePayload[] }>) =>
+        transformDatasetTemplatePayloadToDatasetTemplate(response.data.data)
+      )
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetAvailableDatasetTypes(): Promise<DatasetType[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'))
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetAvailableDatasetType(
+    datasetTypeId: number | string
+  ): Promise<DatasetType> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      'datasetTypes/' + datasetTypeId
+    )
+    return this.doGet(endpoint)
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async addDatasetType(datasetType: DatasetType): Promise<DatasetType> {
+    return this.doPost(
+      this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'),
+      datasetType
+    )
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async linkDatasetTypeWithMetadataBlocks(
+    datasetTypeId: number | string,
+    metadataBlocks: string[]
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes/' + datasetTypeId),
+      metadataBlocks
+    )
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async setAvailableLicensesForDatasetType(
+    datasetTypeId: number | string,
+    licenses: string[]
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(
+        this.datasetsResourceName,
+        'datasetTypes/' + datasetTypeId + '/licenses'
+      ),
+      licenses
+    )
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deleteDatasetType(datasetTypeId: number): Promise<void> {
+    return this.doDelete(
+      this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes/' + datasetTypeId)
+    )
+      .then((response) => response.data.data)
       .catch((error) => {
         throw error
       })

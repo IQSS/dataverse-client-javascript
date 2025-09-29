@@ -20,7 +20,14 @@ import {
   CreatedDatasetIdentifiers,
   DatasetDTO,
   DatasetDeaccessionDTO,
-  publishDataset
+  publishDataset,
+  DatasetType,
+  getDatasetAvailableDatasetTypes,
+  getDatasetAvailableDatasetType,
+  addDatasetType,
+  deleteDatasetType,
+  linkDatasetTypeWithMetadataBlocks,
+  setAvailableLicensesForDatasetType
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -51,6 +58,11 @@ import {
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
+import { CitationFormat } from '../../../src/datasets/domain/models/CitationFormat'
+import {
+  createDatasetTemplateViaApi,
+  deleteDatasetTemplateViaApi
+} from '../../testHelpers/datasets/datasetTemplatesHelper'
 
 const TEST_DIFF_DATASET_DTO: DatasetDTO = {
   license: {
@@ -98,6 +110,7 @@ describe('DatasetsRepository', () => {
 
   const filesRepositorySut = new FilesRepository()
   const directUploadSut: DirectUploadClient = new DirectUploadClient(filesRepositorySut)
+  const defaultDatasetType = 'dataset'
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -492,6 +505,113 @@ describe('DatasetsRepository', () => {
     })
   })
 
+  describe('getDatasetCitationInOtherFormats', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return citation in BibTeX format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.BibTeX
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
+    test('should return citation in BibTeX format using persistent id', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.persistentId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.BibTeX
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
+    test('should return citation in RIS format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.RIS
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+
+    test('should return citation in CSLJson format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.CSLJson
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/application\/json/)
+    })
+
+    test('should return citation in EndNote format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.EndNote
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/xml/)
+    })
+
+    test('should return citation in Internal format', async () => {
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.Internal
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/html/)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const nonExistentId = 9999999
+      const expectedError = new ReadError(`[404] Dataset with ID ${nonExistentId} not found.`)
+
+      await expect(
+        sut.getDatasetCitationInOtherFormats(
+          nonExistentId,
+          DatasetNotNumberedVersion.LATEST,
+          CitationFormat.RIS
+        )
+      ).rejects.toThrow(expectedError)
+    })
+
+    test('should return citation for deaccessioned dataset when includeDeaccessioned = true', async () => {
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
+
+      const citation = await sut.getDatasetCitationInOtherFormats(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        CitationFormat.RIS,
+        true
+      )
+
+      expect(typeof citation.content).toBe('string')
+      expect(citation.contentType).toMatch(/text\/plain/)
+    })
+  })
+
   describe('getDatasetVersionDiff', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
@@ -708,6 +828,64 @@ describe('DatasetsRepository', () => {
       expect(actualCreatedDataset.metadataBlocks[0].fields.subject).toContain(
         'Medicine, Health and Life Sciences'
       )
+      // even though we didn't provide a dataset type, it should be created with the default one
+      expect(actualCreatedDataset.datasetType).toBe(defaultDatasetType)
+    })
+  })
+
+  describe('createDatasetWithDatasetType', () => {
+    test('should create a dataset with the provided dataset type', async () => {
+      const testNewDataset = {
+        metadataBlockValues: [
+          {
+            name: 'citation',
+            fields: {
+              title: 'Dataset created using the createDataset use case',
+              author: [
+                {
+                  authorName: 'Admin, Dataverse',
+                  authorAffiliation: 'Dataverse.org'
+                },
+                {
+                  authorName: 'Owner, Dataverse',
+                  authorAffiliation: 'Dataversedemo.org'
+                }
+              ],
+              datasetContact: [
+                {
+                  datasetContactEmail: 'finch@mailinator.com',
+                  datasetContactName: 'Finch, Fiona'
+                }
+              ],
+              dsDescription: [
+                {
+                  dsDescriptionValue: 'This is the description of the dataset.'
+                }
+              ],
+              subject: ['Medicine, Health and Life Sciences']
+            }
+          }
+        ]
+      }
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+      const createdDataset = await sut.createDataset(
+        testNewDataset,
+        [citationMetadataBlock],
+        ROOT_COLLECTION_ALIAS,
+        defaultDatasetType
+      )
+      const actualCreatedDataset = await sut.getDataset(
+        createdDataset.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(actualCreatedDataset.datasetType).toBe(defaultDatasetType)
     })
   })
 
@@ -954,8 +1132,8 @@ describe('DatasetsRepository', () => {
         }
       ])
     })
-
-    test('should throw error if trying to update an outdated internal version dataset', async () => {
+    // TODO: add this test when https://github.com/IQSS/dataverse-client-javascript/issues/343 is fixed
+    test.skip('should throw error if trying to update an outdated internal version dataset', async () => {
       const testDataset = {
         metadataBlockValues: [
           {
@@ -1386,6 +1564,299 @@ describe('DatasetsRepository', () => {
       )
 
       await expect(sut.deleteDatasetDraft(nonExistentTestDatasetId)).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('linkDataset', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testCollectionAlias = 'testLinkDatasetCollection'
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await createCollectionViaApi(testCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should link a dataset to another collection', async () => {
+      const actual = await sut.linkDataset(testDatasetIds.numericId, testCollectionAlias)
+
+      expect(actual).toBeUndefined()
+
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+      expect(linkedCollections[0].alias).toBe(testCollectionAlias)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.linkDataset(nonExistentTestDatasetId, testCollectionAlias)).rejects.toThrow()
+    })
+
+    test('should return error when collection does not exist', async () => {
+      await expect(
+        sut.linkDataset(testDatasetIds.numericId, 'nonExistentCollectionAlias')
+      ).rejects.toThrow()
+    })
+  })
+
+  describe('unlinkDataset', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testCollectionAlias = 'testUnlinkDatasetCollection'
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await createCollectionViaApi(testCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should unlink a dataset from a collection', async () => {
+      await sut.linkDataset(testDatasetIds.numericId, testCollectionAlias)
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+      expect(linkedCollections[0].alias).toBe(testCollectionAlias)
+
+      const actual = await sut.unlinkDataset(testDatasetIds.numericId, testCollectionAlias)
+
+      expect(actual).toBeUndefined()
+      const updatedLinkedCollections = await sut.getDatasetLinkedCollections(
+        testDatasetIds.numericId
+      )
+      expect(updatedLinkedCollections.length).toBe(0)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.linkDataset(nonExistentTestDatasetId, testCollectionAlias)).rejects.toThrow()
+    })
+
+    test('should return error when collection does not exist', async () => {
+      await expect(
+        sut.linkDataset(testDatasetIds.numericId, 'nonExistentCollectionAlias')
+      ).rejects.toThrow()
+    })
+
+    test('should return error when dataset is not linked to the collection', async () => {
+      await expect(
+        sut.unlinkDataset(testDatasetIds.numericId, testCollectionAlias)
+      ).rejects.toThrow()
+    })
+  })
+
+  describe('getDatasetLinkedCollections', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testCollectionAlias = 'testGetLinkedCollections'
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await createCollectionViaApi(testCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should return empty array when no collections are linked', async () => {
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+
+      expect(linkedCollections.length).toBe(0)
+    })
+
+    test('should return linked collections for a dataset', async () => {
+      await sut.linkDataset(testDatasetIds.numericId, testCollectionAlias)
+
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+
+      expect(linkedCollections.length).toBe(1)
+      expect(linkedCollections[0].alias).toBe(testCollectionAlias)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetLinkedCollections(nonExistentTestDatasetId)).rejects.toThrow()
+    })
+  })
+
+  describe('getDatasetAvailableCategories', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should get available categories', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2', 'Documentation', 'Data', 'Code']
+      }
+
+      await uploadFileViaApi(testDatasetIds.numericId, testTextFile1Name, fileMetadata)
+
+      const actual = await sut.getDatasetAvailableCategories(testDatasetIds.numericId)
+      expect(actual.sort()).toEqual(fileMetadata.categories.sort())
+    })
+
+    test('should get available categorie if dataset id is persistent id', async () => {
+      const fileMetadata = {
+        description: 'test description',
+        directoryLabel: 'directoryLabel',
+        categories: ['category1', 'category2', 'Documentation', 'Data', 'Code']
+      }
+
+      const actual = await sut.getDatasetAvailableCategories(testDatasetIds.persistentId)
+      expect(actual.sort()).toEqual(fileMetadata.categories.sort())
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetAvailableCategories(nonExistentTestDatasetId)).rejects.toThrow()
+    })
+  })
+
+  describe('getDatasetTemplates', () => {
+    const testCollectionAlias = 'testGetDatasetTemplates'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(testCollectionAlias)
+    })
+
+    test('should return empty dataset templates', async () => {
+      const actual = await sut.getDatasetTemplates(testCollectionAlias)
+
+      expect(actual.length).toBe(0)
+    })
+
+    test('should return dataset templates for a collection', async () => {
+      const templateCreated = await createDatasetTemplateViaApi(testCollectionAlias)
+
+      const actual = await sut.getDatasetTemplates(testCollectionAlias)
+
+      expect(actual.length).toBe(1)
+
+      expect(actual[0].name).toBe(templateCreated.name)
+      expect(actual[0].isDefault).toBe(templateCreated.isDefault)
+      expect(actual[0].datasetMetadataBlocks.length).toBe(1)
+      expect(actual[0].datasetMetadataBlocks[0].name).toBe('citation')
+      expect(actual[0].datasetMetadataBlocks[0].fields.author.length).toBe(1)
+      expect(actual[0].instructions.length).toBe(templateCreated.instructions.length)
+
+      await deleteDatasetTemplateViaApi(actual[0].id)
+    })
+  })
+
+  describe('getDatasetAvailableDatasetTypes', () => {
+    test('should return available dataset types', async () => {
+      const actualDatasetTypes: DatasetType[] = await getDatasetAvailableDatasetTypes.execute()
+      const expectedDatasetTypes = [
+        {
+          id: 1,
+          name: 'dataset',
+          linkedMetadataBlocks: [],
+          availableLicenses: []
+        }
+      ]
+
+      expect(actualDatasetTypes).toEqual(expectedDatasetTypes)
+    })
+  })
+
+  describe('getDatasetAvailableDatasetType', () => {
+    test('should return available the default dataset type', async () => {
+      const defaultDatasetType = 'dataset'
+      const actualDatasetType: DatasetType = await getDatasetAvailableDatasetType.execute(
+        defaultDatasetType
+      )
+      const expectedDatasetType = {
+        id: 1,
+        name: 'dataset',
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      }
+
+      expect(actualDatasetType).toEqual(expectedDatasetType)
+    })
+  })
+
+  describe('addDatasetType', () => {
+    test('should add a dataset type', async () => {
+      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const actual: DatasetType = await addDatasetType.execute({
+        name: randomName,
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      })
+
+      expect(actual.name).toEqual(randomName)
+    })
+  })
+
+  describe('deleteDatasetType', () => {
+    test('should delete a dataset type (after adding it)', async () => {
+      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const actual: DatasetType = await addDatasetType.execute({
+        name: randomName,
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      })
+      expect(actual.name).toEqual(randomName)
+
+      const deleted: void = await deleteDatasetType.execute(actual.id as number)
+      expect(deleted).toEqual({ message: 'deleted' })
+    })
+  })
+
+  describe('linkDatasetTypeWithMetadataBlocks', () => {
+    test('should allow for linking a dataset type to metadata blocks', async () => {
+      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const actual: DatasetType = await addDatasetType.execute({
+        name: randomName,
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      })
+      expect(actual.name).toEqual(randomName)
+
+      const linked: void = await linkDatasetTypeWithMetadataBlocks.execute(actual.id as number, [
+        'geospatial'
+      ])
+      expect(linked).toEqual({
+        linkedMetadataBlocks: {
+          before: [],
+          after: ['geospatial']
+        }
+      })
+    })
+  })
+
+  describe('setAvailableLicensesForDatasetType', () => {
+    test('should allow for setting available licenses for a dataset type', async () => {
+      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const actual: DatasetType = await addDatasetType.execute({
+        name: randomName,
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      })
+      expect(actual.name).toEqual(randomName)
+
+      const linked: void = await setAvailableLicensesForDatasetType.execute(actual.id as number, [
+        'CC BY 4.0'
+      ])
+      expect(linked).toEqual({
+        availableLicenses: {
+          before: [],
+          after: ['CC BY 4.0']
+        }
+      })
     })
   })
 })

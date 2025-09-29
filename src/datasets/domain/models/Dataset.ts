@@ -1,4 +1,5 @@
 import { DvObjectOwnerNode } from '../../../core/domain/models/DvObjectOwnerNode'
+import { License } from '../../../licenses'
 
 export interface Dataset {
   id: number
@@ -13,6 +14,7 @@ export interface Dataset {
   citationDate?: string
   metadataBlocks: DatasetMetadataBlocks
   isPartOf: DvObjectOwnerNode
+  datasetType?: string
 }
 
 export interface DatasetVersionInfo {
@@ -32,11 +34,7 @@ export enum DatasetVersionState {
   DEACCESSIONED = 'DEACCESSIONED'
 }
 
-export interface DatasetLicense {
-  name: string
-  uri: string
-  iconUri?: string
-}
+export type DatasetLicense = Pick<License, 'name' | 'uri' | 'iconUri'>
 
 export interface CustomTerms {
   termsOfUse: string

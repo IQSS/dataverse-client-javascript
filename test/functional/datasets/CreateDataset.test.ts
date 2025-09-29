@@ -1,5 +1,5 @@
 import { createDataset, DatasetDTO } from '../../../src/datasets'
-import { ApiConfig } from '../../../src'
+import { ApiConfig, WriteError } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { FieldValidationError } from '../../../src/datasets/domain/useCases/validators/errors/FieldValidationError'
@@ -51,6 +51,58 @@ describe('execute', () => {
 
     try {
       const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
+
+      expect(createdDatasetIdentifiers).not.toBeNull()
+      expect(createdDatasetIdentifiers.numericId).not.toBeNull()
+      expect(createdDatasetIdentifiers.persistentId).not.toBeNull()
+      await deleteUnpublishedDatasetViaApi(createdDatasetIdentifiers.numericId)
+    } catch (error) {
+      throw new Error('Dataset should be created')
+    }
+  })
+
+  test('should successfully create a new dataset when a valid dataset type is sent', async () => {
+    const testNewDataset = {
+      metadataBlockValues: [
+        {
+          name: 'citation',
+          fields: {
+            title: 'Dataset created using the createDataset use case',
+            author: [
+              {
+                authorName: 'Admin, Dataverse',
+                authorAffiliation: 'Dataverse.org'
+              },
+              {
+                authorName: 'Owner, Dataverse',
+                authorAffiliation: 'Dataversedemo.org'
+              }
+            ],
+            datasetContact: [
+              {
+                datasetContactEmail: 'finch@mailinator.com',
+                datasetContactName: 'Finch, Fiona'
+              }
+            ],
+            dsDescription: [
+              {
+                dsDescriptionValue: 'This is the description of the dataset.'
+              }
+            ],
+            subject: ['Medicine, Health and Life Sciences']
+          }
+        }
+      ]
+    }
+    expect.assertions(3)
+
+    try {
+      const defaultDatasetType = 'dataset'
+      const createdDatasetIdentifiers = await createDataset.execute(
+        testNewDataset,
+        ':root',
+        defaultDatasetType
+      )
 
       expect(createdDatasetIdentifiers).not.toBeNull()
       expect(createdDatasetIdentifiers.numericId).not.toBeNull()
@@ -210,6 +262,54 @@ describe('execute', () => {
       expect(fieldValidationError?.fieldPosition).toEqual(1)
       expect(fieldValidationError?.message).toEqual(
         'There was an error when validating the field subject from metadata block citation in position 1. Reason was: The field does not have a valid controlled vocabulary value.'
+      )
+    }
+  })
+
+  test('should throw an error when an invalid dataset type is sent', async () => {
+    const testNewDataset = {
+      metadataBlockValues: [
+        {
+          name: 'citation',
+          fields: {
+            title: 'Dataset created using the createDataset use case',
+            author: [
+              {
+                authorName: 'Admin, Dataverse',
+                authorAffiliation: 'Dataverse.org'
+              },
+              {
+                authorName: 'Owner, Dataverse',
+                authorAffiliation: 'Dataversedemo.org'
+              }
+            ],
+            datasetContact: [
+              {
+                datasetContactEmail: 'finch@mailinator.com',
+                datasetContactName: 'Finch, Fiona'
+              }
+            ],
+            dsDescription: [
+              {
+                dsDescriptionValue: 'This is the description of the dataset.'
+              }
+            ],
+            subject: ['Medicine, Health and Life Sciences']
+          }
+        }
+      ]
+    }
+    expect.assertions(1)
+    let writeError: WriteError | undefined = undefined
+    try {
+      const invalidDatasetType = 'doesNotExist'
+      await createDataset.execute(testNewDataset, ':root', invalidDatasetType)
+      throw new Error('Use case should throw an error')
+    } catch (error) {
+      writeError = error as WriteError
+    } finally {
+      expect(writeError?.message).toEqual(
+        'There was an error when writing the resource. Reason was: [400] Error parsing Json: Invalid dataset type: doesNotExist'
       )
     }
   })

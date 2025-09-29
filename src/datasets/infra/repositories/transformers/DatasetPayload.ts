@@ -13,7 +13,7 @@ export interface DatasetPayload {
   lastUpdateTime: string
   releaseTime: string
   metadataBlocks: MetadataBlocksPayload
-  license?: LicensePayload
+  license?: DatasetLicensePayload
   alternativePersistentId?: string
   publicationDate?: string
   citationDate?: string
@@ -36,9 +36,10 @@ export interface DatasetPayload {
   files: FilePayload[]
   isPartOf: OwnerNodePayload
   deaccessionNote?: string
+  datasetType?: string
 }
 
-export interface LicensePayload {
+export interface DatasetLicensePayload {
   name: string
   uri: string
   iconUri?: string

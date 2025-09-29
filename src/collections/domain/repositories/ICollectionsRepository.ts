@@ -9,6 +9,7 @@ import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
+import { CollectionLinks } from '../models/CollectionLinks'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -27,6 +28,7 @@ export interface ICollectionsRepository {
     limit?: number,
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria,
+    searchServiceName?: string,
     showTypeCounts?: boolean
   ): Promise<CollectionItemSubset>
   getMyDataCollectionItems(
@@ -49,4 +51,13 @@ export interface ICollectionsRepository {
   ): Promise<FeaturedItem[]>
   deleteCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<void>
   deleteCollectionFeaturedItem(featuredItemId: number): Promise<void>
+  linkCollection(
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
+  ): Promise<void>
+  unlinkCollection(
+    linkedCollectionIdOrAlias: number | string,
+    linkingCollectionIdOrAlias: number | string
+  ): Promise<void>
+  getCollectionLinks(collectionIdOrAlias: number | string): Promise<CollectionLinks>
 }
