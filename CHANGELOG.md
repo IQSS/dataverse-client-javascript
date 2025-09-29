@@ -12,6 +12,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Fixed
 
+- Dependencies updated to address security vulnerabilities found by `npm audit`.
+
 ### Removed
 
 ---
