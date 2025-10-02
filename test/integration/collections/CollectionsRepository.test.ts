@@ -996,8 +996,8 @@ describe('CollectionsRepository', () => {
       expect(updatedCollection.alias).toBe(testUpdatedCollectionAlias)
       expect(updatedCollection.name).toBe(updatedCollectionName)
       expect(updatedCollection.affiliation).toBe(updatedCollectionAffiliation)
-      expect(updatedCollection.inputLevels?.length).toBe(1)
-      const updatedInputLevel = updatedCollection.inputLevels?.[0]
+      expect(updatedCollection.inputLevels?.length).toBe(2)
+      const updatedInputLevel = updatedCollection.inputLevels?.[1]
       expect(updatedInputLevel?.datasetFieldName).toBe('country')
       expect(updatedInputLevel?.include).toBe(true)
       expect(updatedInputLevel?.required).toBe(false)
