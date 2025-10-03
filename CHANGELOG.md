@@ -14,6 +14,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Removed
 
+- Removed date fields validations in create and update dataset use cases, since validation is already handled in the backend and SPA frontend (other clients should perform client side validation also). This avoids duplicated logic and keeps the package focused on its core responsibility.
+
 [Unreleased]: https://github.com/IQSS/dataverse-client-javascript/compare/v2.1.0...develop
 
 ---
