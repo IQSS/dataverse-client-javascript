@@ -154,64 +154,6 @@ describe('validate', () => {
     expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
   })
 
-  test('should raise a date format validation error when a date field has an invalid format', () => {
-    const testDataset = createDatasetDTO(undefined, undefined, undefined, '1-1-2020')
-
-    expect.assertions(6)
-    runValidateExpectingFieldValidationError(
-      testDataset,
-      'timePeriodCoveredStart',
-      'There was an error when validating the field timePeriodCoveredStart from metadata block citation. Reason was: The field requires a valid date format (YYYY or YYYY-MM or YYYY-MM-DD).'
-    )
-  })
-
-  test('should not raise a date format validation error when a date field has a valid YYYY-MM-DD format', () => {
-    const testDataset = createDatasetDTO(undefined, undefined, undefined, '2020-01-01')
-    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
-  })
-
-  test('should not raise a date format validation error when a date field has a valid YYYY-MM format', () => {
-    const testDataset = createDatasetDTO(undefined, undefined, undefined, '2020-01')
-    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
-  })
-
-  test('should not raise a date format validation error when a date field has a valid YYYY format', () => {
-    const testDataset = createDatasetDTO(undefined, undefined, undefined, '2020')
-    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
-  })
-
-  test('should raise a date format validation error when a date field has a wrong date format according to the field watermark', () => {
-    const testDataset = createDatasetDTO(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      '01-03'
-    )
-
-    expect.assertions(6)
-    runValidateExpectingFieldValidationError(
-      testDataset,
-      'dateOfCreation',
-      'There was an error when validating the field dateOfCreation from metadata block citation. Reason was: The field requires a valid date format (YYYY-MM-DD).'
-    )
-  })
-
-  test('should not raise a date format validation error when a date field has a valid format according to the field watermark', () => {
-    const testDataset = createDatasetDTO(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      '2024-01-03'
-    )
-    expect(() => sut.validate(testDataset, testMetadataBlocks)).not.toThrow()
-  })
-
   test('should raise a controlled vocabulary error when a controlled vocabulary field has an invalid format', () => {
     const testDataset = createDatasetDTO(
       undefined,

@@ -93,7 +93,8 @@ const transformFilePayloadToFile = (filePayload: FilePayload): FileModel => {
     }),
     ...(filePayload.dataFile.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(filePayload.dataFile.isPartOf)
-    })
+    }),
+    lastUpdateTime: filePayload.dataFile.lastUpdateTime
   }
 }
 

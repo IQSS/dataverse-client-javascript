@@ -2076,6 +2076,8 @@ The `collectionIdOrAlias` is a generic collection identifier, which can be eithe
 
 There is a second optional parameter called `onlyDisplayedOnCreate` which indicates whether or not to return only the metadata blocks that are displayed on dataset creation. The default value is false.
 
+There is a third optional parameter called `datasetType` which will include additional fields from metadata blocks linked to the provided type, if any. Before using this parameter, you will probably want to [list available dataset types](#get-dataset-available-dataset-types) for your installation.
+
 ## Users
 
 ### Users read use cases

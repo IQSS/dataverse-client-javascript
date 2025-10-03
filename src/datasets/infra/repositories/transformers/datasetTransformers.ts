@@ -235,7 +235,7 @@ export const transformVersionPayloadToDataset = (
       minorNumber: versionPayload.versionMinorNumber,
       state: versionPayload.versionState as DatasetVersionState,
       createTime: new Date(versionPayload.createTime),
-      lastUpdateTime: new Date(versionPayload.lastUpdateTime),
+      lastUpdateTime: versionPayload.lastUpdateTime,
       releaseTime: new Date(versionPayload.releaseTime),
       deaccessionNote: versionPayload.deaccessionNote
     },

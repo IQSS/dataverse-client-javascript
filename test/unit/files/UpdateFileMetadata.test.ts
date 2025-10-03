@@ -13,7 +13,11 @@ describe('UpdateFileMetadata', () => {
 
     await sut.execute(1, testFileMetadata)
 
-    expect(filesRepositoryStub.updateFileMetadata).toHaveBeenCalledWith(1, testFileMetadata)
+    expect(filesRepositoryStub.updateFileMetadata).toHaveBeenCalledWith(
+      1,
+      testFileMetadata,
+      undefined
+    )
     expect(filesRepositoryStub.updateFileMetadata).toHaveBeenCalledTimes(1)
   })
 
@@ -28,7 +32,8 @@ describe('UpdateFileMetadata', () => {
 
     expect(filesRepositoryStub.updateFileMetadata).toHaveBeenCalledWith(
       'doi:10.5072/FK2/HC6KTB',
-      testFileMetadata
+      testFileMetadata,
+      undefined
     )
     expect(filesRepositoryStub.updateFileMetadata).toHaveBeenCalledTimes(1)
   })
@@ -41,6 +46,10 @@ describe('UpdateFileMetadata', () => {
     const sut = new UpdateFileMetadata(filesRepositoryStub)
 
     await expect(sut.execute(1, testFileMetadata)).rejects.toThrow(WriteError)
-    expect(filesRepositoryStub.updateFileMetadata).toHaveBeenCalledWith(1, testFileMetadata)
+    expect(filesRepositoryStub.updateFileMetadata).toHaveBeenCalledWith(
+      1,
+      testFileMetadata,
+      undefined
+    )
   })
 })

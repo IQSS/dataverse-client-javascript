@@ -41,8 +41,6 @@ npm version 3.5.0 --no-git-tag-version
 
 This command will update the version in the `package.json` and `package-lock.json`.
 
-If everything looks good, you can push the changes to the repository.
-
 ## Update the changelog
 
 **Note**: Contributors should have already added their changes to the `[Unreleased]` section as part of their pull requests (see [CONTRIBUTING.md](../.github/CONTRIBUTING.md#changelog-guidelines) for details).
@@ -86,8 +84,9 @@ Before releasing, ensure the changelog is properly prepared:
    ### Removed
    ```
 
-4. **Update the version links** at the bottom of the changelog files
-5. **Commit the changelog updates** as part of the release preparation
+4. **Commit the changelog updates** as part of the release preparation
+
+If everything looks good, you can push the changes to the repository.
 
 ## Merge "release branch" into "main"
 

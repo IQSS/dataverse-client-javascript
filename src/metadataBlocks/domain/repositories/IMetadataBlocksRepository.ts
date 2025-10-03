@@ -5,7 +5,8 @@ export interface IMetadataBlocksRepository {
 
   getCollectionMetadataBlocks(
     collectionIdOrAlias: number | string,
-    onlyDisplayedOnCreate: boolean
+    onlyDisplayedOnCreate: boolean,
+    datasetType?: string
   ): Promise<MetadataBlock[]>
 
   getAllMetadataBlocks(): Promise<MetadataBlock[]>

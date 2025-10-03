@@ -72,7 +72,8 @@ export interface IFilesRepository {
 
   updateFileMetadata(
     fileId: number | string,
-    updateFileMetadataDTO: UpdateFileMetadataDTO
+    updateFileMetadataDTO: UpdateFileMetadataDTO,
+    sourceLastUpdateTime?: string
   ): Promise<void>
 
   updateFileTabularTags(

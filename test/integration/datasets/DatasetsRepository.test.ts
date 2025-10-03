@@ -235,7 +235,6 @@ describe('DatasetsRepository', () => {
           false
         )
         expect(actual.id).toBe(testDatasetIds.numericId)
-        expect(actual.internalVersionNumber).toBe(1)
       })
 
       test('should return dataset when it is deaccessioned and includeDeaccessioned param is set', async () => {
@@ -1132,8 +1131,8 @@ describe('DatasetsRepository', () => {
         }
       ])
     })
-    // TODO: add this test when https://github.com/IQSS/dataverse-client-javascript/issues/343 is fixed
-    test.skip('should throw error if trying to update an outdated internal version dataset', async () => {
+
+    test('should throw error if sending an outdated lastUpdateTime', async () => {
       const testDataset = {
         metadataBlockValues: [
           {
@@ -1184,35 +1183,27 @@ describe('DatasetsRepository', () => {
         false,
         false
       )
-      const actualCreatedDatasetInternalVersionNumber = actualCreatedDataset.internalVersionNumber
+      const firstLastUpdateTime = actualCreatedDataset.versionInfo.lastUpdateTime
 
-      expect(actualCreatedDataset.internalVersionNumber).toBe(1)
-
-      // Now update the dataset and then update again with the same internal version number
+      // Now update the dataset and then update again with the same source last update time
       const updatedDsDescription = 'This is the updated description of the dataset.'
       testDataset.metadataBlockValues[0].fields.dsDescription[0].dsDescriptionValue =
         updatedDsDescription
 
-      // First update sending the correct internal version number
+      // Wait for 2 seconds
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      // First update sending the correct lastUpdateTime
       await sut.updateDataset(
         createdDataset.numericId,
         testDataset,
         [citationMetadataBlock],
-        actualCreatedDatasetInternalVersionNumber
+        firstLastUpdateTime
       )
 
-      const afterFirstUpdateDataset = await sut.getDataset(
-        createdDataset.numericId,
-        DatasetNotNumberedVersion.LATEST,
-        false,
-        false
-      )
-
-      expect(afterFirstUpdateDataset.internalVersionNumber).toBe(2)
-
-      //Now try to update again with the previous internal version number
+      //Now try to update again with the previous lastUpdateTime
       const expectedError = new WriteError(
-        `[400] Dataset internal version number ${actualCreatedDatasetInternalVersionNumber} is outdated`
+        `[400] Internal version timestamp ${firstLastUpdateTime} is outdated`
       )
 
       await expect(
@@ -1220,7 +1211,7 @@ describe('DatasetsRepository', () => {
           createdDataset.numericId,
           testDataset,
           [citationMetadataBlock],
-          actualCreatedDatasetInternalVersionNumber
+          firstLastUpdateTime
         )
       ).rejects.toThrow(expectedError)
     })

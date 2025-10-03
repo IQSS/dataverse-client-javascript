@@ -252,16 +252,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     datasetId: string | number,
     dataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    internalVersionNumber?: number
+    sourceLastUpdateTime?: string
   ): Promise<void> {
     return this.doPut(
       this.buildApiEndpoint(this.datasetsResourceName, `editMetadata`, datasetId),
       transformDatasetModelToUpdateDatasetRequestPayload(dataset, datasetMetadataBlocks),
       {
         replace: true,
-        ...(typeof internalVersionNumber === 'number' && {
-          sourceInternalVersionNumber: internalVersionNumber
-        })
+        ...(sourceLastUpdateTime && { sourceLastUpdateTime })
       }
     )
       .then(() => undefined)
