@@ -8,6 +8,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- New Use Case: Get Collections For Linking.
+
 ### Changed
 
 ### Fixed
