@@ -30,6 +30,12 @@ export interface FileModel {
   tabularTags?: string[]
   creationDate?: string
   publicationDate?: string
+  /**
+   * The timestamp of the last update to this file record.
+   * Format: ISO 8601 string (e.g., "2023-06-01T12:34:56Z").
+   * Used for optimistic concurrency control to detect concurrent updates.
+   */
+  lastUpdateTime: string
   deleted: boolean
   tabularData: boolean
   fileAccessRequest?: boolean

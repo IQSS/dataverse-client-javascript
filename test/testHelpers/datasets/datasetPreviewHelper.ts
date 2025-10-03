@@ -25,7 +25,7 @@ export const createDatasetPreviewModel = (): DatasetPreview => {
       minorNumber: 0,
       state: DatasetVersionState.RELEASED,
       createTime: new Date(DATASET_CREATE_TIME_STR),
-      lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
+      lastUpdateTime: DATASET_UPDATE_TIME_STR,
       releaseTime: new Date(DATASET_RELEASE_TIME_STR)
     },
     citation: DATASET_CITATION_HTML,
