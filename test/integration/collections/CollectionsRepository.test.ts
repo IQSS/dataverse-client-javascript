@@ -1381,7 +1381,7 @@ describe('CollectionsRepository', () => {
     })
 
     it('should return error when the dvObjectIdentifier of a file does not exist', async () => {
-      const invalidFileId = '99'
+      const invalidFileId = '99999999'
       const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
         {
           type: FeaturedItemType.FILE,

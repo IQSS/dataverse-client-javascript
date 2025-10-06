@@ -183,4 +183,26 @@ describe('NotificationsRepository', () => {
       expectedError
     )
   })
+  test('should only return unread notifications when onlyUnread is true', async () => {
+    const notifications: Notification[] = await sut.getAllNotificationsByUser(true, true)
+
+    expect(Array.isArray(notifications)).toBe(true)
+    const originalUnreadCount = notifications.length
+    expect(notifications.length).toBeGreaterThanOrEqual(0)
+
+    await expect(sut.markNotificationAsRead(notifications[0].id)).resolves.toBeUndefined()
+
+    const updatedNotifications: Notification[] = await sut.getAllNotificationsByUser(true, true)
+    expect(updatedNotifications.length).toBe(originalUnreadCount - 1)
+
+    const hasReadNotifications = notifications.some((n) => n.displayAsRead === true)
+    expect(hasReadNotifications).toBe(false)
+  })
+  test('should return limited number of notifications when limit is set', async () => {
+    const limit = 1
+    const notifications: Notification[] = await sut.getAllNotificationsByUser(true, false, limit, 0)
+
+    expect(Array.isArray(notifications)).toBe(true)
+    expect(notifications.length).toBeLessThanOrEqual(limit)
+  })
 })
