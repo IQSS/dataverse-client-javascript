@@ -34,4 +34,13 @@ describe('execute', () => {
     expect(notifications[0]).toHaveProperty('sentTimestamp')
     expect(notifications[0]).toHaveProperty('displayAsRead')
   })
+  test('should have correct in-app notification properties when filter and paging params are set', async () => {
+    const notifications = await getAllNotificationsByUser.execute(true, true, 1, 0)
+
+    expect(notifications[0]).toHaveProperty('id')
+    expect(notifications[0]).toHaveProperty('type')
+    expect(notifications[0]).toHaveProperty('sentTimestamp')
+    expect(notifications[0]).toHaveProperty('displayAsRead')
+    expect(notifications.length).toBeLessThanOrEqual(1)
+  })
 })

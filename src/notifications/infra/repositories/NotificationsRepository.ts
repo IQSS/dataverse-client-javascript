@@ -7,13 +7,22 @@ export class NotificationsRepository extends ApiRepository implements INotificat
   private readonly notificationsResourceName: string = 'notifications'
 
   public async getAllNotificationsByUser(
-    inAppNotificationFormat?: boolean
+    inAppNotificationFormat?: boolean,
+    onlyUnread?: boolean,
+    limit?: number,
+    offset?: number
   ): Promise<Notification[]> {
-    const queryParams = inAppNotificationFormat ? { inAppNotificationFormat: 'true' } : undefined
+    const queryParams: Record<string, string | number> = {}
+
+    if (inAppNotificationFormat) queryParams.inAppNotificationFormat = 'true'
+    if (onlyUnread) queryParams.onlyUnread = 'true'
+    if (limit !== undefined) queryParams.limit = limit
+    if (offset !== undefined) queryParams.offset = offset
+
     return this.doGet(
       this.buildApiEndpoint(this.notificationsResourceName, 'all'),
       true,
-      queryParams
+      Object.keys(queryParams).length ? queryParams : undefined
     )
       .then((response) => {
         const notifications = response.data.data.notifications
