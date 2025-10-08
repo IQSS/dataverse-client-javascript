@@ -8,9 +8,13 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- In GetAllNotificationsByUser use case, added support for filtering unread messages and pagination.
+
 ### Changed
 
 ### Fixed
+
+- In GetAllNotificationsByUser use case, additionalInfo field is returned as an object instead of a string.
 
 ### Removed
 
