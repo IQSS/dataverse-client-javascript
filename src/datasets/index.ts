@@ -32,6 +32,7 @@ import { SetAvailableLicensesForDatasetType } from './domain/useCases/SetAvailab
 import { DeleteDatasetType } from './domain/useCases/DeleteDatasetType'
 import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
 import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
+import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -80,6 +81,7 @@ const setAvailableLicensesForDatasetType = new SetAvailableLicensesForDatasetTyp
 const deleteDatasetType = new DeleteDatasetType(datasetsRepository)
 const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
 const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
+const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 
 export {
   getDataset,
@@ -104,6 +106,7 @@ export {
   getDatasetAvailableCategories,
   getDatasetCitationInOtherFormats,
   getDatasetTemplates,
+  updateTermsOfAccess,
   getDatasetAvailableDatasetTypes,
   getDatasetAvailableDatasetType,
   addDatasetType,

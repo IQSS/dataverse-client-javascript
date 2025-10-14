@@ -1012,6 +1012,38 @@ The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/d
 - `VersionUpdateType.MAJOR`
 - `VersionUpdateType.UPDATE_CURRENT`
 
+#### Update Terms of Access
+
+Updates the Terms of Access for restricted files on a dataset.
+
+##### Example call:
+
+```typescript
+import { updateTermsOfAccess } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 3
+
+await updateTermsOfAccess.execute(datasetId, {
+  fileAccessRequest: true,
+  termsOfAccessForRestrictedFiles: 'Your terms of access for restricted files',
+  dataAccessPlace: 'Your data access place',
+  originalArchive: 'Your original archive',
+  availabilityStatus: 'Your availability status',
+  contactForAccess: 'Your contact for access',
+  sizeOfCollection: 'Your size of collection',
+  studyCompletion: 'Your study completion'
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/UpdateTermsOfAccess.ts) implementation_.
+
+Notes:
+
+- If the dataset is already published, this action creates a DRAFT version containing the new terms.
+- Unspecified fields are treated as omissions: sending only `fileAccessRequest` will update that field and leave all other terms absent (undefined). In practice, the new values you send fully replace the previous set of terms — so if you omit a field, you are effectively clearing it unless you include its original value in the new input.
+
 #### Deaccession a Dataset
 
 Deaccession a Dataset, given its identifier, version, and deaccessionDatasetDTO to perform.
