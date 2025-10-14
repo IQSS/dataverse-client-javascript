@@ -11,17 +11,9 @@ export class GetAllNotificationsByUser implements UseCase<Notification[]> {
    * @param inAppNotificationFormat - Optional parameter to retrieve fields needed for in-app notifications
    * @returns {Promise<Notification[]>} - A promise that resolves to an array of Notification instances.
    */
-  async execute(
-    inAppNotificationFormat?: boolean,
-    onlyUnread?: boolean,
-    limit?: number,
-    offset?: number
-  ): Promise<Notification[]> {
+  async execute(inAppNotificationFormat?: boolean): Promise<Notification[]> {
     return (await this.notificationsRepository.getAllNotificationsByUser(
-      inAppNotificationFormat,
-      onlyUnread,
-      limit,
-      offset
+      inAppNotificationFormat
     )) as Notification[]
   }
 }

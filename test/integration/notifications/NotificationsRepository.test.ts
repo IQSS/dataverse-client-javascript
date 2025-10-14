@@ -9,11 +9,7 @@ import {
   NotificationType
 } from '../../../src/notifications/domain/models/Notification'
 import { createDataset, CreatedDatasetIdentifiers } from '../../../src/datasets'
-import {
-  publishDatasetViaApi,
-  waitForNoLocks,
-  deletePublishedDatasetViaApi
-} from '../../testHelpers/datasets/datasetHelper'
+import { publishDatasetViaApi, waitForNoLocks } from '../../testHelpers/datasets/datasetHelper'
 import { WriteError } from '../../../src'
 import { createCollection } from '../../../src/collections'
 import {
@@ -99,24 +95,7 @@ describe('NotificationsRepository', () => {
     expect(notification).toHaveProperty('displayAsRead')
   })
 
-  test('should return only unread notifications when onlyUnread is true (if any exist)', async () => {
-    const notifications: Notification[] = await sut.getAllNotificationsByUser(true, true)
-
-    expect(Array.isArray(notifications)).toBe(true)
-    expect(Array.isArray(notifications)).toBe(true)
-    expect(notifications.every((n) => n.displayAsRead === false)).toBe(true)
-  })
-
-  test('should paginate results using limit and offset', async () => {
-    const limit = 1
-    const page1: Notification[] = await sut.getAllNotificationsByUser(true, undefined, limit, 0)
-    const page2: Notification[] = await sut.getAllNotificationsByUser(true, undefined, limit, 1)
-
-    expect(page1.length).toBeLessThanOrEqual(limit)
-    expect(page2.length).toBeLessThanOrEqual(limit)
-
-    // Always run the assertion, but only if both pages have one notification each
-    expect(page1.length !== 1 || page2.length !== 1 || page1[0].id !== page2[0].id).toBe(true)
+  test('should find notification with ASSIGNROLE type that has not been deleted', async () => {
     const notifications: Notification[] = await sut.getAllNotificationsByUser(true)
 
     const assignRoleNotification = notifications.find(
@@ -135,46 +114,6 @@ describe('NotificationsRepository', () => {
     expect(assignRoleNotification?.roleAssignments?.[0]).toHaveProperty('assignee')
     expect(assignRoleNotification?.roleAssignments?.[0]).toHaveProperty('roleId')
     expect(assignRoleNotification?.roleAssignments?.[0]).toHaveProperty('definitionPointId')
-  })
-
-  test('should generate 5+ notifications and verify pagination across pages', async () => {
-    const createdDatasets: CreatedDatasetIdentifiers[] = []
-    try {
-      const howMany = 5
-      for (let i = 0; i < howMany; i++) {
-        const ids = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-        createdDatasets.push(ids)
-        await publishDatasetViaApi(ids.numericId)
-        await waitForNoLocks(ids.numericId, 10)
-      }
-
-      const limit = 5
-      const page1: Notification[] = await sut.getAllNotificationsByUser(true, undefined, limit, 0)
-      const page2: Notification[] = await sut.getAllNotificationsByUser(true, undefined, limit, 5)
-      const page3: Notification[] = await sut.getAllNotificationsByUser(true, undefined, limit, 10)
-      expect(page1.length).toBeLessThanOrEqual(limit)
-      expect(page2.length).toBeLessThanOrEqual(limit)
-      expect(page3.length).toBeLessThanOrEqual(limit)
-
-      const ids1 = new Set(page1.map((n) => n.id))
-      const ids2 = new Set(page2.map((n) => n.id))
-      const ids3 = new Set(page3.map((n) => n.id))
-
-      const intersects = (a: Set<number>, b: Set<number>): boolean => {
-        for (const x of a) {
-          if (b.has(x)) return true
-        }
-        return false
-      }
-
-      expect(page1.length === 0 || page2.length === 0 || !intersects(ids1, ids2)).toBe(true)
-      expect(page1.length === 0 || page3.length === 0 || !intersects(ids1, ids3)).toBe(true)
-      expect(page2.length === 0 || page3.length === 0 || !intersects(ids2, ids3)).toBe(true)
-    } finally {
-      for (const d of createdDatasets) {
-        await deletePublishedDatasetViaApi(d.persistentId)
-      }
-    }
   })
 
   test('should create a collection and find the notification with CREATEDV type', async () => {
