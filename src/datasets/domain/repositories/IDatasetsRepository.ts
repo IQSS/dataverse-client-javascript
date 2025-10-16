@@ -14,6 +14,7 @@ import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
 import { DatasetTemplate } from '../models/DatasetTemplate'
 import { DatasetType } from '../models/DatasetType'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -90,4 +91,5 @@ export interface IDatasetsRepository {
     licenses: string[]
   ): Promise<void>
   deleteDatasetType(datasetTypeId: number): Promise<void>
+  getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver>
 }

@@ -32,6 +32,7 @@ import { SetAvailableLicensesForDatasetType } from './domain/useCases/SetAvailab
 import { DeleteDatasetType } from './domain/useCases/DeleteDatasetType'
 import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
 import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
+import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -80,6 +81,7 @@ const setAvailableLicensesForDatasetType = new SetAvailableLicensesForDatasetTyp
 const deleteDatasetType = new DeleteDatasetType(datasetsRepository)
 const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
 const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
+const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 
 export {
   getDataset,
@@ -109,7 +111,8 @@ export {
   addDatasetType,
   linkDatasetTypeWithMetadataBlocks,
   setAvailableLicensesForDatasetType,
-  deleteDatasetType
+  deleteDatasetType,
+  getDatasetStorageDriver
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'

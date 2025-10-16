@@ -29,6 +29,7 @@ import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
 import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 import { DatasetType } from '../../domain/models/DatasetType'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -445,6 +446,17 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async deleteDatasetType(datasetTypeId: number): Promise<void> {
     return this.doDelete(
       this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes/' + datasetTypeId)
+    )
+      .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, `storageDriver`, datasetId),
+      true
     )
       .then((response) => response.data.data)
       .catch((error) => {
