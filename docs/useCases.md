@@ -41,6 +41,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Templates](#get-dataset-templates)
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
+    - [Get Dataset Storage Driver](#get-dataset-storage-driver)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -855,6 +856,28 @@ getDatasetAvailableDatasetType.execute().then((datasetType: DatasetType) => {
 ```
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetType.ts) implementation_.
+
+#### Get Dataset Storage Driver
+
+Returns the current [StorageDriver](../src/core/domain/models/StorageDriver.ts) used for a dataset.
+
+##### Example call:
+
+```typescript
+import { getDatasetStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetStorageDriver.execute(datasetId).then((storageDriver: StorageDriver) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetStorageDriver.ts) implementation_.
 
 ### Datasets Write Use Cases
 
