@@ -12,6 +12,7 @@ import { CollectionItemType } from '../../../collections/domain/models/Collectio
 import { CollectionLinks } from '../models/CollectionLinks'
 import { CollectionSummary } from '../models/CollectionSummary'
 import { LinkingObjectType } from '../useCases/GetCollectionsForLinking'
+import { TemplateCreateDTO } from '../dtos/TemplateCreateDTO'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -68,4 +69,5 @@ export interface ICollectionsRepository {
     searchTerm: string,
     alreadyLinked: boolean
   ): Promise<CollectionSummary[]>
+  createTemplate(collectionIdOrAlias: number | string, template: TemplateCreateDTO): Promise<void>
 }

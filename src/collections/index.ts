@@ -16,6 +16,7 @@ import { LinkCollection } from './domain/useCases/LinkCollection'
 import { UnlinkCollection } from './domain/useCases/UnlinkCollection'
 import { GetCollectionLinks } from './domain/useCases/GetCollectionLinks'
 import { GetCollectionsForLinking } from './domain/useCases/GetCollectionsForLinking'
+import { CreateTemplate } from './domain/useCases/CreateTemplate'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -36,6 +37,7 @@ const linkCollection = new LinkCollection(collectionsRepository)
 const unlinkCollection = new UnlinkCollection(collectionsRepository)
 const getCollectionLinks = new GetCollectionLinks(collectionsRepository)
 const getCollectionsForLinking = new GetCollectionsForLinking(collectionsRepository)
+const createTemplate = new CreateTemplate(collectionsRepository)
 
 export {
   getCollection,
@@ -54,7 +56,8 @@ export {
   linkCollection,
   unlinkCollection,
   getCollectionLinks,
-  getCollectionsForLinking
+  getCollectionsForLinking,
+  createTemplate
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'
