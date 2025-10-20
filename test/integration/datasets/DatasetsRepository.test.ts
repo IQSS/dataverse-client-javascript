@@ -1484,6 +1484,69 @@ describe('DatasetsRepository', () => {
     })
   })
 
+  describe('getDatasetStorageDriver', () => {
+    const testStorageDriverCollectionAlias = 'testDatasetStorageDriverCollection'
+    let testDatasetId: number
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testStorageDriverCollectionAlias)
+      await publishCollectionViaApi(testStorageDriverCollectionAlias)
+      // await setStorageDriverViaApi(testStorageDriverCollectionAlias, 'LocalStack')
+
+      const { numericId } = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testStorageDriverCollectionAlias
+      )
+      testDatasetId = numericId
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(testDatasetId)
+      await deleteCollectionViaApi(testStorageDriverCollectionAlias)
+    })
+
+    test('should return correct storage driver', async () => {
+      const actual = await sut.getDatasetStorageDriver(testDatasetId)
+
+      console.log(actual)
+
+      expect(actual).toBeDefined()
+      expect(actual.name).toBe('local')
+      expect(actual.type).toBe('s3')
+      expect(actual.label).toBe('Local')
+
+      /*
+
+      -Ddataverse.files.localstack1.type=s3
+      -Ddataverse.files.localstack1.label=LocalStack
+      -Ddataverse.files.localstack1.upload-redirect=true
+      -Ddataverse.files.localstack1.download-redirect=true
+      {
+        name: 'localstack1',
+        type: 's3',
+        label: 'LocalStack',
+        directUpload: false,
+        directDownload: true
+      }
+
+      {
+        name: 'local',
+        type: 'file',
+        label: 'Local',
+        directUpload: false,
+        directDownload: false
+      }
+
+      */
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetStorageDriver(nonExistentTestDatasetId)).rejects.toBeInstanceOf(
+        ReadError
+      )
+    })
+  })
+
   describe('getDatasetDownloadCount', () => {
     const testGetDatasetDownloadCountCollectionAlias = 'testGetDatasetDownloadCountCollection'
     let testDatasetIds: CreatedDatasetIdentifiers
