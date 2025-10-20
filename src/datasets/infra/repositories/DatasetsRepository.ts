@@ -29,6 +29,7 @@ import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
 import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 import { DatasetType } from '../../domain/models/DatasetType'
+import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -416,7 +417,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async addDatasetType(datasetType: DatasetType): Promise<DatasetType> {
+  public async addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType> {
     return this.doPost(
       this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'),
       datasetType
