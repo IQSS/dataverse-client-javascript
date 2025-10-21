@@ -2,6 +2,7 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { INotificationsRepository } from '../../domain/repositories/INotificationsRepository'
 import { Notification } from '../../domain/models/Notification'
 import { NotificationPayload } from '../transformers/NotificationPayload'
+import { NotificationSubset } from '../../domain/models/NotificationSubset'
 
 export class NotificationsRepository extends ApiRepository implements INotificationsRepository {
   private readonly notificationsResourceName: string = 'notifications'
@@ -11,22 +12,24 @@ export class NotificationsRepository extends ApiRepository implements INotificat
     onlyUnread?: boolean,
     limit?: number,
     offset?: number
-  ): Promise<Notification[]> {
-    const queryParams: Record<string, string | number> = {}
+  ): Promise<NotificationSubset> {
+    const queryParams = new URLSearchParams()
 
-    if (inAppNotificationFormat) queryParams.inAppNotificationFormat = 'true'
-    if (onlyUnread) queryParams.onlyUnread = 'true'
-    if (limit !== undefined) queryParams.limit = limit
-    if (offset !== undefined) queryParams.offset = offset
-
+    if (inAppNotificationFormat) queryParams.set('inAppNotificationFormat', 'true')
+    if (onlyUnread) queryParams.set('onlyUnread', 'true')
+    if (limit !== undefined) queryParams.set('limit', limit.toString())
+    if (offset !== undefined) queryParams.set('offset', offset.toString())
+    console.log('Fetching notifications with params:', queryParams.toString())
+    console.log('keys:', Array.from(queryParams.keys()))
+    console.log('length:', Object.keys(queryParams).length)
     return this.doGet(
       this.buildApiEndpoint(this.notificationsResourceName, 'all'),
       true,
-      Object.keys(queryParams).length ? queryParams : undefined
+      queryParams
     )
       .then((response) => {
-        const notifications = response.data.data.notifications
-        return notifications.map((notification: NotificationPayload) => {
+        console.log('Notifications API response:', response.data)
+        const notifications = response.data.data.map((notification: NotificationPayload) => {
           const { dataverseDisplayName, dataverseAlias, ...restNotification } = notification
           return {
             ...restNotification,
@@ -34,6 +37,8 @@ export class NotificationsRepository extends ApiRepository implements INotificat
             ...(dataverseAlias && { collectionAlias: dataverseAlias })
           }
         }) as Notification[]
+        const totalNotificationCount = response.data.totalCount
+        return { notifications, totalNotificationCount }
       })
       .catch((error) => {
         throw error

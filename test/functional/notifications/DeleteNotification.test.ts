@@ -12,12 +12,14 @@ describe('execute', () => {
   })
 
   test('should successfully delete a notification for authenticated user', async () => {
-    const notifications = await getAllNotificationsByUser.execute()
+    const notificationSubset = await getAllNotificationsByUser.execute()
+    const notifications = notificationSubset.notifications
     const notificationId = notifications[notifications.length - 1].id
 
     await deleteNotification.execute(notificationId)
 
-    const notificationsAfterDelete = await getAllNotificationsByUser.execute()
+    const notificationsAfterDeleteSubset = await getAllNotificationsByUser.execute()
+    const notificationsAfterDelete = notificationsAfterDeleteSubset.notifications
     expect(notificationsAfterDelete.length).toBe(notifications.length - 1)
   })
 

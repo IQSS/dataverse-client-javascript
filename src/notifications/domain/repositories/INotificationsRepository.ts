@@ -1,4 +1,4 @@
-import { Notification } from '../models/Notification'
+import { NotificationSubset } from '../models/NotificationSubset'
 
 export interface INotificationsRepository {
   getAllNotificationsByUser(
@@ -6,7 +6,7 @@ export interface INotificationsRepository {
     onlyUnread?: boolean,
     limit?: number,
     offset?: number
-  ): Promise<Notification[]>
+  ): Promise<NotificationSubset>
   deleteNotification(notificationId: number): Promise<void>
   getUnreadNotificationsCount(): Promise<number>
   markNotificationAsRead(notificationId: number): Promise<void>
