@@ -3,7 +3,7 @@ import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { getDatasetTemplates } from '../../../src/datasets'
 import { TemplateCreateDTO } from '../../../src/collections/domain/dtos/TemplateCreateDTO'
-import { createTemplate } from '../../../src/collections'
+import { createDatasetTemplate } from '../../../src/collections'
 import { MetadataFieldTypeClass } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
@@ -48,7 +48,7 @@ describe('CreateTemplate.execute', () => {
         }
       ]
     }
-    await createTemplate.execute(templateDto)
+    await createDatasetTemplate.execute(templateDto)
     const templates = await getDatasetTemplates.execute(':root')
 
     expect(templates[templates.length - 1].name).toBe(templateDto.name)

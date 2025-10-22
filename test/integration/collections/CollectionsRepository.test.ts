@@ -17,7 +17,7 @@ import {
   restrictFile,
   deleteFile,
   linkDataset,
-  createTemplate,
+  createDatasetTemplate,
   MetadataFieldTypeClass
 } from '../../../src'
 import { ApiConfig } from '../../../src'
@@ -2149,7 +2149,7 @@ describe('CollectionsRepository', () => {
     })
   })
 
-  describe('createTemplate', () => {
+  describe('createDatasetTemplate', () => {
     const templateDto: TemplateCreateDTO = {
       name: 'CollectionsRepository template',
       isDefault: true,
@@ -2182,7 +2182,7 @@ describe('CollectionsRepository', () => {
       ]
     }
     test('should create a template in :root with provided JSON', async () => {
-      await createTemplate.execute(templateDto)
+      await createDatasetTemplate.execute(templateDto)
       const templates = await getDatasetTemplates.execute(':root')
 
       expect(templates[templates.length - 1].name).toBe(templateDto.name)
@@ -2198,9 +2198,9 @@ describe('CollectionsRepository', () => {
       const expectedError = new WriteError(
         `[404] Can't find dataverse with identifier='invalidCollectionAlias'`
       )
-      await expect(createTemplate.execute(templateDto, 'invalidCollectionAlias')).rejects.toThrow(
-        expectedError
-      )
+      await expect(
+        createDatasetTemplate.execute(templateDto, 'invalidCollectionAlias')
+      ).rejects.toThrow(expectedError)
     })
   })
 })

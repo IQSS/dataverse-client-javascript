@@ -530,7 +530,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
-  public async createTemplate(
+  public async createDatasetTemplate(
     collectionIdOrAlias: number | string,
     template: TemplateCreateDTO
   ): Promise<void> {

@@ -2,7 +2,7 @@ import { MetadataFieldTypeClass } from '../../../metadataBlocks/domain/models/Me
 
 export interface TemplateCreateDTO {
   name: string
-  isDefault: boolean | false // defaults to false if not provided
+  isDefault?: boolean
   fields?: TemplateFieldDTO[]
   instructions?: TemplateInstructionDTO[]
 }
@@ -10,8 +10,8 @@ export interface TemplateCreateDTO {
 export interface TemplateFieldDTO {
   typeName: string
   multiple: boolean
-  typeClass: MetadataFieldTypeClass
-  value: TemplateFieldValueDTO[]
+  typeClass?: MetadataFieldTypeClass
+  value?: TemplateFieldValueDTO[]
 }
 
 export interface TemplateFieldValueDTO {

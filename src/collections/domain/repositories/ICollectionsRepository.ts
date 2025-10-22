@@ -69,5 +69,8 @@ export interface ICollectionsRepository {
     searchTerm: string,
     alreadyLinked: boolean
   ): Promise<CollectionSummary[]>
-  createTemplate(collectionIdOrAlias: number | string, template: TemplateCreateDTO): Promise<void>
+  createDatasetTemplate(
+    collectionIdOrAlias: number | string,
+    template: TemplateCreateDTO
+  ): Promise<void>
 }

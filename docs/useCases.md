@@ -18,7 +18,7 @@ The different use cases currently available in the package are classified below,
     - [Get Collection Featured Items](#get-collection-featured-items)
     - [Get Collections for Linking](#get-collections-for-linking)
   - [Collections write use cases](#collections-write-use-cases)
-    - [Create a Template](#create-a-template)
+    - [Create a Dataset Template](#create-a-dataset-template)
     - [Create a Collection](#create-a-collection)
     - [Update a Collection](#update-a-collection)
     - [Publish a Collection](#publish-a-collection)
@@ -568,14 +568,14 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
-#### Create a Template
+#### Create a Dataset Template
 
-Creates a template for a given Dataverse collection id or alias.
+Creates a dataset template for a given Dataverse collection id or alias.
 
 ##### Example call:
 
 ```typescript
-import { createTemplate } from '@iqss/dataverse-client-javascript'
+import { createDatasetTemplate } from '@iqss/dataverse-client-javascript'
 import { TemplateCreateDTO } from '@iqss/dataverse-client-javascript'
 
 const collectionAlias = ':root'
@@ -598,10 +598,10 @@ const template: TemplateCreateDTO = {
   instructions: [{ instructionField: 'author', instructionText: 'The author data' }]
 }
 
-await createTemplate.execute(template, collectionAlias)
+await createDatasetTemplate.execute(template, collectionAlias)
 ```
 
-_See [use case](../src/collections/domain/useCases/CreateTemplate.ts) implementation_.
+_See [use case](../src/collections/domain/useCases/CreateDatasetTemplate.ts) implementation_.
 
 ## Datasets
 

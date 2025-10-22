@@ -3,7 +3,7 @@ import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 import { TemplateCreateDTO } from '../dtos/TemplateCreateDTO'
 
-export class CreateTemplate implements UseCase<void> {
+export class CreateDatasetTemplate implements UseCase<void> {
   private collectionsRepository: ICollectionsRepository
 
   constructor(collectionsRepository: ICollectionsRepository) {
@@ -14,13 +14,14 @@ export class CreateTemplate implements UseCase<void> {
    * Creates a Dataset Template in the specified collection.
    *
    * @param {TemplateCreateDTO} template - Template definition payload.
-   * @param {number | string} [collectionIdOrAlias = ':root'] - Target collection id or alias.
+   * @param {number | string} [collectionIdOrAlias = ':root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
+   * If this parameter is not set, the default value is: ':root'.
    * @returns {Promise<void>}
    */
   async execute(
     template: TemplateCreateDTO,
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<void> {
-    return await this.collectionsRepository.createTemplate(collectionIdOrAlias, template)
+    return await this.collectionsRepository.createDatasetTemplate(collectionIdOrAlias, template)
   }
 }
