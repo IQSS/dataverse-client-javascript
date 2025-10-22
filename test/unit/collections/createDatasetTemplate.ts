@@ -1,10 +1,10 @@
 import { CreateDatasetTemplate } from '../../../src/collections/domain/useCases/CreateDatasetTemplate'
 import { ICollectionsRepository } from '../../../src/collections/domain/repositories/ICollectionsRepository'
-import { TemplateCreateDTO } from '../../../src/collections/domain/dtos/TemplateCreateDTO'
+import { CreateDatasetTemplateDTO } from '../../../src/collections/domain/dtos/CreateDatasetTemplateDTO'
 import { WriteError } from '../../../src'
 
 describe('execute', () => {
-  const testTemplateDTO = { name: 't' } as TemplateCreateDTO
+  const testTemplateDTO = { name: 't' } as CreateDatasetTemplateDTO
   const testCollectionId = 1
 
   test('should return undefined when repository call is successful', async () => {

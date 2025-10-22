@@ -1,6 +1,6 @@
 import { MetadataFieldTypeClass } from '../../../metadataBlocks/domain/models/MetadataBlock'
 
-export interface TemplateCreateDTO {
+export interface CreateDatasetTemplateDTO {
   name: string
   isDefault?: boolean
   fields?: TemplateFieldDTO[]

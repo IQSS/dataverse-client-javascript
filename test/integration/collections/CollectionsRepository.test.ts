@@ -60,7 +60,7 @@ import {
   DvObjectFeaturedItemDTO,
   FeaturedItemsDTO
 } from '../../../src/collections/domain/dtos/FeaturedItemsDTO'
-import { TemplateCreateDTO } from '../../../src/collections/domain/dtos/TemplateCreateDTO'
+import { CreateDatasetTemplateDTO } from '../../../src/collections/domain/dtos/CreateDatasetTemplateDTO'
 import { getDatasetTemplates } from '../../../src/datasets'
 import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
@@ -2150,7 +2150,7 @@ describe('CollectionsRepository', () => {
   })
 
   describe('createDatasetTemplate', () => {
-    const templateDto: TemplateCreateDTO = {
+    const templateDto: CreateDatasetTemplateDTO = {
       name: 'CollectionsRepository template',
       isDefault: true,
       fields: [
