@@ -14,6 +14,7 @@ import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
 import { DatasetTemplate } from '../models/DatasetTemplate'
 import { DatasetType } from '../models/DatasetType'
+import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -67,8 +68,8 @@ export interface IDatasetsRepository {
   ): Promise<DatasetDownloadCount>
   getDatasetVersionsSummaries(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]>
   deleteDatasetDraft(datasetId: number | string): Promise<void>
-  linkDataset(datasetId: number, collectionAlias: string): Promise<void>
-  unlinkDataset(datasetId: number, collectionAlias: string): Promise<void>
+  linkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
+  unlinkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
   getDatasetLinkedCollections(datasetId: number | string): Promise<DatasetLinkedCollection[]>
   getDatasetAvailableCategories(datasetId: number | string): Promise<string[]>
   getDatasetCitationInOtherFormats(
@@ -80,7 +81,7 @@ export interface IDatasetsRepository {
   getDatasetTemplates(collectionIdOrAlias: number | string): Promise<DatasetTemplate[]>
   getDatasetAvailableDatasetTypes(): Promise<DatasetType[]>
   getDatasetAvailableDatasetType(datasetTypeId: number | string): Promise<DatasetType>
-  addDatasetType(datasetType: DatasetType): Promise<DatasetType>
+  addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType>
   linkDatasetTypeWithMetadataBlocks(
     datasetTypeId: number | string,
     metadataBlocks: string[]

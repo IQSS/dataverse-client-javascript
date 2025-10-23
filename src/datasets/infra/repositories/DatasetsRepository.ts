@@ -29,6 +29,7 @@ import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
 import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 import { DatasetType } from '../../domain/models/DatasetType'
+import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -327,16 +328,32 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async linkDataset(datasetId: number, collectionAlias: string): Promise<void> {
-    return this.doPut(`/${this.datasetsResourceName}/${datasetId}/link/${collectionAlias}`, {})
+  public async linkDataset(
+    datasetId: number | string,
+    collectionIdOrAlias: number | string
+  ): Promise<void> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `link/${collectionIdOrAlias}`,
+      datasetId
+    )
+    return this.doPut(endpoint, {})
       .then(() => undefined)
       .catch((error) => {
         throw error
       })
   }
 
-  public async unlinkDataset(datasetId: number, collectionAlias: string): Promise<void> {
-    return this.doDelete(`/${this.datasetsResourceName}/${datasetId}/deleteLink/${collectionAlias}`)
+  public async unlinkDataset(
+    datasetId: number | string,
+    collectionIdOrAlias: number | string
+  ): Promise<void> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `deleteLink/${collectionIdOrAlias}`,
+      datasetId
+    )
+    return this.doDelete(endpoint)
       .then(() => undefined)
       .catch((error) => {
         throw error
@@ -400,7 +417,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async addDatasetType(datasetType: DatasetType): Promise<DatasetType> {
+  public async addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType> {
     return this.doPost(
       this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'),
       datasetType
