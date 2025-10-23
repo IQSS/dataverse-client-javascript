@@ -477,9 +477,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   ): Promise<void> {
     return this.doPut(
       this.buildApiEndpoint(this.datasetsResourceName, 'access', datasetId),
-      transformTermsOfAccessToUpdatePayload(
-        termsOfAccess as TermsOfAccess & { termsOfAccess?: string }
-      )
+      transformTermsOfAccessToUpdatePayload(termsOfAccess)
     )
       .then(() => undefined)
       .catch((error) => {
