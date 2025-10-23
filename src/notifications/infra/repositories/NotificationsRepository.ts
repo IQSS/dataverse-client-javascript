@@ -19,16 +19,12 @@ export class NotificationsRepository extends ApiRepository implements INotificat
     if (onlyUnread) queryParams.set('onlyUnread', 'true')
     if (limit !== undefined) queryParams.set('limit', limit.toString())
     if (offset !== undefined) queryParams.set('offset', offset.toString())
-    console.log('Fetching notifications with params:', queryParams.toString())
-    console.log('keys:', Array.from(queryParams.keys()))
-    console.log('length:', Object.keys(queryParams).length)
     return this.doGet(
       this.buildApiEndpoint(this.notificationsResourceName, 'all'),
       true,
       queryParams
     )
       .then((response) => {
-        console.log('Notifications API response:', response.data)
         const notifications = response.data.data.map((notification: NotificationPayload) => {
           const { dataverseDisplayName, dataverseAlias, ...restNotification } = notification
           return {

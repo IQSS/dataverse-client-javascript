@@ -189,22 +189,16 @@ describe('NotificationsRepository', () => {
     const notificationSubset: NotificationSubset = await sut.getAllNotificationsByUser(true, true)
 
     expect(Array.isArray(notificationSubset.notifications)).toBe(true)
-    const originalUnreadCount = notificationSubset.totalNotificationCount
     expect(notificationSubset.notifications.length).toBeGreaterThanOrEqual(0)
+    const notificationToMarkRead = notificationSubset.notifications[0]
+    await expect(sut.markNotificationAsRead(notificationToMarkRead.id)).resolves.toBeUndefined()
 
-    await expect(
-      sut.markNotificationAsRead(notificationSubset.notifications[0].id)
-    ).resolves.toBeUndefined()
-
-    const updatedNotifications: NotificationSubset = await sut.getAllNotificationsByUser(
-      true,
-      true,
-      10,
-      0
+    const updatedNotifications: NotificationSubset = await sut.getAllNotificationsByUser(true, true)
+    const stillPresent = updatedNotifications.notifications.some(
+      (n) => n.id === notificationToMarkRead.id
     )
-    expect(updatedNotifications.totalNotificationCount).toBe(originalUnreadCount - 1)
-
-    const hasReadNotifications = notificationSubset.notifications.some(
+    expect(stillPresent).toBe(false)
+    const hasReadNotifications = updatedNotifications.notifications.some(
       (n) => n.displayAsRead === true
     )
     expect(hasReadNotifications).toBe(false)

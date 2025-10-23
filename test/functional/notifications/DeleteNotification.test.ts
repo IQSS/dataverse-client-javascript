@@ -20,7 +20,8 @@ describe('execute', () => {
 
     const notificationsAfterDeleteSubset = await getAllNotificationsByUser.execute()
     const notificationsAfterDelete = notificationsAfterDeleteSubset.notifications
-    expect(notificationsAfterDelete.length).toBe(notifications.length - 1)
+    const deletedExists = notificationsAfterDelete.some((n) => n.id === notificationId)
+    expect(deletedExists).toBe(false)
   })
 
   test('should throw an error when the notification id does not exist', async () => {
