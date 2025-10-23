@@ -423,10 +423,20 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       })
   }
 
-  public async getFileVersionSummaries(fileId: number | string): Promise<FileVersionSummaryInfo[]> {
+  public async getFileVersionSummaries(
+    fileId: number | string,
+    limit?: number,
+    offset?: number
+  ): Promise<FileVersionSummaryInfo[]> {
+    const queryParams: { per_page?: string; start?: string } = {}
+
+    limit && (queryParams.per_page = limit.toString())
+    offset && (queryParams.start = offset.toString())
+
     return this.doGet(
       this.buildApiEndpoint(this.filesResourceName, 'versionDifferences', fileId),
-      true
+      true,
+      queryParams
     )
       .then((response) => transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo(response))
       .catch((error) => {

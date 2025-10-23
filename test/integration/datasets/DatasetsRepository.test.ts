@@ -1482,6 +1482,65 @@ describe('DatasetsRepository', () => {
         expectedError
       )
     })
+
+    test('should return dataset versions summaries with pagination', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+
+      for (let i = 1; i <= 21; i++) {
+        await sut.updateDataset(
+          testDatasetIds.numericId,
+          {
+            metadataBlockValues: [
+              {
+                name: 'citation',
+                fields: {
+                  title: `Updated Dataset Title - Version ${i}`
+                }
+              }
+            ]
+          },
+          [citationMetadataBlock]
+        )
+
+        await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MINOR)
+        await waitForNoLocks(testDatasetIds.numericId, 10)
+      }
+
+      const firstPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 0)
+
+      expect(firstPage.length).toBe(5)
+      expect(firstPage[0].versionNumber).toBe('1.21')
+      expect(firstPage[4].versionNumber).toBe('1.17')
+
+      // Test pagination with limit=5, offset=5 (second page)
+      const secondPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 5)
+      expect(secondPage.length).toBe(5)
+      expect(secondPage[0].versionNumber).toBe('1.16')
+      expect(secondPage[4].versionNumber).toBe('1.12')
+
+      // Test pagination with limit=5, offset=10 (third page)
+      const thirdPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 10)
+      expect(thirdPage.length).toBe(5)
+      expect(thirdPage[0].versionNumber).toBe('1.11')
+      expect(thirdPage[4].versionNumber).toBe('1.7')
+
+      // Test that all versions are returned without pagination
+      const allVersions = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
+      expect(allVersions.length).toBe(22) // 1 initial + 21 updates
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    }, 180000)
   })
 
   describe('getDatasetDownloadCount', () => {

@@ -858,7 +858,9 @@ getDatasetVersionsSummaries
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetVersionsSummaries.ts) implementation_.
 
-The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+- The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
 
 #### Get Dataset Linked Collections
 
@@ -1983,6 +1985,9 @@ getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionS
 ```
 
 _See [use case](../src/files/domain/useCases/GetFileVersionSummaries.ts) implementation_.
+
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
 
 ## Metadata Blocks
 

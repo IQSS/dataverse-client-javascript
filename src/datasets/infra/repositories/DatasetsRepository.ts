@@ -306,11 +306,19 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetVersionsSummaries(
-    datasetId: string | number
+    datasetId: string | number,
+    limit?: number,
+    offset?: number
   ): Promise<DatasetVersionSummaryInfo[]> {
+    const queryParams: { per_page?: string; start?: string } = {}
+
+    limit && (queryParams.per_page = limit.toString())
+    offset && (queryParams.start = offset.toString())
+
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, 'versions/compareSummary', datasetId),
-      true
+      true,
+      queryParams
     )
       .then((response) => response.data.data)
       .catch((error) => {

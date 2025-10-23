@@ -88,7 +88,11 @@ export interface IFilesRepository {
     replace?: boolean
   ): Promise<void>
 
-  getFileVersionSummaries(fileId: number | string): Promise<FileVersionSummaryInfo[]>
+  getFileVersionSummaries(
+    fileId: number | string,
+    limit?: number,
+    offset?: number
+  ): Promise<FileVersionSummaryInfo[]>
 
   isFileDeleted(fileId: number | string): Promise<boolean>
 }

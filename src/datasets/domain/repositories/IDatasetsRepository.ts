@@ -66,7 +66,11 @@ export interface IDatasetsRepository {
     datasetId: number | string,
     includeMDC?: boolean
   ): Promise<DatasetDownloadCount>
-  getDatasetVersionsSummaries(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]>
+  getDatasetVersionsSummaries(
+    datasetId: number | string,
+    limit?: number,
+    offset?: number
+  ): Promise<DatasetVersionSummaryInfo[]>
   deleteDatasetDraft(datasetId: number | string): Promise<void>
   linkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
   unlinkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>

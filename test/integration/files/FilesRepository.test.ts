@@ -1047,6 +1047,58 @@ describe('FilesRepository', () => {
       deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
     })
 
+    test('should return file version summaries with pagination', async () => {
+      // Create a new dataset and upload a file
+      const paginationTestDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO
+      )
+      await uploadFileViaApi(paginationTestDatasetIds.numericId, testTextFile1Name)
+
+      // Publish initial version (creates version 1.0)
+      await publishDatasetViaApi(paginationTestDatasetIds.numericId)
+      await waitForNoLocks(paginationTestDatasetIds.numericId, 10)
+
+      // Get the file ID
+      const datasetFiles = await sut.getDatasetFiles(
+        paginationTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const paginationTestFile = datasetFiles.files[0]
+
+      for (let i = 1; i <= 21; i++) {
+        await sut.updateFileMetadata(paginationTestFile.id, {
+          description: `File description update ${i}`,
+          label: `updated-file-${i}.txt`
+        })
+
+        await publishDatasetViaApi(paginationTestDatasetIds.numericId)
+        await waitForNoLocks(paginationTestDatasetIds.numericId, 10)
+      }
+
+      const firstPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 0)
+
+      expect(firstPage.length).toBe(5)
+      expect(firstPage[0].datasetVersion).toBe('1.21')
+      expect(firstPage[4].datasetVersion).toBe('1.17')
+
+      const secondPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 5)
+      expect(secondPage.length).toBe(5)
+      expect(secondPage[0].datasetVersion).toBe('1.16')
+      expect(secondPage[4].datasetVersion).toBe('1.12')
+
+      const thirdPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 10)
+      expect(thirdPage.length).toBe(5)
+      expect(thirdPage[0].datasetVersion).toBe('1.11')
+      expect(thirdPage[4].datasetVersion).toBe('1.7')
+
+      const allVersions = await sut.getFileVersionSummaries(paginationTestFile.id)
+      expect(allVersions.length).toBe(22)
+
+      await deletePublishedDatasetViaApi(paginationTestDatasetIds.persistentId)
+    }, 180000)
+
     test('should return error when file does not exist', async () => {
       const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)
 
