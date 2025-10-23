@@ -1892,12 +1892,6 @@ describe('DatasetsRepository', () => {
   describe('updateTermsOfAccess', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 
-    console.log(
-      'authentication',
-      TestConstants.TEST_API_URL,
-      DataverseApiAuthMechanism.API_KEY,
-      process.env.TEST_API_KEY
-    )
     beforeAll(async () => {
       testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
     })
