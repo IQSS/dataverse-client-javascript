@@ -1,8 +1,8 @@
 import { TermsOfAccess } from '../../../domain/models/Dataset'
 
-type TermsOfAccessInput = TermsOfAccess & { termsOfAccess?: string }
-
-export const transformTermsOfAccessToUpdatePayload = (terms: TermsOfAccessInput) => {
+export const transformTermsOfAccessToUpdatePayload = (
+  terms: TermsOfAccess & { termsOfAccess?: string }
+) => {
   const {
     fileAccessRequest,
     dataAccessPlace,

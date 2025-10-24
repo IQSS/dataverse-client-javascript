@@ -10,6 +10,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 - New Use Case: [Get Collections For Linking Use Case](./docs/useCases.md#get-collections-for-linking).
 
+- New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
+
 ### Changed
 
 ### Fixed
