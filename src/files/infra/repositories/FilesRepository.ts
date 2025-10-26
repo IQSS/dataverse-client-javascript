@@ -428,10 +428,10 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     limit?: number,
     offset?: number
   ): Promise<FileVersionSummaryInfo[]> {
-    const queryParams: { per_page?: string; start?: string } = {}
-
-    limit && (queryParams.per_page = limit.toString())
-    offset && (queryParams.start = offset.toString())
+    const queryParams: { limit?: string; offset?: string } = {
+      limit: limit?.toString(),
+      offset: offset?.toString()
+    }
 
     return this.doGet(
       this.buildApiEndpoint(this.filesResourceName, 'versionDifferences', fileId),

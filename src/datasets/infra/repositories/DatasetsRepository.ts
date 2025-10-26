@@ -310,10 +310,10 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     limit?: number,
     offset?: number
   ): Promise<DatasetVersionSummaryInfo[]> {
-    const queryParams: { per_page?: string; start?: string } = {}
-
-    limit && (queryParams.per_page = limit.toString())
-    offset && (queryParams.start = offset.toString())
+    const queryParams: { limit?: string; offset?: string } = {
+      limit: limit?.toString(),
+      offset: offset?.toString()
+    }
 
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, 'versions/compareSummary', datasetId),
