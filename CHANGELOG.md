@@ -13,6 +13,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Changed
 
+- Add pagination query parameters to Dataset Version Summeries and File Version Summaries use cases
+
 ### Fixed
 
 ### Removed
