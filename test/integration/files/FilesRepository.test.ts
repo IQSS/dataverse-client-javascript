@@ -925,6 +925,8 @@ describe('FilesRepository', () => {
         contributors: 'Dataverse Admin',
         datafileId: testFile.id,
         persistentId: testFile.persistentId,
+        publishedDate: '',
+        versionNote: undefined,
         fileDifferenceSummary: { file: 'Added' }
       }
 
@@ -1022,7 +1024,7 @@ describe('FilesRepository', () => {
         contributors: 'Dataverse Admin',
         datafileId: testFile.id,
         persistentId: testFile.persistentId,
-        publishedDate: actual[0].publishedDate,
+        publishedDate: '',
         versionNote: undefined,
         fileDifferenceSummary: {
           fileMetadata: [
@@ -1080,18 +1082,18 @@ describe('FilesRepository', () => {
       const firstPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 0)
 
       expect(firstPage.length).toBe(5)
-      expect(firstPage[0].datasetVersion).toBe('1.21')
-      expect(firstPage[4].datasetVersion).toBe('1.17')
+      expect(firstPage[0].datasetVersion).toBe('22.0')
+      expect(firstPage[4].datasetVersion).toBe('18.0')
 
       const secondPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 5)
       expect(secondPage.length).toBe(5)
-      expect(secondPage[0].datasetVersion).toBe('1.16')
-      expect(secondPage[4].datasetVersion).toBe('1.12')
+      expect(secondPage[0].datasetVersion).toBe('17.0')
+      expect(secondPage[4].datasetVersion).toBe('13.0')
 
       const thirdPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 10)
       expect(thirdPage.length).toBe(5)
-      expect(thirdPage[0].datasetVersion).toBe('1.11')
-      expect(thirdPage[4].datasetVersion).toBe('1.7')
+      expect(thirdPage[0].datasetVersion).toBe('12.0')
+      expect(thirdPage[4].datasetVersion).toBe('8.0')
 
       const allVersions = await sut.getFileVersionSummaries(paginationTestFile.id)
       expect(allVersions.length).toBe(22)

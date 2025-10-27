@@ -17,7 +17,11 @@ describe('execute', () => {
     const actual = await sut.execute(testDatasetId)
 
     expect(actual).toEqual(testDatasetVersionsSummaries)
-    expect(datasetsRepositoryStub.getDatasetVersionsSummaries).toHaveBeenCalledWith(testDatasetId)
+    expect(datasetsRepositoryStub.getDatasetVersionsSummaries).toHaveBeenCalledWith(
+      testDatasetId,
+      undefined,
+      undefined
+    )
   })
 
   test('should return error result on repository error', async () => {
