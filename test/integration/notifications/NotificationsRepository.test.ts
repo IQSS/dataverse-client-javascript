@@ -56,8 +56,9 @@ describe('NotificationsRepository', () => {
     expect(publishedNotification?.subjectText).toContain(
       `Dataset "${TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields.title}" has been published`
     )
+
     expect(publishedNotification?.messageText).toContain(
-      `Your dataset named "${TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields.title}"`
+      `Your dataset named ${TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields.title}`
     )
   })
 
