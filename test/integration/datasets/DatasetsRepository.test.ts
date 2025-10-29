@@ -1306,7 +1306,6 @@ describe('DatasetsRepository', () => {
       )
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
-      console.log('actual summaries', actual)
 
       expect(actual.summaries.length).toBeGreaterThan(0)
       expect(actual.totalCount).toBeGreaterThan(0)
