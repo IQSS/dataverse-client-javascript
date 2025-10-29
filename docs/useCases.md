@@ -872,7 +872,7 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 
 #### Get Dataset Versions Summaries
 
-Returns an array of [DatasetVersionSummaryInfo](../src/datasets/domain/models/DatasetVersionSummaryInfo.ts) that contains information about what changed in every specific version.
+Returns the total count of versions and an array of [DatasetVersionSummaryInfo](../src/datasets/domain/models/DatasetVersionSummaryInfo.ts) that contains information about what changed in every specific version.
 
 ##### Example call:
 
@@ -885,7 +885,7 @@ const datasetId = 'doi:10.77777/FK2/AAAAAA'
 
 getDatasetVersionsSummaries
   .execute(datasetId)
-  .then((datasetVersionsSummaries: DatasetVersionSummaryInfo[]) => {
+  .then((datasetVersionsSummaries: DatasetVersionSummarySubset) => {
     /* ... */
   })
 
@@ -2002,7 +2002,7 @@ The `fileId` parameter can be a string, for persistent identifiers, or a number,
 
 #### Get File Version Summaries
 
-Get the file versions summaries, return a list of summaries for each version
+Get the file versions summaries, return a total count of versions and a list of summaries for each version
 
 ##### Example call:
 
@@ -2013,7 +2013,7 @@ import { getFileVersionSummaries } from '@iqss/dataverse-client-javascript'
 
 const fileId = 1
 
-getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummaryInfo[]) => {
+getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummarySubset) => {
   /* ... */
 })
 

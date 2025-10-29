@@ -7,7 +7,6 @@ describe('execute', () => {
   test('should return file on repository success when passing numeric id', async () => {
     const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
     const fileVersionSummariesSubset: FileVersionSummarySubset = {
-      totalCount: 1,
       summaries: [
         {
           datasetVersion: '1.0',
