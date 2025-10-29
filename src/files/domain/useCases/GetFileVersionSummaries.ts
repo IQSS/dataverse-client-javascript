@@ -1,8 +1,8 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
-import { FileVersionSummaryInfo } from '../models/FileVersionSummaryInfo'
+import { FileVersionSummarySubset } from '../models/FileVersionSummaryInfo'
 import { IFilesRepository } from '../repositories/IFilesRepository'
 
-export class GetFileVersionSummaries implements UseCase<FileVersionSummaryInfo[]> {
+export class GetFileVersionSummaries implements UseCase<FileVersionSummarySubset> {
   private filesRepository: IFilesRepository
 
   constructor(filesRepository: IFilesRepository) {
@@ -15,13 +15,13 @@ export class GetFileVersionSummaries implements UseCase<FileVersionSummaryInfo[]
    * @param {number | string} [fileId] - The file identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {number} [limit] - Limit for pagination (optional).
    * @param {number} [offset] - Offset for pagination (optional).
-   * @returns {Promise<FileVersionSummaryInfo[]>} - An array of FileVersionSummaryInfo.
+   * @returns {Promise<FileVersionSummarySubset>} - A FileVersionSummarySubset containing the summaries and total count.
    */
   async execute(
     fileId: number | string,
     limit?: number,
     offset?: number
-  ): Promise<FileVersionSummaryInfo[]> {
+  ): Promise<FileVersionSummarySubset> {
     return await this.filesRepository.getFileVersionSummaries(fileId, limit, offset)
   }
 }

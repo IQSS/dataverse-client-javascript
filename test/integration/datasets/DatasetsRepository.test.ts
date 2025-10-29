@@ -42,8 +42,7 @@ import {
   createCollectionViaApi,
   deleteCollectionViaApi,
   publishCollectionViaApi,
-  ROOT_COLLECTION_ALIAS,
-  setStorageDriverViaApi
+  ROOT_COLLECTION_ALIAS
 } from '../../testHelpers/collections/collectionHelper'
 import {
   calculateBlobChecksum,
@@ -1292,7 +1291,6 @@ describe('DatasetsRepository', () => {
     beforeAll(async () => {
       await createCollectionViaApi(testDatasetVersionsCollectionAlias)
       await publishCollectionViaApi(testDatasetVersionsCollectionAlias)
-      await setStorageDriverViaApi(testDatasetVersionsCollectionAlias, 'LocalStack')
     })
 
     afterAll(async () => {
@@ -1306,10 +1304,12 @@ describe('DatasetsRepository', () => {
       )
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
+      console.log('actual summaries', actual)
 
-      expect(actual.length).toBeGreaterThan(0)
-      expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toBe(DatasetVersionSummaryStringValues.firstDraft)
+      expect(actual.summaries.length).toBeGreaterThan(0)
+      expect(actual.totalCount).toBeGreaterThan(0)
+      expect(actual.summaries[0].versionNumber).toBe('DRAFT')
+      expect(actual.summaries[0].summary).toBe(DatasetVersionSummaryStringValues.firstDraft)
 
       await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
@@ -1325,9 +1325,10 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toBeGreaterThan(0)
-      expect(actual[0].versionNumber).toBe('1.0')
-      expect(actual[0].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
+      expect(actual.summaries.length).toBeGreaterThan(0)
+      expect(actual.totalCount).toBeGreaterThan(0)
+      expect(actual.summaries[0].versionNumber).toBe('1.0')
+      expect(actual.summaries[0].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1348,9 +1349,10 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toBeGreaterThan(0)
-      expect(actual[0].versionNumber).toBe('1.0')
-      expect(actual[0].summary).toStrictEqual(deaccessionReason)
+      expect(actual.summaries.length).toBeGreaterThan(0)
+      expect(actual.totalCount).toBeGreaterThan(0)
+      expect(actual.summaries[0].versionNumber).toBe('1.0')
+      expect(actual.summaries[0].summary).toStrictEqual(deaccessionReason)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1387,9 +1389,10 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toEqual(2)
-      expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toMatchObject<DatasetVersionSummary>({
+      expect(actual.summaries.length).toEqual(2)
+      expect(actual.totalCount).toEqual(2)
+      expect(actual.summaries[0].versionNumber).toBe('DRAFT')
+      expect(actual.summaries[0].summary).toMatchObject<DatasetVersionSummary>({
         'Citation Metadata': {
           Title: {
             added: 0,
@@ -1407,8 +1410,8 @@ describe('DatasetsRepository', () => {
         termsAccessChanged: false
       })
 
-      expect(actual[1].versionNumber).toBe('1.0')
-      expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
+      expect(actual.summaries[1].versionNumber).toBe('1.0')
+      expect(actual.summaries[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1454,10 +1457,11 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toEqual(2)
+      expect(actual.summaries.length).toEqual(2)
+      expect(actual.totalCount).toEqual(2)
 
-      expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toMatchObject<DatasetVersionSummary>({
+      expect(actual.summaries[0].versionNumber).toBe('DRAFT')
+      expect(actual.summaries[0].summary).toMatchObject<DatasetVersionSummary>({
         files: {
           added: 1,
           removed: 0,
@@ -1467,8 +1471,8 @@ describe('DatasetsRepository', () => {
         },
         termsAccessChanged: false
       })
-      expect(actual[1].versionNumber).toBe('1.0')
-      expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
+      expect(actual.summaries[1].versionNumber).toBe('1.0')
+      expect(actual.summaries[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1517,27 +1521,34 @@ describe('DatasetsRepository', () => {
         await waitForNoLocks(testDatasetIds.numericId, 10)
       }
 
+      const summaries = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
+      console.log('summaries', summaries)
+
       const firstPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 0)
 
-      expect(firstPage.length).toBe(5)
-      expect(firstPage[0].versionNumber).toBe('1.21')
-      expect(firstPage[4].versionNumber).toBe('1.17')
+      expect(firstPage.summaries.length).toBe(5)
+      expect(firstPage.totalCount).toBe(22)
+      expect(firstPage.summaries[0].versionNumber).toBe('1.21')
+      expect(firstPage.summaries[4].versionNumber).toBe('1.17')
 
       // Test pagination with limit=5, offset=5 (second page)
       const secondPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 5)
-      expect(secondPage.length).toBe(5)
-      expect(secondPage[0].versionNumber).toBe('1.16')
-      expect(secondPage[4].versionNumber).toBe('1.12')
+      expect(secondPage.summaries.length).toBe(5)
+      expect(secondPage.totalCount).toBe(22)
+      expect(secondPage.summaries[0].versionNumber).toBe('1.16')
+      expect(secondPage.summaries[4].versionNumber).toBe('1.12')
 
       // Test pagination with limit=5, offset=10 (third page)
       const thirdPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 10)
-      expect(thirdPage.length).toBe(5)
-      expect(thirdPage[0].versionNumber).toBe('1.11')
-      expect(thirdPage[4].versionNumber).toBe('1.7')
+      expect(thirdPage.summaries.length).toBe(5)
+      expect(thirdPage.totalCount).toBe(22)
+      expect(thirdPage.summaries[0].versionNumber).toBe('1.11')
+      expect(thirdPage.summaries[4].versionNumber).toBe('1.7')
 
       // Test that all versions are returned without pagination
       const allVersions = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
-      expect(allVersions.length).toBe(22) // 1 initial + 21 updates
+      expect(allVersions.summaries.length).toBe(22) // 1 initial + 21 updates
+      expect(allVersions.totalCount).toBe(22)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     }, 180000)

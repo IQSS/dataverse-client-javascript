@@ -1055,7 +1055,8 @@ describe('DatasetsRepository', () => {
     const testDatasetVersionSummariesResponse = {
       data: {
         status: 'OK',
-        data: [testDatasetVersionSummaries]
+        data: [testDatasetVersionSummaries],
+        totalCount: 1
       }
     }
 
@@ -1072,7 +1073,10 @@ describe('DatasetsRepository', () => {
           expectedApiEndpoint,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
         )
-        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+        expect(actual).toStrictEqual({
+          summaries: [testDatasetVersionSummaries],
+          totalCount: 1
+        })
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
@@ -1083,7 +1087,10 @@ describe('DatasetsRepository', () => {
           expectedApiEndpoint,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
         )
-        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+        expect(actual).toStrictEqual({
+          summaries: [testDatasetVersionSummaries],
+          totalCount: 1
+        })
       })
 
       test('should return error result on error response', async () => {
@@ -1113,7 +1120,10 @@ describe('DatasetsRepository', () => {
           expectedApiEndpoint,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
         )
-        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+        expect(actual).toStrictEqual({
+          summaries: [testDatasetVersionSummaries],
+          totalCount: 1
+        })
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
@@ -1124,7 +1134,10 @@ describe('DatasetsRepository', () => {
           expectedApiEndpoint,
           TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
         )
-        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+        expect(actual).toStrictEqual({
+          summaries: [testDatasetVersionSummaries],
+          totalCount: 1
+        })
       })
 
       test('should return error result on error response', async () => {

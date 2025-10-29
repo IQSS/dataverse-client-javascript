@@ -22,7 +22,7 @@ import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { RestrictFileDTO } from '../../domain/dtos/RestrictFileDTO'
-import { FileVersionSummaryInfo } from '../../domain/models/FileVersionSummaryInfo'
+import { FileVersionSummarySubset } from '../../domain/models/FileVersionSummaryInfo'
 import { transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo } from './transformers/fileVersionSummaryInfoTransformers'
 
 export interface GetFilesQueryParams {
@@ -427,10 +427,15 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     fileId: number | string,
     limit?: number,
     offset?: number
-  ): Promise<FileVersionSummaryInfo[]> {
-    const queryParams: { limit?: string; offset?: string } = {
-      limit: limit?.toString(),
-      offset: offset?.toString()
+  ): Promise<FileVersionSummarySubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set('limit', limit.toString())
+    }
+
+    if (offset) {
+      queryParams.set('offset', offset.toString())
     }
 
     return this.doGet(

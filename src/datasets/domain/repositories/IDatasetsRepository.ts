@@ -8,7 +8,7 @@ import { DatasetDeaccessionDTO } from '../dtos/DatasetDeaccessionDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 import { DatasetDownloadCount } from '../models/DatasetDownloadCount'
-import { DatasetVersionSummaryInfo } from '../models/DatasetVersionSummaryInfo'
+import { DatasetVersionSummarySubset } from '../models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
 import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
@@ -70,7 +70,7 @@ export interface IDatasetsRepository {
     datasetId: number | string,
     limit?: number,
     offset?: number
-  ): Promise<DatasetVersionSummaryInfo[]>
+  ): Promise<DatasetVersionSummarySubset>
   deleteDatasetDraft(datasetId: number | string): Promise<void>
   linkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
   unlinkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>

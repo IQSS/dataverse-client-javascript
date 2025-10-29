@@ -6,6 +6,11 @@ export interface DatasetVersionSummaryInfo {
   publishedOn?: string
 }
 
+export interface DatasetVersionSummarySubset {
+  summaries: DatasetVersionSummaryInfo[]
+  totalCount: number
+}
+
 export type DatasetVersionSummary = {
   [key: string]:
     | SummaryUpdates
