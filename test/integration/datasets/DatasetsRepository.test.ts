@@ -1491,7 +1491,7 @@ describe('DatasetsRepository', () => {
     beforeAll(async () => {
       await createCollectionViaApi(testStorageDriverCollectionAlias)
       await publishCollectionViaApi(testStorageDriverCollectionAlias)
-      // await setStorageDriverViaApi(testStorageDriverCollectionAlias, 'LocalStack')
+      await setStorageDriverViaApi(testStorageDriverCollectionAlias, 'LocalStack')
 
       const { numericId } = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,
@@ -1511,16 +1511,19 @@ describe('DatasetsRepository', () => {
       console.log(actual)
 
       expect(actual).toBeDefined()
-      expect(actual.name).toBe('local')
+      expect(actual.name).toBe('localstack1')
       expect(actual.type).toBe('s3')
-      expect(actual.label).toBe('Local')
+      expect(actual.label).toBe('LocalStack')
+      // TODO: waiting to add test for default storage and local stack storage after Jim's PR fixes https://github.com/IQSS/dataverse/pull/11940
 
       /*
-
+      With our current docker-compose JVM args setup:
       -Ddataverse.files.localstack1.type=s3
       -Ddataverse.files.localstack1.label=LocalStack
       -Ddataverse.files.localstack1.upload-redirect=true
       -Ddataverse.files.localstack1.download-redirect=true
+
+      If setting setStorageDriverViaApi(testStorageDriverCollectionAlias, 'LocalStack'), we are receiving this 👇, directUpload should be true
       {
         name: 'localstack1',
         type: 's3',
@@ -1529,6 +1532,7 @@ describe('DatasetsRepository', () => {
         directDownload: true
       }
 
+      Also without setting the storage driver via API, the default 'local' driver label is returned as 'Local' but should be 'LocalStack' as per JVM args.
       {
         name: 'local',
         type: 'file',
@@ -1536,7 +1540,6 @@ describe('DatasetsRepository', () => {
         directUpload: false,
         directDownload: false
       }
-
       */
     })
 
