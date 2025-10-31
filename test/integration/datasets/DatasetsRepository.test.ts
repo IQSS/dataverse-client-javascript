@@ -1524,8 +1524,6 @@ describe('DatasetsRepository', () => {
         await waitForNoLocks(testDatasetIds.numericId, 10)
       }
 
-      const summaries = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
-
       const firstPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 0)
 
       expect(firstPage.summaries.length).toBe(5)
