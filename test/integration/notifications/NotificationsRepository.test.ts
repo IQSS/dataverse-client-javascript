@@ -54,10 +54,11 @@ describe('NotificationsRepository', () => {
     expect(publishedNotification).toHaveProperty('sentTimestamp')
 
     expect(publishedNotification?.subjectText).toContain(
-      'Dataset created using the createDataset use case'
+      `Dataset "${TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields.title}" has been published`
     )
+
     expect(publishedNotification?.messageText).toContain(
-      'Your dataset named Dataset created using the createDataset use case'
+      `Your dataset named ${TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields.title}`
     )
   })
 

@@ -20,7 +20,7 @@ import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transf
 import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
-import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
+import { DatasetVersionSummarySubset } from '../../domain/models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
@@ -306,13 +306,29 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetVersionsSummaries(
-    datasetId: string | number
-  ): Promise<DatasetVersionSummaryInfo[]> {
+    datasetId: string | number,
+    limit?: number,
+    offset?: number
+  ): Promise<DatasetVersionSummarySubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set('limit', limit.toString())
+    }
+
+    if (offset) {
+      queryParams.set('offset', offset.toString())
+    }
+
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, 'versions/compareSummary', datasetId),
-      true
+      true,
+      queryParams
     )
-      .then((response) => response.data.data)
+      .then((response) => ({
+        summaries: response.data.data,
+        totalCount: response.data.totalCount
+      }))
       .catch((error) => {
         throw error
       })
