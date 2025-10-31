@@ -1525,7 +1525,6 @@ describe('DatasetsRepository', () => {
       }
 
       const summaries = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
-      console.log('summaries', summaries)
 
       const firstPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 0)
 
