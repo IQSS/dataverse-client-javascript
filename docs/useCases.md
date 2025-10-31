@@ -16,6 +16,7 @@ The different use cases currently available in the package are classified below,
     - [List All Collection Items](#list-all-collection-items)
     - [List My Data Collection Items](#list-my-data-collection-items)
     - [Get Collection Featured Items](#get-collection-featured-items)
+    - [Get Collections for Linking](#get-collections-for-linking)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
     - [Update a Collection](#update-a-collection)
@@ -24,6 +25,7 @@ The different use cases currently available in the package are classified below,
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
     - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
+    - [Create a Dataset Template](#create-a-dataset-template)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -337,6 +339,69 @@ The `collectionIdOrAlias` is a generic collection identifier, which can be eithe
 
 If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
 
+#### Get Collections for Linking
+
+Returns an array of [CollectionSummary](../src/collections/domain/models/CollectionSummary.ts) (id, alias, displayName) representing the Dataverse collections to which a given Dataverse collection or Dataset may be linked.
+
+This use case supports an optional `searchTerm` to filter by collection name.
+
+##### Example calls:
+
+```typescript
+import { getCollectionsForLinking } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+// Case 1: For a given Dataverse collection (by numeric id or alias)
+const collectionIdOrAlias: number | string = 'collectionAlias' // or 123
+const searchTerm = 'searchOn'
+
+getCollectionsForLinking
+  .execute('collection', collectionIdOrAlias, searchTerm)
+  .then((collections) => {
+    // collections: CollectionSummary[]
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+
+/* ... */
+
+// Case 2: For a given Dataset (by persistent identifier)
+const persistentId = 'doi:10.5072/FK2/J8SJZB'
+
+getCollectionsForLinking
+  .execute('dataset', persistentId, searchTerm)
+  .then((collections) => {
+    // collections: CollectionSummary[]
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+
+// Case 3: [alreadyLinked] Optional flag. When true, returns collections currently linked (candidates to unlink). Defaults to false.
+const alreadyLinked = true
+
+getCollectionsForLinking
+  .execute('dataset', persistentId, searchTerm, alreadyLinked)
+  .then((collections) => {
+    // collections: CollectionSummary[]
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionsForLinking.ts) implementation_.
+
+Notes:
+
+- When the first argument is `'collection'`, the second argument can be a numeric collection id or a collection alias.
+- When the first argument is `'dataset'`, the second argument must be the dataset persistent identifier string (e.g., `doi:...`).
+
 ### Collections Write Use Cases
 
 #### Create a Collection
@@ -503,6 +568,41 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 ```
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
+
+#### Create a Dataset Template
+
+Creates a dataset template for a given Dataverse collection id or alias.
+
+##### Example call:
+
+```typescript
+import { createDatasetTemplate } from '@iqss/dataverse-client-javascript'
+import { TemplateCreateDTO } from '@iqss/dataverse-client-javascript'
+
+const collectionAlias = ':root'
+const template: TemplateCreateDTO = {
+  name: 'Dataverse template',
+  isDefault: true,
+  fields: [
+    {
+      typeName: 'author',
+      typeClass: 'compound',
+      multiple: true,
+      value: [
+        {
+          authorName: { typeName: 'authorName', value: 'Belicheck, Bill' },
+          authorAffiliation: { typeName: 'authorIdentifierScheme', value: 'ORCID' }
+        }
+      ]
+    }
+  ],
+  instructions: [{ instructionField: 'author', instructionText: 'The author data' }]
+}
+
+await createDatasetTemplate.execute(template, collectionAlias)
+```
+
+_See [use case](../src/collections/domain/useCases/CreateDatasetTemplate.ts) implementation_.
 
 ## Datasets
 
@@ -861,7 +961,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetType.t
 
 #### Create a Dataset
 
-Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object and an optional collection identifier, which defaults to `:root`.
+Creates a new Dataset in a collection, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) object, an optional collection identifier, which defaults to `:root`, and an optional dataset type.
 
 This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
 
@@ -916,7 +1016,7 @@ createDataset.execute(datasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers
 
 _See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
 
-The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call.
+The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call. If you want the dataset type to be anything other than dataset, first [check available dataset types](#get-dataset-available-dataset-types) and then add the name of the dataset type as the third parameter.
 
 The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 
@@ -2049,6 +2149,8 @@ _See [use case](../src/metadataBlocks/domain/useCases/GetCollectionMetadataBlock
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 There is a second optional parameter called `onlyDisplayedOnCreate` which indicates whether or not to return only the metadata blocks that are displayed on dataset creation. The default value is false.
+
+There is a third optional parameter called `datasetType` which will include additional fields from metadata blocks linked to the provided type, if any. Before using this parameter, you will probably want to [list available dataset types](#get-dataset-available-dataset-types) for your installation.
 
 ## Users
 

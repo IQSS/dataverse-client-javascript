@@ -767,6 +767,61 @@ describe('FilesRepository', () => {
         errorExpected
       )
     })
+
+    test('should throw error when using outdated sourceLastUpdateTime', async () => {
+      const newDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await uploadFileViaApi(newDatasetIds.numericId, testTextFile1Name)
+      const filesSubset = await sut.getDatasetFiles(
+        newDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const fileId = filesSubset.files[0].id
+
+      await registerFileViaApi(fileId)
+
+      // Fetch file to obtain initial lastUpdateTime from returned model including dataset version
+      const fileInfo: FileModel = (await sut.getFile(
+        fileId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )) as FileModel
+
+      const lastUpdateTimeOne = fileInfo.lastUpdateTime
+
+      // Wait for 2 seconds
+      await new Promise((resolve) => setTimeout(resolve, 2_000))
+
+      // First update using correct lastUpdateTime should succeed
+      await sut.updateFileMetadata(fileId, { description: 'First update desc.' }, lastUpdateTimeOne)
+
+      // Refetch to get new lastUpdateTime
+      const fileInfoAfterFirstUpdate: FileModel = (await sut.getFile(
+        fileId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )) as FileModel
+
+      const lastUpdateTimeTwo = fileInfoAfterFirstUpdate.lastUpdateTime
+
+      expect(lastUpdateTimeTwo).not.toBe(lastUpdateTimeOne)
+
+      // Wait for 2 seconds
+      await new Promise((resolve) => setTimeout(resolve, 2_000))
+
+      // Second update using stale lastUpdateTimeOne should fail
+      const expectedError = new WriteError(
+        `[400] Internal version timestamp ${lastUpdateTimeOne} is outdated`
+      )
+      await expect(
+        sut.updateFileMetadata(fileId, { description: 'Second update attempt.' }, lastUpdateTimeOne)
+      ).rejects.toThrow(expectedError)
+
+      await deletePublishedDatasetViaApi(newDatasetIds.persistentId)
+    })
   })
 
   describe('updateFileTabularTags', () => {

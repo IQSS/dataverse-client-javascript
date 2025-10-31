@@ -17,11 +17,13 @@ export class MetadataBlocksRepository extends ApiRepository implements IMetadata
 
   public async getCollectionMetadataBlocks(
     collectionIdOrAlias: string | number,
-    onlyDisplayedOnCreate: boolean
+    onlyDisplayedOnCreate: boolean,
+    datasetType?: string
   ): Promise<MetadataBlock[]> {
     return this.doGet(`/dataverses/${collectionIdOrAlias}/metadatablocks`, true, {
       onlyDisplayedOnCreate: onlyDisplayedOnCreate,
-      returnDatasetFieldTypes: true
+      returnDatasetFieldTypes: true,
+      datasetType: datasetType
     })
       .then((response) => transformMetadataBlocksResponseToMetadataBlocks(response))
       .catch((error) => {

@@ -149,3 +149,4 @@ export {
 } from './domain/models/DatasetVersionSummaryInfo'
 export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
 export { DatasetType } from './domain/models/DatasetType'
+export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'

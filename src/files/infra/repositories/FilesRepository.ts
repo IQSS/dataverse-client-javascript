@@ -369,7 +369,8 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
 
   public async updateFileMetadata(
     fileId: string | number,
-    updateFileMetadata: UpdateFileMetadataDTO
+    updateFileMetadata: UpdateFileMetadataDTO,
+    sourceLastUpdateTime?: string
   ): Promise<void> {
     const formData = new FormData()
     formData.append('jsonData', JSON.stringify(updateFileMetadata))
@@ -377,7 +378,9 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     return this.doPost(
       this.buildApiEndpoint(this.filesResourceName, `${fileId}/metadata`),
       formData,
-      {},
+      {
+        ...(sourceLastUpdateTime && { sourceLastUpdateTime })
+      },
       ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
     )
       .then(() => undefined)

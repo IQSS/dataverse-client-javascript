@@ -30,6 +30,7 @@ import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
 import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 import { DatasetType } from '../../domain/models/DatasetType'
 import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
+import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -209,11 +210,16 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async createDataset(
     newDataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    collectionId: string
+    collectionId: string,
+    datasetType?: string
   ): Promise<CreatedDatasetIdentifiers> {
     return this.doPost(
       `/dataverses/${collectionId}/datasets`,
-      transformDatasetModelToNewDatasetRequestPayload(newDataset, datasetMetadataBlocks)
+      transformDatasetModelToNewDatasetRequestPayload(
+        newDataset,
+        datasetMetadataBlocks,
+        datasetType
+      )
     )
       .then((response) => {
         const responseData = response.data.data
@@ -248,16 +254,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     datasetId: string | number,
     dataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    internalVersionNumber?: number
+    sourceLastUpdateTime?: string
   ): Promise<void> {
     return this.doPut(
       this.buildApiEndpoint(this.datasetsResourceName, `editMetadata`, datasetId),
       transformDatasetModelToUpdateDatasetRequestPayload(dataset, datasetMetadataBlocks),
       {
         replace: true,
-        ...(typeof internalVersionNumber === 'number' && {
-          sourceInternalVersionNumber: internalVersionNumber
-        })
+        ...(sourceLastUpdateTime && { sourceLastUpdateTime })
       }
     )
       .then(() => undefined)
@@ -325,16 +329,32 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async linkDataset(datasetId: number, collectionAlias: string): Promise<void> {
-    return this.doPut(`/${this.datasetsResourceName}/${datasetId}/link/${collectionAlias}`, {})
+  public async linkDataset(
+    datasetId: number | string,
+    collectionIdOrAlias: number | string
+  ): Promise<void> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `link/${collectionIdOrAlias}`,
+      datasetId
+    )
+    return this.doPut(endpoint, {})
       .then(() => undefined)
       .catch((error) => {
         throw error
       })
   }
 
-  public async unlinkDataset(datasetId: number, collectionAlias: string): Promise<void> {
-    return this.doDelete(`/${this.datasetsResourceName}/${datasetId}/deleteLink/${collectionAlias}`)
+  public async unlinkDataset(
+    datasetId: number | string,
+    collectionIdOrAlias: number | string
+  ): Promise<void> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `deleteLink/${collectionIdOrAlias}`,
+      datasetId
+    )
+    return this.doDelete(endpoint)
       .then(() => undefined)
       .catch((error) => {
         throw error
@@ -398,7 +418,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async addDatasetType(datasetType: DatasetType): Promise<DatasetType> {
+  public async addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType> {
     return this.doPost(
       this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'),
       datasetType

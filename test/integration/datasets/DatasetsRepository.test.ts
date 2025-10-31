@@ -111,6 +111,7 @@ describe('DatasetsRepository', () => {
 
   const filesRepositorySut = new FilesRepository()
   const directUploadSut: DirectUploadClient = new DirectUploadClient(filesRepositorySut)
+  const defaultDatasetType = 'dataset'
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -235,7 +236,6 @@ describe('DatasetsRepository', () => {
           false
         )
         expect(actual.id).toBe(testDatasetIds.numericId)
-        expect(actual.internalVersionNumber).toBe(1)
       })
 
       test('should return dataset when it is deaccessioned and includeDeaccessioned param is set', async () => {
@@ -828,6 +828,64 @@ describe('DatasetsRepository', () => {
       expect(actualCreatedDataset.metadataBlocks[0].fields.subject).toContain(
         'Medicine, Health and Life Sciences'
       )
+      // even though we didn't provide a dataset type, it should be created with the default one
+      expect(actualCreatedDataset.datasetType).toBe(defaultDatasetType)
+    })
+  })
+
+  describe('createDatasetWithDatasetType', () => {
+    test('should create a dataset with the provided dataset type', async () => {
+      const testNewDataset = {
+        metadataBlockValues: [
+          {
+            name: 'citation',
+            fields: {
+              title: 'Dataset created using the createDataset use case',
+              author: [
+                {
+                  authorName: 'Admin, Dataverse',
+                  authorAffiliation: 'Dataverse.org'
+                },
+                {
+                  authorName: 'Owner, Dataverse',
+                  authorAffiliation: 'Dataversedemo.org'
+                }
+              ],
+              datasetContact: [
+                {
+                  datasetContactEmail: 'finch@mailinator.com',
+                  datasetContactName: 'Finch, Fiona'
+                }
+              ],
+              dsDescription: [
+                {
+                  dsDescriptionValue: 'This is the description of the dataset.'
+                }
+              ],
+              subject: ['Medicine, Health and Life Sciences']
+            }
+          }
+        ]
+      }
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+      const createdDataset = await sut.createDataset(
+        testNewDataset,
+        [citationMetadataBlock],
+        ROOT_COLLECTION_ALIAS,
+        defaultDatasetType
+      )
+      const actualCreatedDataset = await sut.getDataset(
+        createdDataset.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(actualCreatedDataset.datasetType).toBe(defaultDatasetType)
     })
   })
 
@@ -1074,8 +1132,8 @@ describe('DatasetsRepository', () => {
         }
       ])
     })
-    // TODO: add this test when https://github.com/IQSS/dataverse-client-javascript/issues/343 is fixed
-    test.skip('should throw error if trying to update an outdated internal version dataset', async () => {
+
+    test('should throw error if sending an outdated lastUpdateTime', async () => {
       const testDataset = {
         metadataBlockValues: [
           {
@@ -1126,35 +1184,27 @@ describe('DatasetsRepository', () => {
         false,
         false
       )
-      const actualCreatedDatasetInternalVersionNumber = actualCreatedDataset.internalVersionNumber
+      const firstLastUpdateTime = actualCreatedDataset.versionInfo.lastUpdateTime
 
-      expect(actualCreatedDataset.internalVersionNumber).toBe(1)
-
-      // Now update the dataset and then update again with the same internal version number
+      // Now update the dataset and then update again with the same source last update time
       const updatedDsDescription = 'This is the updated description of the dataset.'
       testDataset.metadataBlockValues[0].fields.dsDescription[0].dsDescriptionValue =
         updatedDsDescription
 
-      // First update sending the correct internal version number
+      // Wait for 2 seconds
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      // First update sending the correct lastUpdateTime
       await sut.updateDataset(
         createdDataset.numericId,
         testDataset,
         [citationMetadataBlock],
-        actualCreatedDatasetInternalVersionNumber
+        firstLastUpdateTime
       )
 
-      const afterFirstUpdateDataset = await sut.getDataset(
-        createdDataset.numericId,
-        DatasetNotNumberedVersion.LATEST,
-        false,
-        false
-      )
-
-      expect(afterFirstUpdateDataset.internalVersionNumber).toBe(2)
-
-      //Now try to update again with the previous internal version number
+      //Now try to update again with the previous lastUpdateTime
       const expectedError = new WriteError(
-        `[400] Dataset internal version number ${actualCreatedDatasetInternalVersionNumber} is outdated`
+        `[400] Internal version timestamp ${firstLastUpdateTime} is outdated`
       )
 
       await expect(
@@ -1162,7 +1212,7 @@ describe('DatasetsRepository', () => {
           createdDataset.numericId,
           testDataset,
           [citationMetadataBlock],
-          actualCreatedDatasetInternalVersionNumber
+          firstLastUpdateTime
         )
       ).rejects.toThrow(expectedError)
     })
@@ -1541,6 +1591,21 @@ describe('DatasetsRepository', () => {
         sut.linkDataset(testDatasetIds.numericId, 'nonExistentCollectionAlias')
       ).rejects.toThrow()
     })
+
+    test('should link a dataset to another collection using persistent id', async () => {
+      const persistentCollectionAlias = 'testLinkDatasetCollectionPersistent'
+      await createCollectionViaApi(persistentCollectionAlias)
+
+      const actual = await sut.linkDataset(testDatasetIds.persistentId, persistentCollectionAlias)
+
+      expect(actual).toBeUndefined()
+
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+      const aliases = linkedCollections.map((c) => c.alias)
+      expect(aliases).toContain(persistentCollectionAlias)
+
+      await deleteCollectionViaApi(persistentCollectionAlias)
+    })
   })
 
   describe('unlinkDataset', () => {
@@ -1585,6 +1650,27 @@ describe('DatasetsRepository', () => {
       await expect(
         sut.unlinkDataset(testDatasetIds.numericId, testCollectionAlias)
       ).rejects.toThrow()
+    })
+
+    test('should unlink a dataset from a collection using persistent id', async () => {
+      const persistentCollectionAlias = 'testUnlinkDatasetCollectionPersistent'
+      await createCollectionViaApi(persistentCollectionAlias)
+
+      await sut.linkDataset(testDatasetIds.persistentId, persistentCollectionAlias)
+      const linkedCollections = await sut.getDatasetLinkedCollections(testDatasetIds.numericId)
+      const aliases = linkedCollections.map((c) => c.alias)
+      expect(aliases).toContain(persistentCollectionAlias)
+
+      const actual = await sut.unlinkDataset(testDatasetIds.persistentId, persistentCollectionAlias)
+
+      expect(actual).toBeUndefined()
+      const updatedLinkedCollections = await sut.getDatasetLinkedCollections(
+        testDatasetIds.numericId
+      )
+      const updatedAliases = updatedLinkedCollections.map((c) => c.alias)
+      expect(updatedAliases).not.toContain(persistentCollectionAlias)
+
+      await deleteCollectionViaApi(persistentCollectionAlias)
     })
   })
 

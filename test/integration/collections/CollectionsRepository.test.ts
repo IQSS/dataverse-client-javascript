@@ -16,7 +16,9 @@ import {
   getDatasetFiles,
   restrictFile,
   deleteFile,
-  linkDataset
+  linkDataset,
+  createDatasetTemplate,
+  MetadataFieldTypeClass
 } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -58,6 +60,9 @@ import {
   DvObjectFeaturedItemDTO,
   FeaturedItemsDTO
 } from '../../../src/collections/domain/dtos/FeaturedItemsDTO'
+import { CreateDatasetTemplateDTO } from '../../../src/collections/domain/dtos/CreateDatasetTemplateDTO'
+import { getDatasetTemplates } from '../../../src/datasets'
+import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -804,6 +809,101 @@ describe('CollectionsRepository', () => {
     })
   })
 
+  describe('getCollectionsForLinking', () => {
+    const linkingParentCollection = 'collectionsRepositoryLinkingTestParentCollection'
+    const linkingTargetAlias = 'collectionsRepositoryLinkTarget'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(linkingParentCollection)
+      await createCollectionViaApi(linkingTargetAlias, linkingParentCollection)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(linkingTargetAlias)
+      await deleteCollectionViaApi(linkingParentCollection)
+    })
+
+    test('should list collections for linking for a given collection alias', async () => {
+      const results = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        'Scientific',
+        false
+      )
+
+      expect(Array.isArray(results)).toBe(true)
+      // Should contain the newly created linking target collection among candidates
+      const found = results.find((c) => c.alias === linkingTargetAlias)
+      expect(found).toBeDefined()
+      expect(found?.id).toBeGreaterThan(0)
+      expect(found?.displayName).toBe('Scientific Research')
+    })
+
+    test('should list collections for linking for a given dataset persistentId', async () => {
+      // Create a temporary dataset to query linking candidates
+      const { persistentId, numericId } = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        linkingParentCollection
+      )
+
+      const results = await sut.getCollectionsForLinking(
+        'dataset',
+        persistentId,
+        'Scientific',
+        false
+      )
+
+      // Cleanup dataset (unpublished)
+      await deleteUnpublishedDatasetViaApi(numericId)
+
+      expect(Array.isArray(results)).toBe(true)
+      const found = results.find((c) => c.alias === linkingTargetAlias)
+      expect(found).toBeDefined()
+      expect(found?.displayName).toBe('Scientific Research')
+    })
+
+    test('should return collections for unlinking when sending alreadyLinked param to true', async () => {
+      const collectionsForUnlinkingBefore = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        '',
+        true
+      )
+
+      // Link the test collection with the linking target collection
+      await sut.linkCollection(linkingParentCollection, linkingTargetAlias)
+
+      const collectionsForUnlinkingAfter = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        '',
+        true
+      )
+
+      expect(collectionsForUnlinkingBefore.length).toBe(0)
+      expect(collectionsForUnlinkingAfter.length).toBeGreaterThan(0)
+      expect(collectionsForUnlinkingAfter[0].alias).toBe(linkingTargetAlias)
+      expect(collectionsForUnlinkingAfter[0].displayName).toBe('Scientific Research')
+    })
+
+    it('should return error when collection does not exist', async () => {
+      await expect(
+        sut.getCollectionsForLinking(
+          'collection',
+          TestConstants.TEST_DUMMY_COLLECTION_ALIAS,
+          '',
+          false
+        )
+      ).rejects.toThrow(ReadError)
+    })
+
+    it('should return error when dataset does not exist', async () => {
+      await expect(
+        sut.getCollectionsForLinking('dataset', TestConstants.TEST_DUMMY_PERSISTENT_ID, '', false)
+      ).rejects.toThrow(ReadError)
+    })
+  })
+
   describe('getCollectionItems for published tabular file', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
     const testTextFile4Name = 'test-file-4.tab'
@@ -996,8 +1096,8 @@ describe('CollectionsRepository', () => {
       expect(updatedCollection.alias).toBe(testUpdatedCollectionAlias)
       expect(updatedCollection.name).toBe(updatedCollectionName)
       expect(updatedCollection.affiliation).toBe(updatedCollectionAffiliation)
-      expect(updatedCollection.inputLevels?.length).toBe(1)
-      const updatedInputLevel = updatedCollection.inputLevels?.[0]
+      expect(updatedCollection.inputLevels?.length).toBe(2)
+      const updatedInputLevel = updatedCollection.inputLevels?.[1]
       expect(updatedInputLevel?.datasetFieldName).toBe('country')
       expect(updatedInputLevel?.include).toBe(true)
       expect(updatedInputLevel?.required).toBe(false)
@@ -1998,16 +2098,18 @@ describe('CollectionsRepository', () => {
     const thirdCollectionAlias = 'getCollectionLinksThird'
     const fourthCollectionAlias = 'getCollectionLinksFourth'
     let childDatasetNumericId: number
+    let childDatasetPersistentId: string
     beforeAll(async () => {
       await createCollectionViaApi(firstCollectionAlias)
       await createCollectionViaApi(secondCollectionAlias)
       await createCollectionViaApi(thirdCollectionAlias)
       await createCollectionViaApi(fourthCollectionAlias)
-      const { numericId: createdId } = await createDataset.execute(
+      const { numericId: createdId, persistentId: createdPid } = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,
         fourthCollectionAlias
       )
       childDatasetNumericId = createdId
+      childDatasetPersistentId = createdPid
       await sut.linkCollection(secondCollectionAlias, firstCollectionAlias)
       await sut.linkCollection(firstCollectionAlias, thirdCollectionAlias)
       await sut.linkCollection(firstCollectionAlias, fourthCollectionAlias)
@@ -2036,6 +2138,7 @@ describe('CollectionsRepository', () => {
       expect(collectionLinks.linkedDatasets[0].title).toBe(
         'Dataset created using the createDataset use case'
       )
+      expect(collectionLinks.linkedDatasets[0].persistentId).toBe(childDatasetPersistentId)
     })
 
     test('should return error when collection does not exist', async () => {
@@ -2043,6 +2146,61 @@ describe('CollectionsRepository', () => {
       const expectedError = new ReadError("[404] Can't find dataverse with identifier='99999'")
 
       await expect(sut.getCollectionLinks(invalidCollectionId)).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('createDatasetTemplate', () => {
+    const templateDto: CreateDatasetTemplateDTO = {
+      name: 'CollectionsRepository template',
+      isDefault: true,
+      fields: [
+        {
+          typeName: 'author',
+          typeClass: MetadataFieldTypeClass.Compound,
+          multiple: true,
+          value: [
+            {
+              authorName: {
+                typeName: 'authorName',
+                typeClass: MetadataFieldTypeClass.Primitive,
+                value: 'Belicheck, Bill'
+              },
+              authorAffiliation: {
+                typeName: 'authorIdentifierScheme',
+                typeClass: MetadataFieldTypeClass.Primitive,
+                value: 'ORCID'
+              }
+            }
+          ]
+        }
+      ],
+      instructions: [
+        {
+          instructionField: 'author',
+          instructionText: 'The author data'
+        }
+      ]
+    }
+    test('should create a template in :root with provided JSON', async () => {
+      await createDatasetTemplate.execute(templateDto)
+      const templates = await getDatasetTemplates.execute(':root')
+
+      expect(templates[templates.length - 1].name).toBe(templateDto.name)
+      expect(templates[templates.length - 1].isDefault).toBe(templateDto.isDefault)
+      expect(templates[templates.length - 1].instructions.length).toBe(
+        templateDto.instructions?.length ?? 0
+      )
+
+      deleteDatasetTemplateViaApi(templates[templates.length - 1].id)
+    })
+
+    test('should return error when creating a template with invalidCollectionAlias', async () => {
+      const expectedError = new WriteError(
+        `[404] Can't find dataverse with identifier='invalidCollectionAlias'`
+      )
+      await expect(
+        createDatasetTemplate.execute(templateDto, 'invalidCollectionAlias')
+      ).rejects.toThrow(expectedError)
     })
   })
 })

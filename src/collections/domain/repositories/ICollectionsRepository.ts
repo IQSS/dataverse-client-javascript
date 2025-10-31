@@ -10,6 +10,9 @@ import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
 import { CollectionLinks } from '../models/CollectionLinks'
+import { CollectionSummary } from '../models/CollectionSummary'
+import { LinkingObjectType } from '../useCases/GetCollectionsForLinking'
+import { CreateDatasetTemplateDTO } from '../dtos/CreateDatasetTemplateDTO'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -60,4 +63,14 @@ export interface ICollectionsRepository {
     linkingCollectionIdOrAlias: number | string
   ): Promise<void>
   getCollectionLinks(collectionIdOrAlias: number | string): Promise<CollectionLinks>
+  getCollectionsForLinking(
+    objectType: LinkingObjectType,
+    id: number | string,
+    searchTerm: string,
+    alreadyLinked: boolean
+  ): Promise<CollectionSummary[]>
+  createDatasetTemplate(
+    collectionIdOrAlias: number | string,
+    template: CreateDatasetTemplateDTO
+  ): Promise<void>
 }
