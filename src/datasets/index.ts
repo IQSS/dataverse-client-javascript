@@ -144,7 +144,8 @@ export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentif
 export { VersionUpdateType } from './domain/models/Dataset'
 export {
   DatasetVersionSummaryInfo,
-  DatasetVersionSummaryStringValues
+  DatasetVersionSummaryStringValues,
+  DatasetVersionSummarySubset
 } from './domain/models/DatasetVersionSummaryInfo'
 export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
 export { DatasetType } from './domain/models/DatasetType'

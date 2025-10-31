@@ -9,10 +9,13 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 ### Added
 
 - New Use Case: [Get Collections For Linking Use Case](./docs/useCases.md#get-collections-for-linking).
+- New Use Case: [Create a Dataset Template](./docs/useCases.md#create-a-dataset-template) under Collections.
 
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
 
 ### Changed
+
+- Add pagination query parameters to Dataset Version Summeries and File Version Summaries use cases
 
 ### Fixed
 

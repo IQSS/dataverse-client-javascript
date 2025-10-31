@@ -25,6 +25,7 @@ The different use cases currently available in the package are classified below,
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
     - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
+    - [Create a Dataset Template](#create-a-dataset-template)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -567,6 +568,41 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
+#### Create a Dataset Template
+
+Creates a dataset template for a given Dataverse collection id or alias.
+
+##### Example call:
+
+```typescript
+import { createDatasetTemplate } from '@iqss/dataverse-client-javascript'
+import { TemplateCreateDTO } from '@iqss/dataverse-client-javascript'
+
+const collectionAlias = ':root'
+const template: TemplateCreateDTO = {
+  name: 'Dataverse template',
+  isDefault: true,
+  fields: [
+    {
+      typeName: 'author',
+      typeClass: 'compound',
+      multiple: true,
+      value: [
+        {
+          authorName: { typeName: 'authorName', value: 'Belicheck, Bill' },
+          authorAffiliation: { typeName: 'authorIdentifierScheme', value: 'ORCID' }
+        }
+      ]
+    }
+  ],
+  instructions: [{ instructionField: 'author', instructionText: 'The author data' }]
+}
+
+await createDatasetTemplate.execute(template, collectionAlias)
+```
+
+_See [use case](../src/collections/domain/useCases/CreateDatasetTemplate.ts) implementation_.
+
 ## Datasets
 
 ### Datasets Read Use Cases
@@ -836,7 +872,7 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 
 #### Get Dataset Versions Summaries
 
-Returns an array of [DatasetVersionSummaryInfo](../src/datasets/domain/models/DatasetVersionSummaryInfo.ts) that contains information about what changed in every specific version.
+Returns the total count of versions and an array of [DatasetVersionSummaryInfo](../src/datasets/domain/models/DatasetVersionSummaryInfo.ts) that contains information about what changed in every specific version.
 
 ##### Example call:
 
@@ -849,7 +885,7 @@ const datasetId = 'doi:10.77777/FK2/AAAAAA'
 
 getDatasetVersionsSummaries
   .execute(datasetId)
-  .then((datasetVersionsSummaries: DatasetVersionSummaryInfo[]) => {
+  .then((datasetVersionsSummaries: DatasetVersionSummarySubset) => {
     /* ... */
   })
 
@@ -858,7 +894,9 @@ getDatasetVersionsSummaries
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetVersionsSummaries.ts) implementation_.
 
-The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+- The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
 
 #### Get Dataset Linked Collections
 
@@ -1996,7 +2034,7 @@ The `fileId` parameter can be a string, for persistent identifiers, or a number,
 
 #### Get File Version Summaries
 
-Get the file versions summaries, return a list of summaries for each version
+Get the file versions summaries, return a total count of versions and a list of summaries for each version
 
 ##### Example call:
 
@@ -2007,7 +2045,7 @@ import { getFileVersionSummaries } from '@iqss/dataverse-client-javascript'
 
 const fileId = 1
 
-getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummaryInfo[]) => {
+getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummarySubset) => {
   /* ... */
 })
 
@@ -2015,6 +2053,9 @@ getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionS
 ```
 
 _See [use case](../src/files/domain/useCases/GetFileVersionSummaries.ts) implementation_.
+
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
 
 ## Metadata Blocks
 
