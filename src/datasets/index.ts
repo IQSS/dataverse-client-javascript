@@ -32,6 +32,7 @@ import { SetAvailableLicensesForDatasetType } from './domain/useCases/SetAvailab
 import { DeleteDatasetType } from './domain/useCases/DeleteDatasetType'
 import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
 import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
+import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -80,6 +81,7 @@ const setAvailableLicensesForDatasetType = new SetAvailableLicensesForDatasetTyp
 const deleteDatasetType = new DeleteDatasetType(datasetsRepository)
 const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
 const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
+const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 
 export {
   getDataset,
@@ -109,7 +111,8 @@ export {
   addDatasetType,
   linkDatasetTypeWithMetadataBlocks,
   setAvailableLicensesForDatasetType,
-  deleteDatasetType
+  deleteDatasetType,
+  updateDatasetLicense
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -136,6 +139,7 @@ export {
   DatasetMetadataBlockValuesDTO,
   DatasetMetadataChildFieldValueDTO
 } from './domain/dtos/DatasetDTO'
+export { DatasetLicenseUpdateRequest } from './domain/dtos/DatasetLicenseUpdateRequest'
 export { DatasetDeaccessionDTO } from './domain/dtos/DatasetDeaccessionDTO'
 export { CreatedDatasetIdentifiers } from './domain/models/CreatedDatasetIdentifiers'
 export { VersionUpdateType } from './domain/models/Dataset'
