@@ -15,6 +15,7 @@ import { FormattedCitation } from '../models/FormattedCitation'
 import { DatasetTemplate } from '../models/DatasetTemplate'
 import { DatasetType } from '../models/DatasetType'
 import { TermsOfAccess } from '../models/Dataset'
+import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
 
 export interface IDatasetsRepository {
@@ -97,4 +98,8 @@ export interface IDatasetsRepository {
   ): Promise<void>
   deleteDatasetType(datasetTypeId: number): Promise<void>
   updateTermsOfAccess(datasetId: number | string, termsOfAccess: TermsOfAccess): Promise<void>
+  updateDatasetLicense(
+    datasetId: number | string,
+    payload: DatasetLicenseUpdateRequest
+  ): Promise<void>
 }

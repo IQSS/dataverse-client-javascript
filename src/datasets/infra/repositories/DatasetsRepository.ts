@@ -31,6 +31,7 @@ import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers
 import { DatasetType } from '../../domain/models/DatasetType'
 import { TermsOfAccess } from '../../domain/models/Dataset'
 import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
+import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
 
 export interface GetAllDatasetPreviewsQueryParams {
@@ -494,6 +495,20 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     return this.doPut(
       this.buildApiEndpoint(this.datasetsResourceName, 'access', datasetId),
       transformTermsOfAccessToUpdatePayload(termsOfAccess)
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateDatasetLicense(
+    datasetId: number | string,
+    payload: DatasetLicenseUpdateRequest
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, 'license', datasetId),
+      payload
     )
       .then(() => undefined)
       .catch((error) => {
