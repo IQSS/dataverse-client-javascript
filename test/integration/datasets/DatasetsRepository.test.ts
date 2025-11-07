@@ -28,6 +28,7 @@ import {
   deleteDatasetType,
   linkDatasetTypeWithMetadataBlocks,
   setAvailableLicensesForDatasetType,
+  updateTermsOfAccess,
   DatasetLicenseUpdateRequest
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
@@ -37,7 +38,8 @@ import {
   Author,
   DatasetContact,
   DatasetDescription,
-  Publication
+  Publication,
+  TermsOfAccess
 } from '../../../src/datasets/domain/models/Dataset'
 import {
   createCollectionViaApi,
@@ -1523,9 +1525,6 @@ describe('DatasetsRepository', () => {
         await waitForNoLocks(testDatasetIds.numericId, 10)
       }
 
-      const summaries = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
-      console.log('summaries', summaries)
-
       const firstPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 0)
 
       expect(firstPage.summaries.length).toBe(5)
@@ -1956,6 +1955,139 @@ describe('DatasetsRepository', () => {
           after: ['CC BY 4.0']
         }
       })
+    })
+  })
+
+  describe('updateTermsOfAccess', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    test('should update the terms of access for a dataset', async () => {
+      const datasetBefore = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      const termsOfAccessBefore: TermsOfAccess = {
+        fileAccessRequest: true,
+        termsOfAccessForRestrictedFiles: undefined,
+        dataAccessPlace: undefined,
+        originalArchive: undefined,
+        availabilityStatus: undefined,
+        contactForAccess: undefined,
+        sizeOfCollection: undefined,
+        studyCompletion: undefined
+      }
+      expect(datasetBefore.termsOfUse.termsOfAccess).toEqual(termsOfAccessBefore)
+
+      const termsOfAccessAfter: TermsOfAccess = {
+        fileAccessRequest: false,
+        termsOfAccessForRestrictedFiles: 'Your terms of access for restricted files',
+        dataAccessPlace: 'Your data access place',
+        originalArchive: 'Your original archive',
+        availabilityStatus: 'Your availability status',
+        contactForAccess: 'Your contact for access',
+        sizeOfCollection: 'Your size of collection',
+        studyCompletion: 'Your study completion'
+      }
+
+      await updateTermsOfAccess.execute(testDatasetIds.numericId, termsOfAccessAfter)
+
+      const datasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(datasetAfter.termsOfUse.termsOfAccess).toEqual(termsOfAccessAfter)
+    })
+
+    test('should throw error when dataset does not exist', async () => {
+      const nonExistentId = 999999
+      await expect(
+        updateTermsOfAccess.execute(nonExistentId, {
+          fileAccessRequest: true
+        })
+      ).rejects.toBeInstanceOf(WriteError)
+    })
+
+    test('should accept only fileAccessRequest field', async () => {
+      const ids = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await updateTermsOfAccess.execute(ids.numericId, {
+        fileAccessRequest: false
+      })
+
+      const dataset = await sut.getDataset(
+        ids.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(dataset.termsOfUse.termsOfAccess.fileAccessRequest).toBe(false)
+      expect(dataset.termsOfUse.termsOfAccess.dataAccessPlace).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.originalArchive).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.availabilityStatus).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.contactForAccess).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.sizeOfCollection).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.studyCompletion).toBeUndefined()
+    })
+
+    test('should work when identifying dataset by persistent id', async () => {
+      const ids = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await updateTermsOfAccess.execute(ids.persistentId, {
+        termsOfAccessForRestrictedFiles: 'Persistent terms',
+        fileAccessRequest: false
+      })
+
+      const dataset = await sut.getDataset(
+        ids.persistentId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(dataset.persistentId).toBe(ids.persistentId)
+      expect(dataset.termsOfUse.termsOfAccess.fileAccessRequest).toBe(false)
+      expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe(
+        'Persistent terms'
+      )
+    })
+
+    test('should update terms on a published dataset (creates a draft)', async () => {
+      const ids = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await publishDataset.execute(ids.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(ids.numericId, 10)
+
+      await updateTermsOfAccess.execute(ids.numericId, {
+        fileAccessRequest: true,
+        termsOfAccessForRestrictedFiles: 'Updated after publish'
+      })
+
+      await waitForNoLocks(ids.numericId, 10)
+
+      const dataset = await sut.getDataset(
+        ids.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(dataset.versionInfo.state).toBe('DRAFT')
+      expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe(
+        'Updated after publish'
+      )
+
+      await deletePublishedDatasetViaApi(ids.persistentId)
     })
   })
 

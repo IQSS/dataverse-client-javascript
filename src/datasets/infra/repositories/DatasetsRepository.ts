@@ -29,6 +29,8 @@ import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
 import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 import { DatasetType } from '../../domain/models/DatasetType'
+import { TermsOfAccess } from '../../domain/models/Dataset'
+import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
 import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
 
@@ -481,6 +483,20 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes/' + datasetTypeId)
     )
       .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateTermsOfAccess(
+    datasetId: number | string,
+    termsOfAccess: TermsOfAccess
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, 'access', datasetId),
+      transformTermsOfAccessToUpdatePayload(termsOfAccess)
+    )
+      .then(() => undefined)
       .catch((error) => {
         throw error
       })
