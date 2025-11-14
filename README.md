@@ -36,18 +36,18 @@ getDataset.execute(datasetIdentifier, datasetVersion).then((dataset: Dataset) =>
 /* ... */
 ```
 
-For detailed information about available use cases see [Use Cases Docs](https://github.com/IQSS/dataverse-client-javascript/blob/main/docs/useCases.md).
+For detailed information about available use cases see [Use Cases Docs](docs/useCases.md).
 
-For detailed information about usage see [Usage Docs](https://github.com/IQSS/dataverse-client-javascript/blob/main/docs/usage.md).
+For detailed information about usage see [Usage Docs](docs/usage.md).
 
 ## Changelog
 
-See [CHANGELOG.md](https://github.com/IQSS/dataverse-client-javascript/blob/main/CHANGELOG.md) for a detailed history of changes to this project.
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes to this project.
 
 ## Contributing
 
-Want to add a new use case or improve an existing one? Please check the [Contributing](https://github.com/IQSS/dataverse-client-javascript/blob/main/CONTRIBUTING.md) section.
+Want to add a new use case or improve an existing one? Please check the [Contributing](CONTRIBUTING.md) section.
 
 ## License
 
-This project is open source and available under the [MIT License](https://github.com/IQSS/dataverse-client-javascript/blob/main/LICENSE).
+This project is open source and available under the [MIT License](LICENSE).
