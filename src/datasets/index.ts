@@ -19,6 +19,7 @@ import { GetDatasetVersionDiff } from './domain/useCases/GetDatasetVersionDiff'
 import { DeaccessionDataset } from './domain/useCases/DeaccessionDataset'
 import { GetDatasetDownloadCount } from './domain/useCases/GetDatasetDownloadCount'
 import { GetDatasetVersionsSummaries } from './domain/useCases/GetDatasetVersionsSummaries'
+import { GetDatasetVersions } from './domain/useCases/GetDatasetVersions'
 import { DeleteDatasetDraft } from './domain/useCases/DeleteDatasetDraft'
 import { LinkDataset } from './domain/useCases/LinkDataset'
 import { UnlinkDataset } from './domain/useCases/UnlinkDataset'
@@ -67,6 +68,7 @@ const updateDataset = new UpdateDataset(
 const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
 const getDatasetDownloadCount = new GetDatasetDownloadCount(datasetsRepository)
 const getDatasetVersionsSummaries = new GetDatasetVersionsSummaries(datasetsRepository)
+const getDatasetVersions = new GetDatasetVersions(datasetsRepository)
 const deleteDatasetDraft = new DeleteDatasetDraft(datasetsRepository)
 const linkDataset = new LinkDataset(datasetsRepository)
 const unlinkDataset = new UnlinkDataset(datasetsRepository)
@@ -101,6 +103,7 @@ export {
   deaccessionDataset,
   getDatasetDownloadCount,
   getDatasetVersionsSummaries,
+  getDatasetVersions,
   deleteDatasetDraft,
   linkDataset,
   unlinkDataset,
@@ -133,6 +136,7 @@ export {
   TermsOfUse
 } from './domain/models/Dataset'
 export { DatasetPreview } from './domain/models/DatasetPreview'
+export { DatasetVersion } from './domain/models/DatasetVersion'
 export { DatasetVersionDiff } from './domain/models/DatasetVersionDiff'
 export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset'
 export {

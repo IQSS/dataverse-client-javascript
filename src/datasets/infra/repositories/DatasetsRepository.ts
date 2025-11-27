@@ -21,6 +21,7 @@ import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummarySubset } from '../../domain/models/DatasetVersionSummaryInfo'
+import { DatasetVersionSubset } from '../../domain/models/DatasetVersion'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
@@ -330,6 +331,45 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     )
       .then((response) => ({
         summaries: response.data.data,
+        totalCount: response.data.totalCount
+      }))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetVersions(
+    datasetId: string | number,
+    limit?: number,
+    offset?: number,
+    excludeMetadataBlocks?: boolean,
+    excludeFiles?: boolean
+  ): Promise<DatasetVersionSubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set('limit', limit.toString())
+    }
+
+    if (offset) {
+      queryParams.set('offset', offset.toString())
+    }
+
+    if (excludeMetadataBlocks !== undefined) {
+      queryParams.set('excludeMetadataBlocks', excludeMetadataBlocks.toString())
+    }
+
+    if (excludeFiles !== undefined) {
+      queryParams.set('excludeFiles', excludeFiles.toString())
+    }
+
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'versions', datasetId),
+      true,
+      queryParams
+    )
+      .then((response) => ({
+        versions: response.data.data,
         totalCount: response.data.totalCount
       }))
       .catch((error) => {
