@@ -37,6 +37,7 @@ The different use cases currently available in the package are classified below,
     - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
     - [Get Differences between Two Dataset Versions](#get-differences-between-two-dataset-versions)
     - [List All Datasets](#list-all-datasets)
+    - [Get Dataset Versions](#get-dataset-versions)
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
     - [Get Dataset Available Categories](#get-dataset-available-categories)
@@ -870,6 +871,36 @@ Note that `limit` and `offset` are optional parameters for pagination.
 Note that `collectionId` is an optional parameter to filter datasets by collection. If not set, the default value is `:root`.
 
 The `DatasetPreviewSubset`returned instance contains a property called `totalDatasetCount` which is necessary for pagination.
+
+#### Get Dataset Versions
+
+Returns the total count of versions and an array of [DatasetVersion](../src/datasets/domain/models/DatasetVersion.ts) that contains information about every specific version.
+
+##### Example call:
+
+```typescript
+import { getDatasetVersions } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetVersions
+  .execute(datasetId)
+  .then((datasetVersions: DatasetVersionSubset) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetVersions.ts) implementation_.
+
+- The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
+- **excludeMetadataBlocks**: (boolean) Exclude metadata blocks (default: false).
+- **excludesFiles**: (boolean) Exclude files (default: true).
 
 #### Get Dataset Versions Summaries
 
