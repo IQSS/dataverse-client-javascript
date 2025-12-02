@@ -37,29 +37,24 @@ describe('NotificationsRepository', () => {
     await publishDatasetViaApi(testDatasetIds.numericId)
     await waitForNoLocks(testDatasetIds.numericId, 10)
 
-    const notificationSubset: NotificationSubset = await sut.getAllNotificationsByUser()
+    const notificationSubset: NotificationSubset = await sut.getAllNotificationsByUser(true)
 
     expect(Array.isArray(notificationSubset.notifications)).toBe(true)
     expect(notificationSubset.notifications.length).toBeGreaterThan(0)
 
     const publishedNotification = notificationSubset.notifications.find(
-      (n) => n.type === NotificationType.PUBLISHEDDS
+      (n) =>
+        n.datasetPersistentIdentifier === testDatasetIds.persistentId &&
+        n.type === NotificationType.PUBLISHEDDS
     ) as Notification
 
     expect(publishedNotification).toBeDefined()
 
     expect(publishedNotification).toHaveProperty('id')
     expect(publishedNotification).toHaveProperty('type')
-    expect(publishedNotification).toHaveProperty('subjectText')
-    expect(publishedNotification).toHaveProperty('messageText')
-    expect(publishedNotification).toHaveProperty('sentTimestamp')
 
-    expect(publishedNotification?.subjectText).toContain(
-      `Dataset "${TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields.title}" has been published`
-    )
-
-    expect(publishedNotification?.messageText).toContain(
-      `Your dataset named ${TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields.title}`
+    expect(publishedNotification?.datasetDisplayName).toContain(
+      `${TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields.title}`
     )
   })
 
