@@ -27,7 +27,9 @@ import {
   addDatasetType,
   deleteDatasetType,
   linkDatasetTypeWithMetadataBlocks,
-  setAvailableLicensesForDatasetType
+  setAvailableLicensesForDatasetType,
+  updateTermsOfAccess,
+  DatasetLicenseUpdateRequest
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -36,7 +38,8 @@ import {
   Author,
   DatasetContact,
   DatasetDescription,
-  Publication
+  Publication,
+  TermsOfAccess
 } from '../../../src/datasets/domain/models/Dataset'
 import {
   createCollectionViaApi,
@@ -1307,9 +1310,10 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toBeGreaterThan(0)
-      expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toBe(DatasetVersionSummaryStringValues.firstDraft)
+      expect(actual.summaries.length).toBeGreaterThan(0)
+      expect(actual.totalCount).toBeGreaterThan(0)
+      expect(actual.summaries[0].versionNumber).toBe('DRAFT')
+      expect(actual.summaries[0].summary).toBe(DatasetVersionSummaryStringValues.firstDraft)
 
       await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
@@ -1325,9 +1329,10 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toBeGreaterThan(0)
-      expect(actual[0].versionNumber).toBe('1.0')
-      expect(actual[0].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
+      expect(actual.summaries.length).toBeGreaterThan(0)
+      expect(actual.totalCount).toBeGreaterThan(0)
+      expect(actual.summaries[0].versionNumber).toBe('1.0')
+      expect(actual.summaries[0].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1348,9 +1353,10 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toBeGreaterThan(0)
-      expect(actual[0].versionNumber).toBe('1.0')
-      expect(actual[0].summary).toStrictEqual(deaccessionReason)
+      expect(actual.summaries.length).toBeGreaterThan(0)
+      expect(actual.totalCount).toBeGreaterThan(0)
+      expect(actual.summaries[0].versionNumber).toBe('1.0')
+      expect(actual.summaries[0].summary).toStrictEqual(deaccessionReason)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1387,9 +1393,10 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toEqual(2)
-      expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toMatchObject<DatasetVersionSummary>({
+      expect(actual.summaries.length).toEqual(2)
+      expect(actual.totalCount).toEqual(2)
+      expect(actual.summaries[0].versionNumber).toBe('DRAFT')
+      expect(actual.summaries[0].summary).toMatchObject<DatasetVersionSummary>({
         'Citation Metadata': {
           Title: {
             added: 0,
@@ -1407,8 +1414,8 @@ describe('DatasetsRepository', () => {
         termsAccessChanged: false
       })
 
-      expect(actual[1].versionNumber).toBe('1.0')
-      expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
+      expect(actual.summaries[1].versionNumber).toBe('1.0')
+      expect(actual.summaries[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1454,10 +1461,11 @@ describe('DatasetsRepository', () => {
 
       const actual = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
 
-      expect(actual.length).toEqual(2)
+      expect(actual.summaries.length).toEqual(2)
+      expect(actual.totalCount).toEqual(2)
 
-      expect(actual[0].versionNumber).toBe('DRAFT')
-      expect(actual[0].summary).toMatchObject<DatasetVersionSummary>({
+      expect(actual.summaries[0].versionNumber).toBe('DRAFT')
+      expect(actual.summaries[0].summary).toMatchObject<DatasetVersionSummary>({
         files: {
           added: 1,
           removed: 0,
@@ -1467,8 +1475,8 @@ describe('DatasetsRepository', () => {
         },
         termsAccessChanged: false
       })
-      expect(actual[1].versionNumber).toBe('1.0')
-      expect(actual[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
+      expect(actual.summaries[1].versionNumber).toBe('1.0')
+      expect(actual.summaries[1].summary).toBe(DatasetVersionSummaryStringValues.firstPublished)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1482,6 +1490,69 @@ describe('DatasetsRepository', () => {
         expectedError
       )
     })
+
+    test('should return dataset versions summaries with pagination', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+
+      for (let i = 1; i <= 21; i++) {
+        await sut.updateDataset(
+          testDatasetIds.numericId,
+          {
+            metadataBlockValues: [
+              {
+                name: 'citation',
+                fields: {
+                  title: `Updated Dataset Title - Version ${i}`
+                }
+              }
+            ]
+          },
+          [citationMetadataBlock]
+        )
+
+        await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MINOR)
+        await waitForNoLocks(testDatasetIds.numericId, 10)
+      }
+
+      const firstPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 0)
+
+      expect(firstPage.summaries.length).toBe(5)
+      expect(firstPage.totalCount).toBe(22)
+      expect(firstPage.summaries[0].versionNumber).toBe('1.21')
+      expect(firstPage.summaries[4].versionNumber).toBe('1.17')
+
+      // Test pagination with limit=5, offset=5 (second page)
+      const secondPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 5)
+      expect(secondPage.summaries.length).toBe(5)
+      expect(secondPage.totalCount).toBe(22)
+      expect(secondPage.summaries[0].versionNumber).toBe('1.16')
+      expect(secondPage.summaries[4].versionNumber).toBe('1.12')
+
+      // Test pagination with limit=5, offset=10 (third page)
+      const thirdPage = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId, 5, 10)
+      expect(thirdPage.summaries.length).toBe(5)
+      expect(thirdPage.totalCount).toBe(22)
+      expect(thirdPage.summaries[0].versionNumber).toBe('1.11')
+      expect(thirdPage.summaries[4].versionNumber).toBe('1.7')
+
+      // Test that all versions are returned without pagination
+      const allVersions = await sut.getDatasetVersionsSummaries(testDatasetIds.numericId)
+      expect(allVersions.summaries.length).toBe(22) // 1 initial + 21 updates
+      expect(allVersions.totalCount).toBe(22)
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    }, 180000)
   })
 
   describe('getDatasetDownloadCount', () => {
@@ -1884,6 +1955,293 @@ describe('DatasetsRepository', () => {
           after: ['CC BY 4.0']
         }
       })
+    })
+  })
+
+  describe('updateTermsOfAccess', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+    })
+
+    test('should update the terms of access for a dataset', async () => {
+      const datasetBefore = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      const termsOfAccessBefore: TermsOfAccess = {
+        fileAccessRequest: true,
+        termsOfAccessForRestrictedFiles: undefined,
+        dataAccessPlace: undefined,
+        originalArchive: undefined,
+        availabilityStatus: undefined,
+        contactForAccess: undefined,
+        sizeOfCollection: undefined,
+        studyCompletion: undefined
+      }
+      expect(datasetBefore.termsOfUse.termsOfAccess).toEqual(termsOfAccessBefore)
+
+      const termsOfAccessAfter: TermsOfAccess = {
+        fileAccessRequest: false,
+        termsOfAccessForRestrictedFiles: 'Your terms of access for restricted files',
+        dataAccessPlace: 'Your data access place',
+        originalArchive: 'Your original archive',
+        availabilityStatus: 'Your availability status',
+        contactForAccess: 'Your contact for access',
+        sizeOfCollection: 'Your size of collection',
+        studyCompletion: 'Your study completion'
+      }
+
+      await updateTermsOfAccess.execute(testDatasetIds.numericId, termsOfAccessAfter)
+
+      const datasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(datasetAfter.termsOfUse.termsOfAccess).toEqual(termsOfAccessAfter)
+    })
+
+    test('should throw error when dataset does not exist', async () => {
+      const nonExistentId = 999999
+      await expect(
+        updateTermsOfAccess.execute(nonExistentId, {
+          fileAccessRequest: true
+        })
+      ).rejects.toBeInstanceOf(WriteError)
+    })
+
+    test('should accept only fileAccessRequest field', async () => {
+      const ids = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await updateTermsOfAccess.execute(ids.numericId, {
+        fileAccessRequest: false
+      })
+
+      const dataset = await sut.getDataset(
+        ids.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(dataset.termsOfUse.termsOfAccess.fileAccessRequest).toBe(false)
+      expect(dataset.termsOfUse.termsOfAccess.dataAccessPlace).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.originalArchive).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.availabilityStatus).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.contactForAccess).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.sizeOfCollection).toBeUndefined()
+      expect(dataset.termsOfUse.termsOfAccess.studyCompletion).toBeUndefined()
+    })
+
+    test('should work when identifying dataset by persistent id', async () => {
+      const ids = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await updateTermsOfAccess.execute(ids.persistentId, {
+        termsOfAccessForRestrictedFiles: 'Persistent terms',
+        fileAccessRequest: false
+      })
+
+      const dataset = await sut.getDataset(
+        ids.persistentId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(dataset.persistentId).toBe(ids.persistentId)
+      expect(dataset.termsOfUse.termsOfAccess.fileAccessRequest).toBe(false)
+      expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe(
+        'Persistent terms'
+      )
+    })
+
+    test('should update terms on a published dataset (creates a draft)', async () => {
+      const ids = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await publishDataset.execute(ids.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(ids.numericId, 10)
+
+      await updateTermsOfAccess.execute(ids.numericId, {
+        fileAccessRequest: true,
+        termsOfAccessForRestrictedFiles: 'Updated after publish'
+      })
+
+      await waitForNoLocks(ids.numericId, 10)
+
+      const dataset = await sut.getDataset(
+        ids.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+
+      expect(dataset.versionInfo.state).toBe('DRAFT')
+      expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe(
+        'Updated after publish'
+      )
+
+      await deletePublishedDatasetViaApi(ids.persistentId)
+    })
+  })
+
+  describe('updateDatasetLicense', () => {
+    test('should update the license of a published dataset', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const DatasetBefore = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+      expect(DatasetBefore.license?.name).toBe('CC0 1.0') // default license
+
+      const payload: DatasetLicenseUpdateRequest = { name: 'CC BY 4.0' }
+      await sut.updateDatasetLicense(testDatasetIds.numericId, payload)
+
+      const DatasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+      expect(DatasetAfter.license?.name).toBe('CC BY 4.0')
+    })
+
+    test('should update the license of a draft dataset', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      const DatasetBefore = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.LATEST,
+        false,
+        false
+      )
+      expect(DatasetBefore.license?.name).toBe('CC0 1.0') // default license
+      const predefined: DatasetLicenseUpdateRequest = { name: 'CC BY 4.0' }
+      await sut.updateDatasetLicense(testDatasetIds.numericId, predefined)
+
+      const datasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.DRAFT,
+        false,
+        false
+      )
+
+      expect(datasetAfter.license?.name).toBe('CC BY 4.0')
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should set custom terms of use and access on the draft version', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      const custom: DatasetLicenseUpdateRequest = {
+        customTerms: {
+          termsOfUse: 'Your terms of use',
+          confidentialityDeclaration: 'Your confidentiality declaration',
+          specialPermissions: 'Your special permissions',
+          restrictions: 'Your restrictions',
+          citationRequirements: 'Your citation requirements',
+          depositorRequirements: 'Your depositor requirements',
+          conditions: 'Your conditions',
+          disclaimer: 'Your disclaimer'
+        }
+      }
+      const actual = await sut.updateDatasetLicense(testDatasetIds.numericId, custom)
+
+      expect(actual).toBeUndefined()
+
+      const datasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.DRAFT,
+        false,
+        false
+      )
+
+      expect(datasetAfter.license).toBeUndefined()
+      expect(datasetAfter.termsOfUse.customTerms?.termsOfUse).toBe('Your terms of use')
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should set custom terms of use and access on the published version', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const custom: DatasetLicenseUpdateRequest = {
+        customTerms: {
+          termsOfUse: 'Your terms of use',
+          confidentialityDeclaration: 'Your confidentiality declaration',
+          specialPermissions: 'Your special permissions',
+          restrictions: 'Your restrictions',
+          citationRequirements: 'Your citation requirements',
+          depositorRequirements: 'Your depositor requirements',
+          conditions: 'Your conditions',
+          disclaimer: 'Your disclaimer'
+        }
+      }
+      const actual = await sut.updateDatasetLicense(testDatasetIds.numericId, custom)
+
+      expect(actual).toBeUndefined()
+
+      const datasetAfter = await sut.getDataset(
+        testDatasetIds.numericId,
+        DatasetNotNumberedVersion.DRAFT,
+        false,
+        false
+      )
+
+      expect(datasetAfter.license).toBeUndefined()
+      expect(datasetAfter.termsOfUse.customTerms?.termsOfUse).toBe('Your terms of use')
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new WriteError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(
+        sut.updateDatasetLicense(nonExistentTestDatasetId, { name: 'CC BY 4.0' })
+      ).rejects.toThrow(expectedError)
+    })
+
+    test('should accept persistent id when updating license on draft dataset', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await sut.updateDatasetLicense(testDatasetIds.persistentId, { name: 'CC BY 4.0' })
+
+      const draftAfter = await sut.getDataset(
+        testDatasetIds.persistentId,
+        DatasetNotNumberedVersion.DRAFT,
+        false,
+        false
+      )
+      expect(draftAfter.license?.name).toBe('CC BY 4.0')
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should return error when payload is empty', async () => {
+      const testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+      await expect(
+        sut.updateDatasetLicense(testDatasetIds.numericId, {} as unknown as never)
+      ).rejects.toBeInstanceOf(WriteError)
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
   })
 })

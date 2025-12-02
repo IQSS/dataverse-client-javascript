@@ -51,6 +51,7 @@ export interface CustomTerms {
   conditions?: string
   disclaimer?: string
 }
+
 export interface TermsOfAccess {
   fileAccessRequest: boolean
   termsOfAccessForRestrictedFiles?: string

@@ -8,12 +8,14 @@ import { DatasetDeaccessionDTO } from '../dtos/DatasetDeaccessionDTO'
 import { MetadataBlock } from '../../../metadataBlocks'
 import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 import { DatasetDownloadCount } from '../models/DatasetDownloadCount'
-import { DatasetVersionSummaryInfo } from '../models/DatasetVersionSummaryInfo'
+import { DatasetVersionSummarySubset } from '../models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
 import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
 import { DatasetTemplate } from '../models/DatasetTemplate'
 import { DatasetType } from '../models/DatasetType'
+import { TermsOfAccess } from '../models/Dataset'
+import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
 
 export interface IDatasetsRepository {
@@ -66,7 +68,11 @@ export interface IDatasetsRepository {
     datasetId: number | string,
     includeMDC?: boolean
   ): Promise<DatasetDownloadCount>
-  getDatasetVersionsSummaries(datasetId: number | string): Promise<DatasetVersionSummaryInfo[]>
+  getDatasetVersionsSummaries(
+    datasetId: number | string,
+    limit?: number,
+    offset?: number
+  ): Promise<DatasetVersionSummarySubset>
   deleteDatasetDraft(datasetId: number | string): Promise<void>
   linkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
   unlinkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
@@ -91,4 +97,9 @@ export interface IDatasetsRepository {
     licenses: string[]
   ): Promise<void>
   deleteDatasetType(datasetTypeId: number): Promise<void>
+  updateTermsOfAccess(datasetId: number | string, termsOfAccess: TermsOfAccess): Promise<void>
+  updateDatasetLicense(
+    datasetId: number | string,
+    payload: DatasetLicenseUpdateRequest
+  ): Promise<void>
 }

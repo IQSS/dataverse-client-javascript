@@ -2,7 +2,8 @@ import { AxiosResponse } from 'axios'
 import {
   FileVersionSummaryInfo,
   FileMetadataChange,
-  FileDifferenceSummary
+  FileDifferenceSummary,
+  FileVersionSummarySubset
 } from '../../../domain/models/FileVersionSummaryInfo'
 import { DatasetVersionState } from '../../../../datasets/domain/models/Dataset'
 
@@ -29,10 +30,11 @@ export interface FileVersionSummaryInfoPayload {
 
 export const transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo = (
   response: AxiosResponse
-): FileVersionSummaryInfo[] => {
+): FileVersionSummarySubset => {
   const payload = response.data.data
+  const totalCount = response.data.totalCount
 
-  return payload.map((item: FileVersionSummaryInfoPayload): FileVersionSummaryInfo => {
+  const summaries = payload.map((item: FileVersionSummaryInfoPayload): FileVersionSummaryInfo => {
     const summary = item.fileDifferenceSummary || {}
 
     const fileDifferenceSummary: FileDifferenceSummary = {
@@ -54,4 +56,9 @@ export const transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo = (
       versionNote: item.versionNote
     }
   })
+
+  return {
+    summaries,
+    totalCount
+  }
 }

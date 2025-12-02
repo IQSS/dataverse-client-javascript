@@ -8,16 +8,20 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Datasets: Added `updateDatasetLicense` use case and repository method to support Dataverse endpoint `PUT /datasets/{id}/license`, for updating dataset license or custom terms
 - New Use Case: [Get Collections For Linking Use Case](./docs/useCases.md#get-collections-for-linking).
 - New Use Case: [Create a Dataset Template](./docs/useCases.md#create-a-dataset-template) under Collections.
 
-- In GetAllNotificationsByUser use case, added support for filtering unread messages and pagination.
+- New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
 
 ### Changed
+
+- Add pagination query parameters to Dataset Version Summeries and File Version Summaries use cases
 
 ### Fixed
 
 - In GetAllNotificationsByUser use case, additionalInfo field is returned as an object instead of a string.
+- In GetAllNotificationsByUser use case, added support for filtering unread messages and pagination.
 
 ### Removed
 

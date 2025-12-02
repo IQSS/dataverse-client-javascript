@@ -11,6 +11,11 @@ export interface FileVersionSummaryInfo {
   versionNote?: string
 }
 
+export interface FileVersionSummarySubset {
+  summaries: FileVersionSummaryInfo[]
+  totalCount: number
+}
+
 export type FileDifferenceSummary = {
   file?: FileChangeType
   fileAccess?: 'Restricted' | 'Unrestricted'

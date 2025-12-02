@@ -93,3 +93,10 @@ export { FilesSubset } from './domain/models/FilesSubset'
 export { FilePreview, FilePreviewChecksum } from './domain/models/FilePreview'
 export { UploadedFileDTO } from './domain/dtos/UploadedFileDTO'
 export { UpdateFileMetadataDTO } from './domain/dtos/UpdateFileMetadataDTO'
+export {
+  FileVersionSummaryInfo,
+  FileDifferenceSummary,
+  FileChangeType,
+  FileMetadataChange,
+  FileVersionSummarySubset
+} from './domain/models/FileVersionSummaryInfo'

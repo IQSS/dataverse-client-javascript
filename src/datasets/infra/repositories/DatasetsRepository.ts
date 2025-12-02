@@ -20,7 +20,7 @@ import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transf
 import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
-import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
+import { DatasetVersionSummarySubset } from '../../domain/models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
@@ -29,6 +29,9 @@ import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
 import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 import { DatasetType } from '../../domain/models/DatasetType'
+import { TermsOfAccess } from '../../domain/models/Dataset'
+import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
+import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
 
 export interface GetAllDatasetPreviewsQueryParams {
@@ -306,13 +309,29 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetVersionsSummaries(
-    datasetId: string | number
-  ): Promise<DatasetVersionSummaryInfo[]> {
+    datasetId: string | number,
+    limit?: number,
+    offset?: number
+  ): Promise<DatasetVersionSummarySubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set('limit', limit.toString())
+    }
+
+    if (offset) {
+      queryParams.set('offset', offset.toString())
+    }
+
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, 'versions/compareSummary', datasetId),
-      true
+      true,
+      queryParams
     )
-      .then((response) => response.data.data)
+      .then((response) => ({
+        summaries: response.data.data,
+        totalCount: response.data.totalCount
+      }))
       .catch((error) => {
         throw error
       })
@@ -464,6 +483,34 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes/' + datasetTypeId)
     )
       .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateTermsOfAccess(
+    datasetId: number | string,
+    termsOfAccess: TermsOfAccess
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, 'access', datasetId),
+      transformTermsOfAccessToUpdatePayload(termsOfAccess)
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateDatasetLicense(
+    datasetId: number | string,
+    payload: DatasetLicenseUpdateRequest
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, 'license', datasetId),
+      payload
+    )
+      .then(() => undefined)
       .catch((error) => {
         throw error
       })

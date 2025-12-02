@@ -925,11 +925,14 @@ describe('FilesRepository', () => {
         contributors: 'Dataverse Admin',
         datafileId: testFile.id,
         persistentId: testFile.persistentId,
+        publishedDate: '',
+        versionNote: undefined,
         fileDifferenceSummary: { file: 'Added' }
       }
 
-      expect(actual).toHaveLength(1)
-      expect(actual[0]).toEqual(fileSummmaries)
+      expect(actual.summaries).toHaveLength(1)
+      expect(actual.totalCount).toBe(1)
+      expect(actual.summaries[0]).toEqual(fileSummmaries)
       deleteUnpublishedDatasetViaApi(fileTestDatasetIds.numericId)
     })
 
@@ -953,7 +956,7 @@ describe('FilesRepository', () => {
 
       const publishedFileVersionSummmaries: FileVersionSummaryInfo = {
         datasetVersion: '1.0',
-        publishedDate: publishedFileVersionSummariesActual[0].publishedDate,
+        publishedDate: publishedFileVersionSummariesActual.summaries[0].publishedDate,
         versionState: DatasetVersionState.RELEASED,
         contributors: 'Dataverse Admin',
         datafileId: testFile.id,
@@ -961,8 +964,11 @@ describe('FilesRepository', () => {
         fileDifferenceSummary: { file: 'Added' }
       }
 
-      expect(publishedFileVersionSummariesActual).toHaveLength(1)
-      expect(publishedFileVersionSummariesActual[0]).toEqual(publishedFileVersionSummmaries)
+      expect(publishedFileVersionSummariesActual.summaries).toHaveLength(1)
+      expect(publishedFileVersionSummariesActual.totalCount).toBe(1)
+      expect(publishedFileVersionSummariesActual.summaries[0]).toEqual(
+        publishedFileVersionSummmaries
+      )
 
       await deaccessionDatasetViaApi(fileTestDatasetIds.numericId, '1.0').catch(() => {
         throw new Error('Error while deaccessioning test Dataset')
@@ -972,7 +978,7 @@ describe('FilesRepository', () => {
 
       const fileSummmaries: FileVersionSummaryInfo = {
         datasetVersion: '1.0',
-        publishedDate: publishedFileVersionSummariesActual[0].publishedDate,
+        publishedDate: publishedFileVersionSummariesActual.summaries[0].publishedDate,
         versionState: DatasetVersionState.DEACCESSIONED,
         contributors: 'Dataverse Admin',
         datafileId: testFile.id,
@@ -983,8 +989,9 @@ describe('FilesRepository', () => {
         }
       }
 
-      expect(actual).toHaveLength(1)
-      expect(actual[0]).toEqual(fileSummmaries)
+      expect(actual.summaries).toHaveLength(1)
+      expect(actual.totalCount).toBe(1)
+      expect(actual.summaries[0]).toEqual(fileSummmaries)
       deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
     })
 
@@ -1006,7 +1013,8 @@ describe('FilesRepository', () => {
       const testFile = datasetFiles.files[0]
       const actual = await sut.getFileVersionSummaries(testFile.id)
 
-      expect(actual).toHaveLength(1)
+      expect(actual.summaries).toHaveLength(1)
+      expect(actual.totalCount).toBe(1)
 
       await sut.updateFileMetadata(testFile.id, {
         description: 'My description test.',
@@ -1022,7 +1030,7 @@ describe('FilesRepository', () => {
         contributors: 'Dataverse Admin',
         datafileId: testFile.id,
         persistentId: testFile.persistentId,
-        publishedDate: actual[0].publishedDate,
+        publishedDate: '',
         versionNote: undefined,
         fileDifferenceSummary: {
           fileMetadata: [
@@ -1042,10 +1050,67 @@ describe('FilesRepository', () => {
         }
       }
 
-      expect(updatedFileVersionSummariesActual).toHaveLength(2)
-      expect(updatedFileVersionSummariesActual[0]).toEqual(updatedFileVersionSummaries)
+      expect(updatedFileVersionSummariesActual.summaries).toHaveLength(2)
+      expect(updatedFileVersionSummariesActual.totalCount).toBe(2)
+      expect(updatedFileVersionSummariesActual.summaries[0]).toEqual(updatedFileVersionSummaries)
       deletePublishedDatasetViaApi(fileTestDatasetIds.persistentId)
     })
+
+    test('should return file version summaries with pagination', async () => {
+      // Create a new dataset and upload a file
+      const paginationTestDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO
+      )
+      await uploadFileViaApi(paginationTestDatasetIds.numericId, testTextFile1Name)
+
+      // Publish initial version (creates version 1.0)
+      await publishDatasetViaApi(paginationTestDatasetIds.numericId)
+      await waitForNoLocks(paginationTestDatasetIds.numericId, 10)
+
+      // Get the file ID
+      const datasetFiles = await sut.getDatasetFiles(
+        paginationTestDatasetIds.numericId,
+        latestDatasetVersionId,
+        false,
+        FileOrderCriteria.NAME_AZ
+      )
+      const paginationTestFile = datasetFiles.files[0]
+
+      for (let i = 1; i <= 21; i++) {
+        await sut.updateFileMetadata(paginationTestFile.id, {
+          description: `File description update ${i}`,
+          label: `updated-file-${i}.txt`
+        })
+
+        await publishDatasetViaApi(paginationTestDatasetIds.numericId)
+        await waitForNoLocks(paginationTestDatasetIds.numericId, 10)
+      }
+
+      const firstPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 0)
+
+      expect(firstPage.summaries.length).toBe(5)
+      expect(firstPage.totalCount).toBe(22)
+      expect(firstPage.summaries[0].datasetVersion).toBe('22.0')
+      expect(firstPage.summaries[4].datasetVersion).toBe('18.0')
+
+      const secondPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 5)
+      expect(secondPage.summaries.length).toBe(5)
+      expect(secondPage.totalCount).toBe(22)
+      expect(secondPage.summaries[0].datasetVersion).toBe('17.0')
+      expect(secondPage.summaries[4].datasetVersion).toBe('13.0')
+
+      const thirdPage = await sut.getFileVersionSummaries(paginationTestFile.id, 5, 10)
+      expect(thirdPage.summaries.length).toBe(5)
+      expect(thirdPage.totalCount).toBe(22)
+      expect(thirdPage.summaries[0].datasetVersion).toBe('12.0')
+      expect(thirdPage.summaries[4].datasetVersion).toBe('8.0')
+
+      const allVersions = await sut.getFileVersionSummaries(paginationTestFile.id)
+      expect(allVersions.summaries.length).toBe(22)
+      expect(allVersions.totalCount).toBe(22)
+
+      await deletePublishedDatasetViaApi(paginationTestDatasetIds.persistentId)
+    }, 180000)
 
     test('should return error when file does not exist', async () => {
       const expectedError = new ReadError(`[404] File with ID ${nonExistentFiledId} not found.`)

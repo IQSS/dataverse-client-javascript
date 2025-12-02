@@ -46,6 +46,7 @@ The different use cases currently available in the package are classified below,
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
+    - [Update a Dataset License](#update-a-dataset-license)
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
     - [Delete a Draft Dataset](#delete-a-draft-dataset)
@@ -872,7 +873,7 @@ The `DatasetPreviewSubset`returned instance contains a property called `totalDat
 
 #### Get Dataset Versions Summaries
 
-Returns an array of [DatasetVersionSummaryInfo](../src/datasets/domain/models/DatasetVersionSummaryInfo.ts) that contains information about what changed in every specific version.
+Returns the total count of versions and an array of [DatasetVersionSummaryInfo](../src/datasets/domain/models/DatasetVersionSummaryInfo.ts) that contains information about what changed in every specific version.
 
 ##### Example call:
 
@@ -885,7 +886,7 @@ const datasetId = 'doi:10.77777/FK2/AAAAAA'
 
 getDatasetVersionsSummaries
   .execute(datasetId)
-  .then((datasetVersionsSummaries: DatasetVersionSummaryInfo[]) => {
+  .then((datasetVersionsSummaries: DatasetVersionSummarySubset) => {
     /* ... */
   })
 
@@ -894,7 +895,9 @@ getDatasetVersionsSummaries
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetVersionsSummaries.ts) implementation_.
 
-The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+- The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
 
 #### Get Dataset Linked Collections
 
@@ -1077,6 +1080,43 @@ updateDataset.execute(datasetId, datasetDTO)
 
 _See [use case](../src/datasets/domain/useCases/UpdateDataset.ts) implementation_.
 
+#### Update a Dataset License
+
+Updates the license of a dataset by applying it to the draft version. If no draft exists, a new one is automatically created by the API. Supports predefined licenses (by name) or custom terms of use and access.
+
+##### Example calls:
+
+```typescript
+import {
+  updateDatasetLicense,
+  DatasetLicenseUpdateRequest
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+
+const predefinedPayload: DatasetLicenseUpdateRequest = { name: 'CC BY 4.0' }
+await updateDatasetLicense.execute(datasetId, predefinedPayload)
+
+const customPayload: DatasetLicenseUpdateRequest = {
+  customTerms: {
+    termsOfUse: 'Your terms of use',
+    confidentialityDeclaration: 'Your confidentiality declaration',
+    specialPermissions: 'Your special permissions',
+    restrictions: 'Your restrictions',
+    citationRequirements: 'Your citation requirements',
+    depositorRequirements: 'Your depositor requirements',
+    conditions: 'Your conditions',
+    disclaimer: 'Your disclaimer'
+  }
+}
+
+updateDatasetLicense.execute(datasetId, customPayload)
+```
+
+_See [use case](../src/datasets/domain/useCases/UpdateDatasetLicense.ts) implementation_.
+
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 #### Publish a Dataset
@@ -1111,6 +1151,38 @@ The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/d
 - `VersionUpdateType.MINOR`
 - `VersionUpdateType.MAJOR`
 - `VersionUpdateType.UPDATE_CURRENT`
+
+#### Update Terms of Access
+
+Updates the Terms of Access for restricted files on a dataset.
+
+##### Example call:
+
+```typescript
+import { updateTermsOfAccess } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 3
+
+await updateTermsOfAccess.execute(datasetId, {
+  fileAccessRequest: true,
+  termsOfAccessForRestrictedFiles: 'Your terms of access for restricted files',
+  dataAccessPlace: 'Your data access place',
+  originalArchive: 'Your original archive',
+  availabilityStatus: 'Your availability status',
+  contactForAccess: 'Your contact for access',
+  sizeOfCollection: 'Your size of collection',
+  studyCompletion: 'Your study completion'
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/UpdateTermsOfAccess.ts) implementation_.
+
+Notes:
+
+- If the dataset is already published, this action creates a DRAFT version containing the new terms.
+- Unspecified fields are treated as omissions: sending only `fileAccessRequest` will update that field and leave all other terms absent (undefined). In practice, the new values you send fully replace the previous set of terms — so if you omit a field, you are effectively clearing it unless you include its original value in the new input.
 
 #### Deaccession a Dataset
 
@@ -2000,7 +2072,7 @@ The `fileId` parameter can be a string, for persistent identifiers, or a number,
 
 #### Get File Version Summaries
 
-Get the file versions summaries, return a list of summaries for each version
+Get the file versions summaries, return a total count of versions and a list of summaries for each version
 
 ##### Example call:
 
@@ -2011,7 +2083,7 @@ import { getFileVersionSummaries } from '@iqss/dataverse-client-javascript'
 
 const fileId = 1
 
-getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummaryInfo[]) => {
+getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionSummarySubset) => {
   /* ... */
 })
 
@@ -2019,6 +2091,9 @@ getFileVersionSummaries.execute(fileId).then((fileVersionSummaries: fileVersionS
 ```
 
 _See [use case](../src/files/domain/useCases/GetFileVersionSummaries.ts) implementation_.
+
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
 
 ## Metadata Blocks
 

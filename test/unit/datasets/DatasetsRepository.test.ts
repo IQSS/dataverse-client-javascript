@@ -12,7 +12,11 @@ import {
   createUpdateDatasetRequestPayload
 } from '../../testHelpers/datasets/datasetHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { DatasetNotNumberedVersion, DatasetPreviewSubset } from '../../../src/datasets'
+import {
+  DatasetNotNumberedVersion,
+  DatasetPreviewSubset,
+  DatasetVersionSummarySubset
+} from '../../../src/datasets'
 import { createDatasetUserPermissionsModel } from '../../testHelpers/datasets/datasetUserPermissionsHelper'
 import {
   createDatasetLockModel,
@@ -1050,12 +1054,16 @@ describe('DatasetsRepository', () => {
   })
 
   describe('getDatasetVersionSummaries', () => {
-    const testDatasetVersionSummaries = createDatasetVersionSummaryModel()
+    const testDatasetVersionSummariesSubset: DatasetVersionSummarySubset = {
+      summaries: [createDatasetVersionSummaryModel()],
+      totalCount: 1
+    }
 
     const testDatasetVersionSummariesResponse = {
       data: {
         status: 'OK',
-        data: [testDatasetVersionSummaries]
+        data: testDatasetVersionSummariesSubset.summaries,
+        totalCount: testDatasetVersionSummariesSubset.totalCount
       }
     }
 
@@ -1068,22 +1076,37 @@ describe('DatasetsRepository', () => {
         // API Key auth
         let actual = await sut.getDatasetVersionsSummaries(testDatasetModel.id)
 
-        expect(axios.get).toHaveBeenCalledWith(
+        const expectedRequestParams = new URLSearchParams()
+
+        const expectedRequestConfigApiKey = {
+          params: expectedRequestParams,
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        }
+
+        expect(axios.get).toHaveBeenNthCalledWith(
+          1,
           expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+          expectedRequestConfigApiKey
         )
-        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+        expect(actual).toStrictEqual(testDatasetVersionSummariesSubset)
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
 
         actual = await sut.getDatasetVersionsSummaries(testDatasetModel.id)
 
-        expect(axios.get).toHaveBeenCalledWith(
+        const expectedRequestConfigSessionCookie = {
+          params: expectedRequestParams,
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+          withCredentials: true
+        }
+
+        expect(axios.get).toHaveBeenNthCalledWith(
+          2,
           expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+          expectedRequestConfigSessionCookie
         )
-        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+        expect(actual).toStrictEqual(testDatasetVersionSummariesSubset)
       })
 
       test('should return error result on error response', async () => {
@@ -1092,10 +1115,14 @@ describe('DatasetsRepository', () => {
         let error = undefined as unknown as ReadError
         await sut.getDatasetVersionsSummaries(testDatasetModel.id).catch((e) => (error = e))
 
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-        )
+        const expectedRequestParams = new URLSearchParams()
+
+        const expectedRequestConfigApiKey = {
+          params: expectedRequestParams,
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        }
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(error).toBeInstanceOf(ReadError)
       })
     })
@@ -1109,22 +1136,37 @@ describe('DatasetsRepository', () => {
         // API Key auth
         let actual = await sut.getDatasetVersionsSummaries(TestConstants.TEST_DUMMY_PERSISTENT_ID)
 
-        expect(axios.get).toHaveBeenCalledWith(
+        const expectedRequestParams = new URLSearchParams()
+
+        const expectedRequestConfigApiKey = {
+          params: expectedRequestParams,
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        }
+
+        expect(axios.get).toHaveBeenNthCalledWith(
+          1,
           expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+          expectedRequestConfigApiKey
         )
-        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+        expect(actual).toStrictEqual(testDatasetVersionSummariesSubset)
 
         // Session cookie auth
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
 
         actual = await sut.getDatasetVersionsSummaries(TestConstants.TEST_DUMMY_PERSISTENT_ID)
 
-        expect(axios.get).toHaveBeenCalledWith(
+        const expectedRequestConfigSessionCookie = {
+          params: expectedRequestParams,
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE.headers,
+          withCredentials: true
+        }
+
+        expect(axios.get).toHaveBeenNthCalledWith(
+          2,
           expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+          expectedRequestConfigSessionCookie
         )
-        expect(actual).toStrictEqual([testDatasetVersionSummaries])
+        expect(actual).toStrictEqual(testDatasetVersionSummariesSubset)
       })
 
       test('should return error result on error response', async () => {
@@ -1135,10 +1177,14 @@ describe('DatasetsRepository', () => {
           .getDatasetVersionsSummaries(TestConstants.TEST_DUMMY_PERSISTENT_ID)
           .catch((e) => (error = e))
 
-        expect(axios.get).toHaveBeenCalledWith(
-          expectedApiEndpoint,
-          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-        )
+        const expectedRequestParams = new URLSearchParams()
+
+        const expectedRequestConfigApiKey = {
+          params: expectedRequestParams,
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        }
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(error).toBeInstanceOf(ReadError)
       })
     })
