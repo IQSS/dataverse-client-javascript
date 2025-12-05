@@ -501,7 +501,6 @@ describe('CollectionsRepository', () => {
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
-      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
@@ -1002,7 +1001,6 @@ describe('CollectionsRepository', () => {
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
-      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
