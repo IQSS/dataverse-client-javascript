@@ -15,15 +15,27 @@ import { MultipartAbortError } from './errors/MultipartAbortError'
 import { FileUploadCancelError } from './errors/FileUploadCancelError'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
+export interface DirectUploadClientConfig {
+  /** Maximum number of retries for multipart upload parts. Default: 5 */
+  maxMultipartRetries?: number
+  /** Whether to include S3 tagging header (x-amz-tagging: dv-state=temp). Default: true
+   *  Set to false if your S3 implementation doesn't support object tagging. */
+  useS3Tagging?: boolean
+  /** Timeout in milliseconds for file upload operations. Default: 60000 */
+  fileUploadTimeoutMs?: number
+}
+
 export class DirectUploadClient implements IDirectUploadClient {
   private filesRepository: IFilesRepository
   private maxMultipartRetries: number
+  private useS3Tagging: boolean
+  private readonly fileUploadTimeoutMs: number
 
-  private readonly fileUploadTimeoutMs: number = 60_000
-
-  constructor(filesRepository: IFilesRepository, maxMultipartRetries = 5) {
+  constructor(filesRepository: IFilesRepository, config: DirectUploadClientConfig = {}) {
     this.filesRepository = filesRepository
-    this.maxMultipartRetries = maxMultipartRetries
+    this.maxMultipartRetries = config.maxMultipartRetries ?? 5
+    this.useS3Tagging = config.useS3Tagging ?? true
+    this.fileUploadTimeoutMs = config.fileUploadTimeoutMs ?? 60_000
   }
 
   public async uploadFile(
@@ -59,11 +71,15 @@ export class DirectUploadClient implements IDirectUploadClient {
   ): Promise<void> {
     try {
       const arrayBuffer = await file.arrayBuffer()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/octet-stream'
+      }
+      // Only add S3 tagging header if enabled (some S3 implementations don't support it)
+      if (this.useS3Tagging) {
+        headers['x-amz-tagging'] = 'dv-state=temp'
+      }
       await axios.put(destination.urls[0], arrayBuffer, {
-        headers: {
-          'Content-Type': 'application/octet-stream',
-          'x-amz-tagging': 'dv-state=temp'
-        },
+        headers,
         timeout: this.fileUploadTimeoutMs,
         signal: abortController.signal,
         onUploadProgress: (progressEvent) =>

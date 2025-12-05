@@ -13,10 +13,15 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - New Use Case: [Create a Dataset Template](./docs/useCases.md#create-a-dataset-template) under Collections.
 
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
+- Files: Added `FilesConfig` class for configuring file upload behavior at runtime, including:
+  - `useS3Tagging`: Option to disable S3 object tagging (`x-amz-tagging` header) for S3-compatible storage that doesn't support tagging. Default: `true`.
+  - `maxMultipartRetries`: Configurable maximum retries for multipart upload parts. Default: `5`.
+  - `fileUploadTimeoutMs`: Configurable timeout for file upload operations. Default: `60000`.
 
 ### Changed
 
 - Add pagination query parameters to Dataset Version Summeries and File Version Summaries use cases
+- Files: `DirectUploadClient` constructor now accepts a `DirectUploadClientConfig` object instead of a plain number for `maxMultipartRetries`.
 
 ### Fixed
 
