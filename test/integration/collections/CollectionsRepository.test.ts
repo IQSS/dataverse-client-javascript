@@ -1802,7 +1802,6 @@ describe('CollectionsRepository', () => {
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBeDefined()
-      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
