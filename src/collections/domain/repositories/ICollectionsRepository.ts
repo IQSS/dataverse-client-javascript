@@ -25,6 +25,10 @@ export interface ICollectionsRepository {
   getCollectionUserPermissions(
     collectionIdOrAlias: number | string
   ): Promise<CollectionUserPermissions>
+  setDefaultContributorRole(
+    collectionIdOrAlias: number | string,
+    roleAlias: string
+  ): Promise<void>
   getCollectionItems(
     collectionId?: string,
     limit?: number,

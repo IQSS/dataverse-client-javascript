@@ -167,6 +167,20 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
+  public async setDefaultContributorRole(
+    collectionIdOrAlias: number | string,
+    roleAlias: string
+  ): Promise<void> {
+    return this.doPut(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/defaultContributorRole/${roleAlias}`,
+      {}
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
   public async getCollectionItems(
     collectionId?: string,
     limit?: number,
