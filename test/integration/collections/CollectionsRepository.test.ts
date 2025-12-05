@@ -68,7 +68,8 @@ describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
   const sut: CollectionsRepository = new CollectionsRepository()
   let testCollectionId: number
-  const currentYear = new Date().getFullYear()
+  // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+  // const currentYear = new Date().getFullYear()
 
   beforeAll(async () => {
     // create builtin user and pass API key to APiConfig
@@ -432,7 +433,8 @@ describe('CollectionsRepository', () => {
       const actualCollectionPreview = actual.items[2] as CollectionPreview
 
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
-      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-1.txt'
       const expectedCollectionsName = 'Scientific Research'
@@ -501,6 +503,8 @@ describe('CollectionsRepository', () => {
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
@@ -521,7 +525,8 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.canDownloadFile).toBe(true)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
-      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      //  expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
@@ -994,13 +999,16 @@ describe('CollectionsRepository', () => {
 
       const expectedFileMd5 = '77c7f03a7d7772907b43f0b322cef723'
 
-      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case`
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      //  const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-4.tab'
       const expectedCollectionsName = 'Scientific Research'
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      //     expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
@@ -1023,7 +1031,8 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.variables).toBe(3)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
-      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
@@ -1781,7 +1790,8 @@ describe('CollectionsRepository', () => {
       ) as CollectionPreview
 
       const expectedFileMd5 = '799b5c8c5fdcfbd56c3943f7a6c35326'
-      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      //      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-2.txt'
       const expectedCollectionsName = 'Test Collection'
@@ -1802,6 +1812,8 @@ describe('CollectionsRepository', () => {
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBeDefined()
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
@@ -1821,7 +1833,8 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.canDownloadFile).toBe(true)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
-      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
