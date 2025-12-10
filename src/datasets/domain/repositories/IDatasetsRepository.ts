@@ -102,4 +102,9 @@ export interface IDatasetsRepository {
     payload: DatasetLicenseUpdateRequest
   ): Promise<void>
   getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver>
+  assignRoleOnDataset(
+    datasetId: number | string,
+    roleAssignee: string,
+    roleAlias: string
+  ): Promise<void>
 }
