@@ -2,22 +2,30 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { INotificationsRepository } from '../../domain/repositories/INotificationsRepository'
 import { Notification } from '../../domain/models/Notification'
 import { NotificationPayload } from '../transformers/NotificationPayload'
+import { NotificationSubset } from '../../domain/models/NotificationSubset'
 
 export class NotificationsRepository extends ApiRepository implements INotificationsRepository {
   private readonly notificationsResourceName: string = 'notifications'
 
   public async getAllNotificationsByUser(
-    inAppNotificationFormat?: boolean
-  ): Promise<Notification[]> {
-    const queryParams = inAppNotificationFormat ? { inAppNotificationFormat: 'true' } : undefined
+    inAppNotificationFormat?: boolean,
+    onlyUnread?: boolean,
+    limit?: number,
+    offset?: number
+  ): Promise<NotificationSubset> {
+    const queryParams = new URLSearchParams()
+
+    if (inAppNotificationFormat) queryParams.set('inAppNotificationFormat', 'true')
+    if (onlyUnread) queryParams.set('onlyUnread', 'true')
+    if (limit !== undefined) queryParams.set('limit', limit.toString())
+    if (offset !== undefined) queryParams.set('offset', offset.toString())
     return this.doGet(
       this.buildApiEndpoint(this.notificationsResourceName, 'all'),
       true,
       queryParams
     )
       .then((response) => {
-        const notifications = response.data.data.notifications
-        return notifications.map((notification: NotificationPayload) => {
+        const notifications = response.data.data.map((notification: NotificationPayload) => {
           const { dataverseDisplayName, dataverseAlias, ...restNotification } = notification
           return {
             ...restNotification,
@@ -25,6 +33,8 @@ export class NotificationsRepository extends ApiRepository implements INotificat
             ...(dataverseAlias && { collectionAlias: dataverseAlias })
           }
         }) as Notification[]
+        const totalNotificationCount = response.data.totalCount
+        return { notifications, totalNotificationCount }
       })
       .catch((error) => {
         throw error
