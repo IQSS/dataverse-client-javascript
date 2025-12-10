@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios'
 import {
   CollectionContactPayload,
   CollectionInputLevelPayload,
-  CollectionPayload
+  CollectionPayload,
 } from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import { CollectionFacet } from '../../../domain/models/CollectionFacet'
@@ -74,6 +74,9 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     isFacetRoot: collectionPayload.isFacetRoot,
     description: collectionPayload.description,
     childCount: collectionPayload.childCount,
+    ...(collectionPayload.theme && {
+      theme: collectionPayload.theme
+    }),
     ...(collectionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
     }),
