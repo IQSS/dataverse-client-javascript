@@ -107,4 +107,8 @@ export interface IDatasetsRepository {
     roleAssignee: string,
     roleAlias: string
   ): Promise<void>
+  unassignRoleOnDataset(
+    datasetId: number | string,
+    roleAssignmentId: number
+  ): Promise<void>
 }

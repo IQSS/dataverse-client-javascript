@@ -35,6 +35,7 @@ import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 import { AssignRoleOnDataset } from './domain/useCases/AssignRoleOnDataset'
+import { UnassignRoleOnDataset } from './domain/useCases/UnassignRoleOnDataset'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -86,6 +87,7 @@ const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 const assignRoleOnDataset = new AssignRoleOnDataset(datasetsRepository)
+const unassignRoleOnDataset = new AssignRoleOnDataset(datasetsRepository)
 
 export {
   getDataset,
@@ -118,7 +120,8 @@ export {
   deleteDatasetType,
   updateDatasetLicense,
   getDatasetStorageDriver,
-  assignRoleOnDataset
+  assignRoleOnDataset,
+  unassignRoleOnDataset
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
