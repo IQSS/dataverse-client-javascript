@@ -2244,4 +2244,28 @@ describe('DatasetsRepository', () => {
       await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
   })
+
+  describe('getDatasetStorageDriver', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return storage driver info for dataset', async () => {
+      const storageDriver = await sut.getDatasetStorageDriver(testDatasetIds.numericId)
+      expect(storageDriver).toHaveProperty('name')
+      expect(storageDriver).toHaveProperty('type')
+      expect(storageDriver).toHaveProperty('label')
+      expect(typeof storageDriver.directUpload).toBe('boolean')
+      expect(typeof storageDriver.directDownload).toBe('boolean')
+      expect(typeof storageDriver.uploadOutOfBand).toBe('boolean')
+    })
+  })
 })

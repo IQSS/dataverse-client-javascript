@@ -34,6 +34,7 @@ import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCi
 import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
 import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
+import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -84,6 +85,7 @@ const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(da
 const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
 const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
+const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 
 export {
   getDataset,
@@ -115,7 +117,8 @@ export {
   linkDatasetTypeWithMetadataBlocks,
   setAvailableLicensesForDatasetType,
   deleteDatasetType,
-  updateDatasetLicense
+  updateDatasetLicense,
+  getDatasetStorageDriver
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
