@@ -17,6 +17,7 @@ import { UnlinkCollection } from './domain/useCases/UnlinkCollection'
 import { GetCollectionLinks } from './domain/useCases/GetCollectionLinks'
 import { GetCollectionsForLinking } from './domain/useCases/GetCollectionsForLinking'
 import { AssignRoleOnCollection } from './domain/useCases/AssignRoleOnCollection'
+import { UnassignRoleOnCollection } from './domain/useCases/UnassignRoleOnCollection'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -38,6 +39,7 @@ const unlinkCollection = new UnlinkCollection(collectionsRepository)
 const getCollectionLinks = new GetCollectionLinks(collectionsRepository)
 const getCollectionsForLinking = new GetCollectionsForLinking(collectionsRepository)
 const assignRoleOnCollection = new AssignRoleOnCollection(collectionsRepository)
+const unassignRoleOnCollection = new UnassignRoleOnCollection(collectionsRepository)
 
 export {
   getCollection,
@@ -57,7 +59,8 @@ export {
   unlinkCollection,
   getCollectionLinks,
   getCollectionsForLinking,
-  assignRoleOnCollection
+  assignRoleOnCollection,
+  unassignRoleOnCollection
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'

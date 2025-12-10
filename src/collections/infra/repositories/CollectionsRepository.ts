@@ -182,6 +182,17 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
+  public async unassignRoleOnCollection(
+    collectionIdOrAlias: number | string,
+    roleAssignmentId: number
+  ): Promise<void> {
+    return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}/assignments/${roleAssignmentId}`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
   public async getCollectionItems(
     collectionId?: string,
     limit?: number,
