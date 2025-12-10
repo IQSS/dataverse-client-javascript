@@ -538,7 +538,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     return this.doGet("/mydata/retrieve/collectionList", true, queryParams)
       .then((response) => {
-        const payload = response.data.data as {
+        const payload = response.data.data.items as {
           id: number
           alias: string
           name: string
