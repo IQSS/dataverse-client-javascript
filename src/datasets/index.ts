@@ -87,7 +87,7 @@ const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 const assignRoleOnDataset = new AssignRoleOnDataset(datasetsRepository)
-const unassignRoleOnDataset = new AssignRoleOnDataset(datasetsRepository)
+const unassignRoleOnDataset = new UnassignRoleOnDataset(datasetsRepository)
 
 export {
   getDataset,
