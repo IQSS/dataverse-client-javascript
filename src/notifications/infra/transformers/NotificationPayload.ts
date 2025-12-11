@@ -25,6 +25,6 @@ export interface NotificationPayload {
   dataFileId?: number
   dataFileDisplayName?: string
   currentCurationStatus?: string
-  additionalInfo?: string
+  additionalInfo?: Record<string, unknown>
   objectDeleted?: boolean
 }
