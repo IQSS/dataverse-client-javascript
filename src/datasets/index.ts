@@ -157,3 +157,4 @@ export {
 export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
 export { DatasetType } from './domain/models/DatasetType'
 export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'
+export { StorageDriver } from './domain/models/StorageDriver'

@@ -16,3 +16,6 @@ coverage
 # ignore npm lock
 package-json.lock
 .npmrc
+
+# test environment docker volumes
+test/environment/docker-dev-volumes

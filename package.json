@@ -19,7 +19,7 @@
     "lint:fix": "eslint --fix --ext .ts ./src --ignore-path .gitignore .",
     "lint:eslint": "eslint --ignore-path .gitignore .",
     "lint:prettier": "prettier --check '**/*.(yml|json|md)'",
-    "format": "prettier --write './**/*.{js,ts,md,json,yml,md}' --config ./.prettierrc",
+    "format": "prettier --write 'src/**/*.{js,ts}' 'docs/**/*.md' '*.{json,yml,md}' --config ./.prettierrc",
     "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
