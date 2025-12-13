@@ -1372,7 +1372,7 @@ getDatasetStorageDriver.execute(datasetId).then((storageDriver: StorageDriver) =
 /* ... */
 ```
 
-_See [use case](../src/datasets/domain/useCases/GetDatasetStorageDriver.ts)_ implementation\_.
+_See [use case](../src/datasets/domain/useCases/GetDatasetStorageDriver.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
