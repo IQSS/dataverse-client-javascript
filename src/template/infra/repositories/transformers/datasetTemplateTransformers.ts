@@ -3,55 +3,66 @@ import { DatasetTemplate } from '../../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './DatasetTemplatePayload'
 import { transformPayloadToDatasetMetadataBlocks } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
 
-export const transformDatasetTemplatePayloadToDatasetTemplate = (
-  collectionDatasetTemplatePayload: DatasetTemplatePayload[]
+export const transformTemplatePayloadToTemplate = (
+  collectionDatasetTemplatePayload: DatasetTemplatePayload
+): DatasetTemplate => {
+  const datasetTemplate: DatasetTemplate = {
+    id: collectionDatasetTemplatePayload.id,
+    name: collectionDatasetTemplatePayload.name,
+    collectionAlias: collectionDatasetTemplatePayload.dataverseAlias,
+    isDefault: collectionDatasetTemplatePayload.isDefault,
+    usageCount: collectionDatasetTemplatePayload.usageCount,
+    createTime: collectionDatasetTemplatePayload.createTime,
+    createDate: collectionDatasetTemplatePayload.createDate,
+    datasetMetadataBlocks: transformPayloadToDatasetMetadataBlocks(
+      collectionDatasetTemplatePayload.datasetFields,
+      false
+    ),
+    instructions: collectionDatasetTemplatePayload.instructions.map((instruction) => ({
+      instructionField: instruction.instructionField,
+      instructionText: instruction.instructionText
+    })),
+    termsOfUse: {
+      termsOfAccess: {
+        fileAccessRequest: collectionDatasetTemplatePayload.termsOfUseAndAccess.fileAccessRequest,
+        termsOfAccessForRestrictedFiles:
+          collectionDatasetTemplatePayload.termsOfUseAndAccess.termsOfAccess,
+        dataAccessPlace: collectionDatasetTemplatePayload.termsOfUseAndAccess.dataAccessPlace,
+        originalArchive: collectionDatasetTemplatePayload.termsOfUseAndAccess.originalArchive,
+        availabilityStatus: collectionDatasetTemplatePayload.termsOfUseAndAccess.availabilityStatus,
+        contactForAccess: collectionDatasetTemplatePayload.termsOfUseAndAccess.contactForAccess,
+        sizeOfCollection: collectionDatasetTemplatePayload.termsOfUseAndAccess.sizeOfCollection,
+        studyCompletion: collectionDatasetTemplatePayload.termsOfUseAndAccess.studyCompletion
+      }
+    }
+  }
+
+  if (collectionDatasetTemplatePayload.termsOfUseAndAccess.license) {
+    datasetTemplate.license = transformPayloadLicenseToLicense(
+      collectionDatasetTemplatePayload.termsOfUseAndAccess.license
+    )
+  } else {
+    datasetTemplate.termsOfUse.customTerms = {
+      termsOfUse: collectionDatasetTemplatePayload.termsOfUseAndAccess.termsOfUse as string,
+      confidentialityDeclaration: collectionDatasetTemplatePayload.termsOfUseAndAccess
+        .confidentialityDeclaration as string,
+      specialPermissions: collectionDatasetTemplatePayload.termsOfUseAndAccess
+        .specialPermissions as string,
+      restrictions: collectionDatasetTemplatePayload.termsOfUseAndAccess.restrictions as string,
+      citationRequirements: collectionDatasetTemplatePayload.termsOfUseAndAccess
+        .citationRequirements as string,
+      depositorRequirements: collectionDatasetTemplatePayload.termsOfUseAndAccess
+        .depositorRequirements as string,
+      conditions: collectionDatasetTemplatePayload.termsOfUseAndAccess.conditions as string,
+      disclaimer: collectionDatasetTemplatePayload.termsOfUseAndAccess.disclaimer as string
+    }
+  }
+
+  return datasetTemplate
+}
+
+export const transformTemplatePayloadsToTemplates = (
+  datasetTemplatePayloads: DatasetTemplatePayload[]
 ): DatasetTemplate[] => {
-  return collectionDatasetTemplatePayload.map((payload) => {
-    const datasetTemplate: DatasetTemplate = {
-      id: payload.id,
-      name: payload.name,
-      collectionAlias: payload.dataverseAlias,
-      isDefault: payload.isDefault,
-      usageCount: payload.usageCount,
-      createTime: payload.createTime,
-      createDate: payload.createDate,
-      datasetMetadataBlocks: transformPayloadToDatasetMetadataBlocks(payload.datasetFields, false),
-      instructions: payload.instructions.map((instruction) => ({
-        instructionField: instruction.instructionField,
-        instructionText: instruction.instructionText
-      })),
-      termsOfUse: {
-        termsOfAccess: {
-          fileAccessRequest: payload.termsOfUseAndAccess.fileAccessRequest,
-          termsOfAccessForRestrictedFiles: payload.termsOfUseAndAccess.termsOfAccess,
-          dataAccessPlace: payload.termsOfUseAndAccess.dataAccessPlace,
-          originalArchive: payload.termsOfUseAndAccess.originalArchive,
-          availabilityStatus: payload.termsOfUseAndAccess.availabilityStatus,
-          contactForAccess: payload.termsOfUseAndAccess.contactForAccess,
-          sizeOfCollection: payload.termsOfUseAndAccess.sizeOfCollection,
-          studyCompletion: payload.termsOfUseAndAccess.studyCompletion
-        }
-      }
-    }
-
-    if (payload.termsOfUseAndAccess.license) {
-      datasetTemplate.license = transformPayloadLicenseToLicense(
-        payload.termsOfUseAndAccess.license
-      )
-    } else {
-      datasetTemplate.termsOfUse.customTerms = {
-        termsOfUse: payload.termsOfUseAndAccess.termsOfUse as string,
-        confidentialityDeclaration: payload.termsOfUseAndAccess
-          .confidentialityDeclaration as string,
-        specialPermissions: payload.termsOfUseAndAccess.specialPermissions as string,
-        restrictions: payload.termsOfUseAndAccess.restrictions as string,
-        citationRequirements: payload.termsOfUseAndAccess.citationRequirements as string,
-        depositorRequirements: payload.termsOfUseAndAccess.depositorRequirements as string,
-        conditions: payload.termsOfUseAndAccess.conditions as string,
-        disclaimer: payload.termsOfUseAndAccess.disclaimer as string
-      }
-    }
-
-    return datasetTemplate
-  })
+  return datasetTemplatePayloads.map((payload) => transformTemplatePayloadToTemplate(payload))
 }

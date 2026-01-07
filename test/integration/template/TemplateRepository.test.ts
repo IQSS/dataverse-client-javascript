@@ -8,10 +8,7 @@ import {
   createCollectionViaApi,
   deleteCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
-import {
-  createDatasetTemplateViaApi,
-  deleteDatasetTemplateViaApi
-} from '../../testHelpers/datasets/datasetTemplatesHelper'
+import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
 describe('TemplatesRepository', () => {
   const sut: TemplatesRepository = new TemplatesRepository()
@@ -33,7 +30,7 @@ describe('TemplatesRepository', () => {
   describe('createDatasetTemplate', () => {
     const templateDto: CreateDatasetTemplateDTO = {
       name: 'CollectionsRepository template',
-      isDefault: true,
+      isDefault: false,
       fields: [
         {
           typeName: 'author',
@@ -73,7 +70,7 @@ describe('TemplatesRepository', () => {
         templateDto.instructions?.length ?? 0
       )
 
-      deleteDatasetTemplateViaApi(templates[templates.length - 1].id)
+      await deleteDatasetTemplateViaApi(templates[templates.length - 1].id)
     })
 
     test('should return error when creating a template with invalidCollectionAlias', async () => {
@@ -87,27 +84,166 @@ describe('TemplatesRepository', () => {
   })
 
   describe('getDatasetTemplates', () => {
-    test('should return the right number of dataset templates', async () => {
+    test('should return empty dataset templates', async () => {
       const actual = await sut.getDatasetTemplates(testCollectionAlias)
 
-      expect(actual.length).toBe(1)
+      expect(actual.length).toBe(0)
     })
 
     test('should return dataset templates for a collection', async () => {
-      const templateCreated = await createDatasetTemplateViaApi(testCollectionAlias)
+      await createDatasetTemplate.execute(
+        {
+          name: 'Template for GetDatasetTemplates',
+          isDefault: false,
+          fields: [
+            {
+              typeName: 'author',
+              typeClass: MetadataFieldTypeClass.Compound,
+              multiple: true,
+              value: [
+                {
+                  authorName: {
+                    typeName: 'authorName',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'Belicheck, Bill'
+                  },
+                  authorAffiliation: {
+                    typeName: 'authorIdentifierScheme',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'ORCID'
+                  }
+                }
+              ]
+            }
+          ],
+          instructions: [
+            {
+              instructionField: 'author',
+              instructionText: 'The author data'
+            }
+          ]
+        },
+        testCollectionAlias
+      )
 
       const actual = await sut.getDatasetTemplates(testCollectionAlias)
 
       expect(actual.length).toBe(1)
 
-      expect(actual[0].name).toBe(templateCreated.name)
-      expect(actual[0].isDefault).toBe(templateCreated.isDefault)
+      expect(actual[0].name).toBe('Template for GetDatasetTemplates')
+      expect(actual[0].isDefault).toBe(false)
       expect(actual[0].datasetMetadataBlocks.length).toBe(1)
       expect(actual[0].datasetMetadataBlocks[0].name).toBe('citation')
       expect(actual[0].datasetMetadataBlocks[0].fields.author.length).toBe(1)
-      expect(actual[0].instructions.length).toBe(templateCreated.instructions.length)
+      expect(actual[0].instructions.length).toBe(1)
 
       await deleteDatasetTemplateViaApi(actual[0].id)
+    })
+  })
+
+  describe('getTemplate', () => {
+    test('should return a dataset template by id', async () => {
+      await createDatasetTemplate.execute(
+        {
+          name: 'Template for GetTemplate',
+          isDefault: false,
+          fields: [
+            {
+              typeName: 'author',
+              typeClass: MetadataFieldTypeClass.Compound,
+              multiple: true,
+              value: [
+                {
+                  authorName: {
+                    typeName: 'authorName',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'Belicheck, Bill'
+                  },
+                  authorAffiliation: {
+                    typeName: 'authorIdentifierScheme',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'ORCID'
+                  }
+                }
+              ]
+            }
+          ],
+          instructions: [
+            {
+              instructionField: 'author',
+              instructionText: 'The author data'
+            }
+          ]
+        },
+        testCollectionAlias
+      )
+      const templates = await getDatasetTemplates.execute(testCollectionAlias)
+      const templateId = templates[templates.length - 1].id
+      const templateExpectedIsDefault = templates[templates.length - 1].isDefault
+
+      const actual = await sut.getTemplate(templateId)
+
+      expect(actual.name).toBe('Template for GetTemplate')
+      expect(actual.isDefault).toBe(templateExpectedIsDefault)
+      expect(actual.datasetMetadataBlocks.length).toBe(1)
+      expect(actual.datasetMetadataBlocks[0].name).toBe('citation')
+      expect(actual.datasetMetadataBlocks[0].fields.author.length).toBe(1)
+      expect(actual.instructions.length).toBe(1)
+
+      await deleteDatasetTemplateViaApi(templateId)
+    })
+
+    test('should return error when template does not exist', async () => {
+      await expect(sut.getTemplate(999999)).rejects.toThrow()
+    })
+  })
+
+  describe('deleteTemplate', () => {
+    test('should delete a dataset template by id', async () => {
+      await createDatasetTemplate.execute(
+        {
+          name: 'Template for DeleteTemplate',
+          isDefault: false,
+          fields: [
+            {
+              typeName: 'author',
+              typeClass: MetadataFieldTypeClass.Compound,
+              multiple: true,
+              value: [
+                {
+                  authorName: {
+                    typeName: 'authorName',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'Belicheck, Bill'
+                  },
+                  authorAffiliation: {
+                    typeName: 'authorIdentifierScheme',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'ORCID'
+                  }
+                }
+              ]
+            }
+          ],
+          instructions: [
+            {
+              instructionField: 'author',
+              instructionText: 'The author data'
+            }
+          ]
+        },
+        testCollectionAlias
+      )
+      const templates = await getDatasetTemplates.execute(testCollectionAlias)
+      const templateId = templates[templates.length - 1].id
+
+      await sut.deleteTemplate(templateId)
+
+      await expect(sut.getTemplate(templateId)).rejects.toThrow()
+    })
+
+    test('should return error when deleting a template that does not exist', async () => {
+      await expect(sut.deleteTemplate(999999)).rejects.toThrow()
     })
   })
 })

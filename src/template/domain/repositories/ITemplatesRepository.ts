@@ -6,5 +6,7 @@ export interface ITemplatesRepository {
     collectionIdOrAlias: number | string,
     template: CreateDatasetTemplateDTO
   ): Promise<void>
+  getTemplate(templateId: number): Promise<DatasetTemplate>
   getDatasetTemplates(collectionIdOrAlias: number | string): Promise<DatasetTemplate[]>
+  deleteTemplate(templateId: number): Promise<void>
 }

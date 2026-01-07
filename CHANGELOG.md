@@ -9,8 +9,14 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 ### Added
 
 - Datasets: Added `updateDatasetLicense` use case and repository method to support Dataverse endpoint `PUT /datasets/{id}/license`, for updating dataset license or custom terms
+
 - New Use Case: [Get Collections For Linking Use Case](./docs/useCases.md#get-collections-for-linking).
-- New Use Case: [Create a Dataset Template](./docs/useCases.md#create-a-dataset-template) under Collections.
+
+- New Use Case: [Create a Dataset Template](./docs/useCases.md#create-a-dataset-template) under Templates.
+
+- New Use Case: [Get a Template](./docs/useCases.md#get-a-template) under Templates.
+
+- New Use Case: [Delete a Template](./docs/useCases.md#delete-a-template) under Templates.
 
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
 
