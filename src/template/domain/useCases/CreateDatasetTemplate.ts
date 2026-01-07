@@ -1,13 +1,13 @@
-import { ROOT_COLLECTION_ID } from '../models/Collection'
+import { ROOT_COLLECTION_ID } from '../../../collections/domain/models/Collection'
 import { UseCase } from '../../../core/domain/useCases/UseCase'
-import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 import { CreateDatasetTemplateDTO } from '../dtos/CreateDatasetTemplateDTO'
+import { ITemplatesRepository } from '../repositories/ITemplatesRepository'
 
 export class CreateDatasetTemplate implements UseCase<void> {
-  private collectionsRepository: ICollectionsRepository
+  private templatesRepository: ITemplatesRepository
 
-  constructor(collectionsRepository: ICollectionsRepository) {
-    this.collectionsRepository = collectionsRepository
+  constructor(templatesRepository: ITemplatesRepository) {
+    this.templatesRepository = templatesRepository
   }
 
   /**
@@ -22,6 +22,6 @@ export class CreateDatasetTemplate implements UseCase<void> {
     template: CreateDatasetTemplateDTO,
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<void> {
-    return await this.collectionsRepository.createDatasetTemplate(collectionIdOrAlias, template)
+    return await this.templatesRepository.createDatasetTemplate(collectionIdOrAlias, template)
   }
 }

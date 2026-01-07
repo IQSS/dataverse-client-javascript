@@ -16,9 +16,7 @@ import {
   getDatasetFiles,
   restrictFile,
   deleteFile,
-  linkDataset,
-  createDatasetTemplate,
-  MetadataFieldTypeClass
+  linkDataset
 } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -60,9 +58,6 @@ import {
   DvObjectFeaturedItemDTO,
   FeaturedItemsDTO
 } from '../../../src/collections/domain/dtos/FeaturedItemsDTO'
-import { CreateDatasetTemplateDTO } from '../../../src/collections/domain/dtos/CreateDatasetTemplateDTO'
-import { getDatasetTemplates } from '../../../src/datasets'
-import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -2161,61 +2156,6 @@ describe('CollectionsRepository', () => {
       const expectedError = new ReadError("[404] Can't find dataverse with identifier='99999'")
 
       await expect(sut.getCollectionLinks(invalidCollectionId)).rejects.toThrow(expectedError)
-    })
-  })
-
-  describe('createDatasetTemplate', () => {
-    const templateDto: CreateDatasetTemplateDTO = {
-      name: 'CollectionsRepository template',
-      isDefault: true,
-      fields: [
-        {
-          typeName: 'author',
-          typeClass: MetadataFieldTypeClass.Compound,
-          multiple: true,
-          value: [
-            {
-              authorName: {
-                typeName: 'authorName',
-                typeClass: MetadataFieldTypeClass.Primitive,
-                value: 'Belicheck, Bill'
-              },
-              authorAffiliation: {
-                typeName: 'authorIdentifierScheme',
-                typeClass: MetadataFieldTypeClass.Primitive,
-                value: 'ORCID'
-              }
-            }
-          ]
-        }
-      ],
-      instructions: [
-        {
-          instructionField: 'author',
-          instructionText: 'The author data'
-        }
-      ]
-    }
-    test('should create a template in :root with provided JSON', async () => {
-      await createDatasetTemplate.execute(templateDto)
-      const templates = await getDatasetTemplates.execute(':root')
-
-      expect(templates[templates.length - 1].name).toBe(templateDto.name)
-      expect(templates[templates.length - 1].isDefault).toBe(templateDto.isDefault)
-      expect(templates[templates.length - 1].instructions.length).toBe(
-        templateDto.instructions?.length ?? 0
-      )
-
-      deleteDatasetTemplateViaApi(templates[templates.length - 1].id)
-    })
-
-    test('should return error when creating a template with invalidCollectionAlias', async () => {
-      const expectedError = new WriteError(
-        `[404] Can't find dataverse with identifier='invalidCollectionAlias'`
-      )
-      await expect(
-        createDatasetTemplate.execute(templateDto, 'invalidCollectionAlias')
-      ).rejects.toThrow(expectedError)
     })
   })
 })

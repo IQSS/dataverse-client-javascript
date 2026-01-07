@@ -1,5 +1,5 @@
 import { LicensePayload } from '../../../../licenses/domain/repositories/transformers/LicensePayload'
-import { MetadataFieldPayload } from './DatasetPayload'
+import { MetadataFieldPayload } from '../../../../datasets/infra/repositories/transformers/DatasetPayload'
 
 export interface DatasetTemplatePayload {
   id: number

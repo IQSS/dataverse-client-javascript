@@ -25,6 +25,10 @@ The different use cases currently available in the package are classified below,
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
     - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
+- [Templates](#Templates)
+  - [Templates read use cases](#templates-read-use-cases)
+    - [Get Dataset Templates](#get-dataset-templates)
+  - [Templates write use cases](#templates-write-use-cases)
     - [Create a Dataset Template](#create-a-dataset-template)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
@@ -40,7 +44,6 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
     - [Get Dataset Available Categories](#get-dataset-available-categories)
-    - [Get Dataset Templates](#get-dataset-templates)
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
   - [Datasets write use cases](#datasets-write-use-cases)
@@ -569,6 +572,30 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
+## Templates
+
+### Templates Read Use Cases
+
+#### Get Dataset Templates
+
+Returns a [DatasetTemplate](../src/template/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
+
+##### Example call:
+
+```typescript
+import { getDatasetTemplates } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 12345
+
+getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: DatasetTemplate[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/template/domain/useCases/GetDatasetTemplates.ts)_ definition.
+
+### Templates Write Use Cases
+
 #### Create a Dataset Template
 
 Creates a dataset template for a given Dataverse collection id or alias.
@@ -577,10 +604,10 @@ Creates a dataset template for a given Dataverse collection id or alias.
 
 ```typescript
 import { createDatasetTemplate } from '@iqss/dataverse-client-javascript'
-import { TemplateCreateDTO } from '@iqss/dataverse-client-javascript'
+import { CreateDatasetTemplateDTO } from '@iqss/dataverse-client-javascript'
 
 const collectionAlias = ':root'
-const template: TemplateCreateDTO = {
+const template: CreateDatasetTemplateDTO = {
   name: 'Dataverse template',
   isDefault: true,
   fields: [
@@ -602,7 +629,7 @@ const template: TemplateCreateDTO = {
 await createDatasetTemplate.execute(template, collectionAlias)
 ```
 
-_See [use case](../src/collections/domain/useCases/CreateDatasetTemplate.ts) implementation_.
+_See [use case](../src/template/domain/useCases/CreateDatasetTemplate.ts) implementation_.
 
 ## Datasets
 
@@ -1332,24 +1359,6 @@ getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
-
-#### Get Dataset Templates
-
-Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
-
-##### Example call:
-
-```typescript
-import { getDatasetTemplates } from '@iqss/dataverse-client-javascript'
-
-const collectionIdOrAlias = 12345
-
-getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: DatasetTemplate[]) => {
-  /* ... */
-})
-```
-
-_See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definition.
 
 #### Add a Dataset Type
 

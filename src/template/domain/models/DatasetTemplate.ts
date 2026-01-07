@@ -1,4 +1,4 @@
-import { DatasetMetadataBlock, TermsOfUse } from './Dataset'
+import { DatasetMetadataBlock, TermsOfUse } from '../../../datasets/domain/models/Dataset'
 import { License } from '../../../licenses/domain/models/License'
 
 export interface DatasetTemplate {

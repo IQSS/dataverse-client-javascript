@@ -1,13 +1,13 @@
 import { ROOT_COLLECTION_ID } from '../../../collections/domain/models/Collection'
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { DatasetTemplate } from '../models/DatasetTemplate'
-import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
+import { ITemplatesRepository } from '../repositories/ITemplatesRepository'
 
 export class GetDatasetTemplates implements UseCase<DatasetTemplate[]> {
-  private datasetsRepository: IDatasetsRepository
+  private templatesRepository: ITemplatesRepository
 
-  constructor(datasetsRepository: IDatasetsRepository) {
-    this.datasetsRepository = datasetsRepository
+  constructor(templatesRepository: ITemplatesRepository) {
+    this.templatesRepository = templatesRepository
   }
 
   /**
@@ -20,6 +20,6 @@ export class GetDatasetTemplates implements UseCase<DatasetTemplate[]> {
   async execute(
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<DatasetTemplate[]> {
-    return await this.datasetsRepository.getDatasetTemplates(collectionIdOrAlias)
+    return await this.templatesRepository.getDatasetTemplates(collectionIdOrAlias)
   }
 }

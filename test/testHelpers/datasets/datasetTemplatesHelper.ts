@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { TestConstants } from '../TestConstants'
-import { DatasetTemplatePayload } from '../../../src/datasets/infra/repositories/transformers/DatasetTemplatePayload'
+import { DatasetTemplatePayload } from '../../../src/template/infra/repositories/transformers/DatasetTemplatePayload'
 
 const DATASET_TEMPLATE_DTO = {
   name: 'Dataset Template',

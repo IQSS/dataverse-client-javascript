@@ -40,7 +40,6 @@ import { ReadError } from '../../../core/domain/repositories/ReadError'
 import { CollectionLinks } from '../../domain/models/CollectionLinks'
 import { CollectionSummary } from '../../domain/models/CollectionSummary'
 import { LinkingObjectType } from '../../domain/useCases/GetCollectionsForLinking'
-import { CreateDatasetTemplateDTO } from '../../domain/dtos/CreateDatasetTemplateDTO'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -525,20 +524,6 @@ export class CollectionsRepository extends ApiRepository implements ICollections
           displayName: item.name
         }))
       })
-      .catch((error) => {
-        throw error
-      })
-  }
-
-  public async createDatasetTemplate(
-    collectionIdOrAlias: number | string,
-    template: CreateDatasetTemplateDTO
-  ): Promise<void> {
-    return this.doPost(
-      `/${this.collectionsResourceName}/${collectionIdOrAlias}/templates`,
-      template
-    )
-      .then(() => undefined)
       .catch((error) => {
         throw error
       })

@@ -1,7 +1,7 @@
 import { transformPayloadLicenseToLicense } from '../../../../licenses/domain/repositories/transformers/licenseTransformers'
 import { DatasetTemplate } from '../../../domain/models/DatasetTemplate'
 import { DatasetTemplatePayload } from './DatasetTemplatePayload'
-import { transformPayloadToDatasetMetadataBlocks } from './datasetTransformers'
+import { transformPayloadToDatasetMetadataBlocks } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
 
 export const transformDatasetTemplatePayloadToDatasetTemplate = (
   collectionDatasetTemplatePayload: DatasetTemplatePayload[]

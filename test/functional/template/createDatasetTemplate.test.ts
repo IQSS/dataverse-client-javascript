@@ -1,9 +1,8 @@
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { getDatasetTemplates } from '../../../src/datasets'
-import { CreateDatasetTemplateDTO } from '../../../src/collections/domain/dtos/CreateDatasetTemplateDTO'
-import { createDatasetTemplate } from '../../../src/collections'
+import { createDatasetTemplate, getDatasetTemplates } from '../../../src/template'
+import { CreateDatasetTemplateDTO } from '../../../src/template/domain/dtos/CreateDatasetTemplateDTO'
 import { MetadataFieldTypeClass } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
