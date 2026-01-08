@@ -1,6 +1,6 @@
-import { CreateDatasetTemplate } from '../../../src/template/domain/useCases/CreateDatasetTemplate'
-import { ITemplatesRepository } from '../../../src/template/domain/repositories/ITemplatesRepository'
-import { CreateDatasetTemplateDTO } from '../../../src/template/domain/dtos/CreateDatasetTemplateDTO'
+import { CreateTemplate } from '../../../src/templates/domain/useCases/CreateTemplate'
+import { ITemplatesRepository } from '../../../src/templates/domain/repositories/ITemplatesRepository'
+import { CreateDatasetTemplateDTO } from '../../../src/templates/domain/dtos/CreateDatasetTemplateDTO'
 import { WriteError } from '../../../src'
 
 describe('execute', () => {
@@ -8,7 +8,7 @@ describe('execute', () => {
   test('should return undefined when repository call is successful', async () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.createDatasetTemplate = jest.fn().mockResolvedValue(undefined)
-    const sut = new CreateDatasetTemplate(templatesRepositoryStub)
+    const sut = new CreateTemplate(templatesRepositoryStub)
 
     const actual = await sut.execute(testTemplateDTO)
 
@@ -23,7 +23,7 @@ describe('execute', () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.createDatasetTemplate = jest.fn().mockResolvedValue(undefined)
 
-    const sut = new CreateDatasetTemplate(templatesRepositoryStub)
+    const sut = new CreateTemplate(templatesRepositoryStub)
     const actual = await sut.execute(testTemplateDTO, 'alias123')
 
     expect(templatesRepositoryStub.createDatasetTemplate).toHaveBeenCalledWith(
@@ -37,7 +37,7 @@ describe('execute', () => {
   test('should return error result on repository error', async () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.createDatasetTemplate = jest.fn().mockRejectedValue(new WriteError())
-    const testCreateTemplate = new CreateDatasetTemplate(templatesRepositoryStub)
+    const testCreateTemplate = new CreateTemplate(templatesRepositoryStub)
 
     await expect(testCreateTemplate.execute(testTemplateDTO)).rejects.toThrow(WriteError)
   })

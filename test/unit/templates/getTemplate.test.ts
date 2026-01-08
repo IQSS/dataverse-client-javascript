@@ -1,13 +1,13 @@
-import { GetTemplate } from '../../../src/template/domain/useCases/GetTemplate'
-import { ITemplatesRepository } from '../../../src/template/domain/repositories/ITemplatesRepository'
-import { DatasetTemplate } from '../../../src/template/domain/models/DatasetTemplate'
+import { GetTemplate } from '../../../src/templates/domain/useCases/GetTemplate'
+import { ITemplatesRepository } from '../../../src/templates/domain/repositories/ITemplatesRepository'
+import { Template } from '../../../src/templates/domain/models/Template'
 import { ReadError } from '../../../src'
 
 describe('execute', () => {
   const templateId = 123
-  const template = { id: templateId } as DatasetTemplate
+  const template = { id: templateId } as Template
 
-  test('should return a dataset template', async () => {
+  test('should return a template', async () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.getTemplate = jest.fn().mockResolvedValue(template)
     const sut = new GetTemplate(templatesRepositoryStub)

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { TestConstants } from '../TestConstants'
-import { DatasetTemplatePayload } from '../../../src/template/infra/repositories/transformers/DatasetTemplatePayload'
+import { TemplatePayload } from '../../../src/templates/infra/repositories/transformers/TemplatePayload'
 
 const DATASET_TEMPLATE_DTO = {
   name: 'Dataset Template',
@@ -36,7 +36,7 @@ const DATAVERSE_API_REQUEST_HEADERS = {
 
 export async function createDatasetTemplateViaApi(
   collectionAlias: string
-): Promise<DatasetTemplatePayload> {
+): Promise<TemplatePayload> {
   try {
     if (collectionAlias == undefined) {
       collectionAlias = ':root'

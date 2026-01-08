@@ -1,13 +1,13 @@
 import { AxiosResponse } from 'axios'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { CreateDatasetTemplateDTO } from '../../domain/dtos/CreateDatasetTemplateDTO'
-import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
+import { Template } from '../../domain/models/Template'
 import { ITemplatesRepository } from '../../domain/repositories/ITemplatesRepository'
-import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
+import { TemplatePayload } from './transformers/TemplatePayload'
 import {
   transformTemplatePayloadToTemplate,
   transformTemplatePayloadsToTemplates
-} from './transformers/datasetTemplateTransformers'
+} from './transformers/templateTransformers'
 
 export class TemplatesRepository extends ApiRepository implements ITemplatesRepository {
   private readonly collectionsResourceName: string = 'dataverses'
@@ -26,9 +26,9 @@ export class TemplatesRepository extends ApiRepository implements ITemplatesRepo
       })
   }
 
-  public async getTemplate(templateId: number): Promise<DatasetTemplate> {
+  public async getTemplate(templateId: number): Promise<Template> {
     return this.doGet(`/dataverses/${templateId}/template`, true)
-      .then((response: AxiosResponse<{ data: DatasetTemplatePayload }>) =>
+      .then((response: AxiosResponse<{ data: TemplatePayload }>) =>
         transformTemplatePayloadToTemplate(response.data.data)
       )
       .catch((error) => {
@@ -36,11 +36,9 @@ export class TemplatesRepository extends ApiRepository implements ITemplatesRepo
       })
   }
 
-  public async getDatasetTemplates(
-    collectionIdOrAlias: number | string
-  ): Promise<DatasetTemplate[]> {
+  public async getDatasetTemplates(collectionIdOrAlias: number | string): Promise<Template[]> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/templates`, true)
-      .then((response: AxiosResponse<{ data: DatasetTemplatePayload[] }>) =>
+      .then((response: AxiosResponse<{ data: TemplatePayload[] }>) =>
         transformTemplatePayloadsToTemplates(response.data.data)
       )
       .catch((error) => {

@@ -1,17 +1,17 @@
 import { TemplatesRepository } from './infra/repositories/TemplatesRepository'
-import { CreateDatasetTemplate } from './domain/useCases/CreateDatasetTemplate'
+import { CreateTemplate } from './domain/useCases/CreateTemplate'
 import { DeleteTemplate } from './domain/useCases/DeleteTemplate'
 import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
 import { GetTemplate } from './domain/useCases/GetTemplate'
 
 const templatesRepository = new TemplatesRepository()
 
-const createDatasetTemplate = new CreateDatasetTemplate(templatesRepository)
+const createTemplate = new CreateTemplate(templatesRepository)
 const deleteTemplate = new DeleteTemplate(templatesRepository)
 const getDatasetTemplates = new GetDatasetTemplates(templatesRepository)
 const getTemplate = new GetTemplate(templatesRepository)
 
-export { createDatasetTemplate, deleteTemplate, getDatasetTemplates, getTemplate }
+export { createTemplate, deleteTemplate, getDatasetTemplates, getTemplate }
 export {
   CreateDatasetTemplateDTO,
   TemplateFieldDTO,
@@ -21,4 +21,4 @@ export {
   TemplateFieldValueControlledVocabularyDTO,
   TemplateInstructionDTO
 } from './domain/dtos/CreateDatasetTemplateDTO'
-export { DatasetTemplate, DatasetTemplateInstruction } from './domain/models/DatasetTemplate'
+export { Template, TemplateInstruction } from './domain/models/Template'

@@ -30,7 +30,7 @@ The different use cases currently available in the package are classified below,
     - [Get a Template](#get-a-template)
     - [Get Dataset Templates](#get-dataset-templates)
   - [Templates write use cases](#templates-write-use-cases)
-    - [Create a Dataset Template](#create-a-dataset-template)
+    - [Create a Template](#create-a-template)
     - [Delete a Template](#delete-a-template)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
@@ -580,7 +580,7 @@ _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.
 
 #### Get a Template
 
-Returns a [DatasetTemplate](../src/template/domain/models/DatasetTemplate.ts) by its template id.
+Returns a [Template](../src/templates/domain/models/Template.ts) by its template id.
 
 ##### Example call:
 
@@ -589,16 +589,16 @@ import { getTemplate } from '@iqss/dataverse-client-javascript'
 
 const templateId = 12345
 
-getTemplate.execute(templateId).then((template: DatasetTemplate) => {
+getTemplate.execute(templateId).then((template: Template) => {
   /* ... */
 })
 ```
 
-_See [use case](../src/template/domain/useCases/GetTemplate.ts)_ definition.
+_See [use case](../src/templates/domain/useCases/GetTemplate.ts)_ definition.
 
 #### Get Dataset Templates
 
-Returns a [DatasetTemplate](../src/template/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
+Returns a [Template](../src/templates/domain/models/Template.ts) array containing the templates of the requested collection, given the collection identifier or alias.
 
 ##### Example call:
 
@@ -607,23 +607,23 @@ import { getDatasetTemplates } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = 12345
 
-getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: DatasetTemplate[]) => {
+getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: Template[]) => {
   /* ... */
 })
 ```
 
-_See [use case](../src/template/domain/useCases/GetDatasetTemplates.ts)_ definition.
+_See [use case](../src/templates/domain/useCases/GetDatasetTemplates.ts)_ definition.
 
 ### Templates Write Use Cases
 
-#### Create a Dataset Template
+#### Create a Template
 
-Creates a dataset template for a given Dataverse collection id or alias.
+Creates a template for a given Dataverse collection id or alias.
 
 ##### Example call:
 
 ```typescript
-import { createDatasetTemplate } from '@iqss/dataverse-client-javascript'
+import { createTemplate } from '@iqss/dataverse-client-javascript'
 import { CreateDatasetTemplateDTO } from '@iqss/dataverse-client-javascript'
 
 const collectionAlias = ':root'
@@ -646,14 +646,14 @@ const template: CreateDatasetTemplateDTO = {
   instructions: [{ instructionField: 'author', instructionText: 'The author data' }]
 }
 
-await createDatasetTemplate.execute(template, collectionAlias)
+await createTemplate.execute(template, collectionAlias)
 ```
 
-_See [use case](../src/template/domain/useCases/CreateDatasetTemplate.ts) implementation_.
+_See [use case](../src/templates/domain/useCases/CreateTemplate.ts) implementation_.
 
 #### Delete a Template
 
-Deletes a dataset template by its template id.
+Deletes a template by its template id.
 
 ##### Example call:
 
@@ -665,7 +665,7 @@ const templateId = 12345
 await deleteTemplate.execute(templateId)
 ```
 
-_See [use case](../src/template/domain/useCases/DeleteTemplate.ts)_ definition.
+_See [use case](../src/templates/domain/useCases/DeleteTemplate.ts)_ definition.
 
 ## Datasets
 

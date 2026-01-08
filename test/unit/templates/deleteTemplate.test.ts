@@ -1,11 +1,11 @@
-import { DeleteTemplate } from '../../../src/template/domain/useCases/DeleteTemplate'
-import { ITemplatesRepository } from '../../../src/template/domain/repositories/ITemplatesRepository'
+import { DeleteTemplate } from '../../../src/templates/domain/useCases/DeleteTemplate'
+import { ITemplatesRepository } from '../../../src/templates/domain/repositories/ITemplatesRepository'
 import { WriteError } from '../../../src'
 
 describe('execute', () => {
   const templateId = 123
 
-  test('should delete a dataset template', async () => {
+  test('should delete a template', async () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.deleteTemplate = jest.fn().mockResolvedValue(undefined)
     const sut = new DeleteTemplate(templatesRepositoryStub)

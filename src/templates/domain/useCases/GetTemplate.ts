@@ -1,8 +1,8 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
-import { DatasetTemplate } from '../models/DatasetTemplate'
+import { Template } from '../models/Template'
 import { ITemplatesRepository } from '../repositories/ITemplatesRepository'
 
-export class GetTemplate implements UseCase<DatasetTemplate> {
+export class GetTemplate implements UseCase<Template> {
   private templatesRepository: ITemplatesRepository
 
   constructor(templatesRepository: ITemplatesRepository) {
@@ -10,12 +10,12 @@ export class GetTemplate implements UseCase<DatasetTemplate> {
   }
 
   /**
-   * Returns a dataset template by its template id.
+   * Returns a template by its template id.
    *
-   * @param {number} templateId - Dataset template id.
-   * @returns {Promise<DatasetTemplate>}
+   * @param {number} templateId - Template id.
+   * @returns {Promise<Template>}
    */
-  async execute(templateId: number): Promise<DatasetTemplate> {
+  async execute(templateId: number): Promise<Template> {
     return await this.templatesRepository.getTemplate(templateId)
   }
 }

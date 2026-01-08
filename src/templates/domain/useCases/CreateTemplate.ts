@@ -1,9 +1,9 @@
 import { ROOT_COLLECTION_ID } from '../../../collections/domain/models/Collection'
 import { UseCase } from '../../../core/domain/useCases/UseCase'
-import { DatasetTemplate } from '../models/DatasetTemplate'
+import { CreateDatasetTemplateDTO } from '../dtos/CreateDatasetTemplateDTO'
 import { ITemplatesRepository } from '../repositories/ITemplatesRepository'
 
-export class GetDatasetTemplates implements UseCase<DatasetTemplate[]> {
+export class CreateTemplate implements UseCase<void> {
   private templatesRepository: ITemplatesRepository
 
   constructor(templatesRepository: ITemplatesRepository) {
@@ -11,15 +11,17 @@ export class GetDatasetTemplates implements UseCase<DatasetTemplate[]> {
   }
 
   /**
-   * Returns a DatasetTemplate array containing the dataset templates of the requested collection, given the collection identifier or alias.
+   * Creates a template in the specified collection.
    *
+   * @param {CreateDatasetTemplateDTO} template - Template definition payload.
    * @param {number | string} [collectionIdOrAlias = ':root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
-   * If this parameter is not set, the default value is: ':root'
-   * @returns {Promise<DatasetTemplate[]>}
+   * If this parameter is not set, the default value is: ':root'.
+   * @returns {Promise<void>}
    */
   async execute(
+    template: CreateDatasetTemplateDTO,
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
-  ): Promise<DatasetTemplate[]> {
-    return await this.templatesRepository.getDatasetTemplates(collectionIdOrAlias)
+  ): Promise<void> {
+    return await this.templatesRepository.createDatasetTemplate(collectionIdOrAlias, template)
   }
 }

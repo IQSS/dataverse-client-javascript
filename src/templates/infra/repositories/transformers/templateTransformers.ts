@@ -1,12 +1,12 @@
 import { transformPayloadLicenseToLicense } from '../../../../licenses/domain/repositories/transformers/licenseTransformers'
-import { DatasetTemplate } from '../../../domain/models/DatasetTemplate'
-import { DatasetTemplatePayload } from './DatasetTemplatePayload'
+import { Template } from '../../../domain/models/Template'
+import { TemplatePayload } from './TemplatePayload'
 import { transformPayloadToDatasetMetadataBlocks } from '../../../../datasets/infra/repositories/transformers/datasetTransformers'
 
 export const transformTemplatePayloadToTemplate = (
-  collectionDatasetTemplatePayload: DatasetTemplatePayload
-): DatasetTemplate => {
-  const datasetTemplate: DatasetTemplate = {
+  collectionDatasetTemplatePayload: TemplatePayload
+): Template => {
+  const template: Template = {
     id: collectionDatasetTemplatePayload.id,
     name: collectionDatasetTemplatePayload.name,
     collectionAlias: collectionDatasetTemplatePayload.dataverseAlias,
@@ -38,11 +38,11 @@ export const transformTemplatePayloadToTemplate = (
   }
 
   if (collectionDatasetTemplatePayload.termsOfUseAndAccess.license) {
-    datasetTemplate.license = transformPayloadLicenseToLicense(
+    template.license = transformPayloadLicenseToLicense(
       collectionDatasetTemplatePayload.termsOfUseAndAccess.license
     )
   } else {
-    datasetTemplate.termsOfUse.customTerms = {
+    template.termsOfUse.customTerms = {
       termsOfUse: collectionDatasetTemplatePayload.termsOfUseAndAccess.termsOfUse as string,
       confidentialityDeclaration: collectionDatasetTemplatePayload.termsOfUseAndAccess
         .confidentialityDeclaration as string,
@@ -58,11 +58,11 @@ export const transformTemplatePayloadToTemplate = (
     }
   }
 
-  return datasetTemplate
+  return template
 }
 
 export const transformTemplatePayloadsToTemplates = (
-  datasetTemplatePayloads: DatasetTemplatePayload[]
-): DatasetTemplate[] => {
+  datasetTemplatePayloads: TemplatePayload[]
+): Template[] => {
   return datasetTemplatePayloads.map((payload) => transformTemplatePayloadToTemplate(payload))
 }

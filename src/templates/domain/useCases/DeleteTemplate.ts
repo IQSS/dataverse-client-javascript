@@ -9,9 +9,9 @@ export class DeleteTemplate implements UseCase<void> {
   }
 
   /**
-   * Deletes a dataset template by its template id.
+   * Deletes a template by its template id.
    *
-   * @param {number} templateId - Dataset template id.
+   * @param {number} templateId - Template id.
    */
   async execute(templateId: number): Promise<void> {
     return await this.templatesRepository.deleteTemplate(templateId)

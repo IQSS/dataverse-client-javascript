@@ -1,7 +1,7 @@
 import { ApiConfig, MetadataFieldTypeClass, WriteError } from '../../../src'
-import { createDatasetTemplate, getDatasetTemplates } from '../../../src/template'
-import { CreateDatasetTemplateDTO } from '../../../src/template/domain/dtos/CreateDatasetTemplateDTO'
-import { TemplatesRepository } from '../../../src/template/infra/repositories/TemplatesRepository'
+import { createTemplate, getDatasetTemplates } from '../../../src/templates'
+import { CreateDatasetTemplateDTO } from '../../../src/templates/domain/dtos/CreateDatasetTemplateDTO'
+import { TemplatesRepository } from '../../../src/templates/infra/repositories/TemplatesRepository'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
@@ -27,7 +27,7 @@ describe('TemplatesRepository', () => {
     await deleteCollectionViaApi(testCollectionAlias)
   })
 
-  describe('createDatasetTemplate', () => {
+  describe('createTemplate', () => {
     const templateDto: CreateDatasetTemplateDTO = {
       name: 'CollectionsRepository template',
       isDefault: false,
@@ -61,7 +61,7 @@ describe('TemplatesRepository', () => {
     }
 
     test('should create a template in :root with provided JSON', async () => {
-      await createDatasetTemplate.execute(templateDto)
+      await createTemplate.execute(templateDto)
       const templates = await getDatasetTemplates.execute(':root')
 
       expect(templates[templates.length - 1].name).toBe(templateDto.name)
@@ -78,20 +78,20 @@ describe('TemplatesRepository', () => {
         `[404] Can't find dataverse with identifier='invalidCollectionAlias'`
       )
       await expect(
-        createDatasetTemplate.execute(templateDto, 'invalidCollectionAlias')
+        createTemplate.execute(templateDto, 'invalidCollectionAlias')
       ).rejects.toThrow(expectedError)
     })
   })
 
   describe('getDatasetTemplates', () => {
-    test('should return empty dataset templates', async () => {
+    test('should return empty templates', async () => {
       const actual = await sut.getDatasetTemplates(testCollectionAlias)
 
       expect(actual.length).toBe(0)
     })
 
-    test('should return dataset templates for a collection', async () => {
-      await createDatasetTemplate.execute(
+    test('should return templates for a collection', async () => {
+      await createTemplate.execute(
         {
           name: 'Template for GetDatasetTemplates',
           isDefault: false,
@@ -142,8 +142,8 @@ describe('TemplatesRepository', () => {
   })
 
   describe('getTemplate', () => {
-    test('should return a dataset template by id', async () => {
-      await createDatasetTemplate.execute(
+    test('should return a template by id', async () => {
+      await createTemplate.execute(
         {
           name: 'Template for GetTemplate',
           isDefault: false,
@@ -199,8 +199,8 @@ describe('TemplatesRepository', () => {
   })
 
   describe('deleteTemplate', () => {
-    test('should delete a dataset template by id', async () => {
-      await createDatasetTemplate.execute(
+    test('should delete a template by id', async () => {
+      await createTemplate.execute(
         {
           name: 'Template for DeleteTemplate',
           isDefault: false,
