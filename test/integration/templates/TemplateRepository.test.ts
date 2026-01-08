@@ -77,9 +77,9 @@ describe('TemplatesRepository', () => {
       const expectedError = new WriteError(
         `[404] Can't find dataverse with identifier='invalidCollectionAlias'`
       )
-      await expect(
-        createTemplate.execute(templateDto, 'invalidCollectionAlias')
-      ).rejects.toThrow(expectedError)
+      await expect(createTemplate.execute(templateDto, 'invalidCollectionAlias')).rejects.toThrow(
+        expectedError
+      )
     })
   })
 
