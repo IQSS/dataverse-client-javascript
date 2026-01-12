@@ -1,10 +1,10 @@
 import { CreateTemplate } from '../../../src/templates/domain/useCases/CreateTemplate'
 import { ITemplatesRepository } from '../../../src/templates/domain/repositories/ITemplatesRepository'
-import { CreateDatasetTemplateDTO } from '../../../src/templates/domain/dtos/CreateDatasetTemplateDTO'
+import { CreateTemplateDTO } from '../../../src/templates/domain/dtos/CreateTemplateDTO'
 import { WriteError } from '../../../src'
 
 describe('execute', () => {
-  const testTemplateDTO = { name: 't' } as CreateDatasetTemplateDTO
+  const testTemplateDTO = { name: 't' } as CreateTemplateDTO
   test('should return undefined when repository call is successful', async () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.createDatasetTemplate = jest.fn().mockResolvedValue(undefined)

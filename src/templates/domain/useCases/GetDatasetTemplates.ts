@@ -18,6 +18,6 @@ export class GetDatasetTemplates implements UseCase<Template[]> {
    * @returns {Promise<Template[]>}
    */
   async execute(collectionIdOrAlias: number | string = ROOT_COLLECTION_ID): Promise<Template[]> {
-    return await this.templatesRepository.getDatasetTemplates(collectionIdOrAlias)
+    return await this.templatesRepository.getTemplatesByCollectionId(collectionIdOrAlias)
   }
 }

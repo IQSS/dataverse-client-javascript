@@ -624,10 +624,10 @@ Creates a template for a given Dataverse collection id or alias.
 
 ```typescript
 import { createTemplate } from '@iqss/dataverse-client-javascript'
-import { CreateDatasetTemplateDTO } from '@iqss/dataverse-client-javascript'
+import { CreateTemplateDTO } from '@iqss/dataverse-client-javascript'
 
 const collectionAlias = ':root'
-const template: CreateDatasetTemplateDTO = {
+const template: CreateTemplateDTO = {
   name: 'Dataverse template',
   isDefault: true,
   fields: [

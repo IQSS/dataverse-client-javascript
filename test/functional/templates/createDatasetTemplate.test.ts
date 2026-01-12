@@ -2,7 +2,7 @@ import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { createTemplate, getDatasetTemplates } from '../../../src/templates'
-import { CreateDatasetTemplateDTO } from '../../../src/templates/domain/dtos/CreateDatasetTemplateDTO'
+import { CreateTemplateDTO } from '../../../src/templates/domain/dtos/CreateTemplateDTO'
 import { MetadataFieldTypeClass } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
@@ -16,7 +16,7 @@ describe('CreateTemplate.execute', () => {
   })
 
   test('should create a template in :root with provided JSON', async () => {
-    const templateDto: CreateDatasetTemplateDTO = {
+    const templateDto: CreateTemplateDTO = {
       name: 'TestDataverse template',
       isDefault: true,
       fields: [

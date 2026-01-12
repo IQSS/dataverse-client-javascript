@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
-import { CreateDatasetTemplateDTO } from '../../domain/dtos/CreateDatasetTemplateDTO'
+import { CreateTemplateDTO } from '../../domain/dtos/CreateTemplateDTO'
 import { Template } from '../../domain/models/Template'
 import { ITemplatesRepository } from '../../domain/repositories/ITemplatesRepository'
 import { TemplatePayload } from './transformers/TemplatePayload'
@@ -14,7 +14,7 @@ export class TemplatesRepository extends ApiRepository implements ITemplatesRepo
 
   public async createDatasetTemplate(
     collectionIdOrAlias: number | string,
-    template: CreateDatasetTemplateDTO
+    template: CreateTemplateDTO
   ): Promise<void> {
     return this.doPost(
       `/${this.collectionsResourceName}/${collectionIdOrAlias}/templates`,
@@ -36,7 +36,9 @@ export class TemplatesRepository extends ApiRepository implements ITemplatesRepo
       })
   }
 
-  public async getDatasetTemplates(collectionIdOrAlias: number | string): Promise<Template[]> {
+  public async getTemplatesByCollectionId(
+    collectionIdOrAlias: number | string
+  ): Promise<Template[]> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}/templates`, true)
       .then((response: AxiosResponse<{ data: TemplatePayload[] }>) =>
         transformTemplatePayloadsToTemplates(response.data.data)

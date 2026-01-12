@@ -1,6 +1,6 @@
 import { ApiConfig, MetadataFieldTypeClass, WriteError } from '../../../src'
 import { createTemplate, getDatasetTemplates } from '../../../src/templates'
-import { CreateDatasetTemplateDTO } from '../../../src/templates/domain/dtos/CreateDatasetTemplateDTO'
+import { CreateTemplateDTO } from '../../../src/templates/domain/dtos/CreateTemplateDTO'
 import { TemplatesRepository } from '../../../src/templates/infra/repositories/TemplatesRepository'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
@@ -28,7 +28,7 @@ describe('TemplatesRepository', () => {
   })
 
   describe('createTemplate', () => {
-    const templateDto: CreateDatasetTemplateDTO = {
+    const templateDto: CreateTemplateDTO = {
       name: 'CollectionsRepository template',
       isDefault: false,
       fields: [
@@ -85,7 +85,7 @@ describe('TemplatesRepository', () => {
 
   describe('getDatasetTemplates', () => {
     test('should return empty templates', async () => {
-      const actual = await sut.getDatasetTemplates(testCollectionAlias)
+      const actual = await sut.getTemplatesByCollectionId(testCollectionAlias)
 
       expect(actual.length).toBe(0)
     })
@@ -126,7 +126,7 @@ describe('TemplatesRepository', () => {
         testCollectionAlias
       )
 
-      const actual = await sut.getDatasetTemplates(testCollectionAlias)
+      const actual = await sut.getTemplatesByCollectionId(testCollectionAlias)
 
       expect(actual.length).toBe(1)
 

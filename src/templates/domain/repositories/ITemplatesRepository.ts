@@ -1,12 +1,12 @@
-import { CreateDatasetTemplateDTO } from '../dtos/CreateDatasetTemplateDTO'
+import { CreateTemplateDTO } from '../dtos/CreateTemplateDTO'
 import { Template } from '../models/Template'
 
 export interface ITemplatesRepository {
   createDatasetTemplate(
     collectionIdOrAlias: number | string,
-    template: CreateDatasetTemplateDTO
+    template: CreateTemplateDTO
   ): Promise<void>
   getTemplate(templateId: number): Promise<Template>
-  getDatasetTemplates(collectionIdOrAlias: number | string): Promise<Template[]>
+  getTemplatesByCollectionId(collectionIdOrAlias: number | string): Promise<Template[]>
   deleteTemplate(templateId: number): Promise<void>
 }

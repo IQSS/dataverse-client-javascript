@@ -13,12 +13,12 @@ const getTemplate = new GetTemplate(templatesRepository)
 
 export { createTemplate, deleteTemplate, getDatasetTemplates, getTemplate }
 export {
-  CreateDatasetTemplateDTO,
+  CreateTemplateDTO,
   TemplateFieldDTO,
   TemplateFieldValueDTO,
   TemplateFieldValuePrimitiveDTO,
   TemplateFieldValueCompoundDTO,
   TemplateFieldValueControlledVocabularyDTO,
   TemplateInstructionDTO
-} from './domain/dtos/CreateDatasetTemplateDTO'
+} from './domain/dtos/CreateTemplateDTO'
 export { Template, TemplateInstruction } from './domain/models/Template'
