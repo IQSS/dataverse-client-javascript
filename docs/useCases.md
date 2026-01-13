@@ -613,7 +613,6 @@ getTemplatesByCollectionId.execute(collectionIdOrAlias).then((template: Template
 ```
 
 _See [use case](../src/templates/domain/useCases/GetTemplatesByCollectionId.ts)_ definition.
-Repository implementation uses `getTemplatesByCollectionId`.
 
 ### Templates Write Use Cases
 
@@ -651,7 +650,6 @@ await createTemplate.execute(template, collectionAlias)
 ```
 
 _See [use case](../src/templates/domain/useCases/CreateTemplate.ts) implementation_.
-Repository implementation uses `createTemplate`.
 
 #### Delete a Template
 
