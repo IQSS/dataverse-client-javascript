@@ -3,7 +3,7 @@ import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { Template } from '../models/Template'
 import { ITemplatesRepository } from '../repositories/ITemplatesRepository'
 
-export class GetDatasetTemplates implements UseCase<Template[]> {
+export class GetTemplatesByCollectionId implements UseCase<Template[]> {
   private templatesRepository: ITemplatesRepository
 
   constructor(templatesRepository: ITemplatesRepository) {

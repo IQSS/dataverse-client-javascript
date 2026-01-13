@@ -1,5 +1,5 @@
 import { ApiConfig, MetadataFieldTypeClass, WriteError } from '../../../src'
-import { createTemplate, getDatasetTemplates } from '../../../src/templates'
+import { createTemplate, getTemplatesByCollectionId } from '../../../src/templates'
 import { CreateTemplateDTO } from '../../../src/templates/domain/dtos/CreateTemplateDTO'
 import { TemplatesRepository } from '../../../src/templates/infra/repositories/TemplatesRepository'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -12,7 +12,7 @@ import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetT
 
 describe('TemplatesRepository', () => {
   const sut: TemplatesRepository = new TemplatesRepository()
-  const testCollectionAlias = 'testGetDatasetTemplates'
+  const testCollectionAlias = 'testGetTemplatesByCollectionId'
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -62,7 +62,7 @@ describe('TemplatesRepository', () => {
 
     test('should create a template in :root with provided JSON', async () => {
       await createTemplate.execute(templateDto)
-      const templates = await getDatasetTemplates.execute(':root')
+      const templates = await getTemplatesByCollectionId.execute(':root')
 
       expect(templates[templates.length - 1].name).toBe(templateDto.name)
       expect(templates[templates.length - 1].isDefault).toBe(templateDto.isDefault)
@@ -83,7 +83,7 @@ describe('TemplatesRepository', () => {
     })
   })
 
-  describe('getDatasetTemplates', () => {
+  describe('getTemplatesByCollectionId', () => {
     test('should return empty templates', async () => {
       const actual = await sut.getTemplatesByCollectionId(testCollectionAlias)
 
@@ -93,7 +93,7 @@ describe('TemplatesRepository', () => {
     test('should return templates for a collection', async () => {
       await createTemplate.execute(
         {
-          name: 'Template for GetDatasetTemplates',
+          name: 'Template for GetTemplatesByCollectionId',
           isDefault: false,
           fields: [
             {
@@ -130,7 +130,7 @@ describe('TemplatesRepository', () => {
 
       expect(actual.length).toBe(1)
 
-      expect(actual[0].name).toBe('Template for GetDatasetTemplates')
+      expect(actual[0].name).toBe('Template for GetTemplatesByCollectionId')
       expect(actual[0].isDefault).toBe(false)
       expect(actual[0].datasetMetadataBlocks.length).toBe(1)
       expect(actual[0].datasetMetadataBlocks[0].name).toBe('citation')
@@ -177,7 +177,7 @@ describe('TemplatesRepository', () => {
         },
         testCollectionAlias
       )
-      const templates = await getDatasetTemplates.execute(testCollectionAlias)
+      const templates = await getTemplatesByCollectionId.execute(testCollectionAlias)
       const templateId = templates[templates.length - 1].id
       const templateExpectedIsDefault = templates[templates.length - 1].isDefault
 
@@ -234,7 +234,7 @@ describe('TemplatesRepository', () => {
         },
         testCollectionAlias
       )
-      const templates = await getDatasetTemplates.execute(testCollectionAlias)
+      const templates = await getTemplatesByCollectionId.execute(testCollectionAlias)
       const templateId = templates[templates.length - 1].id
 
       await sut.deleteTemplate(templateId)

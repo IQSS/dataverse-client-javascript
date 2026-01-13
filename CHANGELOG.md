@@ -18,6 +18,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 ### Changed
 
 - Add pagination query parameters to Dataset Version Summeries and File Version Summaries use cases.
+- Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
+- Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.
 
 ### Fixed
@@ -53,7 +55,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 - Use cases for External Tools: GetExternalTools, GetDatasetExternalToolResolved, GetFileExternalToolResolved.
 
-- Use case: GetDatasetTemplates.
+- Use case: GetTemplatesByCollectionId.
 
 - Use case: GetAvailableStandardLicenses.
 

@@ -28,7 +28,7 @@ The different use cases currently available in the package are classified below,
 - [Templates](#Templates)
   - [Templates read use cases](#templates-read-use-cases)
     - [Get a Template](#get-a-template)
-    - [Get Dataset Templates](#get-dataset-templates)
+    - [Get Templates By Collection Id](#get-templates-by-collection-id)
   - [Templates write use cases](#templates-write-use-cases)
     - [Create a Template](#create-a-template)
     - [Delete a Template](#delete-a-template)
@@ -596,23 +596,24 @@ getTemplate.execute(templateId).then((template: Template) => {
 
 _See [use case](../src/templates/domain/useCases/GetTemplate.ts)_ definition.
 
-#### Get Dataset Templates
+#### Get Templates By Collection Id
 
 Returns a [Template](../src/templates/domain/models/Template.ts) array containing the templates of the requested collection, given the collection identifier or alias.
 
 ##### Example call:
 
 ```typescript
-import { getDatasetTemplates } from '@iqss/dataverse-client-javascript'
+import { getTemplatesByCollectionId } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = 12345
 
-getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: Template[]) => {
+getTemplatesByCollectionId.execute(collectionIdOrAlias).then((template: Template[]) => {
   /* ... */
 })
 ```
 
-_See [use case](../src/templates/domain/useCases/GetDatasetTemplates.ts)_ definition.
+_See [use case](../src/templates/domain/useCases/GetTemplatesByCollectionId.ts)_ definition.
+Repository implementation uses `getTemplatesByCollectionId`.
 
 ### Templates Write Use Cases
 
@@ -650,6 +651,7 @@ await createTemplate.execute(template, collectionAlias)
 ```
 
 _See [use case](../src/templates/domain/useCases/CreateTemplate.ts) implementation_.
+Repository implementation uses `createTemplate`.
 
 #### Delete a Template
 

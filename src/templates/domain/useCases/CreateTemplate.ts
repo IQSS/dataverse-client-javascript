@@ -22,6 +22,6 @@ export class CreateTemplate implements UseCase<void> {
     template: CreateTemplateDTO,
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<void> {
-    return await this.templatesRepository.createDatasetTemplate(collectionIdOrAlias, template)
+    return await this.templatesRepository.createTemplate(collectionIdOrAlias, template)
   }
 }

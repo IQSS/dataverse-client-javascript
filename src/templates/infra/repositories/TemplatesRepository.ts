@@ -12,7 +12,7 @@ import {
 export class TemplatesRepository extends ApiRepository implements ITemplatesRepository {
   private readonly collectionsResourceName: string = 'dataverses'
 
-  public async createDatasetTemplate(
+  public async createTemplate(
     collectionIdOrAlias: number | string,
     template: CreateTemplateDTO
   ): Promise<void> {
