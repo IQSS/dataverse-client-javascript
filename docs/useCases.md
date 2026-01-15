@@ -46,6 +46,8 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
     - [Get Dataset Available Categories](#get-dataset-available-categories)
+    - [Get Dataset Templates](#get-dataset-templates)
+    - [Get Dataset Storage Driver](#get-dataset-storage-driver)
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
   - [Datasets write use cases](#datasets-write-use-cases)
@@ -1395,6 +1397,52 @@ getDatasetAvailableCategories.execute(datasetId).then((categories: String[]) => 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts) implementation_.
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
+
+# <<<<<<< HEAD
+
+#### Get Dataset Templates
+
+Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
+
+##### Example call:
+
+```typescript
+import { getDatasetTemplates } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 12345
+
+getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: DatasetTemplate[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definition.
+
+#### Get Dataset Storage Driver
+
+Returns a [StorageDriver](../src/datasets/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
+
+##### Example call:
+
+```typescript
+import { getDatasetStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetStorageDriver.execute(datasetId).then((storageDriver: StorageDriver) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetStorageDriver.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+> > > > > > > develop
 
 #### Add a Dataset Type
 

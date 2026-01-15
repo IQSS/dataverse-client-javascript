@@ -33,6 +33,7 @@ import { DeleteDatasetType } from './domain/useCases/DeleteDatasetType'
 import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
 import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
+import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -82,6 +83,7 @@ const deleteDatasetType = new DeleteDatasetType(datasetsRepository)
 const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
 const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
+const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 
 export {
   getDataset,
@@ -112,7 +114,8 @@ export {
   linkDatasetTypeWithMetadataBlocks,
   setAvailableLicensesForDatasetType,
   deleteDatasetType,
-  updateDatasetLicense
+  updateDatasetLicense,
+  getDatasetStorageDriver
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -151,3 +154,4 @@ export {
 export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
 export { DatasetType } from './domain/models/DatasetType'
 export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'
+export { StorageDriver } from './domain/models/StorageDriver'

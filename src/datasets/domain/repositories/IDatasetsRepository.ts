@@ -16,6 +16,7 @@ import { DatasetType } from '../models/DatasetType'
 import { TermsOfAccess } from '../models/Dataset'
 import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
+import { StorageDriver } from '../models/StorageDriver'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -100,4 +101,5 @@ export interface IDatasetsRepository {
     datasetId: number | string,
     payload: DatasetLicenseUpdateRequest
   ): Promise<void>
+  getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver>
 }
