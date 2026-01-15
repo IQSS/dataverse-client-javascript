@@ -33,6 +33,7 @@ import { TermsOfAccess } from '../../domain/models/Dataset'
 import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
 import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
+import { StorageDriver } from '../../domain/models/StorageDriver'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -511,6 +512,17 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       payload
     )
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'storageDriver', datasetId),
+      true
+    )
+      .then((response) => response.data.data as StorageDriver)
       .catch((error) => {
         throw error
       })
