@@ -31,7 +31,6 @@ import { LinkDatasetTypeWithMetadataBlocks } from './domain/useCases/LinkDataset
 import { SetAvailableLicensesForDatasetType } from './domain/useCases/SetAvailableLicensesForDatasetType'
 import { DeleteDatasetType } from './domain/useCases/DeleteDatasetType'
 import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
-import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
 import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
@@ -82,7 +81,6 @@ const setAvailableLicensesForDatasetType = new SetAvailableLicensesForDatasetTyp
 )
 const deleteDatasetType = new DeleteDatasetType(datasetsRepository)
 const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
-const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
 const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
@@ -109,7 +107,6 @@ export {
   getDatasetLinkedCollections,
   getDatasetAvailableCategories,
   getDatasetCitationInOtherFormats,
-  getDatasetTemplates,
   updateTermsOfAccess,
   getDatasetAvailableDatasetTypes,
   getDatasetAvailableDatasetType,

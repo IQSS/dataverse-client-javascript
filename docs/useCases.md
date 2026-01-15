@@ -25,7 +25,13 @@ The different use cases currently available in the package are classified below,
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
     - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
-    - [Create a Dataset Template](#create-a-dataset-template)
+- [Templates](#Templates)
+  - [Templates read use cases](#templates-read-use-cases)
+    - [Get a Template](#get-a-template)
+    - [Get Templates By Collection Id](#get-templates-by-collection-id)
+  - [Templates write use cases](#templates-write-use-cases)
+    - [Create a Template](#create-a-template)
+    - [Delete a Template](#delete-a-template)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -570,18 +576,60 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
-#### Create a Dataset Template
+## Templates
 
-Creates a dataset template for a given Dataverse collection id or alias.
+### Templates Read Use Cases
+
+#### Get a Template
+
+Returns a [Template](../src/templates/domain/models/Template.ts) by its template id.
 
 ##### Example call:
 
 ```typescript
-import { createDatasetTemplate } from '@iqss/dataverse-client-javascript'
-import { TemplateCreateDTO } from '@iqss/dataverse-client-javascript'
+import { getTemplate } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+getTemplate.execute(templateId).then((template: Template) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/templates/domain/useCases/GetTemplate.ts)_ definition.
+
+#### Get Templates By Collection Id
+
+Returns a [Template](../src/templates/domain/models/Template.ts) array containing the templates of the requested collection, given the collection identifier or alias.
+
+##### Example call:
+
+```typescript
+import { getTemplatesByCollectionId } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 12345
+
+getTemplatesByCollectionId.execute(collectionIdOrAlias).then((template: Template[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/templates/domain/useCases/GetTemplatesByCollectionId.ts)_ definition.
+
+### Templates Write Use Cases
+
+#### Create a Template
+
+Creates a template for a given Dataverse collection id or alias.
+
+##### Example call:
+
+```typescript
+import { createTemplate } from '@iqss/dataverse-client-javascript'
+import { CreateTemplateDTO } from '@iqss/dataverse-client-javascript'
 
 const collectionAlias = ':root'
-const template: TemplateCreateDTO = {
+const template: CreateTemplateDTO = {
   name: 'Dataverse template',
   isDefault: true,
   fields: [
@@ -600,10 +648,26 @@ const template: TemplateCreateDTO = {
   instructions: [{ instructionField: 'author', instructionText: 'The author data' }]
 }
 
-await createDatasetTemplate.execute(template, collectionAlias)
+await createTemplate.execute(template, collectionAlias)
 ```
 
-_See [use case](../src/collections/domain/useCases/CreateDatasetTemplate.ts) implementation_.
+_See [use case](../src/templates/domain/useCases/CreateTemplate.ts) implementation_.
+
+#### Delete a Template
+
+Deletes a template by its template id.
+
+##### Example call:
+
+```typescript
+import { deleteTemplate } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+await deleteTemplate.execute(templateId)
+```
+
+_See [use case](../src/templates/domain/useCases/DeleteTemplate.ts)_ definition.
 
 ## Datasets
 
@@ -1334,6 +1398,8 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
+# <<<<<<< HEAD
+
 #### Get Dataset Templates
 
 Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
@@ -1375,6 +1441,8 @@ getDatasetStorageDriver.execute(datasetId).then((storageDriver: StorageDriver) =
 _See [use case](../src/datasets/domain/useCases/GetDatasetStorageDriver.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+> > > > > > > develop
 
 #### Add a Dataset Type
 

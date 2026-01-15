@@ -12,7 +12,6 @@ import { DatasetVersionSummarySubset } from '../models/DatasetVersionSummaryInfo
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
 import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
-import { DatasetTemplate } from '../models/DatasetTemplate'
 import { DatasetType } from '../models/DatasetType'
 import { TermsOfAccess } from '../models/Dataset'
 import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
@@ -85,7 +84,6 @@ export interface IDatasetsRepository {
     format: CitationFormat,
     includeDeaccessioned?: boolean
   ): Promise<FormattedCitation>
-  getDatasetTemplates(collectionIdOrAlias: number | string): Promise<DatasetTemplate[]>
   getDatasetAvailableDatasetTypes(): Promise<DatasetType[]>
   getDatasetAvailableDatasetType(datasetTypeId: number | string): Promise<DatasetType>
   addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType>
