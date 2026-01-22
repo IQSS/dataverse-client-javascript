@@ -16,6 +16,6 @@ export class UnsetTemplateAsDefault implements UseCase<void> {
    * If this parameter is not set, the default value is: ':root'.
    */
   async execute(collectionIdOrAlias: number | string = ROOT_COLLECTION_ID): Promise<void> {
-    return await this.templatesRepository.unsetDefaultTemplate(collectionIdOrAlias)
+    return await this.templatesRepository.unsetTemplateAsDefault(collectionIdOrAlias)
   }
 }

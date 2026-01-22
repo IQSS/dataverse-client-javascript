@@ -20,6 +20,6 @@ export class SetTemplateAsDefault implements UseCase<void> {
     templateId: number,
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
   ): Promise<void> {
-    return await this.templatesRepository.setDefaultTemplate(collectionIdOrAlias, templateId)
+    return await this.templatesRepository.setTemplateAsDefault(collectionIdOrAlias, templateId)
   }
 }
