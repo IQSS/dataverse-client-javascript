@@ -32,6 +32,8 @@ The different use cases currently available in the package are classified below,
   - [Templates write use cases](#templates-write-use-cases)
     - [Create a Template](#create-a-template)
     - [Delete a Template](#delete-a-template)
+    - [Set Default Template](#set-default-template)
+    - [Remove Default Template](#remove-default-template)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -668,6 +670,43 @@ await deleteTemplate.execute(templateId)
 ```
 
 _See [use case](../src/templates/domain/useCases/DeleteTemplate.ts)_ definition.
+
+#### Set Default Template
+
+Sets the default template for a given Dataverse collection.
+
+You must have edit permissions on the collection in order to use this endpoint.
+
+##### Example call:
+
+```typescript
+import { setDefaultTemplate } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = ':root'
+const templateId = 12345
+
+await setDefaultTemplate.execute(templateId, collectionIdOrAlias)
+```
+
+_See [use case](../src/templates/domain/useCases/SetDefaultTemplate.ts)_ definition.
+
+#### Remove Default Template
+
+Removes the default template from a given Dataverse collection.
+
+You must have edit permissions on the collection in order to use this endpoint.
+
+##### Example call:
+
+```typescript
+import { removeDefaultTemplate } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = ':root'
+
+await removeDefaultTemplate.execute(collectionIdOrAlias)
+```
+
+_See [use case](../src/templates/domain/useCases/RemoveDefaultTemplate.ts)_ definition.
 
 ## Datasets
 

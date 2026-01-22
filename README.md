@@ -10,6 +10,7 @@ This package is part of the Dataverse Frontend ecosystem and is intended to be u
 
 - **Use case-centric API functions** – Organized around domain-specific actions like `getDataset`, `createCollection`, or `restrictFile`.
 - **TypeScript-first** – All use cases include strong typings for inputs and outputs, improving developer experience.
+- **Template defaults management** – Set or unset the default template for a collection.
 
 ## Installation
 
