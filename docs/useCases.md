@@ -32,8 +32,8 @@ The different use cases currently available in the package are classified below,
   - [Templates write use cases](#templates-write-use-cases)
     - [Create a Template](#create-a-template)
     - [Delete a Template](#delete-a-template)
-    - [Set Default Template](#set-default-template)
-    - [Remove Default Template](#remove-default-template)
+    - [Set Template As Default](#set-template-as-default)
+    - [Unset Template As Default](#unset-template-as-default)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -671,7 +671,7 @@ await deleteTemplate.execute(templateId)
 
 _See [use case](../src/templates/domain/useCases/DeleteTemplate.ts)_ definition.
 
-#### Set Default Template
+#### Set Template As Default
 
 Sets the default template for a given Dataverse collection.
 
@@ -680,17 +680,17 @@ You must have edit permissions on the collection in order to use this endpoint.
 ##### Example call:
 
 ```typescript
-import { setDefaultTemplate } from '@iqss/dataverse-client-javascript'
+import { setTemplateAsDefault } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = ':root'
 const templateId = 12345
 
-await setDefaultTemplate.execute(templateId, collectionIdOrAlias)
+await setTemplateAsDefault.execute(templateId, collectionIdOrAlias)
 ```
 
-_See [use case](../src/templates/domain/useCases/SetDefaultTemplate.ts)_ definition.
+_See [use case](../src/templates/domain/useCases/SetTemplateAsDefault.ts)_ definition.
 
-#### Remove Default Template
+#### Unset Template As Default
 
 Removes the default template from a given Dataverse collection.
 
@@ -699,14 +699,14 @@ You must have edit permissions on the collection in order to use this endpoint.
 ##### Example call:
 
 ```typescript
-import { removeDefaultTemplate } from '@iqss/dataverse-client-javascript'
+import { unsetTemplateAsDefault } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = ':root'
 
-await removeDefaultTemplate.execute(collectionIdOrAlias)
+await unsetTemplateAsDefault.execute(collectionIdOrAlias)
 ```
 
-_See [use case](../src/templates/domain/useCases/RemoveDefaultTemplate.ts)_ definition.
+_See [use case](../src/templates/domain/useCases/UnsetTemplateAsDefault.ts)_ definition.
 
 ## Datasets
 

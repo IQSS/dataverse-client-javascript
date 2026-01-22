@@ -56,7 +56,7 @@ export class TemplatesRepository extends ApiRepository implements ITemplatesRepo
       })
   }
 
-  public async setDefaultTemplate(
+  public async setTemplateAsDefault(
     collectionIdOrAlias: number | string,
     templateId: number
   ): Promise<void> {
@@ -70,7 +70,7 @@ export class TemplatesRepository extends ApiRepository implements ITemplatesRepo
       })
   }
 
-  public async unsetDefaultTemplate(collectionIdOrAlias: number | string): Promise<void> {
+  public async unsetTemplateAsDefault(collectionIdOrAlias: number | string): Promise<void> {
     return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}/template/default`)
       .then(() => undefined)
       .catch((error) => {

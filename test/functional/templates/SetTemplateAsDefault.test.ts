@@ -4,14 +4,14 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   createTemplate,
   getTemplatesByCollectionId,
-  setDefaultTemplate,
-  removeDefaultTemplate
+  setTemplateAsDefault,
+  unsetTemplateAsDefault
 } from '../../../src/templates'
 import { CreateTemplateDTO } from '../../../src/templates/domain/dtos/CreateTemplateDTO'
 import { MetadataFieldTypeClass } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
-describe('RemoveDefaultTemplate.execute', () => {
+describe('SetTemplateAsDefault.execute', () => {
   const collectionIdOrAlias = ':root'
 
   beforeEach(async () => {
@@ -22,8 +22,8 @@ describe('RemoveDefaultTemplate.execute', () => {
     )
   })
 
-  test('should remove the default template from a collection', async () => {
-    const templateName = `TestRemoveDefaultTemplate-${Date.now()}`
+  test('should set the default template for a collection', async () => {
+    const templateName = `TestDefaultTemplate-${Date.now()}`
     const templateDto: CreateTemplateDTO = {
       name: templateName,
       isDefault: false,
@@ -68,16 +68,17 @@ describe('RemoveDefaultTemplate.execute', () => {
       throw new Error('Created template was not found in collection templates.')
     }
 
-    await setDefaultTemplate.execute(createdTemplate.id, collectionIdOrAlias)
-    await removeDefaultTemplate.execute(collectionIdOrAlias)
+    await setTemplateAsDefault.execute(createdTemplate.id, collectionIdOrAlias)
 
-    const templatesAfterRemove = await getTemplatesByCollectionId.execute(collectionIdOrAlias)
-    const hasDefaultTemplate = templatesAfterRemove.some((template) => template.isDefault)
+    const templatesAfterSet = await getTemplatesByCollectionId.execute(collectionIdOrAlias)
+    const updatedTemplate = templatesAfterSet.find((template) => template.id === createdTemplate.id)
 
-    expect(hasDefaultTemplate).toBe(false)
+    expect(updatedTemplate?.isDefault).toBe(true)
 
     if (originalDefaultTemplateId && originalDefaultTemplateId !== createdTemplate.id) {
-      await setDefaultTemplate.execute(originalDefaultTemplateId, collectionIdOrAlias)
+      await setTemplateAsDefault.execute(originalDefaultTemplateId, collectionIdOrAlias)
+    } else if (!originalDefaultTemplateId) {
+      await unsetTemplateAsDefault.execute(collectionIdOrAlias)
     }
 
     await deleteDatasetTemplateViaApi(createdTemplate.id)

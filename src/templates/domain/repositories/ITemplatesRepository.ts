@@ -6,6 +6,6 @@ export interface ITemplatesRepository {
   getTemplate(templateId: number): Promise<Template>
   getTemplatesByCollectionId(collectionIdOrAlias: number | string): Promise<Template[]>
   deleteTemplate(templateId: number): Promise<void>
-  setDefaultTemplate(collectionIdOrAlias: number | string, templateId: number): Promise<void>
-  unsetDefaultTemplate(collectionIdOrAlias: number | string): Promise<void>
+  setTemplateAsDefault(collectionIdOrAlias: number | string, templateId: number): Promise<void>
+  unsetTemplateAsDefault(collectionIdOrAlias: number | string): Promise<void>
 }

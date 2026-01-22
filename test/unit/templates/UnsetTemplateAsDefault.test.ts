@@ -1,4 +1,4 @@
-import { RemoveDefaultTemplate } from '../../../src/templates/domain/useCases/RemoveDefaultTemplate'
+import { UnsetTemplateAsDefault } from '../../../src/templates/domain/useCases/UnsetTemplateAsDefault'
 import { ITemplatesRepository } from '../../../src/templates/domain/repositories/ITemplatesRepository'
 import { WriteError } from '../../../src'
 
@@ -6,7 +6,7 @@ describe('execute', () => {
   test('should remove default template for :root', async () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.unsetDefaultTemplate = jest.fn().mockResolvedValue(undefined)
-    const sut = new RemoveDefaultTemplate(templatesRepositoryStub)
+    const sut = new UnsetTemplateAsDefault(templatesRepositoryStub)
 
     const actual = await sut.execute()
 
@@ -17,7 +17,7 @@ describe('execute', () => {
   test('should call repository with provided collection id/alias', async () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.unsetDefaultTemplate = jest.fn().mockResolvedValue(undefined)
-    const sut = new RemoveDefaultTemplate(templatesRepositoryStub)
+    const sut = new UnsetTemplateAsDefault(templatesRepositoryStub)
 
     const actual = await sut.execute('alias123')
 
@@ -28,7 +28,7 @@ describe('execute', () => {
   test('should return error result on repository error', async () => {
     const templatesRepositoryStub: ITemplatesRepository = {} as ITemplatesRepository
     templatesRepositoryStub.unsetDefaultTemplate = jest.fn().mockRejectedValue(new WriteError())
-    const sut = new RemoveDefaultTemplate(templatesRepositoryStub)
+    const sut = new UnsetTemplateAsDefault(templatesRepositoryStub)
 
     await expect(sut.execute()).rejects.toThrow(WriteError)
   })

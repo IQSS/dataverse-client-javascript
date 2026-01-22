@@ -3,8 +3,8 @@ import { CreateTemplate } from './domain/useCases/CreateTemplate'
 import { DeleteTemplate } from './domain/useCases/DeleteTemplate'
 import { GetTemplatesByCollectionId } from './domain/useCases/GetTemplatesByCollectionId'
 import { GetTemplate } from './domain/useCases/GetTemplate'
-import { SetDefaultTemplate } from './domain/useCases/SetDefaultTemplate'
-import { RemoveDefaultTemplate } from './domain/useCases/RemoveDefaultTemplate'
+import { SetTemplateAsDefault } from './domain/useCases/SetTemplateAsDefault'
+import { UnsetTemplateAsDefault } from './domain/useCases/UnsetTemplateAsDefault'
 
 const templatesRepository = new TemplatesRepository()
 
@@ -12,16 +12,16 @@ const createTemplate = new CreateTemplate(templatesRepository)
 const deleteTemplate = new DeleteTemplate(templatesRepository)
 const getTemplatesByCollectionId = new GetTemplatesByCollectionId(templatesRepository)
 const getTemplate = new GetTemplate(templatesRepository)
-const setDefaultTemplate = new SetDefaultTemplate(templatesRepository)
-const removeDefaultTemplate = new RemoveDefaultTemplate(templatesRepository)
+const setTemplateAsDefault = new SetTemplateAsDefault(templatesRepository)
+const unsetTemplateAsDefault = new UnsetTemplateAsDefault(templatesRepository)
 
 export {
   createTemplate,
   deleteTemplate,
   getTemplatesByCollectionId,
   getTemplate,
-  setDefaultTemplate,
-  removeDefaultTemplate
+  setTemplateAsDefault,
+  unsetTemplateAsDefault
 }
 export {
   CreateTemplateDTO,

@@ -2,7 +2,7 @@ import { ROOT_COLLECTION_ID } from '../../../collections/domain/models/Collectio
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { ITemplatesRepository } from '../repositories/ITemplatesRepository'
 
-export class SetDefaultTemplate implements UseCase<void> {
+export class UnsetTemplateAsDefault implements UseCase<void> {
   private templatesRepository: ITemplatesRepository
 
   constructor(templatesRepository: ITemplatesRepository) {
@@ -10,16 +10,12 @@ export class SetDefaultTemplate implements UseCase<void> {
   }
 
   /**
-   * Sets the default template for the specified collection.
+   * Removes the default template for the specified collection.
    *
-   * @param {number} templateId - Template id to set as default.
    * @param {number | string} [collectionIdOrAlias = ':root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
    * If this parameter is not set, the default value is: ':root'.
    */
-  async execute(
-    templateId: number,
-    collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
-  ): Promise<void> {
-    return await this.templatesRepository.setDefaultTemplate(collectionIdOrAlias, templateId)
+  async execute(collectionIdOrAlias: number | string = ROOT_COLLECTION_ID): Promise<void> {
+    return await this.templatesRepository.unsetDefaultTemplate(collectionIdOrAlias)
   }
 }
