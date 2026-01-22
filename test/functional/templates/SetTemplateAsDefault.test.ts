@@ -4,8 +4,7 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   createTemplate,
   getTemplatesByCollectionId,
-  setTemplateAsDefault,
-  unsetTemplateAsDefault
+  setTemplateAsDefault
 } from '../../../src/templates'
 import { CreateTemplateDTO } from '../../../src/templates/domain/dtos/CreateTemplateDTO'
 import { MetadataFieldTypeClass } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
@@ -56,10 +55,6 @@ describe('SetTemplateAsDefault.execute', () => {
       ]
     }
 
-    const templatesBefore = await getTemplatesByCollectionId.execute(collectionIdOrAlias)
-    const originalDefaultTemplateId =
-      templatesBefore.find((template) => template.isDefault)?.id ?? null
-
     await createTemplate.execute(templateDto, collectionIdOrAlias)
     const templatesAfterCreate = await getTemplatesByCollectionId.execute(collectionIdOrAlias)
     const createdTemplate = templatesAfterCreate.find((template) => template.name === templateName)
@@ -74,12 +69,6 @@ describe('SetTemplateAsDefault.execute', () => {
     const updatedTemplate = templatesAfterSet.find((template) => template.id === createdTemplate.id)
 
     expect(updatedTemplate?.isDefault).toBe(true)
-
-    if (originalDefaultTemplateId && originalDefaultTemplateId !== createdTemplate.id) {
-      await setTemplateAsDefault.execute(originalDefaultTemplateId, collectionIdOrAlias)
-    } else if (!originalDefaultTemplateId) {
-      await unsetTemplateAsDefault.execute(collectionIdOrAlias)
-    }
 
     await deleteDatasetTemplateViaApi(createdTemplate.id)
   })

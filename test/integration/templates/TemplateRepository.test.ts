@@ -249,6 +249,9 @@ describe('TemplatesRepository', () => {
 
   describe('setTemplateAsDefault', () => {
     test('should set a template as default for a collection', async () => {
+      const existingTemplates = await getTemplatesByCollectionId.execute(testCollectionAlias)
+      const previousDefaultTemplate = existingTemplates.find((template) => template.isDefault)
+      const previousDefaultTemplateId = previousDefaultTemplate?.id
       await createTemplate.execute(
         {
           name: 'Template for setTemplateAsDefault',
@@ -294,7 +297,11 @@ describe('TemplatesRepository', () => {
 
       expect(updatedTemplate?.isDefault).toBe(true)
 
-      await deleteDatasetTemplateViaApi(templateId)
+      if (previousDefaultTemplateId !== undefined) {
+        await sut.setTemplateAsDefault(testCollectionAlias, previousDefaultTemplateId)
+      } else {
+        await sut.unsetTemplateAsDefault(testCollectionAlias)
+      }
     })
 
     test('should return error when template does not exist', async () => {
@@ -343,6 +350,12 @@ describe('TemplatesRepository', () => {
       const templateId = templates[templates.length - 1].id
 
       await sut.setTemplateAsDefault(testCollectionAlias, templateId)
+      const templatesSetAsDefault = await getTemplatesByCollectionId.execute(testCollectionAlias)
+      const templateSetAsDefault = templatesSetAsDefault.find(
+        (template) => template.id === templateId
+      )
+      expect(templateSetAsDefault?.isDefault).toBe(true)
+
       await sut.unsetTemplateAsDefault(testCollectionAlias)
 
       const templatesAfter = await getTemplatesByCollectionId.execute(testCollectionAlias)

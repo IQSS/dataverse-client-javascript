@@ -56,10 +56,6 @@ describe('UnsetTemplateAsDefault.execute', () => {
       ]
     }
 
-    const templatesBefore = await getTemplatesByCollectionId.execute(collectionIdOrAlias)
-    const originalDefaultTemplateId =
-      templatesBefore.find((template) => template.isDefault)?.id ?? null
-
     await createTemplate.execute(templateDto, collectionIdOrAlias)
     const templatesAfterCreate = await getTemplatesByCollectionId.execute(collectionIdOrAlias)
     const createdTemplate = templatesAfterCreate.find((template) => template.name === templateName)
@@ -75,10 +71,6 @@ describe('UnsetTemplateAsDefault.execute', () => {
     const hasDefaultTemplate = templatesAfterRemove.some((template) => template.isDefault)
 
     expect(hasDefaultTemplate).toBe(false)
-
-    if (originalDefaultTemplateId && originalDefaultTemplateId !== createdTemplate.id) {
-      await setTemplateAsDefault.execute(originalDefaultTemplateId, collectionIdOrAlias)
-    }
 
     await deleteDatasetTemplateViaApi(createdTemplate.id)
   })
