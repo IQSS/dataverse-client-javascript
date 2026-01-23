@@ -11,7 +11,6 @@ export const createDatasetVersionModel = (
   internalVersionNumber: 1,
   versionState: DatasetVersionState.DRAFT,
   latestVersionPublishingState: DatasetVersionState.DRAFT,
-  isInReviewState: false,
   lastUpdateTime: '2021-01-01T00:00:00Z',
   createTime: '2021-01-01T00:00:00Z',
   publicationDate: '2021-01-01',

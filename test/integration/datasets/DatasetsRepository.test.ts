@@ -1580,7 +1580,6 @@ describe('DatasetsRepository', () => {
       expect(actual.totalCount).toBeGreaterThan(0)
       expect(actual.versions[0].versionState).toBe('DRAFT')
       expect(actual.versions[0].latestVersionPublishingState).toBe('DRAFT')
-      expect(actual.versions[0].isInReviewState).toBe(false)
 
       await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
     })
@@ -1601,7 +1600,6 @@ describe('DatasetsRepository', () => {
       expect(actual.versions[0].versionNumber).toBe(1)
       expect(actual.versions[0].versionMinorNumber).toBe(0)
       expect(actual.versions[0].versionState).toBe('RELEASED')
-      expect(actual.versions[0].isInReviewState).toBe(false)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1624,7 +1622,6 @@ describe('DatasetsRepository', () => {
       expect(actual.versions[0].versionNumber).toBe(1)
       expect(actual.versions[0].versionMinorNumber).toBe(0)
       expect(actual.versions[0].versionState).toBe('DEACCESSIONED')
-      expect(actual.versions[0].isInReviewState).toBe(false)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
     })
@@ -1664,7 +1661,6 @@ describe('DatasetsRepository', () => {
       expect(actual.versions.length).toEqual(2)
       expect(actual.totalCount).toEqual(2)
       expect(actual.versions[0].versionState).toBe('DRAFT')
-      expect(actual.versions[0].isInReviewState).toBe(false)
 
       expect(actual.versions[1].versionNumber).toBe(1)
       expect(actual.versions[1].versionMinorNumber).toBe(0)

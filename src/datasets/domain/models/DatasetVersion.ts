@@ -12,7 +12,6 @@ export interface DatasetVersion {
   versionMinorNumber?: number
   internalVersionNumber: number
   versionState: DatasetVersionState
-  isInReviewState: boolean
   latestVersionPublishingState: DatasetVersionState
   lastUpdateTime: string
   releaseTime?: string
