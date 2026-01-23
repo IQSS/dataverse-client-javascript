@@ -900,7 +900,6 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetVersions.ts) implement
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
 - **excludeMetadataBlocks**: (boolean) Exclude metadata blocks (default: false).
-- **excludesFiles**: (boolean) Exclude files (default: true).
 
 #### Get Dataset Versions Summaries
 

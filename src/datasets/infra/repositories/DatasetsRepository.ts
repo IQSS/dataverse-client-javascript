@@ -342,8 +342,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     datasetId: string | number,
     limit?: number,
     offset?: number,
-    excludeMetadataBlocks?: boolean,
-    excludeFiles?: boolean
+    excludeMetadataBlocks?: boolean
   ): Promise<DatasetVersionSubset> {
     const queryParams = new URLSearchParams()
 
@@ -357,10 +356,6 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
 
     if (excludeMetadataBlocks !== undefined) {
       queryParams.set('excludeMetadataBlocks', excludeMetadataBlocks.toString())
-    }
-
-    if (excludeFiles !== undefined) {
-      queryParams.set('excludeFiles', excludeFiles.toString())
     }
 
     return this.doGet(

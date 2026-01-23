@@ -17,16 +17,14 @@ export class GetDatasetVersions implements UseCase<DatasetVersionSubset> {
    * @param {number} [limit] - Limit for pagination (optional).
    * @param {number} [offset] - Offset for pagination (optional).
    * @param {boolean} [excludeMetadataBlocks] - Exclude metadata blocks (optional, default: false).
-   * @param {boolean} [excludeFiles] - Exclude files (optional, default: true).
    * @returns {Promise<DatasetVersionSubset>} - A DatasetVersionSubset containing the versions and total count.
    */
   async execute(
     datasetId: number | string,
     limit?: number,
     offset?: number,
-    excludeMetadataBlocks?: boolean,
-    excludeFiles?: boolean
+    excludeMetadataBlocks?: boolean
   ): Promise<DatasetVersionSubset> {
-    return await this.datasetsRepository.getDatasetVersions(datasetId, limit, offset, excludeMetadataBlocks, excludeFiles)
+    return await this.datasetsRepository.getDatasetVersions(datasetId, limit, offset, excludeMetadataBlocks)
   }
 }
