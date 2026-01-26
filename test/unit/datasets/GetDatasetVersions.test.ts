@@ -7,13 +7,13 @@ import { DatasetVersionSubset } from '../../../src/datasets/domain/models/Datase
 const testDatasetId = 1
 
 describe('execute', () => {
-  test('should return dataset versions summaries on repository success', async () => {
+  test('should return dataset versions on repository success', async () => {
     const testDatasetVersionsSubset: DatasetVersionSubset = {
       versions: [createDatasetVersionModel()],
       totalCount: 1
     }
     const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
-    datasetsRepositoryStub.getDatasetVersionsSummaries = jest
+    datasetsRepositoryStub.getDatasetVersions = jest
       .fn()
       .mockResolvedValue(testDatasetVersionsSubset)
     const sut = new GetDatasetVersions(datasetsRepositoryStub)
@@ -21,8 +21,9 @@ describe('execute', () => {
     const actual = await sut.execute(testDatasetId)
 
     expect(actual).toEqual(testDatasetVersionsSubset)
-    expect(datasetsRepositoryStub.getDatasetVersionsSummaries).toHaveBeenCalledWith(
+    expect(datasetsRepositoryStub.getDatasetVersions).toHaveBeenCalledWith(
       testDatasetId,
+      undefined,
       undefined,
       undefined
     )
@@ -30,7 +31,7 @@ describe('execute', () => {
 
   test('should return error result on repository error', async () => {
     const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
-    datasetsRepositoryStub.getDatasetVersionsSummaries = jest
+    datasetsRepositoryStub.getDatasetVersions = jest
       .fn()
       .mockRejectedValue(new ReadError())
     const sut = new GetDatasetVersions(datasetsRepositoryStub)
