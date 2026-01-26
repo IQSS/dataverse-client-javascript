@@ -25,6 +25,8 @@ The different use cases currently available in the package are classified below,
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
     - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
+    - [Assign a Role on a Collection](#assign-a-role-on-a-collection)
+    - [Unassign a Role on a Collection](#unassign-a-role-on-a-collection)
 - [Templates](#Templates)
   - [Templates read use cases](#templates-read-use-cases)
     - [Get a Template](#get-a-template)
@@ -63,6 +65,8 @@ The different use cases currently available in the package are classified below,
     - [Link Dataset Type with Metadata Blocks](#link-dataset-type-with-metadata-blocks)
     - [Set Available Licenses For Dataset Type](#set-available-licenses-for-dataset-type)
     - [Delete a Dataset Type](#delete-a-dataset-type)
+    - [Assign a Role on a Dataset](#assign-a-role-on-a-dataset)
+    - [Unassign a Role on a Dataset](#unassign-a-role-on-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -575,6 +579,49 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 ```
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
+
+#### Assign a Role on a Collection
+
+Assigns a role on a collection, given a collection identifier, a role assignee and a role alias.
+
+##### Example call:
+
+```typescript
+import { assignRoleOnCollection } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+const roleAssignee = "@myUser"
+const roleAlias = "curator"
+
+assignRoleOnCollection.execute(collectionIdOrAlias, roleAssignee, roleAlias)
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/AssignRoleOnCollection.ts)_ definition.
+
+#### Unassign a Role on a Collection
+
+Unassigns a role on a collection, given a collection identifier and a role assignment identifier.
+
+##### Example call:
+
+```typescript
+import { unassignRoleOnCollection } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+const roleAssignmentId = 67890
+
+unassignRoleOnCollection.execute(collectionIdOrAlias, roleAssignmentId)
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/UnassignRoleOnCollection.ts)_ definition.
 
 ## Templates
 
@@ -1515,6 +1562,49 @@ deleteDatasetType.execute(datasetTypeId).then(() => {
 ```
 
 _See [use case](../src/datasets/domain/useCases/DeleteDatasetType.ts) implementation_.
+
+#### Assign a Role on a Dataset
+
+Assigns a role on a dataset, given a dataset identifier, a role assignee and a role alias.
+
+##### Example call:
+
+```typescript
+import { assignRoleOnDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const roleAssignee = "@myUser"
+const roleAlias = "curator"
+
+assignRoleOnDataset.execute(datasetId, roleAssignee, roleAlias)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/AssignRoleOnDataset.ts)_ definition.
+
+#### Unassign a Role on a Dataset
+
+Unassigns a role on a dataset, given a dataset identifier and a role assignment identifier.
+
+##### Example call:
+
+```typescript
+import { unassignRoleOnDataset } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+const roleAssignmentId = 67890
+
+unassignRoleOnDataset.execute(datasetId, roleAssignmentId)
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/UnassignRoleOnDataset.ts)_ definition.
 
 ## Files
 
