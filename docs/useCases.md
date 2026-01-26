@@ -25,6 +25,7 @@ The different use cases currently available in the package are classified below,
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
     - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
+    - [Set Default Contributor Role](#set-default-contributor-role)
 - [Templates](#Templates)
   - [Templates read use cases](#templates-read-use-cases)
     - [Get a Template](#get-a-template)
@@ -575,6 +576,27 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 ```
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
+
+#### Set Default Contributor Role
+
+Sets the default contributor role of a collection, given a collection identifier and a role alias.
+
+##### Example call:
+
+```typescript
+import { setDefaultContributorRole } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+const roleAlias = 'curator'
+
+setDefaultContributorRole.execute(collectionIdOrAlias, roleAlias)
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/SetDefaultContributorRole.ts)_ definition.
 
 ## Templates
 
