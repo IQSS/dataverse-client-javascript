@@ -40,6 +40,7 @@ import { ReadError } from '../../../core/domain/repositories/ReadError'
 import { CollectionLinks } from '../../domain/models/CollectionLinks'
 import { CollectionSummary } from '../../domain/models/CollectionSummary'
 import { LinkingObjectType } from '../../domain/useCases/GetCollectionsForLinking'
+import { StorageDriver } from '../../../datasets/domain/models/StorageDriver'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -524,6 +525,19 @@ export class CollectionsRepository extends ApiRepository implements ICollections
           displayName: item.name
         }))
       })
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getCollectionStorageDriver(
+    collectionIdOrAlias: number | string,
+    getEffective = false
+  ): Promise<StorageDriver> {
+    const queryParams = getEffective ? { getEffective: true } : {}
+
+    return this.doGet(`/admin/dataverse/${collectionIdOrAlias}/storageDriver`, true, queryParams)
+      .then((response) => response.data.data as StorageDriver)
       .catch((error) => {
         throw error
       })

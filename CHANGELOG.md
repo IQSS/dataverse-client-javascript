@@ -11,6 +11,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Datasets: Added `updateDatasetLicense` use case and repository method to support Dataverse endpoint `PUT /datasets/{id}/license`, for updating dataset license or custom terms.
 - Datasets: Added `getDatasetStorageDriver` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/storageDriver`, for retrieving dataset storage driver configuration with properties: name, type, label, directUpload, directDownload, and uploadOutOfBand.
 - Datasets: Added `updateDatasetLicense` use case and repository method to support Dataverse endpoint `PUT /datasets/{id}/license`, for updating dataset license or custom terms
+- Collections: Added `getCollectionStorageDriver` use case and repository method to support Dataverse endpoints `GET /admin/dataverse/{alias}/storageDriver` and `GET /admin/dataverse/{alias}/storageDriver?getEffective=true`, returning storage driver configuration and optionally resolving the effective driver up the parent chain.
 - New Use Case: [Get Collections For Linking Use Case](./docs/useCases.md#get-collections-for-linking).
 - New Use Case: [Create a Template](./docs/useCases.md#create-a-template) under Templates.
 - New Use Case: [Get a Template](./docs/useCases.md#get-a-template) under Templates.
@@ -23,6 +24,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
 - Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.
+- Storage Driver endpoints: map new response shape (`name`, `type`, `label`) replacing the legacy `message` field for dataset and collection storage driver retrieval.
 
 ### Fixed
 

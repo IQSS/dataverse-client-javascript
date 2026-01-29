@@ -13,6 +13,7 @@ The different use cases currently available in the package are classified below,
     - [Get a Collection](#get-a-collection)
     - [Get Collection Facets](#get-collection-facets)
     - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
+    - [Get Collection Storage Driver](#get-collection-storage-driver)
     - [List All Collection Items](#list-all-collection-items)
     - [List My Data Collection Items](#list-my-data-collection-items)
     - [Get Collection Featured Items](#get-collection-featured-items)
@@ -226,6 +227,30 @@ _See [use case](../src/collections/domain/useCases/GetCollectionUserPermissions.
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+#### Get Collection Storage Driver
+
+Returns a [StorageDriver](../src/datasets/domain/models/StorageDriver.ts) instance describing the storage driver configuration for a collection, including name, type, label, and upload/download capabilities. You can optionally resolve the effective storage driver by traversing parent collections.
+
+##### Example call:
+
+```typescript
+import { getCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+const collectionAlias = 'sampleCollection'
+
+// Get the storage driver configured directly on the collection
+getCollectionStorageDriver.execute(collectionAlias).then((storageDriver) => {
+  console.log(storageDriver.name, storageDriver.label)
+})
+
+// Get the effective storage driver (looks up the parent chain)
+getCollectionStorageDriver.execute(collectionAlias, true).then((storageDriver) => {
+  console.log(storageDriver.name, storageDriver.label)
+})
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionStorageDriver.ts)_ implementation.
 
 #### List All Collection Items
 
@@ -1421,6 +1446,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definit
 #### Get Dataset Storage Driver
 
 Returns a [StorageDriver](../src/datasets/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
+If you're targeting Dataverse versions that previously returned the field `message` instead of `name`, this client transparently maps that legacy field to `name`.
 
 ##### Example call:
 
