@@ -306,6 +306,45 @@ export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResp
   }
 }
 
+export const setUseStorageQuotasViaApi = async (
+  useStorageQuotas: boolean
+): Promise<AxiosResponse> => {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/admin/settings/:UseStorageQuotas`,
+      `${useStorageQuotas}`,
+      {
+        headers: {
+          'Content-Type': 'text/plain',
+          'X-Dataverse-Key': process.env.TEST_API_KEY
+        }
+      }
+    )
+  } catch (error) {
+    throw new Error(`Error while setting UseStorageQuotas to ${useStorageQuotas}`)
+  }
+}
+
+export const setDatasetStorageSizeViaApi = async (
+  datasetId: number | string,
+  sizeInBytes: number
+): Promise<AxiosResponse> => {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}/storage/quota`,
+      `${sizeInBytes}`,
+      {
+        headers: {
+          'Content-Type': 'text/plain',
+          'X-Dataverse-Key': process.env.TEST_API_KEY
+        }
+      }
+    )
+  } catch (error) {
+    throw new Error(`Error while setting storage quota for dataset ${datasetId}`)
+  }
+}
+
 export const deaccessionDatasetViaApi = async (
   datasetId: number,
   versionId: string
