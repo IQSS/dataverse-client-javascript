@@ -2260,7 +2260,7 @@ describe('DatasetsRepository', () => {
       expect(uploadLimits).toEqual({})
     })
 
-    test('should return upload limits for dataset  (if DatasetStorageSize is set)', async () => {
+    test('should return upload limits for dataset (if DatasetStorageSize is set)', async () => {
       await setDatasetStorageSizeViaApi(testDatasetIds.numericId, testCollectionStorageQuotaInBytes)
       const uploadLimits = await sut.getDatasetUploadLimits(testDatasetIds.numericId)
 
