@@ -2254,16 +2254,20 @@ describe('DatasetsRepository', () => {
       await deleteCollectionViaApi(testCollectionAlias).catch(() => undefined)
     })
 
-    test('should return upload limits for dataset (quota configured)', async () => {
+    test('should return empty for dataset (if DatasetStorageSize is not set)', async () => {
+      const uploadLimits = await sut.getDatasetUploadLimits(testDatasetIds.numericId)
+
+      expect(uploadLimits).toEqual({})
+    })
+
+    test('should return upload limits for dataset  (if DatasetStorageSize is set)', async () => {
       await setDatasetStorageSizeViaApi(testDatasetIds.numericId, testCollectionStorageQuotaInBytes)
       const uploadLimits = await sut.getDatasetUploadLimits(testDatasetIds.numericId)
 
       expect(uploadLimits).toBeDefined()
-      expect(typeof uploadLimits.storageQuotaRemaining).toBe('number')
       expect(uploadLimits.storageQuotaRemaining).toBeLessThanOrEqual(
         testCollectionStorageQuotaInBytes
       )
-      expect(uploadLimits.storageQuotaRemaining).toBeGreaterThanOrEqual(0)
     })
 
     test('should return error when dataset does not exist', async () => {
