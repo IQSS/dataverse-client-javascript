@@ -5,6 +5,7 @@ import { GetMaxEmbargoDurationInMonths } from './domain/useCases/GetMaxEmbargoDu
 import { GetApplicationTermsOfUse } from './domain/useCases/GetApplicationTermsOfUse'
 import { GetAvailableDatasetMetadataExportFormats } from './domain/useCases/GetAvailableDatasetMetadataExportFormats'
 import { GetDatasetPublishPopupCustomText } from './domain/useCases/GetDatasetPublishPopupCustomText'
+import { GetPublishDatasetDisclaimerText } from './domain/useCases/GetPublishDatasetDisclaimerText'
 
 const dataverseInfoRepository = new DataverseInfoRepository()
 
@@ -15,7 +16,7 @@ const getApplicationTermsOfUse = new GetApplicationTermsOfUse(dataverseInfoRepos
 const getAvailableDatasetMetadataExportFormats = new GetAvailableDatasetMetadataExportFormats(
   dataverseInfoRepository
 )
-const getPublishDatasetDisclaimerText = new GetApplicationTermsOfUse(dataverseInfoRepository)
+const getPublishDatasetDisclaimerText = new GetPublishDatasetDisclaimerText(dataverseInfoRepository)
 const getDatasetPublishPopupCustomText = new GetDatasetPublishPopupCustomText(
   dataverseInfoRepository
 )
