@@ -240,4 +240,76 @@ describe('DataverseInfoRepository', () => {
       expect(error).toBeInstanceOf(Error)
     })
   })
+
+  describe('getDatasetPublishPopupCustomText', () => {
+    test('should return dataset publish popup custom text on successful response', async () => {
+      const testPopupText = 'Custom popup text.'
+      const testSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: {
+            message: testPopupText
+          }
+        }
+      }
+      jest.spyOn(axios, 'get').mockResolvedValue(testSuccessfulResponse)
+
+      const actual = await sut.getDatasetPublishPopupCustomText()
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/settings/:DatasetPublishPopupCustomText`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(actual).toMatch(testPopupText)
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: ReadError | undefined
+      await sut.getDatasetPublishPopupCustomText().catch((e) => (error = e))
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/settings/:DatasetPublishPopupCustomText`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('getPublishDatasetDisclaimerText', () => {
+    test('should return publish dataset disclaimer text on successful response', async () => {
+      const testDisclaimerText = 'Disclaimer text.'
+      const testSuccessfulResponse = {
+        data: {
+          status: 'OK',
+          data: {
+            message: testDisclaimerText
+          }
+        }
+      }
+      jest.spyOn(axios, 'get').mockResolvedValue(testSuccessfulResponse)
+
+      const actual = await sut.getPublishDatasetDisclaimerText()
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/settings/:PublishDatasetDisclaimerText`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(actual).toMatch(testDisclaimerText)
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: ReadError | undefined
+      await sut.getPublishDatasetDisclaimerText().catch((e) => (error = e))
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/info/settings/:PublishDatasetDisclaimerText`,
+        TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
+      )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
 })
