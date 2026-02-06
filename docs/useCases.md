@@ -25,7 +25,13 @@ The different use cases currently available in the package are classified below,
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
     - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
-    - [Create a Dataset Template](#create-a-dataset-template)
+- [Templates](#Templates)
+  - [Templates read use cases](#templates-read-use-cases)
+    - [Get a Template](#get-a-template)
+    - [Get Templates By Collection Id](#get-templates-by-collection-id)
+  - [Templates write use cases](#templates-write-use-cases)
+    - [Create a Template](#create-a-template)
+    - [Delete a Template](#delete-a-template)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
@@ -41,11 +47,13 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
     - [Get Dataset Available Categories](#get-dataset-available-categories)
     - [Get Dataset Templates](#get-dataset-templates)
+    - [Get Dataset Storage Driver](#get-dataset-storage-driver)
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
+    - [Update a Dataset License](#update-a-dataset-license)
     - [Publish a Dataset](#publish-a-dataset)
     - [Deaccession a Dataset](#deaccession-a-dataset)
     - [Delete a Draft Dataset](#delete-a-draft-dataset)
@@ -568,18 +576,60 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
-#### Create a Dataset Template
+## Templates
 
-Creates a dataset template for a given Dataverse collection id or alias.
+### Templates Read Use Cases
+
+#### Get a Template
+
+Returns a [Template](../src/templates/domain/models/Template.ts) by its template id.
 
 ##### Example call:
 
 ```typescript
-import { createDatasetTemplate } from '@iqss/dataverse-client-javascript'
-import { TemplateCreateDTO } from '@iqss/dataverse-client-javascript'
+import { getTemplate } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+getTemplate.execute(templateId).then((template: Template) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/templates/domain/useCases/GetTemplate.ts)_ definition.
+
+#### Get Templates By Collection Id
+
+Returns a [Template](../src/templates/domain/models/Template.ts) array containing the templates of the requested collection, given the collection identifier or alias.
+
+##### Example call:
+
+```typescript
+import { getTemplatesByCollectionId } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 12345
+
+getTemplatesByCollectionId.execute(collectionIdOrAlias).then((template: Template[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/templates/domain/useCases/GetTemplatesByCollectionId.ts)_ definition.
+
+### Templates Write Use Cases
+
+#### Create a Template
+
+Creates a template for a given Dataverse collection id or alias.
+
+##### Example call:
+
+```typescript
+import { createTemplate } from '@iqss/dataverse-client-javascript'
+import { CreateTemplateDTO } from '@iqss/dataverse-client-javascript'
 
 const collectionAlias = ':root'
-const template: TemplateCreateDTO = {
+const template: CreateTemplateDTO = {
   name: 'Dataverse template',
   isDefault: true,
   fields: [
@@ -598,10 +648,26 @@ const template: TemplateCreateDTO = {
   instructions: [{ instructionField: 'author', instructionText: 'The author data' }]
 }
 
-await createDatasetTemplate.execute(template, collectionAlias)
+await createTemplate.execute(template, collectionAlias)
 ```
 
-_See [use case](../src/collections/domain/useCases/CreateDatasetTemplate.ts) implementation_.
+_See [use case](../src/templates/domain/useCases/CreateTemplate.ts) implementation_.
+
+#### Delete a Template
+
+Deletes a template by its template id.
+
+##### Example call:
+
+```typescript
+import { deleteTemplate } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+await deleteTemplate.execute(templateId)
+```
+
+_See [use case](../src/templates/domain/useCases/DeleteTemplate.ts)_ definition.
 
 ## Datasets
 
@@ -1079,6 +1145,43 @@ updateDataset.execute(datasetId, datasetDTO)
 
 _See [use case](../src/datasets/domain/useCases/UpdateDataset.ts) implementation_.
 
+#### Update a Dataset License
+
+Updates the license of a dataset by applying it to the draft version. If no draft exists, a new one is automatically created by the API. Supports predefined licenses (by name) or custom terms of use and access.
+
+##### Example calls:
+
+```typescript
+import {
+  updateDatasetLicense,
+  DatasetLicenseUpdateRequest
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 1
+
+const predefinedPayload: DatasetLicenseUpdateRequest = { name: 'CC BY 4.0' }
+await updateDatasetLicense.execute(datasetId, predefinedPayload)
+
+const customPayload: DatasetLicenseUpdateRequest = {
+  customTerms: {
+    termsOfUse: 'Your terms of use',
+    confidentialityDeclaration: 'Your confidentiality declaration',
+    specialPermissions: 'Your special permissions',
+    restrictions: 'Your restrictions',
+    citationRequirements: 'Your citation requirements',
+    depositorRequirements: 'Your depositor requirements',
+    conditions: 'Your conditions',
+    disclaimer: 'Your disclaimer'
+  }
+}
+
+updateDatasetLicense.execute(datasetId, customPayload)
+```
+
+_See [use case](../src/datasets/domain/useCases/UpdateDatasetLicense.ts) implementation_.
+
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 #### Publish a Dataset
@@ -1113,6 +1216,38 @@ The `versionUpdateType` parameter can be a [VersionUpdateType](../src/datasets/d
 - `VersionUpdateType.MINOR`
 - `VersionUpdateType.MAJOR`
 - `VersionUpdateType.UPDATE_CURRENT`
+
+#### Update Terms of Access
+
+Updates the Terms of Access for restricted files on a dataset.
+
+##### Example call:
+
+```typescript
+import { updateTermsOfAccess } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 3
+
+await updateTermsOfAccess.execute(datasetId, {
+  fileAccessRequest: true,
+  termsOfAccessForRestrictedFiles: 'Your terms of access for restricted files',
+  dataAccessPlace: 'Your data access place',
+  originalArchive: 'Your original archive',
+  availabilityStatus: 'Your availability status',
+  contactForAccess: 'Your contact for access',
+  sizeOfCollection: 'Your size of collection',
+  studyCompletion: 'Your study completion'
+})
+```
+
+_See [use case](../src/datasets/domain/useCases/UpdateTermsOfAccess.ts) implementation_.
+
+Notes:
+
+- If the dataset is already published, this action creates a DRAFT version containing the new terms.
+- Unspecified fields are treated as omissions: sending only `fileAccessRequest` will update that field and leave all other terms absent (undefined). In practice, the new values you send fully replace the previous set of terms — so if you omit a field, you are effectively clearing it unless you include its original value in the new input.
 
 #### Deaccession a Dataset
 
@@ -1263,6 +1398,8 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
+# <<<<<<< HEAD
+
 #### Get Dataset Templates
 
 Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
@@ -1280,6 +1417,32 @@ getDatasetTemplates.execute(collectionIdOrAlias).then((datasetTemplates: Dataset
 ```
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definition.
+
+#### Get Dataset Storage Driver
+
+Returns a [StorageDriver](../src/datasets/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
+
+##### Example call:
+
+```typescript
+import { getDatasetStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetStorageDriver.execute(datasetId).then((storageDriver: StorageDriver) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetStorageDriver.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+> > > > > > > develop
 
 #### Add a Dataset Type
 

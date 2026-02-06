@@ -12,7 +12,6 @@ import { CollectionItemType } from '../../../collections/domain/models/Collectio
 import { CollectionLinks } from '../models/CollectionLinks'
 import { CollectionSummary } from '../models/CollectionSummary'
 import { LinkingObjectType } from '../useCases/GetCollectionsForLinking'
-import { CreateDatasetTemplateDTO } from '../dtos/CreateDatasetTemplateDTO'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -69,8 +68,4 @@ export interface ICollectionsRepository {
     searchTerm: string,
     alreadyLinked: boolean
   ): Promise<CollectionSummary[]>
-  createDatasetTemplate(
-    collectionIdOrAlias: number | string,
-    template: CreateDatasetTemplateDTO
-  ): Promise<void>
 }
