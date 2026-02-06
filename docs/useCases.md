@@ -2593,7 +2593,7 @@ import { submitContactInfo } from '@iqss/dataverse-client-javascript'
 /* ... */
 
 const contactDTO: ContactDTO = {
-  targedId: 1,
+  targetId: 1,
   subject: 'Data Question',
   body: 'Please help me understand your data. Thank you!',
   fromEmail: 'test@gmail.com'
