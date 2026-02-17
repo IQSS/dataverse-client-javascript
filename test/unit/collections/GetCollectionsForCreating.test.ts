@@ -14,7 +14,7 @@ describe('GetCollectionsForCreating', () => {
 
     const uc = new GetCollectionsForCreating(repo)
     await expect(uc.execute('testUser')).resolves.toEqual(sample)
-    expect(repo.getCollectionsForCreating).toHaveBeenCalledWith('@testUser')
+    expect(repo.getCollectionsForCreating).toHaveBeenCalledWith('testUser')
   })
 
   test('should return error result on repository error', async () => {
@@ -23,6 +23,6 @@ describe('GetCollectionsForCreating', () => {
 
     const uc = new GetCollectionsForCreating(repo)
     await expect(uc.execute('testUser')).rejects.toThrow(ReadError)
-    expect(repo.getCollectionsForCreating).toHaveBeenCalledWith('@testUser')
+    expect(repo.getCollectionsForCreating).toHaveBeenCalledWith('testUser')
   })
 })
