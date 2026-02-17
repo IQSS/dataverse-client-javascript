@@ -10,7 +10,7 @@ export class ApiConfig {
     dataverseApiAuthMechanism: DataverseApiAuthMechanism,
     dataverseApiKey?: string,
     bearerTokenLocalStorageKey?: string,
-    bearerTokenGetFunction?: () => string
+    bearerTokenGetFunction?: () => string | null
   ) {
     this.dataverseApiUrl = dataverseApiUrl
     this.dataverseApiAuthMechanism = dataverseApiAuthMechanism
