@@ -31,7 +31,7 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
       })
   }
 
-  public async getGuestbooksBycollectionId(
+  public async getGuestbooksByCollectionId(
     collectionIdOrAlias: number | string
   ): Promise<Guestbook[]> {
     return this.doGet(

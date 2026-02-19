@@ -7,7 +7,7 @@ export interface IGuestbooksRepository {
     guestbook: CreateGuestbookDTO
   ): Promise<void>
   getGuestbook(guestbookId: number): Promise<Guestbook>
-  getGuestbooksBycollectionId(collectionIdOrAlias: number | string): Promise<Guestbook[]>
+  getGuestbooksByCollectionId(collectionIdOrAlias: number | string): Promise<Guestbook[]>
   setGuestbookEnabled(
     collectionIdOrAlias: number | string,
     guestbookId: number,

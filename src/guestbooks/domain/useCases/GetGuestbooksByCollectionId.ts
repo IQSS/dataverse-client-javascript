@@ -12,6 +12,6 @@ export class GetGuestbooksByCollectionId implements UseCase<Guestbook[]> {
    * @returns {Promise<Guestbook[]>}
    */
   async execute(collectionIdOrAlias: number | string): Promise<Guestbook[]> {
-    return await this.guestbooksRepository.getGuestbooksBycollectionId(collectionIdOrAlias)
+    return await this.guestbooksRepository.getGuestbooksByCollectionId(collectionIdOrAlias)
   }
 }

@@ -22,18 +22,18 @@ describe('GetGuestbooksByCollectionId', () => {
 
   test('should return guestbooks for collection', async () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
-    repository.getGuestbooksBycollectionId = jest.fn().mockResolvedValue(guestbooks)
+    repository.getGuestbooksByCollectionId = jest.fn().mockResolvedValue(guestbooks)
 
     const sut = new GetGuestbooksByCollectionId(repository)
     const actual = await sut.execute(collectionId)
 
-    expect(repository.getGuestbooksBycollectionId).toHaveBeenCalledWith(collectionId)
+    expect(repository.getGuestbooksByCollectionId).toHaveBeenCalledWith(collectionId)
     expect(actual).toEqual(guestbooks)
   })
 
   test('should throw ReadError when repository fails', async () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
-    repository.getGuestbooksBycollectionId = jest.fn().mockRejectedValue(new ReadError())
+    repository.getGuestbooksByCollectionId = jest.fn().mockRejectedValue(new ReadError())
     const sut = new GetGuestbooksByCollectionId(repository)
 
     await expect(sut.execute(collectionId)).rejects.toThrow(ReadError)

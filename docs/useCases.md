@@ -2810,11 +2810,11 @@ Returns all [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) entries av
 ##### Example call:
 
 ```typescript
-import { getGuestbooksBycollectionId } from '@iqss/dataverse-client-javascript'
+import { getGuestbooksByCollectionId } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = 'root'
 
-getGuestbooksBycollectionId.execute(collectionIdOrAlias).then((guestbooks: Guestbook[]) => {
+getGuestbooksByCollectionId.execute(collectionIdOrAlias).then((guestbooks: Guestbook[]) => {
   /* ... */
 })
 ```

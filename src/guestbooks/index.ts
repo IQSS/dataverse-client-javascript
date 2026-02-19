@@ -8,10 +8,10 @@ const guestbooksRepository = new GuestbooksRepository()
 
 const createGuestbook = new CreateGuestbook(guestbooksRepository)
 const getGuestbook = new GetGuestbook(guestbooksRepository)
-const getGuestbooksBycollectionId = new GetGuestbooksByCollectionId(guestbooksRepository)
+const getGuestbooksByCollectionId = new GetGuestbooksByCollectionId(guestbooksRepository)
 const setGuestbookEnabled = new SetGuestbookEnabled(guestbooksRepository)
 
-export { createGuestbook, getGuestbook, getGuestbooksBycollectionId, setGuestbookEnabled }
+export { createGuestbook, getGuestbook, getGuestbooksByCollectionId, setGuestbookEnabled }
 
 export {
   CreateGuestbookDTO,

@@ -85,22 +85,22 @@ describe('GuestbooksRepository', () => {
     })
   })
 
-  describe('getGuestbooksBycollectionId', () => {
+  describe('getGuestbooksByCollectionId', () => {
     test('should list guestbooks for collection', async () => {
       await sut.createGuestbook(testCollectionId, createGuestbookDTO)
-      const actual = await sut.getGuestbooksBycollectionId(testCollectionId)
+      const actual = await sut.getGuestbooksByCollectionId(testCollectionId)
       expect(actual.length).toBeGreaterThan(0)
       createdGuestbookId = actual[0].id as number
     })
 
     test('should list guestbooks for collection by collection alias', async () => {
       await sut.createGuestbook(testCollectionAlias, createGuestbookDTO)
-      const actual = await sut.getGuestbooksBycollectionId(testCollectionAlias)
+      const actual = await sut.getGuestbooksByCollectionId(testCollectionAlias)
       expect(actual.length).toBeGreaterThan(0)
     })
 
     test('should return error when collection does not exist', async () => {
-      await expect(sut.getGuestbooksBycollectionId(999999)).rejects.toThrow(ReadError)
+      await expect(sut.getGuestbooksByCollectionId(999999)).rejects.toThrow(ReadError)
     })
   })
 
