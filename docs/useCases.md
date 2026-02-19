@@ -123,6 +123,19 @@ The different use cases currently available in the package are classified below,
     - [Get External Tools](#get-external-tools)
     - [Get Dataset External Tool Resolved](#get-dataset-external-tool-resolved)
     - [Get File External Tool Resolved](#get-file-external-tool-resolved)
+- [Guestbooks](#Guestbooks)
+  - [Guestbooks read use cases](#guestbooks-read-use-cases)
+    - [Get a Guestbook](#get-a-guestbook)
+    - [Get Guestbooks By Collection Id](#get-guestbooks-by-collection-id)
+  - [Guestbooks write use cases](#guestbooks-write-use-cases)
+    - [Create a Guestbook](#create-a-guestbook)
+    - [Set Guestbook Enabled](#set-guestbook-enabled)
+- [Access](#Access)
+  - [Access write use cases](#access-write-use-cases)
+    - [Submit Guestbook For Datafile Download](#submit-guestbook-for-datafile-download)
+    - [Submit Guestbook For Datafiles Download](#submit-guestbook-for-datafiles-download)
+    - [Submit Guestbook For Dataset Download](#submit-guestbook-for-dataset-download)
+    - [Submit Guestbook For Dataset Version Download](#submit-guestbook-for-dataset-version-download)
 
 ## Collections
 
@@ -2767,3 +2780,188 @@ getFileExternalToolResolved
 ```
 
 _See [use case](../src/externalTools/domain/useCases/GetfileExternalToolResolved.ts) implementation_.
+
+## Guestbooks
+
+### Guestbooks Read Use Cases
+
+#### Get a Guestbook
+
+Returns a [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) by its id.
+
+##### Example call:
+
+```typescript
+import { getGuestbook } from '@iqss/dataverse-client-javascript'
+
+const guestbookId = 123
+
+getGuestbook.execute(guestbookId).then((guestbook: Guestbook) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/GetGuestbook.ts) implementation_.
+
+#### Get Guestbooks By Collection Id
+
+Returns all [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) entries available for a collection.
+
+##### Example call:
+
+```typescript
+import { getGuestbooksBycollectionId } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+
+getGuestbooksBycollectionId.execute(collectionIdOrAlias).then((guestbooks: Guestbook[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId.ts) implementation_.
+
+### Guestbooks Write Use Cases
+
+#### Create a Guestbook
+
+Creates a guestbook on a collection using [CreateGuestbookDTO](../src/guestbooks/domain/dtos/CreateGuestbookDTO.ts).
+
+##### Example call:
+
+```typescript
+import { createGuestbook } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+const guestbook: CreateGuestbookDTO = {
+  name: 'my test guestbook',
+  enabled: true,
+  emailRequired: true,
+  nameRequired: true,
+  institutionRequired: false,
+  positionRequired: false,
+  customQuestions: [
+    {
+      question: 'Describe yourself',
+      required: false,
+      displayOrder: 1,
+      type: 'textarea',
+      hidden: false
+    }
+  ]
+}
+
+createGuestbook.execute(guestbook, collectionIdOrAlias).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/CreateGuestbook.ts) implementation_.
+
+#### Set Guestbook Enabled
+
+Enables or disables a guestbook in a collection.
+
+##### Example call:
+
+```typescript
+import { setGuestbookEnabled } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+const guestbookId = 123
+
+setGuestbookEnabled.execute(collectionIdOrAlias, guestbookId, false).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/SetGuestbookEnabled.ts) implementation_.
+
+## Access
+
+### Access Write Use Cases
+
+#### Submit Guestbook For Datafile Download
+
+Submits guestbook answers for a datafile and returns a signed URL.
+
+##### Example call:
+
+```typescript
+import { submitGuestbookForDatafileDownload } from '@iqss/dataverse-client-javascript'
+
+submitGuestbookForDatafileDownload
+  .execute(10, {
+    guestbookResponse: {
+      answers: [
+        { id: 123, value: 'Good' },
+        { id: 124, value: ['Multi', 'Line'] }
+      ]
+    }
+  })
+  .then((signedUrl: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/access/domain/useCases/SubmitGuestbookForDatafileDownload.ts) implementation_.
+
+#### Submit Guestbook For Datafiles Download
+
+Submits guestbook answers for multiple files and returns a signed URL.
+
+##### Example call:
+
+```typescript
+import { submitGuestbookForDatafilesDownload } from '@iqss/dataverse-client-javascript'
+
+submitGuestbookForDatafilesDownload
+  .execute([10, 11], {
+    guestbookResponse: { answers: [{ id: 123, value: 'Good' }] }
+  })
+  .then((signedUrl: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/access/domain/useCases/SubmitGuestbookForDatafilesDownload.ts) implementation_.
+
+#### Submit Guestbook For Dataset Download
+
+Submits guestbook answers for dataset download and returns a signed URL.
+
+##### Example call:
+
+```typescript
+import { submitGuestbookForDatasetDownload } from '@iqss/dataverse-client-javascript'
+
+submitGuestbookForDatasetDownload
+  .execute('doi:10.5072/FK2/XXXXXX', {
+    guestbookResponse: { answers: [{ id: 123, value: 'Good' }] }
+  })
+  .then((signedUrl: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/access/domain/useCases/SubmitGuestbookForDatasetDownload.ts) implementation_.
+
+#### Submit Guestbook For Dataset Version Download
+
+Submits guestbook answers for a specific dataset version and returns a signed URL.
+
+##### Example call:
+
+```typescript
+import { submitGuestbookForDatasetVersionDownload } from '@iqss/dataverse-client-javascript'
+
+submitGuestbookForDatasetVersionDownload
+  .execute(10, ':latest', {
+    guestbookResponse: { answers: [{ id: 123, value: 'Good' }] }
+  })
+  .then((signedUrl: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/access/domain/useCases/SubmitGuestbookForDatasetVersionDownload.ts) implementation_.
