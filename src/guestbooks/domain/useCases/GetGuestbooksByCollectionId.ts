@@ -2,7 +2,7 @@ import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { IGuestbooksRepository } from '../repositories/IGuestbooksRepository'
 import { Guestbook } from '../models/Guestbook'
 
-export class GetGuestbooksBycollectionId implements UseCase<Guestbook[]> {
+export class GetGuestbooksByCollectionId implements UseCase<Guestbook[]> {
   constructor(private readonly guestbooksRepository: IGuestbooksRepository) {}
 
   /**

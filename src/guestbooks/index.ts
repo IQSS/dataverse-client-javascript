@@ -1,14 +1,14 @@
 import { GuestbooksRepository } from './infra/repositories/GuestbooksRepository'
 import { CreateGuestbook } from './domain/useCases/CreateGuestbook'
 import { GetGuestbook } from './domain/useCases/GetGuestbook'
-import { GetGuestbooksBycollectionId } from './domain/useCases/GetGuestbooksByCollectionId'
+import { GetGuestbooksByCollectionId } from './domain/useCases/GetGuestbooksByCollectionId'
 import { SetGuestbookEnabled } from './domain/useCases/SetGuestbookEnabled'
 
 const guestbooksRepository = new GuestbooksRepository()
 
 const createGuestbook = new CreateGuestbook(guestbooksRepository)
 const getGuestbook = new GetGuestbook(guestbooksRepository)
-const getGuestbooksBycollectionId = new GetGuestbooksBycollectionId(guestbooksRepository)
+const getGuestbooksBycollectionId = new GetGuestbooksByCollectionId(guestbooksRepository)
 const setGuestbookEnabled = new SetGuestbookEnabled(guestbooksRepository)
 
 export { createGuestbook, getGuestbook, getGuestbooksBycollectionId, setGuestbookEnabled }

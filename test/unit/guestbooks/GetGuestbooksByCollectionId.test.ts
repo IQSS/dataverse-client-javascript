@@ -1,9 +1,9 @@
 import { ReadError } from '../../../src'
 import { Guestbook } from '../../../src/guestbooks/domain/models/Guestbook'
 import { IGuestbooksRepository } from '../../../src/guestbooks/domain/repositories/IGuestbooksRepository'
-import { GetGuestbooksBycollectionId } from '../../../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId'
+import { GetGuestbooksByCollectionId } from '../../../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId'
 
-describe('GetGuestbooksBycollectionId', () => {
+describe('GetGuestbooksByCollectionId', () => {
   const guestbooks: Guestbook[] = [
     {
       id: 12,
@@ -24,7 +24,7 @@ describe('GetGuestbooksBycollectionId', () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
     repository.getGuestbooksBycollectionId = jest.fn().mockResolvedValue(guestbooks)
 
-    const sut = new GetGuestbooksBycollectionId(repository)
+    const sut = new GetGuestbooksByCollectionId(repository)
     const actual = await sut.execute(collectionId)
 
     expect(repository.getGuestbooksBycollectionId).toHaveBeenCalledWith(collectionId)
@@ -34,7 +34,7 @@ describe('GetGuestbooksBycollectionId', () => {
   test('should throw ReadError when repository fails', async () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
     repository.getGuestbooksBycollectionId = jest.fn().mockRejectedValue(new ReadError())
-    const sut = new GetGuestbooksBycollectionId(repository)
+    const sut = new GetGuestbooksByCollectionId(repository)
 
     await expect(sut.execute(collectionId)).rejects.toThrow(ReadError)
   })

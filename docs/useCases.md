@@ -2917,7 +2917,13 @@ import { submitGuestbookForDatafilesDownload } from '@iqss/dataverse-client-java
 
 submitGuestbookForDatafilesDownload
   .execute([10, 11], {
-    guestbookResponse: { answers: [{ id: 123, value: 'Good' }] }
+    guestbookResponse: {
+      answers: [
+        { id: 123, value: 'Good' },
+        { id: 124, value: ['Multi', 'Line'] },
+        { id: 125, value: 'Yellow' }
+      ]
+    }
   })
   .then((signedUrl: string) => {
     /* ... */
@@ -2937,7 +2943,13 @@ import { submitGuestbookForDatasetDownload } from '@iqss/dataverse-client-javasc
 
 submitGuestbookForDatasetDownload
   .execute('doi:10.5072/FK2/XXXXXX', {
-    guestbookResponse: { answers: [{ id: 123, value: 'Good' }] }
+    guestbookResponse: {
+      answers: [
+        { id: 123, value: 'Good' },
+        { id: 124, value: ['Multi', 'Line'] },
+        { id: 125, value: 'Yellow' }
+      ]
+    }
   })
   .then((signedUrl: string) => {
     /* ... */
@@ -2957,7 +2969,13 @@ import { submitGuestbookForDatasetVersionDownload } from '@iqss/dataverse-client
 
 submitGuestbookForDatasetVersionDownload
   .execute(10, ':latest', {
-    guestbookResponse: { answers: [{ id: 123, value: 'Good' }] }
+    guestbookResponse: {
+      answers: [
+        { id: 123, value: 'Good' },
+        { id: 124, value: ['Multi', 'Line'] },
+        { id: 125, value: 'Yellow' }
+      ]
+    }
   })
   .then((signedUrl: string) => {
     /* ... */
