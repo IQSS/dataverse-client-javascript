@@ -89,7 +89,6 @@ describe('GuestbooksRepository', () => {
     test('should list guestbooks for collection', async () => {
       await sut.createGuestbook(testCollectionId, createGuestbookDTO)
       const actual = await sut.getGuestbooksBycollectionId(testCollectionId)
-      console.log('actual guestbooks: ', actual)
       expect(actual.length).toBeGreaterThan(0)
       createdGuestbookId = actual[0].id as number
     })
@@ -97,7 +96,6 @@ describe('GuestbooksRepository', () => {
     test('should list guestbooks for collection by collection alias', async () => {
       await sut.createGuestbook(testCollectionAlias, createGuestbookDTO)
       const actual = await sut.getGuestbooksBycollectionId(testCollectionAlias)
-      console.log('actual guestbooks: ', actual)
       expect(actual.length).toBeGreaterThan(0)
     })
 
@@ -110,7 +108,6 @@ describe('GuestbooksRepository', () => {
     test('should get guestbook by id', async () => {
       await sut.createGuestbook(testCollectionId, createGuestbookDTO)
       const actual = await sut.getGuestbook(createdGuestbookId as number)
-      console.log('getGuestbook guestbooks: ', actual)
       expect(actual.id).toBe(createdGuestbookId)
       expect(actual.name).toBe(createGuestbookDTO.name)
     })

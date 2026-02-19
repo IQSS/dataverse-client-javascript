@@ -11,7 +11,7 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
     guestbook: CreateGuestbookDTO
   ): Promise<void> {
     return this.doPost(
-      this.buildApiEndpoint(this.guestbooksResourceName, undefined, collectionIdOrAlias),
+      this.buildApiEndpoint(this.guestbooksResourceName, `${collectionIdOrAlias}`),
       guestbook
     )
       .then(() => undefined)
@@ -35,7 +35,7 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
     collectionIdOrAlias: number | string
   ): Promise<Guestbook[]> {
     return this.doGet(
-      this.buildApiEndpoint(this.guestbooksResourceName, 'list', collectionIdOrAlias),
+      this.buildApiEndpoint(this.guestbooksResourceName, `${collectionIdOrAlias}/list`),
       true
     )
       .then((response) => response.data.data as Guestbook[])
@@ -51,8 +51,7 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
   ): Promise<void> {
     const endpoint = this.buildApiEndpoint(
       this.guestbooksResourceName,
-      `${guestbookId}/enabled`,
-      collectionIdOrAlias
+      `${collectionIdOrAlias}/${guestbookId}/enabled`
     )
     return this.doPut(endpoint, enabled)
       .then(() => undefined)
