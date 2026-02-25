@@ -14,17 +14,16 @@ describe('getDatasetAvailableDatasetTypes', () => {
 
     test('should return available dataset types', async () => {
       const actualDatasetTypes: DatasetType[] = await getDatasetAvailableDatasetTypes.execute()
-      const expectedDatasetTypes = [
-        {
-          id: 1,
-          name: 'dataset',
-          linkedMetadataBlocks: [],
-          availableLicenses: []
-        }
-      ]
+      const expectedDatasetTypes = {
+        id: 1,
+        name: 'dataset',
+        linkedMetadataBlocks: [],
+        availableLicenses: []
+      }
+
       // check that the actual dataset types include the expected dataset types
       // (without requiring an exact match, since other dataset types may be created by concurrent tests)
-      expect(actualDatasetTypes).toContain(expectedDatasetTypes)
+      expect(actualDatasetTypes).toContainEqual(expectedDatasetTypes)
     })
   })
 })
