@@ -22,8 +22,9 @@ describe('getDatasetAvailableDatasetTypes', () => {
           availableLicenses: []
         }
       ]
-
-      expect(actualDatasetTypes).toEqual(expectedDatasetTypes)
+      // check that the actual dataset types include the expected dataset types
+      // (without requiring an exact match, since other dataset types may be created by concurrent tests)
+      expect(actualDatasetTypes).toContain(expectedDatasetTypes)
     })
   })
 })
