@@ -2930,7 +2930,7 @@ _See [use case](../src/guestbooks/domain/useCases/RemoveDatasetGuestbook.ts) imp
 
 #### Get Signed Datafile Download URL
 
-Returns a signed URL for downloading a single datafile using `GET /api/access/datafile/{fileId:.+}?signed=true`.
+Returns a signed URL for downloading a single datafile.
 
 ##### Example call:
 
@@ -2946,7 +2946,7 @@ _See [use case](../src/access/domain/useCases/GetSignedDatafileDownloadUrl.ts) i
 
 #### Get Signed Datafiles Download URL
 
-Returns a signed URL for downloading multiple datafiles using `GET /api/access/datafiles/{fileIds}?signed=true`.
+Returns a signed URL for downloading multiple datafiles.
 
 ##### Example call:
 
@@ -2962,7 +2962,7 @@ _See [use case](../src/access/domain/useCases/GetSignedDatafilesDownloadUrl.ts) 
 
 #### Get Signed Dataset Download URL
 
-Returns a signed URL for downloading a dataset using `GET /api/access/dataset/{id}?signed=true`.
+Returns a signed URL for downloading a dataset.
 
 ##### Example call:
 
@@ -2978,7 +2978,7 @@ _See [use case](../src/access/domain/useCases/GetSignedDatasetDownloadUrl.ts) im
 
 #### Get Signed Dataset Version Download URL
 
-Returns a signed URL for downloading a dataset version using `GET /api/access/dataset/{id}/versions/{versionId}?signed=true`.
+Returns a signed URL for downloading a dataset version.
 
 ##### Example call:
 
@@ -2989,8 +2989,6 @@ getSignedDatasetVersionDownloadUrl.execute(10, '1.0').then((signedUrl: string) =
   /* ... */
 })
 ```
-
-Signed URLs are only available to authenticated users. Guest users will receive an error when requesting `signed=true`.
 
 _See [use case](../src/access/domain/useCases/GetSignedDatasetVersionDownloadUrl.ts) implementation_.
 
