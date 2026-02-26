@@ -3,7 +3,12 @@ import { ApiConfig, ReadError, WriteError } from '../../../src'
 import { GuestbooksRepository } from '../../../src/guestbooks/infra/repositories/GuestbooksRepository'
 import { CreateGuestbookDTO } from '../../../src/guestbooks/domain/dtos/CreateGuestbookDTO'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { createDataset, CreatedDatasetIdentifiers } from '../../../src/datasets'
+import {
+  createDataset,
+  CreatedDatasetIdentifiers,
+  DatasetNotNumberedVersion,
+  getDataset
+} from '../../../src/datasets'
 import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
 import {
   createCollectionViaApi,
@@ -179,6 +184,17 @@ describe('GuestbooksRepository', () => {
           assignableGuestbookId
         )
         expect(actual).toBeUndefined()
+      })
+
+      test('should return guestbookId in dataset response after assigning guestbook', async () => {
+        await sut.assignDatasetGuestbook(testDatasetIds.numericId, assignableGuestbookId)
+
+        const dataset = await getDataset.execute(
+          testDatasetIds.numericId,
+          DatasetNotNumberedVersion.LATEST
+        )
+
+        expect(dataset.guestbookId).toBe(assignableGuestbookId)
       })
 
       test('should assign guestbook to dataset by persistent id', async () => {

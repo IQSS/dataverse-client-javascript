@@ -39,7 +39,8 @@ const DATAVERSE_API_REQUEST_HEADERS = {
 
 export const createDatasetModel = (
   license?: DatasetLicense,
-  addOptionalParameters = false
+  addOptionalParameters = false,
+  guestbookId?: number
 ): Dataset => {
   const datasetModel: Dataset = {
     id: 1,
@@ -119,12 +120,16 @@ export const createDatasetModel = (
     datasetModel.publicationDate = '2021-01-01'
     datasetModel.citationDate = '2021-01-01'
   }
+  if (guestbookId !== undefined) {
+    datasetModel.guestbookId = guestbookId
+  }
   return datasetModel
 }
 
 export const createDatasetVersionPayload = (
   license?: DatasetLicense,
-  addOptionalProperties = false
+  addOptionalProperties = false,
+  guestbookId?: number
 ): DatasetPayload => {
   const datasetPayload: DatasetPayload = {
     id: 19,
@@ -255,6 +260,9 @@ export const createDatasetVersionPayload = (
     datasetPayload.alternativePersistentId = 'doi:10.5072/FK2/HC6KTB'
     datasetPayload.publicationDate = '2021-01-01'
     datasetPayload.citationDate = '2021-01-01'
+  }
+  if (guestbookId !== undefined) {
+    datasetPayload.guestbookId = guestbookId
   }
   return datasetPayload
 }

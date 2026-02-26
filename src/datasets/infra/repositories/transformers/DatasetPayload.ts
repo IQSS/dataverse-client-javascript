@@ -17,6 +17,7 @@ export interface DatasetPayload {
   alternativePersistentId?: string
   publicationDate?: string
   citationDate?: string
+  guestbookId?: number
   fileAccessRequest: boolean
   termsOfAccess?: string
   dataAccessPlace?: string
