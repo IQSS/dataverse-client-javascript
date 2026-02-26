@@ -22,6 +22,9 @@ export interface Guestbook {
   nameRequired: boolean
   institutionRequired: boolean
   positionRequired: boolean
+  email: string
+  institution: string
+  position: string
   customQuestions: GuestbookCustomQuestion[]
   createTime: string
   dataverseId: number

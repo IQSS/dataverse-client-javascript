@@ -13,4 +13,6 @@ export interface IGuestbooksRepository {
     guestbookId: number,
     enabled: boolean
   ): Promise<void>
+  assignDatasetGuestbook(datasetId: number | string, guestbookId: number): Promise<void>
+  removeDatasetGuestbook(datasetId: number | string): Promise<void>
 }

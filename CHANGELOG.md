@@ -17,6 +17,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - New Use Case: [Delete a Template](./docs/useCases.md#delete-a-template) under Templates.
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
 - Guestbooks: Added use cases and repository support for guestbook creation, listing, and enabling/disabling.
+- Guestbooks: Added dataset-level guestbook assignment and removal support via `assignDatasetGuestbook` (`PUT /api/datasets/{identifier}/guestbook`) and `removeDatasetGuestbook` (`DELETE /api/datasets/{identifier}/guestbook`).
+- Access: Added signed-URL GET use cases for `access/datafile`, `access/datafiles`, `access/dataset`, and `access/dataset/{id}/versions/{versionId}` endpoints using `?signed=true` (authenticated users only).
 - Access: Added a dedicated `access` module for guestbook-at-request and download terms/guestbook submission endpoints.
 
 ### Changed

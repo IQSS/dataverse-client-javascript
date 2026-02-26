@@ -3,6 +3,8 @@ import { ApiConfig, ReadError, WriteError } from '../../../src'
 import { GuestbooksRepository } from '../../../src/guestbooks/infra/repositories/GuestbooksRepository'
 import { CreateGuestbookDTO } from '../../../src/guestbooks/domain/dtos/CreateGuestbookDTO'
 import { TestConstants } from '../../testHelpers/TestConstants'
+import { createDataset, CreatedDatasetIdentifiers } from '../../../src/datasets'
+import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
 import {
   createCollectionViaApi,
   deleteCollectionViaApi
@@ -22,6 +24,9 @@ describe('GuestbooksRepository', () => {
     nameRequired: true,
     institutionRequired: false,
     positionRequired: false,
+    email: 'test@gmail.com',
+    institution: 'Harvard University',
+    position: 'Researcher',
     customQuestions: [
       {
         question: "how's your day",
@@ -138,6 +143,75 @@ describe('GuestbooksRepository', () => {
       await expect(sut.setGuestbookEnabled(testCollectionId, 999999, false)).rejects.toThrow(
         WriteError
       )
+    })
+  })
+
+  describe('assignDatasetGuestbook / removeDatasetGuestbook', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+    let assignableGuestbookId: number
+
+    beforeAll(async () => {
+      await sut.createGuestbook(testCollectionId, {
+        ...createGuestbookDTO,
+        name: 'assign/remove guestbook test'
+      })
+
+      const guestbooks = await sut.getGuestbooksByCollectionId(testCollectionId)
+      const assignableGuestbook = guestbooks.find(
+        (guestbook) => guestbook.name === 'assign/remove guestbook test'
+      )
+      assignableGuestbookId = assignableGuestbook?.id as number
+
+      testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    describe('assignDatasetGuestbook', () => {
+      test('should assign guestbook to dataset by numeric id', async () => {
+        const actual = await sut.assignDatasetGuestbook(
+          testDatasetIds.numericId,
+          assignableGuestbookId
+        )
+        expect(actual).toBeUndefined()
+      })
+
+      test('should assign guestbook to dataset by persistent id', async () => {
+        const actual = await sut.assignDatasetGuestbook(
+          testDatasetIds.persistentId,
+          assignableGuestbookId
+        )
+        expect(actual).toBeUndefined()
+      })
+
+      test('should return error when assigning guestbook to non-existent dataset', async () => {
+        await expect(sut.assignDatasetGuestbook(999999, assignableGuestbookId)).rejects.toThrow(
+          WriteError
+        )
+      })
+    })
+
+    describe('removeDatasetGuestbook', () => {
+      test('should remove guestbook from dataset by numeric id', async () => {
+        await sut.assignDatasetGuestbook(testDatasetIds.numericId, assignableGuestbookId)
+        const actual = await sut.removeDatasetGuestbook(testDatasetIds.numericId)
+        expect(actual).toBeUndefined()
+      })
+
+      test('should remove guestbook from dataset by persistent id', async () => {
+        await sut.assignDatasetGuestbook(testDatasetIds.numericId, assignableGuestbookId)
+        const actual = await sut.removeDatasetGuestbook(testDatasetIds.persistentId)
+        expect(actual).toBeUndefined()
+      })
+
+      test('should return error when removing guestbook from non-existent dataset', async () => {
+        await expect(sut.removeDatasetGuestbook(999999)).rejects.toThrow(WriteError)
+      })
     })
   })
 })

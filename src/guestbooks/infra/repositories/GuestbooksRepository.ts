@@ -5,6 +5,7 @@ import { IGuestbooksRepository } from '../../domain/repositories/IGuestbooksRepo
 
 export class GuestbooksRepository extends ApiRepository implements IGuestbooksRepository {
   private readonly guestbooksResourceName: string = 'guestbooks'
+  private readonly datasetsResourceName: string = 'datasets'
 
   public async createGuestbook(
     collectionIdOrAlias: number | string,
@@ -54,6 +55,27 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
       `${collectionIdOrAlias}/${guestbookId}/enabled`
     )
     return this.doPut(endpoint, enabled)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async assignDatasetGuestbook(
+    datasetId: number | string,
+    guestbookId: number
+  ): Promise<void> {
+    const endpoint = this.buildApiEndpoint(this.datasetsResourceName, 'guestbook', datasetId)
+    return this.doPut(endpoint, guestbookId.toString())
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async removeDatasetGuestbook(datasetId: number | string): Promise<void> {
+    const endpoint = this.buildApiEndpoint(this.datasetsResourceName, 'guestbook', datasetId)
+    return this.doDelete(endpoint)
       .then(() => undefined)
       .catch((error) => {
         throw error

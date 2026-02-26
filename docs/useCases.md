@@ -130,7 +130,14 @@ The different use cases currently available in the package are classified below,
   - [Guestbooks write use cases](#guestbooks-write-use-cases)
     - [Create a Guestbook](#create-a-guestbook)
     - [Set Guestbook Enabled](#set-guestbook-enabled)
+    - [Assign Dataset Guestbook](#assign-dataset-guestbook)
+    - [Remove Dataset Guestbook](#remove-dataset-guestbook)
 - [Access](#Access)
+  - [Access read use cases](#access-read-use-cases)
+    - [Get Signed Datafile Download URL](#get-signed-datafile-download-url)
+    - [Get Signed Datafiles Download URL](#get-signed-datafiles-download-url)
+    - [Get Signed Dataset Download URL](#get-signed-dataset-download-url)
+    - [Get Signed Dataset Version Download URL](#get-signed-dataset-version-download-url)
   - [Access write use cases](#access-write-use-cases)
     - [Submit Guestbook For Datafile Download](#submit-guestbook-for-datafile-download)
     - [Submit Guestbook For Datafiles Download](#submit-guestbook-for-datafiles-download)
@@ -2840,6 +2847,9 @@ const guestbook: CreateGuestbookDTO = {
   nameRequired: true,
   institutionRequired: false,
   positionRequired: false,
+  email: 'test@gmail.com',
+  institution: 'Harvard University',
+  position: 'Researcher',
   customQuestions: [
     {
       question: 'Describe yourself',
@@ -2877,7 +2887,112 @@ setGuestbookEnabled.execute(collectionIdOrAlias, guestbookId, false).then(() => 
 
 _See [use case](../src/guestbooks/domain/useCases/SetGuestbookEnabled.ts) implementation_.
 
+#### Assign Dataset Guestbook
+
+Assigns a guestbook to a dataset using `PUT /api/datasets/{identifier}/guestbook`.
+
+##### Example call:
+
+```typescript
+import { assignDatasetGuestbook } from '@iqss/dataverse-client-javascript'
+
+const datasetIdOrPersistentId = 123
+const guestbookId = 456
+
+assignDatasetGuestbook.execute(datasetIdOrPersistentId, guestbookId).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/AssignDatasetGuestbook.ts) implementation_.
+
+#### Remove Dataset Guestbook
+
+Removes the guestbook assignment for a dataset using `DELETE /api/datasets/{identifier}/guestbook`.
+
+##### Example call:
+
+```typescript
+import { removeDatasetGuestbook } from '@iqss/dataverse-client-javascript'
+
+const datasetIdOrPersistentId = 123
+
+removeDatasetGuestbook.execute(datasetIdOrPersistentId).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/RemoveDatasetGuestbook.ts) implementation_.
+
 ## Access
+
+### Access Read Use Cases
+
+#### Get Signed Datafile Download URL
+
+Returns a signed URL for downloading a single datafile using `GET /api/access/datafile/{fileId:.+}?signed=true`.
+
+##### Example call:
+
+```typescript
+import { getSignedDatafileDownloadUrl } from '@iqss/dataverse-client-javascript'
+
+getSignedDatafileDownloadUrl.execute(10).then((signedUrl: string) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/access/domain/useCases/GetSignedDatafileDownloadUrl.ts) implementation_.
+
+#### Get Signed Datafiles Download URL
+
+Returns a signed URL for downloading multiple datafiles using `GET /api/access/datafiles/{fileIds}?signed=true`.
+
+##### Example call:
+
+```typescript
+import { getSignedDatafilesDownloadUrl } from '@iqss/dataverse-client-javascript'
+
+getSignedDatafilesDownloadUrl.execute([10, 11]).then((signedUrl: string) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/access/domain/useCases/GetSignedDatafilesDownloadUrl.ts) implementation_.
+
+#### Get Signed Dataset Download URL
+
+Returns a signed URL for downloading a dataset using `GET /api/access/dataset/{id}?signed=true`.
+
+##### Example call:
+
+```typescript
+import { getSignedDatasetDownloadUrl } from '@iqss/dataverse-client-javascript'
+
+getSignedDatasetDownloadUrl.execute(10).then((signedUrl: string) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/access/domain/useCases/GetSignedDatasetDownloadUrl.ts) implementation_.
+
+#### Get Signed Dataset Version Download URL
+
+Returns a signed URL for downloading a dataset version using `GET /api/access/dataset/{id}/versions/{versionId}?signed=true`.
+
+##### Example call:
+
+```typescript
+import { getSignedDatasetVersionDownloadUrl } from '@iqss/dataverse-client-javascript'
+
+getSignedDatasetVersionDownloadUrl.execute(10, '1.0').then((signedUrl: string) => {
+  /* ... */
+})
+```
+
+Signed URLs are only available to authenticated users. Guest users will receive an error when requesting `signed=true`.
+
+_See [use case](../src/access/domain/useCases/GetSignedDatasetVersionDownloadUrl.ts) implementation_.
 
 ### Access Write Use Cases
 

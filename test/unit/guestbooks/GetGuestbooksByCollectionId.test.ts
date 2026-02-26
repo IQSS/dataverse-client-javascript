@@ -13,6 +13,9 @@ describe('GetGuestbooksByCollectionId', () => {
       nameRequired: true,
       institutionRequired: false,
       positionRequired: false,
+      email: 'test@gmail.com',
+      institution: 'Harvard University',
+      position: 'Researcher',
       customQuestions: [],
       createTime: '2024-01-01T00:00:00Z',
       dataverseId: 10
