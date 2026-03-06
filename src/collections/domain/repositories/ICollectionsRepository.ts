@@ -16,7 +16,10 @@ import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { LinkingObjectType } from '../useCases/GetCollectionsForLinking'
 
 export interface ICollectionsRepository {
-  getCollection(collectionIdOrAlias: number | string): Promise<Collection>
+  getCollection(
+    collectionIdOrAlias: number | string,
+    ignoreSettingExcludeEmailFromExport?: boolean
+  ): Promise<Collection>
   getCollectionStorageDriver(
     collectionIdOrAlias: number | string,
     getEffective?: boolean

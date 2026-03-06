@@ -98,11 +98,13 @@ export enum GetMyDataCollectionItemsQueryParams {
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
   private readonly collectionsResourceName: string = 'dataverses'
   public async getCollection(
-    collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
+    collectionIdOrAlias: number | string = ROOT_COLLECTION_ID,
+    ignoreSettingExcludeEmailFromExport?: boolean
   ): Promise<Collection> {
     return this.doGet(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, true, {
       returnOwners: true,
-      returnChildCount: true
+      returnChildCount: true,
+      ignoreSettingExcludeEmailFromExport: ignoreSettingExcludeEmailFromExport
     })
       .then((response) => transformCollectionResponseToCollection(response))
       .catch((error) => {
