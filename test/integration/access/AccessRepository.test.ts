@@ -92,8 +92,6 @@ describe('AccessRepository', () => {
         testDatasetIds.numericId,
         guestbookResponse
       )
-      console.log('Signed URL for dataset download:', actual) // Debug log to check the signed URL
-
       expect(actual).toEqual(expect.any(String))
     })
 
@@ -112,8 +110,6 @@ describe('AccessRepository', () => {
         DatasetNotNumberedVersion.LATEST,
         guestbookResponse
       )
-      console.log('Signed URL for dataset version download:', actual)
-
       expect(actual).toEqual(expect.any(String))
     })
 
