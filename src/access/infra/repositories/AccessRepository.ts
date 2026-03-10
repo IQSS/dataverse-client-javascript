@@ -5,61 +5,6 @@ import { IAccessRepository } from '../../domain/repositories/IAccessRepository'
 export class AccessRepository extends ApiRepository implements IAccessRepository {
   private readonly accessResourceName = 'access'
 
-  public async getSignedDatafileDownloadUrl(fileId: number | string): Promise<string> {
-    const endpoint = this.buildApiEndpoint(`${this.accessResourceName}/datafile`, undefined, fileId)
-    return this.doGet(endpoint, true, { signed: true })
-      .then((response) => response.data.data.signedUrl)
-      .catch((error) => {
-        throw error
-      })
-  }
-
-  public async getSignedDatafilesDownloadUrl(
-    fileIds: string | Array<number | string>
-  ): Promise<string> {
-    return this.doGet(
-      this.buildApiEndpoint(
-        this.accessResourceName,
-        `datafiles/${Array.isArray(fileIds) ? fileIds.join(',') : fileIds}`
-      ),
-      true,
-      { signed: true }
-    )
-      .then((response) => response.data.data.signedUrl)
-      .catch((error) => {
-        throw error
-      })
-  }
-
-  public async getSignedDatasetDownloadUrl(datasetId: number | string): Promise<string> {
-    const endpoint = this.buildApiEndpoint(
-      `${this.accessResourceName}/dataset`,
-      undefined,
-      datasetId
-    )
-    return this.doGet(endpoint, true, { signed: true })
-      .then((response) => response.data.data.signedUrl)
-      .catch((error) => {
-        throw error
-      })
-  }
-
-  public async getSignedDatasetVersionDownloadUrl(
-    datasetId: number | string,
-    versionId: string
-  ): Promise<string> {
-    const endpoint = this.buildApiEndpoint(
-      `${this.accessResourceName}/dataset`,
-      `versions/${versionId}`,
-      datasetId
-    )
-    return this.doGet(endpoint, true, { signed: true })
-      .then((response) => response.data.data.signedUrl)
-      .catch((error) => {
-        throw error
-      })
-  }
-
   public async submitGuestbookForDatafileDownload(
     fileId: number | string,
     guestbookResponse: GuestbookResponseDTO

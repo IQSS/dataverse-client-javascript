@@ -9,7 +9,6 @@ import {
   CreatedDatasetIdentifiers,
   createDataset,
   DatasetNotNumberedVersion,
-  ReadError,
   WriteError
 } from '../../../src'
 import { uploadFileViaApi, testTextFile1Name } from '../../testHelpers/files/filesHelper'
@@ -25,7 +24,11 @@ describe('AccessRepository', () => {
 
   const guestbookResponse: GuestbookResponseDTO = {
     guestbookResponse: {
-      answers: [{ id: 1, value: 'question 1' }]
+      name: 'Terminal Test',
+      email: 'terminal@example.edu',
+      institution: 'Dataverse Client JavaScript',
+      position: 'CLI',
+      answers: []
     }
   }
 
@@ -74,108 +77,6 @@ describe('AccessRepository', () => {
     })
   })
 
-  describe('getSignedDatafileDownloadUrl', () => {
-    test('should return signed url for datafile download', async () => {
-      const actual = await sut.getSignedDatafileDownloadUrl(testFileId)
-
-      expect(actual).toEqual(expect.any(String))
-    })
-
-    test('should return error when datafile does not exist', async () => {
-      const nonExistentId = 999999999
-      await expect(sut.getSignedDatafileDownloadUrl(nonExistentId)).rejects.toThrow(ReadError)
-    })
-  })
-
-  describe('getSignedDatafilesDownloadUrl', () => {
-    test('should return signed url for datafiles download', async () => {
-      const actual = await sut.getSignedDatafilesDownloadUrl([testFileId])
-
-      expect(actual).toEqual(expect.any(String))
-    })
-
-    test('should return error when one of the datafiles does not exist', async () => {
-      const nonExistentId = 999999999
-      await expect(sut.getSignedDatafilesDownloadUrl([testFileId, nonExistentId])).rejects.toThrow(
-        ReadError
-      )
-    })
-  })
-
-  describe('getSignedDatasetDownloadUrl', () => {
-    test('should return signed url for dataset download', async () => {
-      const actual = await sut.getSignedDatasetDownloadUrl(testDatasetIds.numericId)
-
-      expect(actual).toEqual(expect.any(String))
-    })
-
-    test('should return signed url for dataset download by persistent id', async () => {
-      const actual = await sut.getSignedDatasetDownloadUrl(testDatasetIds.persistentId)
-
-      expect(actual).toEqual(expect.any(String))
-    })
-
-    test('should return error when dataset does not exist', async () => {
-      const nonExistentId = 999999999
-      await expect(sut.getSignedDatasetDownloadUrl(nonExistentId)).rejects.toThrow(ReadError)
-    })
-  })
-
-  describe('getSignedDatasetVersionDownloadUrl', () => {
-    test('should return signed url for dataset version download', async () => {
-      const actual = await sut.getSignedDatasetVersionDownloadUrl(
-        testDatasetIds.numericId,
-        DatasetNotNumberedVersion.LATEST
-      )
-
-      expect(actual).toEqual(expect.any(String))
-    })
-
-    test('should return error when dataset version does not exist', async () => {
-      const nonExistentId = 999999999
-      await expect(
-        sut.getSignedDatasetVersionDownloadUrl(nonExistentId, DatasetNotNumberedVersion.LATEST)
-      ).rejects.toThrow(ReadError)
-    })
-  })
-
-  describe('signed URL requests by guest users', () => {
-    beforeEach(() => {
-      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
-    })
-
-    afterEach(() => {
-      ApiConfig.init(
-        TestConstants.TEST_API_URL,
-        DataverseApiAuthMechanism.API_KEY,
-        process.env.TEST_API_KEY
-      )
-    })
-
-    test('should return error when guest requests signed datafile url', async () => {
-      await expect(sut.getSignedDatafileDownloadUrl(testFileId)).rejects.toThrow(ReadError)
-    })
-
-    test('should return error when guest requests signed datafiles url', async () => {
-      await expect(sut.getSignedDatafilesDownloadUrl([testFileId])).rejects.toThrow(ReadError)
-    })
-
-    test('should return error when guest requests signed dataset url', async () => {
-      await expect(sut.getSignedDatasetDownloadUrl(testDatasetIds.numericId)).rejects.toThrow(
-        ReadError
-      )
-    })
-
-    test('should return error when guest requests signed dataset version url', async () => {
-      await expect(
-        sut.getSignedDatasetVersionDownloadUrl(
-          testDatasetIds.numericId,
-          DatasetNotNumberedVersion.LATEST
-        )
-      ).rejects.toThrow(ReadError)
-    })
-  })
-
   describe('submitGuestbookForDatafilesDownload', () => {
     test('should return signed url for datafiles download', async () => {
       const actual = await sut.submitGuestbookForDatafilesDownload([testFileId], guestbookResponse)
@@ -191,6 +92,7 @@ describe('AccessRepository', () => {
         testDatasetIds.numericId,
         guestbookResponse
       )
+      console.log('Signed URL for dataset download:', actual) // Debug log to check the signed URL
 
       expect(actual).toEqual(expect.any(String))
     })
@@ -210,6 +112,7 @@ describe('AccessRepository', () => {
         DatasetNotNumberedVersion.LATEST,
         guestbookResponse
       )
+      console.log('Signed URL for dataset version download:', actual)
 
       expect(actual).toEqual(expect.any(String))
     })

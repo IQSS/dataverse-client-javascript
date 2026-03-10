@@ -5,6 +5,10 @@ export interface GuestbookAnswerDTO {
 
 export interface GuestbookResponseDTO {
   guestbookResponse: {
+    name?: string
+    email?: string
+    institution?: string
+    position?: string
     answers: GuestbookAnswerDTO[]
   }
 }
