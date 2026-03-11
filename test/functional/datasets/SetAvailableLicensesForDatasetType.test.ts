@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import {
   ApiConfig,
   DatasetType,
@@ -19,11 +20,13 @@ describe('SetAvailableLicensesForDatasetType', () => {
     })
 
     test('should allow for setting available licenses for a dataset type', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
       expect(actual.name).toEqual(randomName)
 
