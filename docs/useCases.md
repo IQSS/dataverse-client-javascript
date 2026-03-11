@@ -1023,7 +1023,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetTypes.
 
 #### Get Dataset Available Dataset Type
 
-Returns an available dataset types that can be used at dataset creation.
+Returns a single available dataset type that can be used at dataset creation.
 
 ###### Example call:
 
@@ -1032,12 +1032,30 @@ import { getDatasetAvailableDatasetType } from '@iqss/dataverse-client-javascrip
 
 /* ... */
 
-getDatasetAvailableDatasetType.execute().then((datasetType: DatasetType) => {
+const datasetTypeIdOrName = 'dataset'
+
+getDatasetAvailableDatasetType.execute(datasetTypeIdOrName).then((datasetType: DatasetType) => {
   /* ... */
 })
 ```
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetType.ts) implementation_.
+
+The `datasetTypeIdOrName` parameter can be either the numeric dataset type id or its name.
+
+Example returned value:
+
+```typescript
+{
+  id: 1,
+  name: 'dataset',
+  displayName: 'Dataset',
+  linkedMetadataBlocks: [],
+  availableLicenses: [],
+  description:
+    'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.'
+}
+```
 
 ### Datasets Write Use Cases
 
@@ -1413,8 +1431,6 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
-# <<<<<<< HEAD
-
 #### Get Dataset Templates
 
 Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
@@ -1457,11 +1473,9 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetStorageDriver.ts) impl
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-> > > > > > > develop
-
 #### Add a Dataset Type
 
-Adds a dataset types that can be used at dataset creation.
+Adds a dataset type that can be used at dataset creation.
 
 ###### Example call:
 
@@ -1470,12 +1484,22 @@ import { addDatasetType } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
+const datasetType = {
+  name: 'software',
+  displayName: 'Software',
+  linkedMetadataBlocks: ['codeMeta20'],
+  availableLicenses: ['MIT', 'Apache-2.0'],
+  description: 'Software data and metadata.'
+}
+
 addDatasetType.execute(datasetType).then((datasetType: DatasetType) => {
   /* ... */
 })
 ```
 
 _See [use case](../src/datasets/domain/useCases/AddDatasetType.ts) implementation_.
+
+The `datasetType` parameter must match [DatasetTypeDTO](../src/datasets/domain/dtos/DatasetTypeDTO.ts) and includes all [DatasetType](../src/datasets/domain/models/DatasetType.ts) fields except `id`.
 
 #### Link Dataset Type with Metadata Blocks
 
@@ -3014,6 +3038,10 @@ import { submitGuestbookForDatasetVersionDownload } from '@iqss/dataverse-client
 submitGuestbookForDatasetVersionDownload
   .execute(10, ':latest', {
     guestbookResponse: {
+      name: 'Jane Doe',
+      email: 'jane@example.org',
+      institution: 'Example University',
+      position: 'Researcher',
       answers: [
         { id: 123, value: 'Good' },
         { id: 124, value: ['Multi', 'Line'] },
@@ -3027,3 +3055,9 @@ submitGuestbookForDatasetVersionDownload
 ```
 
 _See [use case](../src/access/domain/useCases/SubmitGuestbookForDatasetVersionDownload.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `versionId` parameter accepts a numbered version such as `'1.0'` or a non-numbered version such as `':latest'`.
+
+The third parameter must match [GuestbookResponseDTO](../src/access/domain/dtos/GuestbookResponseDTO.ts). The resolved value is a signed download URL as a string.
