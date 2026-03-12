@@ -192,7 +192,7 @@ describe('CollectionsRepository', () => {
       const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/test-collection/storageDriver`
       const expectedRequestConfigApiKey = {
         params: {
-          getEffective: false
+          getEffective: true
         },
         headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
       }

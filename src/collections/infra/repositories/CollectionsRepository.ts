@@ -112,7 +112,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async getCollectionStorageDriver(
     collectionIdOrAlias: number | string,
-    getEffective = false
+    getEffective = true
   ): Promise<StorageDriver> {
     return this.doGet(
       `/${this.collectionsResourceName}/${collectionIdOrAlias}/storageDriver`,
