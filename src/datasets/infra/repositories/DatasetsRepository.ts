@@ -29,7 +29,7 @@ import { TermsOfAccess } from '../../domain/models/Dataset'
 import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
 import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
-import { StorageDriver } from '../../domain/models/StorageDriver'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number

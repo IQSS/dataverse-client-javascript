@@ -3,6 +3,7 @@ import { GetCollection } from './domain/useCases/GetCollection'
 import { GetCollectionFacets } from './domain/useCases/GetCollectionFacets'
 import { GetCollectionUserPermissions } from './domain/useCases/GetCollectionUserPermissions'
 import { GetCollectionItems } from './domain/useCases/GetCollectionItems'
+import { GetCollectionStorageDriver } from './domain/useCases/GetCollectionStorageDriver'
 import { PublishCollection } from './domain/useCases/PublishCollection'
 import { UpdateCollection } from './domain/useCases/UpdateCollection'
 import { GetCollectionFeaturedItems } from './domain/useCases/GetCollectionFeaturedItems'
@@ -16,10 +17,14 @@ import { LinkCollection } from './domain/useCases/LinkCollection'
 import { UnlinkCollection } from './domain/useCases/UnlinkCollection'
 import { GetCollectionLinks } from './domain/useCases/GetCollectionLinks'
 import { GetCollectionsForLinking } from './domain/useCases/GetCollectionsForLinking'
+import { SetCollectionStorageDriver } from './domain/useCases/SetCollectionStorageDriver'
+import { DeleteCollectionStorageDriver } from './domain/useCases/DeleteCollectionStorageDriver'
+import { GetAllowedCollectionStorageDrivers } from './domain/useCases/GetAllowedCollectionStorageDrivers'
 
 const collectionsRepository = new CollectionsRepository()
 
 const getCollection = new GetCollection(collectionsRepository)
+const getCollectionStorageDriver = new GetCollectionStorageDriver(collectionsRepository)
 const createCollection = new CreateCollection(collectionsRepository)
 const getCollectionFacets = new GetCollectionFacets(collectionsRepository)
 const getCollectionUserPermissions = new GetCollectionUserPermissions(collectionsRepository)
@@ -36,9 +41,15 @@ const linkCollection = new LinkCollection(collectionsRepository)
 const unlinkCollection = new UnlinkCollection(collectionsRepository)
 const getCollectionLinks = new GetCollectionLinks(collectionsRepository)
 const getCollectionsForLinking = new GetCollectionsForLinking(collectionsRepository)
+const setCollectionStorageDriver = new SetCollectionStorageDriver(collectionsRepository)
+const deleteCollectionStorageDriver = new DeleteCollectionStorageDriver(collectionsRepository)
+const getAllowedCollectionStorageDrivers = new GetAllowedCollectionStorageDrivers(
+  collectionsRepository
+)
 
 export {
   getCollection,
+  getCollectionStorageDriver,
   createCollection,
   getCollectionFacets,
   getCollectionUserPermissions,
@@ -54,7 +65,10 @@ export {
   linkCollection,
   unlinkCollection,
   getCollectionLinks,
-  getCollectionsForLinking
+  getCollectionsForLinking,
+  setCollectionStorageDriver,
+  deleteCollectionStorageDriver,
+  getAllowedCollectionStorageDrivers
 }
 export { Collection, CollectionInputLevel } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'
@@ -66,3 +80,5 @@ export { CollectionSearchCriteria } from './domain/models/CollectionSearchCriter
 export { FeaturedItem } from './domain/models/FeaturedItem'
 export { FeaturedItemsDTO } from './domain/dtos/FeaturedItemsDTO'
 export { CollectionSummary } from './domain/models/CollectionSummary'
+export { AllowedStorageDrivers } from './domain/models/AllowedStorageDrivers'
+export { StorageDriver } from '../core/domain/models/StorageDriver'
