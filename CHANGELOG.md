@@ -16,6 +16,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - New Use Case: [Get a Template](./docs/useCases.md#get-a-template) under Templates.
 - New Use Case: [Delete a Template](./docs/useCases.md#delete-a-template) under Templates.
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
+- DatasetType: Updated datasetType data model. Added two more fields: description and displayName.
 
 ### Changed
 

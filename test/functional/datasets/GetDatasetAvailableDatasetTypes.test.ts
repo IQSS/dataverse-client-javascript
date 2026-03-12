@@ -19,10 +19,12 @@ describe('getDatasetAvailableDatasetTypes', () => {
           id: 1,
           name: 'dataset',
           linkedMetadataBlocks: [],
-          availableLicenses: []
+          availableLicenses: [],
+          description:
+            'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.',
+          displayName: 'Dataset'
         }
       ]
-
       expect(actualDatasetTypes).toEqual(expectedDatasetTypes)
     })
   })
