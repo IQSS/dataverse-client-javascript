@@ -1,8 +1,7 @@
-import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { CreateGuestbookDTO } from '../dtos/CreateGuestbookDTO'
 import { IGuestbooksRepository } from '../repositories/IGuestbooksRepository'
 
-export class CreateGuestbook implements UseCase<void> {
+export class CreateGuestbook {
   constructor(private readonly guestbooksRepository: IGuestbooksRepository) {}
 
   /**
@@ -10,9 +9,12 @@ export class CreateGuestbook implements UseCase<void> {
    *
    * @param {CreateGuestbookDTO} guestbook - Guestbook creation payload.
    * @param {number | string} collectionIdOrAlias - Collection identifier (numeric id or alias).
-   * @returns {Promise<void>}
+   * @returns {Promise<number>} - The created guestbook identifier.
    */
-  async execute(guestbook: CreateGuestbookDTO, collectionIdOrAlias: number | string) {
+  async execute(
+    guestbook: CreateGuestbookDTO,
+    collectionIdOrAlias: number | string
+  ): Promise<number> {
     return await this.guestbooksRepository.createGuestbook(collectionIdOrAlias, guestbook)
   }
 }

@@ -79,12 +79,20 @@ describe('GuestbooksRepository', () => {
   describe('createGuestbook', () => {
     test('should create guestbook for collection', async () => {
       const actual = await sut.createGuestbook(testCollectionId, createGuestbookDTO)
-      expect(actual).toBeUndefined()
+      expect(actual).toEqual(expect.any(Number))
+      expect(actual).toBeGreaterThan(0)
+
+      const getGuestbookResponse = await sut.getGuestbook(actual)
+      expect(getGuestbookResponse.name).toBe(createGuestbookDTO.name)
     })
 
     test('should create guestbook for collection by collection alias', async () => {
       const actual = await sut.createGuestbook(testCollectionAlias, createGuestbookDTO)
-      expect(actual).toBeUndefined()
+      expect(actual).toEqual(expect.any(Number))
+      expect(actual).toBeGreaterThan(0)
+
+      const getGuestbookResponse = await sut.getGuestbook(actual)
+      expect(getGuestbookResponse.name).toBe(createGuestbookDTO.name)
     })
 
     test('should return error when collection does not exist', async () => {
@@ -94,16 +102,20 @@ describe('GuestbooksRepository', () => {
 
   describe('getGuestbooksByCollectionId', () => {
     test('should list guestbooks for collection', async () => {
-      await sut.createGuestbook(testCollectionId, createGuestbookDTO)
+      createdGuestbookId = await sut.createGuestbook(testCollectionId, createGuestbookDTO)
       const actual = await sut.getGuestbooksByCollectionId(testCollectionId)
       expect(actual.length).toBeGreaterThan(0)
-      createdGuestbookId = actual[0].id as number
+      expect(actual.some((guestbook) => guestbook.id === createdGuestbookId)).toBe(true)
     })
 
     test('should list guestbooks for collection by collection alias', async () => {
-      await sut.createGuestbook(testCollectionAlias, createGuestbookDTO)
+      const createdByAliasGuestbookId = await sut.createGuestbook(
+        testCollectionAlias,
+        createGuestbookDTO
+      )
       const actual = await sut.getGuestbooksByCollectionId(testCollectionAlias)
       expect(actual.length).toBeGreaterThan(0)
+      expect(actual.some((guestbook) => guestbook.id === createdByAliasGuestbookId)).toBe(true)
     })
 
     test('should return error when collection does not exist', async () => {
@@ -113,8 +125,8 @@ describe('GuestbooksRepository', () => {
 
   describe('getGuestbook', () => {
     test('should get guestbook by id', async () => {
-      await sut.createGuestbook(testCollectionId, createGuestbookDTO)
-      const actual = await sut.getGuestbook(createdGuestbookId as number)
+      createdGuestbookId = await sut.createGuestbook(testCollectionId, createGuestbookDTO)
+      const actual = await sut.getGuestbook(createdGuestbookId)
       expect(actual.id).toBe(createdGuestbookId)
       expect(actual.name).toBe(createGuestbookDTO.name)
     })
@@ -126,17 +138,17 @@ describe('GuestbooksRepository', () => {
 
   describe('setGuestbookEnabled', () => {
     test('should disable guestbook', async () => {
-      await sut.createGuestbook(testCollectionId, createGuestbookDTO)
+      createdGuestbookId = await sut.createGuestbook(testCollectionId, createGuestbookDTO)
 
-      await sut.setGuestbookEnabled(testCollectionId, createdGuestbookId as number, false)
-      const actual = await sut.getGuestbook(createdGuestbookId as number)
+      await sut.setGuestbookEnabled(testCollectionId, createdGuestbookId, false)
+      const actual = await sut.getGuestbook(createdGuestbookId)
 
       expect(actual.enabled).toBe(false)
     })
 
     test('should enable guestbook', async () => {
-      await sut.setGuestbookEnabled(testCollectionId, createdGuestbookId as number, true)
-      const actual = await sut.getGuestbook(createdGuestbookId as number)
+      await sut.setGuestbookEnabled(testCollectionId, createdGuestbookId, true)
+      const actual = await sut.getGuestbook(createdGuestbookId)
 
       expect(actual.enabled).toBe(true)
     })
@@ -153,16 +165,10 @@ describe('GuestbooksRepository', () => {
     let assignableGuestbookId: number
 
     beforeAll(async () => {
-      await sut.createGuestbook(testCollectionId, {
+      assignableGuestbookId = await sut.createGuestbook(testCollectionId, {
         ...createGuestbookDTO,
         name: 'assign/remove guestbook test'
       })
-
-      const guestbooks = await sut.getGuestbooksByCollectionId(testCollectionId)
-      const assignableGuestbook = guestbooks.find(
-        (guestbook) => guestbook.name === 'assign/remove guestbook test'
-      )
-      assignableGuestbookId = assignableGuestbook?.id as number
 
       testDatasetIds = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,

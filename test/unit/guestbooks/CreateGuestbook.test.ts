@@ -45,13 +45,13 @@ describe('CreateGuestbook', () => {
 
   test('should create guestbook for collection', async () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
-    repository.createGuestbook = jest.fn().mockResolvedValue(undefined)
+    repository.createGuestbook = jest.fn().mockResolvedValue(123)
 
     const sut = new CreateGuestbook(repository)
     const actual = await sut.execute(createGuestbookDTO, collectionId)
 
     expect(repository.createGuestbook).toHaveBeenCalledWith(collectionId, createGuestbookDTO)
-    expect(actual).toBeUndefined()
+    expect(actual).toBe(123)
   })
 
   test('should throw WriteError when repository fails', async () => {

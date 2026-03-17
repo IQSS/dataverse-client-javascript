@@ -10,12 +10,12 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
   public async createGuestbook(
     collectionIdOrAlias: number | string,
     guestbook: CreateGuestbookDTO
-  ): Promise<void> {
+  ): Promise<number> {
     return this.doPost(
       this.buildApiEndpoint(this.guestbooksResourceName, `${collectionIdOrAlias}`),
       guestbook
     )
-      .then(() => undefined)
+      .then((response) => response.data.data.id)
       .catch((error) => {
         throw error
       })
