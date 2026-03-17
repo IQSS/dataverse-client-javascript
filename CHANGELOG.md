@@ -20,7 +20,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Guestbooks: Added dataset-level guestbook assignment and removal support via `assignDatasetGuestbook` (`PUT /api/datasets/{identifier}/guestbook`) and `removeDatasetGuestbook` (`DELETE /api/datasets/{identifier}/guestbook`).
 - Datasets/Guestbooks: Added `guestbookId` in `getDataset` responses.
 - Access: Added`access` module for guestbook-at-request and download terms/guestbook submission endpoints.
-- DatasetType: Updated datasetType data model. Added two more fields Description and DisplayName.
+- DatasetType: Updated datasetType data model. Added two more fields: description and displayName.
 
 ### Changed
 
