@@ -9,6 +9,6 @@ export interface GuestbookResponseDTO {
     email?: string
     institution?: string
     position?: string
-    answers: GuestbookAnswerDTO[]
+    answers?: GuestbookAnswerDTO[]
   }
 }

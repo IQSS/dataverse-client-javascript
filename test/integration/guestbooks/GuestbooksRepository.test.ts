@@ -29,9 +29,6 @@ describe('GuestbooksRepository', () => {
     nameRequired: true,
     institutionRequired: false,
     positionRequired: false,
-    email: 'test@gmail.com',
-    institution: 'Harvard University',
-    position: 'Researcher',
     customQuestions: [
       {
         question: "how's your day",

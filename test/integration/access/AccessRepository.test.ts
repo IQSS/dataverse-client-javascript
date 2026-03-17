@@ -67,6 +67,7 @@ describe('AccessRepository', () => {
       const actual = await sut.submitGuestbookForDatafileDownload(testFileId, guestbookResponse)
 
       expect(actual).toEqual(expect.any(String))
+      expect(() => new URL(actual)).not.toThrow()
     })
 
     test('should return error when datafile does not exist', async () => {
@@ -93,6 +94,7 @@ describe('AccessRepository', () => {
         guestbookResponse
       )
       expect(actual).toEqual(expect.any(String))
+      expect(() => new URL(actual)).not.toThrow()
     })
 
     test('should return error when dataset does not exist', async () => {
@@ -111,6 +113,7 @@ describe('AccessRepository', () => {
         guestbookResponse
       )
       expect(actual).toEqual(expect.any(String))
+      expect(() => new URL(actual)).not.toThrow()
     })
 
     test('should return error when dataset version does not exist', async () => {

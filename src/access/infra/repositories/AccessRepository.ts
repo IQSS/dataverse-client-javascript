@@ -21,7 +21,7 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
   }
 
   public async submitGuestbookForDatafilesDownload(
-    fileIds: string | Array<number | string>,
+    fileIds: Array<number>,
     guestbookResponse: GuestbookResponseDTO
   ): Promise<string> {
     return this.doPost(

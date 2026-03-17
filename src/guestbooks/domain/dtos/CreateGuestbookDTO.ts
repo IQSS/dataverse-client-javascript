@@ -21,8 +21,5 @@ export interface CreateGuestbookDTO {
   nameRequired: boolean
   institutionRequired: boolean
   positionRequired: boolean
-  email: string
-  institution: string
-  position: string
   customQuestions: CreateGuestbookCustomQuestionDTO[]
 }

@@ -2866,9 +2866,6 @@ const guestbook: CreateGuestbookDTO = {
   nameRequired: true,
   institutionRequired: false,
   positionRequired: false,
-  email: 'test@gmail.com',
-  institution: 'Harvard University',
-  position: 'Researcher',
   customQuestions: [
     {
       question: 'Describe yourself',
@@ -2898,6 +2895,7 @@ import { setGuestbookEnabled } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = 'root'
 const guestbookId = 123
+const enabled = false
 
 setGuestbookEnabled.execute(collectionIdOrAlias, guestbookId, false).then(() => {
   /* ... */
