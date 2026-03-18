@@ -19,6 +19,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - New Use Case: [Update Template License Terms](./docs/useCases.md#update-template-license-terms) under Templates.
 - New Use Case: [Update Template Terms Of Access](./docs/useCases.md#update-template-terms-of-access) under Templates.
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
+- DatasetType: Updated datasetType data model. Added two more fields: description and displayName.
 
 ### Changed
 
