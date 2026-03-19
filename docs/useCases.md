@@ -50,6 +50,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Storage Driver](#get-dataset-storage-driver)
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
+    - [Get Dataset Upload Limits](#get-dataset-upload-limits)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -1554,6 +1555,30 @@ deleteDatasetType.execute(datasetTypeId).then(() => {
 ```
 
 _See [use case](../src/datasets/domain/useCases/DeleteDatasetType.ts) implementation_.
+
+#### Get Dataset Upload Limits
+
+Returns a [DatasetUploadLimits](../src/datasets/domain/models/DatasetUploadLimits.ts) instance with the remaining dataset storage and/or file upload quotas, if present.
+
+##### Example call:
+
+```typescript
+import { getDatasetUploadLimits } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetUploadLimits.execute(datasetId).then((uploadLimits: DatasetUploadLimits) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetUploadLimits.ts) implementation_.
+
+If the backend does not define any quota limits for the dataset, the returned object can be empty (`{}`).
 
 ## Files
 
