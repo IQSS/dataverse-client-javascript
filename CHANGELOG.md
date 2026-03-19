@@ -18,6 +18,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
 - New Use Case: [Get Publish Dataset Disclaimer Text](./docs/useCases.md#get-publish-dataset-disclaimer-text).
 - New Use Case: [Get Dataset Publish Popup Custom Text](./docs/useCases.md#get-dataset-publish-popup-custom-text).
+- DatasetType: Updated datasetType data model. Added two more fields: description and displayName.
 
 ### Changed
 

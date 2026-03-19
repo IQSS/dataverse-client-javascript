@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
@@ -1821,8 +1822,11 @@ describe('DatasetsRepository', () => {
         {
           id: 1,
           name: 'dataset',
+          displayName: 'Dataset',
           linkedMetadataBlocks: [],
-          availableLicenses: []
+          availableLicenses: [],
+          description:
+            'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.'
         }
       ]
 
@@ -1839,8 +1843,11 @@ describe('DatasetsRepository', () => {
       const expectedDatasetType = {
         id: 1,
         name: 'dataset',
+        displayName: 'Dataset',
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        description:
+          'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.'
       }
 
       expect(actualDatasetType).toEqual(expectedDatasetType)
@@ -1849,11 +1856,13 @@ describe('DatasetsRepository', () => {
 
   describe('addDatasetType', () => {
     test('should add a dataset type', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
 
       expect(actual.name).toEqual(randomName)
@@ -1862,11 +1871,13 @@ describe('DatasetsRepository', () => {
 
   describe('deleteDatasetType', () => {
     test('should delete a dataset type (after adding it)', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
       expect(actual.name).toEqual(randomName)
 
@@ -1877,11 +1888,13 @@ describe('DatasetsRepository', () => {
 
   describe('linkDatasetTypeWithMetadataBlocks', () => {
     test('should allow for linking a dataset type to metadata blocks', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
       expect(actual.name).toEqual(randomName)
 
@@ -1899,11 +1912,13 @@ describe('DatasetsRepository', () => {
 
   describe('setAvailableLicensesForDatasetType', () => {
     test('should allow for setting available licenses for a dataset type', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
       expect(actual.name).toEqual(randomName)
 
