@@ -2589,6 +2589,42 @@ getAvailableDatasetMetadataExportFormats
 
 _See [use case](../src/info/domain/useCases/GetAvailableDatasetMetadataExportFormats.ts) implementation_.
 
+#### Get Dataset Publish Popup Custom Text
+
+Returns the custom text displayed in the dataset publish confirmation popup
+
+##### Example call:
+
+```typescript
+import { getDatasetPublishPopupCustomText } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getDatasetPublishPopupCustomText.execute().then((text: string) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/info/domain/useCases/GetDatasetPublishPopupCustomText.ts) implementation_.
+
+#### Get Publish Dataset Disclaimer Text
+
+Returns the disclaimer text displayed in the dataset publish flow.
+
+##### Example calls:
+
+```typescript
+import { getPublishDatasetDisclaimerText } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getPublishDatasetDisclaimerText.execute().then((disclaimerText: string) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/info/domain/useCases/GetPublishDatasetDisclaimerText.ts) implementation_.
+
 ## Licenses
 
 ### Get Available Standard License Terms
@@ -2623,7 +2659,7 @@ import { submitContactInfo } from '@iqss/dataverse-client-javascript'
 /* ... */
 
 const contactDTO: ContactDTO = {
-  targedId: 1
+  targetId: 1,
   subject: 'Data Question',
   body: 'Please help me understand your data. Thank you!',
   fromEmail: 'test@gmail.com'
