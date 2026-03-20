@@ -12,6 +12,7 @@ export interface Dataset {
   alternativePersistentId?: string
   publicationDate?: string
   citationDate?: string
+  guestbookId?: number
   metadataBlocks: DatasetMetadataBlocks
   isPartOf: DvObjectOwnerNode
   datasetType?: string

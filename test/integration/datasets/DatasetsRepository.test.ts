@@ -9,7 +9,9 @@ import {
   waitForDatasetsIndexedInSolr,
   deletePublishedDatasetViaApi,
   deaccessionDatasetViaApi,
-  createDatasetLicenseModel
+  createDatasetLicenseModel,
+  setDatasetStorageSizeViaApi,
+  setUseStorageQuotasViaApi
 } from '../../testHelpers/datasets/datasetHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
@@ -2242,6 +2244,51 @@ describe('DatasetsRepository', () => {
       expect(typeof storageDriver.directUpload).toBe('boolean')
       expect(typeof storageDriver.directDownload).toBe('boolean')
       expect(typeof storageDriver.uploadOutOfBand).toBe('boolean')
+    })
+  })
+
+  describe('getDatasetUploadLimits', () => {
+    const testCollectionAlias = 'UploadLimitsQuotaDataset'
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testCollectionStorageQuotaInBytes = 1000
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testCollectionAlias)
+      await publishCollectionViaApi(testCollectionAlias)
+      testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      await setUseStorageQuotasViaApi(true)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId).catch(() => undefined)
+      await deleteCollectionViaApi(testCollectionAlias).catch(() => undefined)
+    })
+
+    test('should return empty for dataset (if DatasetStorageSize is not set)', async () => {
+      const uploadLimits = await sut.getDatasetUploadLimits(testDatasetIds.numericId)
+
+      expect(uploadLimits).toEqual({})
+    })
+
+    test('should return upload limits for dataset (if DatasetStorageSize is set)', async () => {
+      await setDatasetStorageSizeViaApi(testDatasetIds.numericId, testCollectionStorageQuotaInBytes)
+      const uploadLimits = await sut.getDatasetUploadLimits(testDatasetIds.numericId)
+
+      expect(uploadLimits).toBeDefined()
+      expect(uploadLimits.storageQuotaRemaining).toBeLessThanOrEqual(
+        testCollectionStorageQuotaInBytes
+      )
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetUploadLimits(nonExistentTestDatasetId)).rejects.toBeInstanceOf(
+        ReadError
+      )
     })
   })
 })
