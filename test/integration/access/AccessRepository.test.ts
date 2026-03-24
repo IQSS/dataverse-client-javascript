@@ -97,7 +97,7 @@ describe('AccessRepository', () => {
       expect(() => new URL(actual)).not.toThrow()
     })
 
-    test('should preserve format=tab in signed url for dataset download', async () => {
+    test('should preserve format=original in signed url for dataset download', async () => {
       const actual = await sut.submitGuestbookForDatasetDownload(
         testDatasetIds.numericId,
         guestbookResponse,
