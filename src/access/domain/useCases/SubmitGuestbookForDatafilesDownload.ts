@@ -14,11 +14,13 @@ export class SubmitGuestbookForDatafilesDownload implements UseCase<string> {
    */
   async execute(
     fileIds: string | Array<number | string>,
-    guestbookResponse: GuestbookResponseDTO
+    guestbookResponse: GuestbookResponseDTO,
+    format?: string
   ): Promise<string> {
     return await this.accessRepository.submitGuestbookForDatafilesDownload(
       fileIds,
-      guestbookResponse
+      guestbookResponse,
+      format
     )
   }
 }

@@ -97,6 +97,17 @@ describe('AccessRepository', () => {
       expect(() => new URL(actual)).not.toThrow()
     })
 
+    test('should preserve format=tab in signed url for dataset download', async () => {
+      const actual = await sut.submitGuestbookForDatasetDownload(
+        testDatasetIds.numericId,
+        guestbookResponse,
+        'original'
+      )
+      const signedUrl = new URL(actual)
+
+      expect(signedUrl.searchParams.get('format')).toEqual('original')
+    })
+
     test('should return error when dataset does not exist', async () => {
       const nonExistentId = 999999999
       await expect(

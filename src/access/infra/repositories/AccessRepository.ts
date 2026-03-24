@@ -7,10 +7,13 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
 
   public async submitGuestbookForDatafileDownload(
     fileId: number | string,
-    guestbookResponse: GuestbookResponseDTO
+    guestbookResponse: GuestbookResponseDTO,
+    format?: string
   ): Promise<string> {
     const endpoint = this.buildApiEndpoint(`${this.accessResourceName}/datafile`, undefined, fileId)
-    return this.doPost(endpoint, guestbookResponse, { signed: true })
+    const queryParams = format ? { signed: true, format } : { signed: true }
+
+    return this.doPost(endpoint, guestbookResponse, queryParams)
       .then((response) => {
         const signedUrl = response.data.data.signedUrl
         return signedUrl
@@ -22,15 +25,18 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
 
   public async submitGuestbookForDatafilesDownload(
     fileIds: Array<number>,
-    guestbookResponse: GuestbookResponseDTO
+    guestbookResponse: GuestbookResponseDTO,
+    format?: string
   ): Promise<string> {
+    const queryParams = format ? { signed: true, format } : { signed: true }
+
     return this.doPost(
       this.buildApiEndpoint(
         this.accessResourceName,
         `datafiles/${Array.isArray(fileIds) ? fileIds.join(',') : fileIds}`
       ),
       guestbookResponse,
-      { signed: true }
+      queryParams
     )
       .then((response) => {
         const signedUrl = response.data.data.signedUrl
@@ -43,14 +49,17 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
 
   public async submitGuestbookForDatasetDownload(
     datasetId: number | string,
-    guestbookResponse: GuestbookResponseDTO
+    guestbookResponse: GuestbookResponseDTO,
+    format?: string
   ): Promise<string> {
     const endpoint = this.buildApiEndpoint(
       `${this.accessResourceName}/dataset`,
       undefined,
       datasetId
     )
-    return this.doPost(endpoint, guestbookResponse, { signed: true })
+    const queryParams = format ? { signed: true, format } : { signed: true }
+
+    return this.doPost(endpoint, guestbookResponse, queryParams)
       .then((response) => {
         const signedUrl = response.data.data.signedUrl
         return signedUrl
@@ -63,14 +72,17 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
   public async submitGuestbookForDatasetVersionDownload(
     datasetId: number | string,
     versionId: string,
-    guestbookResponse: GuestbookResponseDTO
+    guestbookResponse: GuestbookResponseDTO,
+    format?: string
   ): Promise<string> {
     const endpoint = this.buildApiEndpoint(
       `${this.accessResourceName}/dataset`,
       `versions/${versionId}`,
       datasetId
     )
-    return this.doPost(endpoint, guestbookResponse, { signed: true })
+    const queryParams = format ? { signed: true, format } : { signed: true }
+
+    return this.doPost(endpoint, guestbookResponse, queryParams)
       .then((response) => {
         const signedUrl = response.data.data.signedUrl
         return signedUrl

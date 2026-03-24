@@ -16,12 +16,14 @@ export class SubmitGuestbookForDatasetVersionDownload implements UseCase<string>
   async execute(
     datasetId: number | string,
     versionId: string,
-    guestbookResponse: GuestbookResponseDTO
+    guestbookResponse: GuestbookResponseDTO,
+    format?: string
   ): Promise<string> {
     return await this.accessRepository.submitGuestbookForDatasetVersionDownload(
       datasetId,
       versionId,
-      guestbookResponse
+      guestbookResponse,
+      format
     )
   }
 }

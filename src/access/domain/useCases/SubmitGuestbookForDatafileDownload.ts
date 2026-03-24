@@ -12,7 +12,15 @@ export class SubmitGuestbookForDatafileDownload implements UseCase<string> {
    * @param {GuestbookResponseDTO} guestbookResponse - Guestbook response payload.
    * @returns {Promise<string>} - Signed URL for the download.
    */
-  async execute(fileId: number | string, guestbookResponse: GuestbookResponseDTO): Promise<string> {
-    return await this.accessRepository.submitGuestbookForDatafileDownload(fileId, guestbookResponse)
+  async execute(
+    fileId: number | string,
+    guestbookResponse: GuestbookResponseDTO,
+    format?: string
+  ): Promise<string> {
+    return await this.accessRepository.submitGuestbookForDatafileDownload(
+      fileId,
+      guestbookResponse,
+      format
+    )
   }
 }
