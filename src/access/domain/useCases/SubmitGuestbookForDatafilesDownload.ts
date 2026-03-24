@@ -10,6 +10,7 @@ export class SubmitGuestbookForDatafilesDownload implements UseCase<string> {
    *
    * @param {string | Array<number | string>} fileIds - Comma-separated string or array of file ids.
    * @param {GuestbookResponseDTO} guestbookResponse - Guestbook response payload.
+   * @param {string} [format] - Optional download format passed as a query parameter.
    * @returns {Promise<string>} - Signed URL for the download.
    */
   async execute(
