@@ -22,8 +22,29 @@ describe('access download use cases', () => {
 
     const actual = await sut.execute(1, guestbookResponse)
 
-    expect(repository.submitGuestbookForDatafileDownload).toHaveBeenCalledWith(1, guestbookResponse)
+    expect(repository.submitGuestbookForDatafileDownload).toHaveBeenCalledWith(
+      1,
+      guestbookResponse,
+      undefined
+    )
     expect(actual).toEqual('https://signed.datafile')
+  })
+
+  test('should submit datafile download with format and return signed url', async () => {
+    const repository: IAccessRepository = {} as IAccessRepository
+    repository.submitGuestbookForDatafileDownload = jest
+      .fn()
+      .mockResolvedValue('https://signed.datafile?format=original')
+    const sut = new SubmitGuestbookForDatafileDownload(repository)
+
+    const actual = await sut.execute(1, guestbookResponse, 'original')
+
+    expect(repository.submitGuestbookForDatafileDownload).toHaveBeenCalledWith(
+      1,
+      guestbookResponse,
+      'original'
+    )
+    expect(actual).toEqual('https://signed.datafile?format=original')
   })
 
   test('should submit datafiles download and return signed url', async () => {
@@ -37,9 +58,27 @@ describe('access download use cases', () => {
 
     expect(repository.submitGuestbookForDatafilesDownload).toHaveBeenCalledWith(
       [1, 2],
-      guestbookResponse
+      guestbookResponse,
+      undefined
     )
     expect(actual).toEqual('https://signed.datafiles')
+  })
+
+  test('should submit datafiles download with format and return signed url', async () => {
+    const repository: IAccessRepository = {} as IAccessRepository
+    repository.submitGuestbookForDatafilesDownload = jest
+      .fn()
+      .mockResolvedValue('https://signed.datafiles?format=original')
+    const sut = new SubmitGuestbookForDatafilesDownload(repository)
+
+    const actual = await sut.execute([1, 2], guestbookResponse, 'original')
+
+    expect(repository.submitGuestbookForDatafilesDownload).toHaveBeenCalledWith(
+      [1, 2],
+      guestbookResponse,
+      'original'
+    )
+    expect(actual).toEqual('https://signed.datafiles?format=original')
   })
 
   test('should submit dataset download and return signed url', async () => {
@@ -53,9 +92,27 @@ describe('access download use cases', () => {
 
     expect(repository.submitGuestbookForDatasetDownload).toHaveBeenCalledWith(
       'doi:10.5072/FK2/TEST',
-      guestbookResponse
+      guestbookResponse,
+      undefined
     )
     expect(actual).toEqual('https://signed.dataset')
+  })
+
+  test('should submit dataset download with format and return signed url', async () => {
+    const repository: IAccessRepository = {} as IAccessRepository
+    repository.submitGuestbookForDatasetDownload = jest
+      .fn()
+      .mockResolvedValue('https://signed.dataset?format=original')
+    const sut = new SubmitGuestbookForDatasetDownload(repository)
+
+    const actual = await sut.execute('doi:10.5072/FK2/TEST', guestbookResponse, 'original')
+
+    expect(repository.submitGuestbookForDatasetDownload).toHaveBeenCalledWith(
+      'doi:10.5072/FK2/TEST',
+      guestbookResponse,
+      'original'
+    )
+    expect(actual).toEqual('https://signed.dataset?format=original')
   })
 
   test('should throw WriteError when dataset version download fails', async () => {
@@ -66,5 +123,29 @@ describe('access download use cases', () => {
     const sut = new SubmitGuestbookForDatasetVersionDownload(repository)
 
     await expect(sut.execute(10, '2.0', guestbookResponse)).rejects.toThrow(WriteError)
+    expect(repository.submitGuestbookForDatasetVersionDownload).toHaveBeenCalledWith(
+      10,
+      '2.0',
+      guestbookResponse,
+      undefined
+    )
+  })
+
+  test('should submit dataset version download with format and return signed url', async () => {
+    const repository: IAccessRepository = {} as IAccessRepository
+    repository.submitGuestbookForDatasetVersionDownload = jest
+      .fn()
+      .mockResolvedValue('https://signed.dataset.version?format=original')
+    const sut = new SubmitGuestbookForDatasetVersionDownload(repository)
+
+    const actual = await sut.execute(10, '2.0', guestbookResponse, 'original')
+
+    expect(repository.submitGuestbookForDatasetVersionDownload).toHaveBeenCalledWith(
+      10,
+      '2.0',
+      guestbookResponse,
+      'original'
+    )
+    expect(actual).toEqual('https://signed.dataset.version?format=original')
   })
 })

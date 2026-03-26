@@ -3018,14 +3018,18 @@ Submits guestbook answers for a datafile and returns a signed URL.
 import { submitGuestbookForDatafileDownload } from '@iqss/dataverse-client-javascript'
 
 submitGuestbookForDatafileDownload
-  .execute(10, {
-    guestbookResponse: {
-      answers: [
-        { id: 123, value: 'Good' },
-        { id: 124, value: ['Multi', 'Line'] }
-      ]
-    }
-  })
+  .execute(
+    10,
+    {
+      guestbookResponse: {
+        answers: [
+          { id: 123, value: 'Good' },
+          { id: 124, value: ['Multi', 'Line'] }
+        ]
+      }
+    },
+    'original'
+  )
   .then((signedUrl: string) => {
     /* ... */
   })
@@ -3043,15 +3047,19 @@ Submits guestbook answers for multiple files and returns a signed URL.
 import { submitGuestbookForDatafilesDownload } from '@iqss/dataverse-client-javascript'
 
 submitGuestbookForDatafilesDownload
-  .execute([10, 11], {
-    guestbookResponse: {
-      answers: [
-        { id: 123, value: 'Good' },
-        { id: 124, value: ['Multi', 'Line'] },
-        { id: 125, value: 'Yellow' }
-      ]
-    }
-  })
+  .execute(
+    [10, 11],
+    {
+      guestbookResponse: {
+        answers: [
+          { id: 123, value: 'Good' },
+          { id: 124, value: ['Multi', 'Line'] },
+          { id: 125, value: 'Yellow' }
+        ]
+      }
+    },
+    'original'
+  )
   .then((signedUrl: string) => {
     /* ... */
   })
@@ -3069,15 +3077,19 @@ Submits guestbook answers for dataset download and returns a signed URL.
 import { submitGuestbookForDatasetDownload } from '@iqss/dataverse-client-javascript'
 
 submitGuestbookForDatasetDownload
-  .execute('doi:10.5072/FK2/XXXXXX', {
-    guestbookResponse: {
-      answers: [
-        { id: 123, value: 'Good' },
-        { id: 124, value: ['Multi', 'Line'] },
-        { id: 125, value: 'Yellow' }
-      ]
-    }
-  })
+  .execute(
+    'doi:10.5072/FK2/XXXXXX',
+    {
+      guestbookResponse: {
+        answers: [
+          { id: 123, value: 'Good' },
+          { id: 124, value: ['Multi', 'Line'] },
+          { id: 125, value: 'Yellow' }
+        ]
+      }
+    },
+    'original'
+  )
   .then((signedUrl: string) => {
     /* ... */
   })
@@ -3095,19 +3107,24 @@ Submits guestbook answers for a specific dataset version and returns a signed UR
 import { submitGuestbookForDatasetVersionDownload } from '@iqss/dataverse-client-javascript'
 
 submitGuestbookForDatasetVersionDownload
-  .execute(10, ':latest', {
-    guestbookResponse: {
-      name: 'Jane Doe',
-      email: 'jane@example.org',
-      institution: 'Example University',
-      position: 'Researcher',
-      answers: [
-        { id: 123, value: 'Good' },
-        { id: 124, value: ['Multi', 'Line'] },
-        { id: 125, value: 'Yellow' }
-      ]
-    }
-  })
+  .execute(
+    10,
+    ':latest',
+    {
+      guestbookResponse: {
+        name: 'Jane Doe',
+        email: 'jane@example.org',
+        institution: 'Example University',
+        position: 'Researcher',
+        answers: [
+          { id: 123, value: 'Good' },
+          { id: 124, value: ['Multi', 'Line'] },
+          { id: 125, value: 'Yellow' }
+        ]
+      }
+    },
+    'original'
+  )
   .then((signedUrl: string) => {
     /* ... */
   })
@@ -3119,4 +3136,8 @@ The `datasetId` parameter can be a string, for persistent identifiers, or a numb
 
 The `versionId` parameter accepts a numbered version such as `'1.0'` or a non-numbered version such as `':latest'`.
 
-The third parameter must match [GuestbookResponseDTO](../src/access/domain/dtos/GuestbookResponseDTO.ts). The resolved value is a signed download URL as a string.
+The `guestbookResponse` parameter must match [GuestbookResponseDTO](../src/access/domain/dtos/GuestbookResponseDTO.ts).
+
+The optional `format` parameter is sent as a query parameter on the download endpoint. For example, pass `'original'` to request the original dataset or file format.
+
+The resolved value is a signed download URL as a string.
