@@ -296,6 +296,9 @@ export const transformVersionPayloadToDataset = (
   if ('citationDate' in versionPayload) {
     datasetModel.citationDate = versionPayload.citationDate
   }
+  if ('guestbookId' in versionPayload) {
+    datasetModel.guestbookId = versionPayload.guestbookId
+  }
   if ('datasetType' in versionPayload) {
     datasetModel.datasetType = versionPayload.datasetType
   }

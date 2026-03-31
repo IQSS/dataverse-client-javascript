@@ -66,4 +66,26 @@ export class DataverseInfoRepository extends ApiRepository implements IDataverse
         throw error
       })
   }
+  public async getDatasetPublishPopupCustomText(): Promise<string> {
+    return this.doGet(
+      this.buildApiEndpoint(this.infoResourceName, `settings/:DatasetPublishPopupCustomText`)
+    )
+      .then((response: AxiosResponse<{ data: { message: string } }>) => {
+        return response.data.data.message
+      })
+      .catch((error) => {
+        throw error
+      })
+  }
+  public async getPublishDatasetDisclaimerText(): Promise<string> {
+    return this.doGet(
+      this.buildApiEndpoint(this.infoResourceName, `settings/:PublishDatasetDisclaimerText`)
+    )
+      .then((response: AxiosResponse<{ data: { message: string } }>) => {
+        return response.data.data.message
+      })
+      .catch((error) => {
+        throw error
+      })
+  }
 }
