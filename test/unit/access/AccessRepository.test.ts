@@ -4,6 +4,7 @@
 
 import { AccessRepository } from '../../../src/access/infra/repositories/AccessRepository'
 import { GuestbookResponseDTO } from '../../../src/access/domain/dtos/GuestbookResponseDTO'
+import { WriteError } from '../../../src/core/domain/repositories/WriteError'
 import {
   ApiConfig,
   DataverseApiAuthMechanism
@@ -12,6 +13,7 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 
 describe('AccessRepository', () => {
   const sut = new AccessRepository()
+  const originalFetch = global.fetch
   const guestbookResponse: GuestbookResponseDTO = {
     guestbookResponse: {
       answers: [{ id: 1, value: 'question 1' }]
@@ -26,6 +28,7 @@ describe('AccessRepository', () => {
   })
 
   afterEach(() => {
+    global.fetch = originalFetch
     window.localStorage.clear()
   })
 
@@ -65,5 +68,53 @@ describe('AccessRepository', () => {
       }
     )
     expect(actual).toBe('https://signed.dataset')
+  })
+
+  test('parses signed url from a JSON body when content-type is incorrect', async () => {
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.BEARER_TOKEN,
+      undefined,
+      TestConstants.TEST_BEARER_TOKEN_LOCAL_STORAGE_KEY
+    )
+
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'text/plain' }),
+      text: jest
+        .fn()
+        .mockResolvedValue(JSON.stringify({ data: { signedUrl: 'https://signed.text' } }))
+    } as unknown as Response)
+
+    global.fetch = fetchMock as typeof fetch
+
+    await expect(sut.submitGuestbookForDatasetDownload(123, guestbookResponse)).resolves.toBe(
+      'https://signed.text'
+    )
+  })
+
+  test('throws WriteError when signedUrl is missing from a successful response', async () => {
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.BEARER_TOKEN,
+      undefined,
+      TestConstants.TEST_BEARER_TOKEN_LOCAL_STORAGE_KEY
+    )
+
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: jest.fn().mockResolvedValue({
+        data: {}
+      })
+    } as unknown as Response)
+
+    global.fetch = fetchMock as typeof fetch
+
+    await expect(sut.submitGuestbookForDatasetDownload(123, guestbookResponse)).rejects.toThrow(
+      new WriteError('Missing signedUrl in access download response.')
+    )
   })
 })

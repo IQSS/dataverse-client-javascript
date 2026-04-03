@@ -99,7 +99,7 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
       throw new WriteError(this.buildFetchErrorMessage(response.status, responseData))
     }
 
-    return responseData.data.signedUrl as string
+    return this.getSignedUrlOrThrow(responseData)
   }
 
   private getFetchCredentials(withCredentials?: boolean): RequestCredentials | undefined {
@@ -149,7 +149,13 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
       return await response.json()
     }
 
-    return await response.text()
+    const responseText = await response.text()
+
+    try {
+      return JSON.parse(responseText)
+    } catch {
+      return responseText
+    }
   }
 
   private buildFetchErrorMessage(status: number, responseData: any): string {
@@ -159,5 +165,15 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
         : responseData?.message || responseData?.data?.message || 'unknown error'
 
     return `[${status}] ${message}`
+  }
+
+  private getSignedUrlOrThrow(responseData: any): string {
+    const signedUrl = responseData?.data?.signedUrl
+
+    if (typeof signedUrl !== 'string' || signedUrl.length === 0) {
+      throw new WriteError('Missing signedUrl in access download response.')
+    }
+
+    return signedUrl
   }
 }
