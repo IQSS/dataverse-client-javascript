@@ -98,4 +98,26 @@ export class TemplatesRepository extends ApiRepository implements ITemplatesRepo
         throw error
       })
   }
+
+  public async setTemplateAsDefault(
+    collectionIdOrAlias: number | string,
+    templateId: number
+  ): Promise<void> {
+    return this.doPost(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/template/default/${templateId}`,
+      {}
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async unsetTemplateAsDefault(collectionIdOrAlias: number | string): Promise<void> {
+    return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}/template/default`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }

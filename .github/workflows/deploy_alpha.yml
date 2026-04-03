@@ -72,17 +72,19 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+          CURRENT_PACKAGE_VERSION=$(jq -r '.version' package.json)
+          BASE_VERSION=${CURRENT_PACKAGE_VERSION%%-alpha.*}
 
-          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --registry=https://npm.pkg.github.com/ --json | jq -r '.[]' | grep "^2.0.0-alpha." | sort -V | tail -n 1)
+          LATEST_VERSION=$(npm show @iqss/dataverse-client-javascript versions --registry=https://npm.pkg.github.com/ --json | jq -r '.[]' | grep "^${BASE_VERSION}-alpha\\." | sort -V | tail -n 1)
 
           if [ -z "$LATEST_VERSION" ]; then
             NEW_INCREMENTAL_NUMBER=1
           else
-            CURRENT_INCREMENTAL_NUMBER=$(echo $LATEST_VERSION | sed 's/2.0.0-alpha.//')
+            CURRENT_INCREMENTAL_NUMBER=$(echo "$LATEST_VERSION" | sed "s/^${BASE_VERSION}-alpha\\.//")
             NEW_INCREMENTAL_NUMBER=$((CURRENT_INCREMENTAL_NUMBER + 1))
           fi
 
-          NEW_VERSION="2.0.0-alpha.${NEW_INCREMENTAL_NUMBER}"
+          NEW_VERSION="${BASE_VERSION}-alpha.${NEW_INCREMENTAL_NUMBER}"
 
           echo "Latest version: $LATEST_VERSION"
           echo "New version: $NEW_VERSION"
@@ -93,7 +95,6 @@ jobs:
       - name: Publish package
         run: |
           echo "$(jq '.publishConfig.registry = "https://npm.pkg.github.com"' package.json)" > package.json
-          echo "$( jq '.name = "@IQSS/dataverse-client-javascript"' package.json )" > package.json
-          npm publish --@IQSS:registry=https://npm.pkg.github.com
+          npm publish --@iqss:registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
