@@ -63,11 +63,14 @@ describe('AccessRepository', () => {
   })
 
   describe('submitGuestbookForDatafileDownload', () => {
-    test('should return signed url for datafile download', async () => {
+    test('should return signed url that can be used to download the datafile', async () => {
       const actual = await sut.submitGuestbookForDatafileDownload(testFileId, guestbookResponse)
+      const downloadResponse = await fetch(actual)
 
       expect(actual).toEqual(expect.any(String))
       expect(() => new URL(actual)).not.toThrow()
+      expect(downloadResponse.ok).toBe(true)
+      await expect(downloadResponse.text()).resolves.toBe('test file 1\n')
     })
 
     test('should return error when datafile does not exist', async () => {
