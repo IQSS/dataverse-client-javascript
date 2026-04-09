@@ -17,6 +17,7 @@ import { TermsOfAccess } from '../models/Dataset'
 import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
 import { StorageDriver } from '../../../core/domain/models/StorageDriver'
+import { DatasetUploadLimits } from '../models/DatasetUploadLimits'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -102,4 +103,5 @@ export interface IDatasetsRepository {
     payload: DatasetLicenseUpdateRequest
   ): Promise<void>
   getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver>
+  getDatasetUploadLimits(datasetId: number | string): Promise<DatasetUploadLimits>
 }

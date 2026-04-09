@@ -20,8 +20,11 @@ describe('getDatasetAvailableDatasetType', () => {
       const expectedDatasetType = {
         id: 1,
         name: 'dataset',
+        displayName: 'Dataset',
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        description:
+          'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.'
       }
 
       expect(actualDatasetType).toEqual(expectedDatasetType)
