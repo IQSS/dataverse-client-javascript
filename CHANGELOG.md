@@ -8,22 +8,29 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
-- Datasets: Added `updateDatasetLicense` use case and repository method to support Dataverse endpoint `PUT /datasets/{id}/license`, for updating dataset license or custom terms.
-- Datasets: Added `getDatasetStorageDriver` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/storageDriver`, for retrieving dataset storage driver configuration with properties: name, type, label, directUpload, directDownload, and uploadOutOfBand.
-- Datasets: Added `getDatasetUploadLimits` use case and repository method to support Dataverse endpoint `GET /datasets/{id}/uploadlimits`, for retrieving remaining storage upload quotas, if present.
-- New Use Case: [Get Collections For Linking Use Case](./docs/useCases.md#get-collections-for-linking).
+- New Use Case: [Update Dataset License](./docs/useCases.md#update-dataset-license) under Datasets.
+- New Use Case: [Get Dataset Storage Driver](./docs/useCases.md#get-dataset-storage-driver) under Datasets.
+- New Use Case: [Get Dataset Upload Limits](./docs/useCases.md#get-dataset-upload-limits) under Datasets.
+- New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access) under Datasets.
 - New Use Case: [Create a Template](./docs/useCases.md#create-a-template) under Templates.
 - New Use Case: [Get a Template](./docs/useCases.md#get-a-template) under Templates.
 - New Use Case: [Delete a Template](./docs/useCases.md#delete-a-template) under Templates.
-- Templates: Added `setTemplateAsDefault` use case and repository method to support Dataverse endpoint `POST /dataverses/{id}/template/default/{templateId}`.
-- Templates: Added `unsetTemplateAsDefault` use case and repository method to support Dataverse endpoint `DELETE /dataverses/{id}/template/default`.
-- New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
-- Guestbooks: Added use cases and repository support for guestbook creation, listing, and enabling/disabling.
-- Guestbooks: Added dataset-level guestbook assignment and removal support via `assignDatasetGuestbook` (`PUT /api/datasets/{identifier}/guestbook`) and `removeDatasetGuestbook` (`DELETE /api/datasets/{identifier}/guestbook`).
-- Datasets/Guestbooks: Added `guestbookId` in `getDataset` responses.
-- Access: Added`access` module for guestbook-at-request and download terms/guestbook submission endpoints.
+- New Use Case: [Set Template as Default](./docs/useCases.md#set-template-as-default) under Templates.
+- New Use Case: [Unset Template as Default](./docs/useCases.md#unset-template-as-default) under Templates.
+- New Use Case: [Create Guestbook](./docs/useCases.md#create-guestbook) under Guestbooks.
+- New Use Case: [Get Guestbooks](./docs/useCases.md#get-guestbooks) under Guestbooks.
+- New Use Case: [Enable Guestbook](./docs/useCases.md#enable-guestbook) under Guestbooks.
+- New Use Case: [Disable Guestbook](./docs/useCases.md#disable-guestbook) under Guestbooks.
+- New Use Case: [Assign Dataset Guestbook](./docs/useCases.md#assign-dataset-guestbook) under Guestbooks.
+- New Use Case: [Remove Dataset Guestbook](./docs/useCases.md#remove-dataset-guestbook) under Guestbooks.
 - New Use Case: [Get Publish Dataset Disclaimer Text](./docs/useCases.md#get-publish-dataset-disclaimer-text).
 - New Use Case: [Get Dataset Publish Popup Custom Text](./docs/useCases.md#get-dataset-publish-popup-custom-text).
+- New Use Case: [Get Allowed Collection Storage Drivers](./docs/useCases.md#get-allowed-collection-storage-drivers) under Collections.
+- New Use Case: [Get Collection Storage Driver](./docs/useCases.md#get-collection-storage-driver) under Collections.
+- New Use Case: [Set Collection Storage Driver](./docs/useCases.md#set-collection-storage-driver) under Collections.
+- New Use Case: [Delete Collection Storage Driver](./docs/useCases.md#delete-collection-storage-driver) under Collections.
+- New Use Case: [Get Collections For Linking](./docs/useCases.md#get-collections-for-linking) under Collections.
+- Access: Added `access` module for guestbook-at-request and download terms/guestbook submission endpoints.
 - DatasetType: Updated datasetType data model. Added two more fields: description and displayName.
 
 ### Changed
@@ -32,6 +39,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
 - Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.
+- Datasets/Guestbooks: Added `guestbookId` in `getDataset` responses.
+- DatasetType: Updated datasetType data model. Added two more fields: description and displayName.
 
 ### Fixed
 
