@@ -23,14 +23,12 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
 - Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.
+- Collections: `updateCollection` now supports partial updates by accepting `Partial<CollectionDTO>`. Only explicitly provided fields are sent in update requests, aligning with Dataverse API semantics. Metadata blocks handling was adjusted to respect inheritance flags and avoid invalid field combinations.
 
 ### Fixed
 
-- Allow partial CollectionDTO for UpdateCollection use case
-
 - In GetAllNotificationsByUser use case, additionalInfo field is returned as an object instead of a string.
 - In GetAllNotificationsByUser use case, added support for filtering unread messages and pagination.
-
 
 ### Removed
 

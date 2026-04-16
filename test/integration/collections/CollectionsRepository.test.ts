@@ -1110,6 +1110,27 @@ describe('CollectionsRepository', () => {
       expect(updatedInputLevel?.required).toBe(false)
     })
 
+    test('should update collection with only partial fields (name and affiliation)', async () => {
+      const collectionDTO = createCollectionDTO('partial-update-test')
+      const testCollectionId = await sut.createCollection(collectionDTO)
+      const createdCollection = await sut.getCollection(testCollectionId)
+      const partialUpdate: Partial<CollectionDTO> = {
+        name: 'Partially Updated Name',
+        affiliation: 'New Affiliation'
+      }
+
+      await sut.updateCollection(testCollectionId, partialUpdate)
+      const updatedCollection = await sut.getCollection(testCollectionId)
+
+      expect(updatedCollection.name).toBe('Partially Updated Name')
+      expect(updatedCollection.affiliation).toBe('New Affiliation')
+      expect(updatedCollection.alias).toBe(createdCollection.alias)
+      expect(updatedCollection.type).toBe(createdCollection.type)
+      expect(updatedCollection.contacts).toEqual(createdCollection.contacts)
+
+      await deleteCollectionViaApi(collectionDTO.alias)
+    })
+
     test('should update the collection to inherit metadata blocks from parent collection', async () => {
       const parentCollectionAlias = 'inherit-metablocks-parent-update'
       const parentCollectionDTO = createCollectionDTO(parentCollectionAlias)
