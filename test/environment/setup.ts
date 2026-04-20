@@ -9,13 +9,13 @@ const CONTAINER_DATAVERSE_BOOTSTRAP_NAME = 'test_dataverse_bootstrap'
 const CONTAINER_DATAVERSE_BOOTSTRAP_END_MESSAGE =
   'Done, your instance has been configured for development. Have a nice day!'
 const CONTAINERS_STARTUP_TIMEOUT = 300000
-
+const SKIP_CONTAINERS = process.env.SKIP_CONTAINERS === 'true' // Set this environment variable to true to skip container setup and run tests against an already running instance
 const API_ALLOW_TOKEN_LOOKUP_ENDPOINT = '/admin/settings/:AllowApiTokenLookupViaApi'
 const API_KEY_USER_ENDPOINT = '/builtin-users/dataverseAdmin/api-token'
 const API_KEY_USER_PASSWORD = 'admin1'
 
 export default async function setupTestEnvironment(): Promise<void> {
-  await setupContainers() //Set skipContainers to true to skip container setup and run tests against an already running instance
+  await setupContainers(SKIP_CONTAINERS) //Set skipContainers to true to skip container setup and run tests against an already running instance
   await setupApiKey()
 }
 
