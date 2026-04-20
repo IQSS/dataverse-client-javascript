@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "mini": "node mini.js",
     "test": "jest -c jest.config.ts",
     "test:unit": "jest -c jest.config.unit.ts",
     "test:integration": "jest -c jest.config.integration.ts",

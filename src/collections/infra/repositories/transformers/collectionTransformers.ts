@@ -3,7 +3,8 @@ import { AxiosResponse } from 'axios'
 import {
   CollectionContactPayload,
   CollectionInputLevelPayload,
-  CollectionPayload
+  CollectionPayload,
+  AllowedDatasetTypePayload
 } from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import { CollectionFacet } from '../../../domain/models/CollectionFacet'
@@ -45,6 +46,7 @@ import {
 } from '../../../domain/models/MyDataCollectionItemSubset'
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 import { CollectionLinks } from '../../../domain/models/CollectionLinks'
+import { AllowedDatasetType } from '../../../domain/models/AllowedDatasetType'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -82,6 +84,11 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     }),
     ...(collectionPayload.dataverseContacts && {
       contacts: transformContactsPayloadToContacts(collectionPayload.dataverseContacts)
+    }),
+    ...(collectionPayload.allowedDatasetTypes && {
+      allowedDatasetTypes: transformAllowedDatasetTypesPayloadToAllowedDatasetTypes(
+        collectionPayload.allowedDatasetTypes
+      )
     })
   }
   return collectionModel
@@ -250,5 +257,15 @@ const transformContactsPayloadToContacts = (
   return contactsPayload.map((contactPayload) => ({
     email: contactPayload.contactEmail,
     displayOrder: contactPayload.displayOrder
+  }))
+}
+
+const transformAllowedDatasetTypesPayloadToAllowedDatasetTypes = (
+  allowedDatasetTypesPayload: AllowedDatasetTypePayload[]
+): AllowedDatasetType[] => {
+  return allowedDatasetTypesPayload.map((allowedDatasetType) => ({
+    name: allowedDatasetType.name,
+    displayName: allowedDatasetType.displayName,
+    description: allowedDatasetType.description
   }))
 }
