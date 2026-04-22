@@ -266,8 +266,6 @@ const transformAllowedDatasetTypesPayloadToAllowedDatasetTypes = (
     id: allowedDatasetType.id,
     name: allowedDatasetType.name,
     displayName: allowedDatasetType.displayName,
-    description: allowedDatasetType.description,
-    linkedMetadataBlocks: allowedDatasetType.linkedMetadataBlocks,
-    availableLicenses: allowedDatasetType.availableLicenses
+    description: allowedDatasetType.description
   }))
 }

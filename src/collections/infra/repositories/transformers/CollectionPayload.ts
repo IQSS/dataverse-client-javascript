@@ -33,6 +33,4 @@ export interface AllowedDatasetTypePayload {
   name: string
   displayName: string
   description?: string
-  linkedMetadataBlocks?: string[]
-  availableLicenses?: string[]
 }
