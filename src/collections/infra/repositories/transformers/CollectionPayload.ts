@@ -29,7 +29,10 @@ export interface CollectionContactPayload {
 }
 
 export interface AllowedDatasetTypePayload {
+  id: number
   name: string
   displayName: string
   description?: string
+  linkedMetadataBlocks?: string[]
+  availableLicenses?: string[]
 }

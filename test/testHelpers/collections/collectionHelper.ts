@@ -47,6 +47,7 @@ export const createCollectionModel = (): Collection => {
     ],
     allowedDatasetTypes: [
       {
+        id: 1,
         name: 'review',
         displayName: 'Review',
         description: 'A review of a dataset compiled by the expert community.'
@@ -84,6 +85,7 @@ export const createCollectionPayload = (): CollectionPayload => {
     ],
     allowedDatasetTypes: [
       {
+        id: 1,
         name: 'review',
         displayName: 'Review',
         description: 'A review of a dataset compiled by the expert community.'

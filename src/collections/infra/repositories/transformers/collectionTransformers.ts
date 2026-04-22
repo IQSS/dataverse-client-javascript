@@ -14,7 +14,7 @@ import {
   CollectionItemSubset,
   CountPerObjectType
 } from '../../../domain/models/CollectionItemSubset'
-import { DatasetPreview } from '../../../../datasets'
+import { DatasetPreview, DatasetType } from '../../../../datasets'
 import { FilePreview } from '../../../../files'
 import { DatasetPreviewPayload } from '../../../../datasets/infra/repositories/transformers/DatasetPreviewPayload'
 import { FilePreviewPayload } from '../../../../files/infra/repositories/transformers/FilePreviewPayload'
@@ -46,7 +46,6 @@ import {
 } from '../../../domain/models/MyDataCollectionItemSubset'
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 import { CollectionLinks } from '../../../domain/models/CollectionLinks'
-import { AllowedDatasetType } from '../../../domain/models/AllowedDatasetType'
 
 export const transformCollectionResponseToCollection = (response: AxiosResponse): Collection => {
   const collectionPayload = response.data.data
@@ -262,10 +261,13 @@ const transformContactsPayloadToContacts = (
 
 const transformAllowedDatasetTypesPayloadToAllowedDatasetTypes = (
   allowedDatasetTypesPayload: AllowedDatasetTypePayload[]
-): AllowedDatasetType[] => {
+): DatasetType[] => {
   return allowedDatasetTypesPayload.map((allowedDatasetType) => ({
+    id: allowedDatasetType.id,
     name: allowedDatasetType.name,
     displayName: allowedDatasetType.displayName,
-    description: allowedDatasetType.description
+    description: allowedDatasetType.description,
+    linkedMetadataBlocks: allowedDatasetType.linkedMetadataBlocks,
+    availableLicenses: allowedDatasetType.availableLicenses
   }))
 }

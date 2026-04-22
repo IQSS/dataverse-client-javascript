@@ -66,4 +66,3 @@ export { CollectionSearchCriteria } from './domain/models/CollectionSearchCriter
 export { FeaturedItem } from './domain/models/FeaturedItem'
 export { FeaturedItemsDTO } from './domain/dtos/FeaturedItemsDTO'
 export { CollectionSummary } from './domain/models/CollectionSummary'
-export { AllowedDatasetType } from './domain/models/AllowedDatasetType'
