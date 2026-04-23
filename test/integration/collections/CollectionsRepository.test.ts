@@ -910,7 +910,7 @@ describe('CollectionsRepository', () => {
 
   describe('getCollectionItems for published tabular file', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
-    const testTextFile4Name = 'test-file-4.tab'
+    const testTextFile4Name = 'test-file-4.tsv'
     const testSubCollectionAlias = 'collectionsRepositoryTestSubCollection'
 
     beforeAll(async () => {
