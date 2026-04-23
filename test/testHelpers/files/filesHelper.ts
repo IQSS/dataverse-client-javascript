@@ -16,7 +16,7 @@ interface FileMetadata {
 export const testTextFile1Name = 'test-file-1.txt'
 export const testTextFile2Name = 'test-file-2.txt'
 export const testTextFile3Name = 'test-file-3.txt'
-export const testTabFile4Name = 'test-file-4.tab'
+export const testTabFile4Name = 'test-file-4.tsv'
 export const createFileModel = (): FileModel => {
   return {
     id: 1,

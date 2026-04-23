@@ -21,7 +21,7 @@ import { FileModel } from '../../../src/files/domain/models/FileModel'
 describe('execute', () => {
   const testCollectionAlias = 'updateFileMetadataFunctionalTest'
   let testDatasetIds: CreatedDatasetIdentifiers
-  const testTextFile4Name = 'test-file-4.tab'
+  const testTextFile4Name = 'test-file-4.tsv'
   const tabularTags = ['Event']
 
   beforeAll(async () => {
