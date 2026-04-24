@@ -29,6 +29,7 @@ export interface FilePayload {
     tabularTags?: string[]
     creationDate?: string
     publicationDate?: string
+    lastUpdateTime: string
     deleted: boolean
     tabularData: boolean
     fileAccessRequest?: boolean

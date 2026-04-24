@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
@@ -20,15 +19,18 @@ import { transformDatasetPreviewsResponseToDatasetPreviewSubset } from './transf
 import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
-import { DatasetVersionSummaryInfo } from '../../domain/models/DatasetVersionSummaryInfo'
+import { DatasetVersionSummarySubset } from '../../domain/models/DatasetVersionSummaryInfo'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
 import { FormattedCitation } from '../../domain/models/FormattedCitation'
-import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
-import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
-import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 import { DatasetType } from '../../domain/models/DatasetType'
+import { TermsOfAccess } from '../../domain/models/Dataset'
+import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
+import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
+import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
+import { StorageDriver } from '../../domain/models/StorageDriver'
+import { DatasetUploadLimits } from '../../domain/models/DatasetUploadLimits'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -252,16 +254,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     datasetId: string | number,
     dataset: DatasetDTO,
     datasetMetadataBlocks: MetadataBlock[],
-    internalVersionNumber?: number
+    sourceLastUpdateTime?: string
   ): Promise<void> {
     return this.doPut(
       this.buildApiEndpoint(this.datasetsResourceName, `editMetadata`, datasetId),
       transformDatasetModelToUpdateDatasetRequestPayload(dataset, datasetMetadataBlocks),
       {
         replace: true,
-        ...(typeof internalVersionNumber === 'number' && {
-          sourceInternalVersionNumber: internalVersionNumber
-        })
+        ...(sourceLastUpdateTime && { sourceLastUpdateTime })
       }
     )
       .then(() => undefined)
@@ -307,13 +307,29 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   }
 
   public async getDatasetVersionsSummaries(
-    datasetId: string | number
-  ): Promise<DatasetVersionSummaryInfo[]> {
+    datasetId: string | number,
+    limit?: number,
+    offset?: number
+  ): Promise<DatasetVersionSummarySubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set('limit', limit.toString())
+    }
+
+    if (offset) {
+      queryParams.set('offset', offset.toString())
+    }
+
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, 'versions/compareSummary', datasetId),
-      true
+      true,
+      queryParams
     )
-      .then((response) => response.data.data)
+      .then((response) => ({
+        summaries: response.data.data,
+        totalCount: response.data.totalCount
+      }))
       .catch((error) => {
         throw error
       })
@@ -329,16 +345,32 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async linkDataset(datasetId: number, collectionAlias: string): Promise<void> {
-    return this.doPut(`/${this.datasetsResourceName}/${datasetId}/link/${collectionAlias}`, {})
+  public async linkDataset(
+    datasetId: number | string,
+    collectionIdOrAlias: number | string
+  ): Promise<void> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `link/${collectionIdOrAlias}`,
+      datasetId
+    )
+    return this.doPut(endpoint, {})
       .then(() => undefined)
       .catch((error) => {
         throw error
       })
   }
 
-  public async unlinkDataset(datasetId: number, collectionAlias: string): Promise<void> {
-    return this.doDelete(`/${this.datasetsResourceName}/${datasetId}/deleteLink/${collectionAlias}`)
+  public async unlinkDataset(
+    datasetId: number | string,
+    collectionIdOrAlias: number | string
+  ): Promise<void> {
+    const endpoint = this.buildApiEndpoint(
+      this.datasetsResourceName,
+      `deleteLink/${collectionIdOrAlias}`,
+      datasetId
+    )
+    return this.doDelete(endpoint)
       .then(() => undefined)
       .catch((error) => {
         throw error
@@ -368,18 +400,6 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async getDatasetTemplates(
-    collectionIdOrAlias: number | string
-  ): Promise<DatasetTemplate[]> {
-    return this.doGet(`/dataverses/${collectionIdOrAlias}/templates`, true)
-      .then((response: AxiosResponse<{ data: DatasetTemplatePayload[] }>) =>
-        transformDatasetTemplatePayloadToDatasetTemplate(response.data.data)
-      )
-      .catch((error) => {
-        throw error
-      })
-  }
-
   public async getDatasetAvailableDatasetTypes(): Promise<DatasetType[]> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'))
       .then((response) => response.data.data)
@@ -402,7 +422,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async addDatasetType(datasetType: DatasetType): Promise<DatasetType> {
+  public async addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType> {
     return this.doPost(
       this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'),
       datasetType
@@ -449,6 +469,56 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes/' + datasetTypeId)
     )
       .then((response) => response.data.data)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateTermsOfAccess(
+    datasetId: number | string,
+    termsOfAccess: TermsOfAccess
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, 'access', datasetId),
+      transformTermsOfAccessToUpdatePayload(termsOfAccess)
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async updateDatasetLicense(
+    datasetId: number | string,
+    payload: DatasetLicenseUpdateRequest
+  ): Promise<void> {
+    return this.doPut(
+      this.buildApiEndpoint(this.datasetsResourceName, 'license', datasetId),
+      payload
+    )
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'storageDriver', datasetId),
+      true
+    )
+      .then((response) => response.data.data as StorageDriver)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetUploadLimits(datasetId: number | string): Promise<DatasetUploadLimits> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'uploadlimits', datasetId),
+      true
+    )
+      .then((response) => (response.data?.data?.uploadLimits ?? {}) as DatasetUploadLimits)
       .catch((error) => {
         throw error
       })

@@ -22,7 +22,7 @@ import { UploadedFileDTO } from '../../domain/dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../../domain/dtos/UpdateFileMetadataDTO'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { RestrictFileDTO } from '../../domain/dtos/RestrictFileDTO'
-import { FileVersionSummaryInfo } from '../../domain/models/FileVersionSummaryInfo'
+import { FileVersionSummarySubset } from '../../domain/models/FileVersionSummaryInfo'
 import { transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo } from './transformers/fileVersionSummaryInfoTransformers'
 
 export interface GetFilesQueryParams {
@@ -369,7 +369,8 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
 
   public async updateFileMetadata(
     fileId: string | number,
-    updateFileMetadata: UpdateFileMetadataDTO
+    updateFileMetadata: UpdateFileMetadataDTO,
+    sourceLastUpdateTime?: string
   ): Promise<void> {
     const formData = new FormData()
     formData.append('jsonData', JSON.stringify(updateFileMetadata))
@@ -377,7 +378,9 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     return this.doPost(
       this.buildApiEndpoint(this.filesResourceName, `${fileId}/metadata`),
       formData,
-      {},
+      {
+        ...(sourceLastUpdateTime && { sourceLastUpdateTime })
+      },
       ApiConstants.CONTENT_TYPE_MULTIPART_FORM_DATA
     )
       .then(() => undefined)
@@ -420,10 +423,25 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       })
   }
 
-  public async getFileVersionSummaries(fileId: number | string): Promise<FileVersionSummaryInfo[]> {
+  public async getFileVersionSummaries(
+    fileId: number | string,
+    limit?: number,
+    offset?: number
+  ): Promise<FileVersionSummarySubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set('limit', limit.toString())
+    }
+
+    if (offset) {
+      queryParams.set('offset', offset.toString())
+    }
+
     return this.doGet(
       this.buildApiEndpoint(this.filesResourceName, 'versionDifferences', fileId),
-      true
+      true,
+      queryParams
     )
       .then((response) => transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo(response))
       .catch((error) => {

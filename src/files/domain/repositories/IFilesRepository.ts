@@ -10,7 +10,7 @@ import { FileUploadDestination } from '../models/FileUploadDestination'
 import { UploadedFileDTO } from '../dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../dtos/UpdateFileMetadataDTO'
 import { RestrictFileDTO } from '../dtos/RestrictFileDTO'
-import { FileVersionSummaryInfo } from '../models/FileVersionSummaryInfo'
+import { FileVersionSummarySubset } from '../models/FileVersionSummaryInfo'
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -72,7 +72,8 @@ export interface IFilesRepository {
 
   updateFileMetadata(
     fileId: number | string,
-    updateFileMetadataDTO: UpdateFileMetadataDTO
+    updateFileMetadataDTO: UpdateFileMetadataDTO,
+    sourceLastUpdateTime?: string
   ): Promise<void>
 
   updateFileTabularTags(
@@ -87,7 +88,11 @@ export interface IFilesRepository {
     replace?: boolean
   ): Promise<void>
 
-  getFileVersionSummaries(fileId: number | string): Promise<FileVersionSummaryInfo[]>
+  getFileVersionSummaries(
+    fileId: number | string,
+    limit?: number,
+    offset?: number
+  ): Promise<FileVersionSummarySubset>
 
   isFileDeleted(fileId: number | string): Promise<boolean>
 }

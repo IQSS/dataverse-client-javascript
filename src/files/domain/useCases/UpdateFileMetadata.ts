@@ -15,12 +15,18 @@ export class UpdateFileMetadata implements UseCase<void> {
    *
    * @param {number | string} [fileId] - The file identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {UpdateFileMetadataDTO} [updateFileMetadataDTO] - The DTO containing the metadata updates.
+   * @param {string} [sourceLastUpdateTime] - The lastUpdateTime value from the file. If another user updates the file metadata before you send the update request, data inconsistencies may occur. To prevent this, you can use the optional sourceLastUpdateTime parameter. This parameter must include the lastUpdateTime value corresponding to the file being updated.
    * @returns {Promise<void>}
    */
   async execute(
     fileId: number | string,
-    updateFileMetadataDTO: UpdateFileMetadataDTO
+    updateFileMetadataDTO: UpdateFileMetadataDTO,
+    sourceLastUpdateTime?: string
   ): Promise<void> {
-    await this.filesRepository.updateFileMetadata(fileId, updateFileMetadataDTO)
+    await this.filesRepository.updateFileMetadata(
+      fileId,
+      updateFileMetadataDTO,
+      sourceLastUpdateTime
+    )
   }
 }

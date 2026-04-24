@@ -39,7 +39,8 @@ const DATAVERSE_API_REQUEST_HEADERS = {
 
 export const createDatasetModel = (
   license?: DatasetLicense,
-  addOptionalParameters = false
+  addOptionalParameters = false,
+  guestbookId?: number
 ): Dataset => {
   const datasetModel: Dataset = {
     id: 1,
@@ -51,7 +52,7 @@ export const createDatasetModel = (
       minorNumber: 0,
       state: DatasetVersionState.RELEASED,
       createTime: new Date(DATASET_CREATE_TIME_STR),
-      lastUpdateTime: new Date(DATASET_UPDATE_TIME_STR),
+      lastUpdateTime: DATASET_UPDATE_TIME_STR,
       releaseTime: new Date(DATASET_RELEASE_TIME_STR),
       deaccessionNote: undefined
     },
@@ -119,12 +120,16 @@ export const createDatasetModel = (
     datasetModel.publicationDate = '2021-01-01'
     datasetModel.citationDate = '2021-01-01'
   }
+  if (guestbookId !== undefined) {
+    datasetModel.guestbookId = guestbookId
+  }
   return datasetModel
 }
 
 export const createDatasetVersionPayload = (
   license?: DatasetLicense,
-  addOptionalProperties = false
+  addOptionalProperties = false,
+  guestbookId?: number
 ): DatasetPayload => {
   const datasetPayload: DatasetPayload = {
     id: 19,
@@ -256,6 +261,9 @@ export const createDatasetVersionPayload = (
     datasetPayload.publicationDate = '2021-01-01'
     datasetPayload.citationDate = '2021-01-01'
   }
+  if (guestbookId !== undefined) {
+    datasetPayload.guestbookId = guestbookId
+  }
   return datasetPayload
 }
 
@@ -303,6 +311,45 @@ export const publishDatasetViaApi = async (datasetId: number): Promise<AxiosResp
     )
   } catch (error) {
     throw new Error(`Error while publishing test dataset ${datasetId}`)
+  }
+}
+
+export const setUseStorageQuotasViaApi = async (
+  useStorageQuotas: boolean
+): Promise<AxiosResponse> => {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/admin/settings/:UseStorageQuotas`,
+      `${useStorageQuotas}`,
+      {
+        headers: {
+          'Content-Type': 'text/plain',
+          'X-Dataverse-Key': process.env.TEST_API_KEY
+        }
+      }
+    )
+  } catch (error) {
+    throw new Error(`Error while setting UseStorageQuotas to ${useStorageQuotas}`)
+  }
+}
+
+export const setDatasetStorageSizeViaApi = async (
+  datasetId: number | string,
+  sizeInBytes: number
+): Promise<AxiosResponse> => {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/datasets/${datasetId}/storage/quota`,
+      `${sizeInBytes}`,
+      {
+        headers: {
+          'Content-Type': 'text/plain',
+          'X-Dataverse-Key': process.env.TEST_API_KEY
+        }
+      }
+    )
+  } catch (error) {
+    throw new Error(`Error while setting storage quota for dataset ${datasetId}`)
   }
 }
 

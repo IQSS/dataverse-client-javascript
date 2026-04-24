@@ -235,7 +235,7 @@ export const transformVersionPayloadToDataset = (
       minorNumber: versionPayload.versionMinorNumber,
       state: versionPayload.versionState as DatasetVersionState,
       createTime: new Date(versionPayload.createTime),
-      lastUpdateTime: new Date(versionPayload.lastUpdateTime),
+      lastUpdateTime: versionPayload.lastUpdateTime,
       releaseTime: new Date(versionPayload.releaseTime),
       deaccessionNote: versionPayload.deaccessionNote
     },
@@ -295,6 +295,9 @@ export const transformVersionPayloadToDataset = (
   }
   if ('citationDate' in versionPayload) {
     datasetModel.citationDate = versionPayload.citationDate
+  }
+  if ('guestbookId' in versionPayload) {
+    datasetModel.guestbookId = versionPayload.guestbookId
   }
   if ('datasetType' in versionPayload) {
     datasetModel.datasetType = versionPayload.datasetType

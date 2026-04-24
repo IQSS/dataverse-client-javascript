@@ -18,7 +18,7 @@ export class UpdateDataset extends DatasetWriteUseCase<void> {
    *
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {DatasetDTO} [updatedDataset] - DatasetDTO object including the updated dataset metadata field values for each metadata block.
-   * @param {number} [internalVersionNumber] - The internal version number of the dataset. If another user updates the dataset version metadata before you send the update request, data inconsistencies may occur. To prevent this, you can use the optional internalVersionNumber parameter. This parameter must include the internal version number corresponding to the dataset version being updated. Note that internal version numbers increase sequentially with each version update.
+   * @param {string} [sourceLastUpdateTime] - The lastUpdateTime value from the dataset. If another user updates the dataset version metadata before you send the update request, data inconsistencies may occur. To prevent this, you can use the optional sourceLastUpdateTime parameter. This parameter must include the lastUpdateTime value corresponding to the dataset version being updated.
    * @returns {Promise<void>} - This method does not return anything upon successful completion.
    * @throws {ResourceValidationError} - If there are validation errors related to the provided information.
    * @throws {ReadError} - If there are errors while reading data.
@@ -27,7 +27,7 @@ export class UpdateDataset extends DatasetWriteUseCase<void> {
   async execute(
     datasetId: number | string,
     updatedDataset: DatasetDTO,
-    internalVersionNumber?: number
+    sourceLastUpdateTime?: string
   ): Promise<void> {
     const metadataBlocks = await this.getNewDatasetMetadataBlocks(updatedDataset)
     this.getNewDatasetValidator().validate(updatedDataset, metadataBlocks)
@@ -35,7 +35,7 @@ export class UpdateDataset extends DatasetWriteUseCase<void> {
       datasetId,
       updatedDataset,
       metadataBlocks,
-      internalVersionNumber
+      sourceLastUpdateTime
     )
   }
 }

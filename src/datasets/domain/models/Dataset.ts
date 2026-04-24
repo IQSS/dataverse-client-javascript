@@ -12,6 +12,7 @@ export interface Dataset {
   alternativePersistentId?: string
   publicationDate?: string
   citationDate?: string
+  guestbookId?: number
   metadataBlocks: DatasetMetadataBlocks
   isPartOf: DvObjectOwnerNode
   datasetType?: string
@@ -22,7 +23,12 @@ export interface DatasetVersionInfo {
   minorNumber: number
   state: DatasetVersionState
   createTime: Date
-  lastUpdateTime: Date
+  /**
+   * The timestamp of the last update to this dataset version.
+   * Format: ISO 8601 string (e.g., "2023-06-01T12:34:56Z").
+   * Used for optimistic concurrency control to detect concurrent updates.
+   */
+  lastUpdateTime: string
   releaseTime?: Date
   deaccessionNote?: string
 }
@@ -46,6 +52,7 @@ export interface CustomTerms {
   conditions?: string
   disclaimer?: string
 }
+
 export interface TermsOfAccess {
   fileAccessRequest: boolean
   termsOfAccessForRestrictedFiles?: string

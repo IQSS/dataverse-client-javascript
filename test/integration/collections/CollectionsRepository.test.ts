@@ -63,7 +63,8 @@ describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
   const sut: CollectionsRepository = new CollectionsRepository()
   let testCollectionId: number
-  const currentYear = new Date().getFullYear()
+  // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+  // const currentYear = new Date().getFullYear()
 
   beforeAll(async () => {
     // create builtin user and pass API key to APiConfig
@@ -375,9 +376,14 @@ describe('CollectionsRepository', () => {
 
     const testTextFile1Name = 'test-file-1.txt'
     const testSubCollectionAlias = 'collectionsRepositoryTestSubCollection'
-
+    const testCollectionItemsAlias = 'collectionsRepositoryTestCollectionItems'
     beforeAll(async () => {
-      await createCollectionViaApi(testSubCollectionAlias, testCollectionAlias).catch(() => {
+      await createCollectionViaApi(testCollectionItemsAlias, ROOT_COLLECTION_ALIAS).catch(() => {
+        throw new Error(
+          `Tests beforeAll(): Error while creating collection ${testCollectionItemsAlias}`
+        )
+      })
+      await createCollectionViaApi(testSubCollectionAlias, testCollectionItemsAlias).catch(() => {
         throw new Error(
           `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
         )
@@ -416,13 +422,14 @@ describe('CollectionsRepository', () => {
       // Give enough time to Solr for indexing
       await new Promise((resolve) => setTimeout(resolve, 5000))
 
-      let actual = await sut.getCollectionItems(testCollectionAlias)
+      let actual = await sut.getCollectionItems(testCollectionItemsAlias)
       const actualFilePreview = actual.items[1] as FilePreview
       const actualDatasetPreview = actual.items[0] as DatasetPreview
       const actualCollectionPreview = actual.items[2] as CollectionPreview
 
       const expectedFileMd5 = '68b22040025784da775f55cfcb6dee2e'
-      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-1.txt'
       const expectedCollectionsName = 'Scientific Research'
@@ -491,7 +498,8 @@ describe('CollectionsRepository', () => {
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
-      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
@@ -512,7 +520,8 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.canDownloadFile).toBe(true)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
-      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      //  expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
@@ -534,12 +543,12 @@ describe('CollectionsRepository', () => {
       expect(actualCollectionPreview.alias).toBe(testSubCollectionAlias)
       expect(actualCollectionPreview.description).toBe('We do all the science.')
       expect(actualCollectionPreview.imageUrl).toBe(undefined)
-      expect(actualCollectionPreview.parentAlias).toBe(testCollectionAlias)
+      expect(actualCollectionPreview.parentAlias).toBe(testCollectionItemsAlias)
       expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
       expect(actualCollectionPreview.publicationStatuses).toContain(PublicationStatus.Unpublished)
       expect(actualCollectionPreview.releaseOrCreateDate).not.toBeUndefined()
       expect(actualCollectionPreview.affiliation).toBe('Scientific Research University')
-      expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollection')
+      expect(actualCollectionPreview.parentAlias).toBe('collectionsRepositoryTestCollectionItems')
       expect(actualCollectionPreview.parentName).toBe(expectedCollectionsName)
       expect(actualCollectionPreview.type).toBe(CollectionItemType.COLLECTION)
 
@@ -548,7 +557,7 @@ describe('CollectionsRepository', () => {
       expect(actual.facets).toEqual(expectedFacetsAll)
 
       // Test limit and offset
-      actual = await sut.getCollectionItems(testCollectionAlias, 1, 1)
+      actual = await sut.getCollectionItems(testCollectionItemsAlias, 1, 1)
       expect((actual.items[0] as FilePreview).name).toBe(expectedFileName)
       expect(actual.items.length).toBe(1)
       expect(actual.totalItemCount).toBe(3)
@@ -558,7 +567,7 @@ describe('CollectionsRepository', () => {
         'test-fi'
       )
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaForFile
@@ -570,7 +579,7 @@ describe('CollectionsRepository', () => {
         'Dataset created using'
       )
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaForDataset
@@ -582,7 +591,7 @@ describe('CollectionsRepository', () => {
       const collectionSearchCriteriaForDatasetAndCollection =
         new CollectionSearchCriteria().withSearchText('the')
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaForDatasetAndCollection
@@ -593,7 +602,7 @@ describe('CollectionsRepository', () => {
 
       // Test search text, limit and offset
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         1,
         1,
         collectionSearchCriteriaForDatasetAndCollection
@@ -606,7 +615,7 @@ describe('CollectionsRepository', () => {
       const collectionSearchCriteriaForCollectionType =
         new CollectionSearchCriteria().withItemTypes([CollectionItemType.COLLECTION])
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaForCollectionType
@@ -621,7 +630,7 @@ describe('CollectionsRepository', () => {
         CollectionItemType.DATASET
       ])
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaForDatasetType
@@ -636,7 +645,7 @@ describe('CollectionsRepository', () => {
         CollectionItemType.FILE
       ])
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaForFileType
@@ -652,7 +661,7 @@ describe('CollectionsRepository', () => {
         CollectionItemType.COLLECTION
       ])
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaForMultiTypes
@@ -669,7 +678,7 @@ describe('CollectionsRepository', () => {
         .withOrder(OrderType.ASC)
 
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaNameAscending
@@ -686,7 +695,7 @@ describe('CollectionsRepository', () => {
         .withOrder(OrderType.DESC)
 
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaNameDescending
@@ -703,7 +712,7 @@ describe('CollectionsRepository', () => {
         .withOrder(OrderType.ASC)
 
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaDateAscending
@@ -720,7 +729,7 @@ describe('CollectionsRepository', () => {
         .withOrder(OrderType.DESC)
 
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaDateDescending
@@ -736,7 +745,7 @@ describe('CollectionsRepository', () => {
         new CollectionSearchCriteria().withFilterQueries(['dvCategory:Laboratory'])
 
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaFilterQueryCollection
@@ -753,7 +762,7 @@ describe('CollectionsRepository', () => {
         ])
 
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaFilterQueryDataset
@@ -768,7 +777,7 @@ describe('CollectionsRepository', () => {
         new CollectionSearchCriteria().withFilterQueries(['fileAccess:Public'])
 
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         collectionSearchCriteriaFilterQuerieCollAndFile
@@ -781,7 +790,7 @@ describe('CollectionsRepository', () => {
 
       // Test with showTypeCounts param in true
       actual = await sut.getCollectionItems(
-        testCollectionAlias,
+        testCollectionItemsAlias,
         undefined,
         undefined,
         undefined,
@@ -801,6 +810,101 @@ describe('CollectionsRepository', () => {
       await expect(
         sut.getCollectionItems(TestConstants.TEST_DUMMY_COLLECTION_ALIAS)
       ).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('getCollectionsForLinking', () => {
+    const linkingParentCollection = 'collectionsRepositoryLinkingTestParentCollection'
+    const linkingTargetAlias = 'collectionsRepositoryLinkTarget'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(linkingParentCollection)
+      await createCollectionViaApi(linkingTargetAlias, linkingParentCollection)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(linkingTargetAlias)
+      await deleteCollectionViaApi(linkingParentCollection)
+    })
+
+    test('should list collections for linking for a given collection alias', async () => {
+      const results = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        'Scientific',
+        false
+      )
+
+      expect(Array.isArray(results)).toBe(true)
+      // Should contain the newly created linking target collection among candidates
+      const found = results.find((c) => c.alias === linkingTargetAlias)
+      expect(found).toBeDefined()
+      expect(found?.id).toBeGreaterThan(0)
+      expect(found?.displayName).toBe('Scientific Research')
+    })
+
+    test('should list collections for linking for a given dataset persistentId', async () => {
+      // Create a temporary dataset to query linking candidates
+      const { persistentId, numericId } = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        linkingParentCollection
+      )
+
+      const results = await sut.getCollectionsForLinking(
+        'dataset',
+        persistentId,
+        'Scientific',
+        false
+      )
+
+      // Cleanup dataset (unpublished)
+      await deleteUnpublishedDatasetViaApi(numericId)
+
+      expect(Array.isArray(results)).toBe(true)
+      const found = results.find((c) => c.alias === linkingTargetAlias)
+      expect(found).toBeDefined()
+      expect(found?.displayName).toBe('Scientific Research')
+    })
+
+    test('should return collections for unlinking when sending alreadyLinked param to true', async () => {
+      const collectionsForUnlinkingBefore = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        '',
+        true
+      )
+
+      // Link the test collection with the linking target collection
+      await sut.linkCollection(linkingParentCollection, linkingTargetAlias)
+
+      const collectionsForUnlinkingAfter = await sut.getCollectionsForLinking(
+        'collection',
+        linkingParentCollection,
+        '',
+        true
+      )
+
+      expect(collectionsForUnlinkingBefore.length).toBe(0)
+      expect(collectionsForUnlinkingAfter.length).toBeGreaterThan(0)
+      expect(collectionsForUnlinkingAfter[0].alias).toBe(linkingTargetAlias)
+      expect(collectionsForUnlinkingAfter[0].displayName).toBe('Scientific Research')
+    })
+
+    it('should return error when collection does not exist', async () => {
+      await expect(
+        sut.getCollectionsForLinking(
+          'collection',
+          TestConstants.TEST_DUMMY_COLLECTION_ALIAS,
+          '',
+          false
+        )
+      ).rejects.toThrow(ReadError)
+    })
+
+    it('should return error when dataset does not exist', async () => {
+      await expect(
+        sut.getCollectionsForLinking('dataset', TestConstants.TEST_DUMMY_PERSISTENT_ID, '', false)
+      ).rejects.toThrow(ReadError)
     })
   })
 
@@ -890,14 +994,16 @@ describe('CollectionsRepository', () => {
 
       const expectedFileMd5 = '77c7f03a7d7772907b43f0b322cef723'
 
-      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case`
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      //  const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
-      const expectedFileName = 'test-file-4.tab'
+      const expectedFileName = 'test-file-4.tsv'
       const expectedCollectionsName = 'Scientific Research'
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBe(expectedFileMd5)
-      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      //     expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
@@ -920,7 +1026,8 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.variables).toBe(3)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
-      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
@@ -996,8 +1103,8 @@ describe('CollectionsRepository', () => {
       expect(updatedCollection.alias).toBe(testUpdatedCollectionAlias)
       expect(updatedCollection.name).toBe(updatedCollectionName)
       expect(updatedCollection.affiliation).toBe(updatedCollectionAffiliation)
-      expect(updatedCollection.inputLevels?.length).toBe(1)
-      const updatedInputLevel = updatedCollection.inputLevels?.[0]
+      expect(updatedCollection.inputLevels?.length).toBe(2)
+      const updatedInputLevel = updatedCollection.inputLevels?.[1]
       expect(updatedInputLevel?.datasetFieldName).toBe('country')
       expect(updatedInputLevel?.include).toBe(true)
       expect(updatedInputLevel?.required).toBe(false)
@@ -1381,7 +1488,7 @@ describe('CollectionsRepository', () => {
     })
 
     it('should return error when the dvObjectIdentifier of a file does not exist', async () => {
-      const invalidFileId = '99'
+      const invalidFileId = '99999999'
       const newFeaturedItems: DvObjectFeaturedItemDTO[] = [
         {
           type: FeaturedItemType.FILE,
@@ -1678,7 +1785,8 @@ describe('CollectionsRepository', () => {
       ) as CollectionPreview
 
       const expectedFileMd5 = '799b5c8c5fdcfbd56c3943f7a6c35326'
-      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      //      const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case"`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
       const expectedFileName = 'test-file-2.txt'
       const expectedCollectionsName = 'Test Collection'
@@ -1699,7 +1807,8 @@ describe('CollectionsRepository', () => {
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
       expect(actualFilePreview.checksum?.value).toBeDefined()
-      expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // expect(actualFilePreview.datasetCitation).toContain(expectedDatasetCitationFragment)
       expect(actualFilePreview.datasetId).toBe(testDatasetIds.numericId)
       expect(actualFilePreview.datasetName).toBe(expectedDatasetDescription)
       expect(actualFilePreview.datasetPersistentId).toBe(testDatasetIds.persistentId)
@@ -1719,7 +1828,8 @@ describe('CollectionsRepository', () => {
       expect(actualFilePreview.canDownloadFile).toBe(true)
 
       expect(actualDatasetPreview.title).toBe(expectedDatasetDescription)
-      expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
+      // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
+      // expect(actualDatasetPreview.citation).toContain(expectedDatasetCitationFragment)
       expect(actualDatasetPreview.description).toBe('This is the description of the dataset.')
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
       expect(actualDatasetPreview.persistentId).not.toBeUndefined()
@@ -1998,16 +2108,18 @@ describe('CollectionsRepository', () => {
     const thirdCollectionAlias = 'getCollectionLinksThird'
     const fourthCollectionAlias = 'getCollectionLinksFourth'
     let childDatasetNumericId: number
+    let childDatasetPersistentId: string
     beforeAll(async () => {
       await createCollectionViaApi(firstCollectionAlias)
       await createCollectionViaApi(secondCollectionAlias)
       await createCollectionViaApi(thirdCollectionAlias)
       await createCollectionViaApi(fourthCollectionAlias)
-      const { numericId: createdId } = await createDataset.execute(
+      const { numericId: createdId, persistentId: createdPid } = await createDataset.execute(
         TestConstants.TEST_NEW_DATASET_DTO,
         fourthCollectionAlias
       )
       childDatasetNumericId = createdId
+      childDatasetPersistentId = createdPid
       await sut.linkCollection(secondCollectionAlias, firstCollectionAlias)
       await sut.linkCollection(firstCollectionAlias, thirdCollectionAlias)
       await sut.linkCollection(firstCollectionAlias, fourthCollectionAlias)
@@ -2036,6 +2148,7 @@ describe('CollectionsRepository', () => {
       expect(collectionLinks.linkedDatasets[0].title).toBe(
         'Dataset created using the createDataset use case'
       )
+      expect(collectionLinks.linkedDatasets[0].persistentId).toBe(childDatasetPersistentId)
     })
 
     test('should return error when collection does not exist', async () => {

@@ -3,14 +3,12 @@ import {
   DatasetMetadataFieldAndValueInfo
 } from './BaseMetadataFieldValidator'
 import { ControlledVocabularyFieldError } from './errors/ControlledVocabularyFieldError'
-import { DateFormatFieldError } from './errors/DateFormatFieldError'
 import { MetadataFieldValidator } from './MetadataFieldValidator'
 import { DatasetMetadataChildFieldValueDTO } from '../../dtos/DatasetDTO'
 import { MultipleMetadataFieldValidator } from './MultipleMetadataFieldValidator'
 import {
   MetadataFieldInfo,
-  MetadataFieldType,
-  MetadataFieldWatermark
+  MetadataFieldType
 } from '../../../../metadataBlocks/domain/models/MetadataBlock'
 
 export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
@@ -50,10 +48,6 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
       this.validateControlledVocabularyFieldValue(datasetMetadataFieldAndValueInfo)
     }
 
-    if (metadataFieldInfo.type == MetadataFieldType.Date) {
-      this.validateDateFieldValue(datasetMetadataFieldAndValueInfo)
-    }
-
     if (metadataFieldInfo.childMetadataFields != undefined) {
       this.validateChildMetadataFieldValues(datasetMetadataFieldAndValueInfo)
     }
@@ -70,47 +64,6 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
       throw new ControlledVocabularyFieldError(
         datasetMetadataFieldAndValueInfo.metadataFieldKey,
         datasetMetadataFieldAndValueInfo.metadataBlockName,
-        datasetMetadataFieldAndValueInfo.metadataParentFieldKey,
-        datasetMetadataFieldAndValueInfo.metadataFieldPosition
-      )
-    }
-  }
-
-  private validateDateFieldValue(
-    datasetMetadataFieldAndValueInfo: DatasetMetadataFieldAndValueInfo
-  ) {
-    const {
-      metadataFieldInfo: { watermark },
-      metadataFieldValue
-    } = datasetMetadataFieldAndValueInfo
-
-    const acceptsAllDateFormats = watermark === MetadataFieldWatermark.YYYYOrYYYYMMOrYYYYMMDD
-
-    const YYYY_MM_DD_DATE_FORMAT_REGEX = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/
-
-    const YYYY_MM_FORMAT_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/
-
-    const YYYY_FORMAT_REGEX = /^\d{4}$/
-
-    const isValidDateFormat = (value: string): boolean => {
-      if (acceptsAllDateFormats) {
-        // Check if it matches any of the formats
-        return (
-          YYYY_MM_DD_DATE_FORMAT_REGEX.test(value) ||
-          YYYY_MM_FORMAT_REGEX.test(value) ||
-          YYYY_FORMAT_REGEX.test(value)
-        )
-      } else {
-        // Only accepts YYYY-MM-DD format
-        return YYYY_MM_DD_DATE_FORMAT_REGEX.test(value)
-      }
-    }
-
-    if (!isValidDateFormat(metadataFieldValue as string)) {
-      throw new DateFormatFieldError(
-        datasetMetadataFieldAndValueInfo.metadataFieldKey,
-        datasetMetadataFieldAndValueInfo.metadataBlockName,
-        watermark,
         datasetMetadataFieldAndValueInfo.metadataParentFieldKey,
         datasetMetadataFieldAndValueInfo.metadataFieldPosition
       )
