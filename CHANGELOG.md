@@ -8,6 +8,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Files: Added `getFileCitationByFormat` use case, repository method, and `FileCitationFormat` enum to support Dataverse file citation exports in `EndNote`, `RIS`, `BibTeX`, `CSL`, and `Internal` formats.
+
 ### Changed
 
 ### Fixed

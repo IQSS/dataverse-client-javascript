@@ -30,6 +30,7 @@ import {
   createFileCountsPayload
 } from '../../testHelpers/files/fileCountsHelper'
 import { createFilesTotalDownloadSizePayload } from '../../testHelpers/files/filesTotalDownloadSizeHelper'
+import { FileCitationFormat } from '../../../src/files/domain/models/FileCitationFormat'
 import { FileDownloadSizeMode, WriteError } from '../../../src'
 import {
   createMultipartFileUploadDestinationModel,
@@ -1160,6 +1161,84 @@ describe('FilesRepository', () => {
 
       await expect(
         sut.getFileCitation(testFile.id, DatasetNotNumberedVersion.LATEST, testIncludeDeaccessioned)
+      ).rejects.toThrow(ReadError)
+    })
+  })
+
+  describe('getFileCitationByFormat', () => {
+    test.each([
+      {
+        format: FileCitationFormat.ENDNOTE,
+        apiValue: 'EndNote',
+        contentType: 'XML',
+        responseData: '<?xml version="1.0" encoding="UTF-8"?><xml><records></records></xml>',
+        expected: '<?xml version="1.0" encoding="UTF-8"?><xml><records></records></xml>'
+      },
+      {
+        format: FileCitationFormat.RIS,
+        apiValue: 'RIS',
+        contentType: 'plain text',
+        responseData: 'TY  - DATA\nT1  - Test\nER  - ',
+        expected: 'TY  - DATA\nT1  - Test\nER  - '
+      },
+      {
+        format: FileCitationFormat.BIBTEX,
+        apiValue: 'BibTeX',
+        contentType: 'plain text',
+        responseData: '@article{test}',
+        expected: '@article{test}'
+      },
+      {
+        format: FileCitationFormat.CSL,
+        apiValue: 'CSL',
+        contentType: 'JSON',
+        // axios auto-parses JSON responses to objects; the repository stringifies them back.
+        responseData: [{ id: 'doi:10.5072/FK2/TEST', type: 'dataset' }],
+        expected: JSON.stringify([{ id: 'doi:10.5072/FK2/TEST', type: 'dataset' }])
+      },
+      {
+        format: FileCitationFormat.INTERNAL,
+        apiValue: 'Internal',
+        contentType: 'HTML',
+        responseData: '<a href="https://doi.org/10.5072/FK2/TEST">Test Dataset</a>',
+        expected: '<a href="https://doi.org/10.5072/FK2/TEST">Test Dataset</a>'
+      }
+    ])(
+      'should call /citation/$apiValue and return $contentType citation for $apiValue format',
+      async ({ format, apiValue, responseData, expected }) => {
+        jest.spyOn(axios, 'get').mockResolvedValue({ data: responseData })
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/access/datafile/${testFile.id}/citation/${apiValue}`
+
+        const actual = await sut.getFileCitationByFormat(testFile.id, format)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toEqual(expected)
+      }
+    )
+
+    test('should authenticate via session cookie when configured', async () => {
+      const testCitation = '@article{test}'
+      jest.spyOn(axios, 'get').mockResolvedValue({ data: testCitation })
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/access/datafile/${testFile.id}/citation/BibTeX`
+
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+      const actual = await sut.getFileCitationByFormat(testFile.id, FileCitationFormat.BIBTEX)
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+      )
+      expect(actual).toEqual(testCitation)
+    })
+
+    test('should return error on repository read error', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      await expect(
+        sut.getFileCitationByFormat(testFile.id, FileCitationFormat.BIBTEX)
       ).rejects.toThrow(ReadError)
     })
   })
