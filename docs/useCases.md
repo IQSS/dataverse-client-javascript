@@ -1718,20 +1718,15 @@ Returns the File citation in the requested citation export format.
 ##### Example call:
 
 ```typescript
-import {
-  FileCitationFormat,
-  getFileCitationByFormat
-} from '@iqss/dataverse-client-javascript'
+import { FileCitationFormat, getFileCitationByFormat } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
 const fileId = 3
 
-getFileCitationByFormat
-  .execute(fileId, FileCitationFormat.BIBTEX)
-  .then((citationText: string) => {
-    /* ... */
-  })
+getFileCitationByFormat.execute(fileId, FileCitationFormat.BIBTEX).then((citationText: string) => {
+  /* ... */
+})
 
 /* ... */
 ```
