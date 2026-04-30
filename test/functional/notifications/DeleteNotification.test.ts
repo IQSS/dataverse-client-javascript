@@ -25,6 +25,6 @@ describe('execute', () => {
   })
 
   test('should throw an error when the notification id does not exist', async () => {
-    await expect(deleteNotification.execute(123)).rejects.toThrow(WriteError)
+    await expect(deleteNotification.execute(9999)).rejects.toThrow(WriteError)
   })
 })

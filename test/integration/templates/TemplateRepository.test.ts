@@ -246,4 +246,128 @@ describe('TemplatesRepository', () => {
       await expect(sut.deleteTemplate(999999)).rejects.toThrow()
     })
   })
+
+  describe('setTemplateAsDefault', () => {
+    test('should set a template as default for a collection', async () => {
+      const existingTemplates = await getTemplatesByCollectionId.execute(testCollectionAlias)
+      const previousDefaultTemplate = existingTemplates.find((template) => template.isDefault)
+      const previousDefaultTemplateId = previousDefaultTemplate?.id
+      await createTemplate.execute(
+        {
+          name: 'Template for setTemplateAsDefault',
+          isDefault: false,
+          fields: [
+            {
+              typeName: 'author',
+              typeClass: MetadataFieldTypeClass.Compound,
+              multiple: true,
+              value: [
+                {
+                  authorName: {
+                    typeName: 'authorName',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'Belicheck, Bill'
+                  },
+                  authorAffiliation: {
+                    typeName: 'authorIdentifierScheme',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'ORCID'
+                  }
+                }
+              ]
+            }
+          ],
+          instructions: [
+            {
+              instructionField: 'author',
+              instructionText: 'The author data'
+            }
+          ]
+        },
+        testCollectionAlias
+      )
+
+      const templates = await getTemplatesByCollectionId.execute(testCollectionAlias)
+      const templateId = templates[templates.length - 1].id
+
+      await sut.setTemplateAsDefault(testCollectionAlias, templateId)
+
+      const templatesAfter = await getTemplatesByCollectionId.execute(testCollectionAlias)
+      const updatedTemplate = templatesAfter.find((template) => template.id === templateId)
+
+      expect(updatedTemplate?.isDefault).toBe(true)
+
+      if (previousDefaultTemplateId !== undefined) {
+        await sut.setTemplateAsDefault(testCollectionAlias, previousDefaultTemplateId)
+      } else {
+        await sut.unsetTemplateAsDefault(testCollectionAlias)
+      }
+    })
+
+    test('should return error when template does not exist', async () => {
+      await expect(sut.setTemplateAsDefault(testCollectionAlias, 999999)).rejects.toThrow()
+    })
+  })
+
+  describe('unsetTemplateAsDefault', () => {
+    test('should remove the default template from a collection', async () => {
+      await createTemplate.execute(
+        {
+          name: 'Template for unsetTemplateAsDefault',
+          isDefault: false,
+          fields: [
+            {
+              typeName: 'author',
+              typeClass: MetadataFieldTypeClass.Compound,
+              multiple: true,
+              value: [
+                {
+                  authorName: {
+                    typeName: 'authorName',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'Belicheck, Bill'
+                  },
+                  authorAffiliation: {
+                    typeName: 'authorIdentifierScheme',
+                    typeClass: MetadataFieldTypeClass.Primitive,
+                    value: 'ORCID'
+                  }
+                }
+              ]
+            }
+          ],
+          instructions: [
+            {
+              instructionField: 'author',
+              instructionText: 'The author data'
+            }
+          ]
+        },
+        testCollectionAlias
+      )
+
+      const templates = await getTemplatesByCollectionId.execute(testCollectionAlias)
+      const templateId = templates[templates.length - 1].id
+
+      await sut.setTemplateAsDefault(testCollectionAlias, templateId)
+      const templatesSetAsDefault = await getTemplatesByCollectionId.execute(testCollectionAlias)
+      const templateSetAsDefault = templatesSetAsDefault.find(
+        (template) => template.id === templateId
+      )
+      expect(templateSetAsDefault?.isDefault).toBe(true)
+
+      await sut.unsetTemplateAsDefault(testCollectionAlias)
+
+      const templatesAfter = await getTemplatesByCollectionId.execute(testCollectionAlias)
+      const hasDefaultTemplate = templatesAfter.some((template) => template.isDefault)
+
+      expect(hasDefaultTemplate).toBe(false)
+
+      await deleteDatasetTemplateViaApi(templateId)
+    })
+
+    test('should return error when collection does not exist', async () => {
+      await expect(sut.unsetTemplateAsDefault('invalidCollectionAlias')).rejects.toThrow()
+    })
+  })
 })
