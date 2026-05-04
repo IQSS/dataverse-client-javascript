@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
@@ -8,7 +9,9 @@ import {
   waitForDatasetsIndexedInSolr,
   deletePublishedDatasetViaApi,
   deaccessionDatasetViaApi,
-  createDatasetLicenseModel
+  createDatasetLicenseModel,
+  setDatasetStorageSizeViaApi,
+  setUseStorageQuotasViaApi
 } from '../../testHelpers/datasets/datasetHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
@@ -62,10 +65,6 @@ import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepo
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
 import { CitationFormat } from '../../../src/datasets/domain/models/CitationFormat'
-import {
-  createDatasetTemplateViaApi,
-  deleteDatasetTemplateViaApi
-} from '../../testHelpers/datasets/datasetTemplatesHelper'
 
 const TEST_DIFF_DATASET_DTO: DatasetDTO = {
   license: {
@@ -1818,41 +1817,6 @@ describe('DatasetsRepository', () => {
     })
   })
 
-  describe('getDatasetTemplates', () => {
-    const testCollectionAlias = 'testGetDatasetTemplates'
-
-    beforeAll(async () => {
-      await createCollectionViaApi(testCollectionAlias)
-    })
-
-    afterAll(async () => {
-      await deleteCollectionViaApi(testCollectionAlias)
-    })
-
-    test('should return empty dataset templates', async () => {
-      const actual = await sut.getDatasetTemplates(testCollectionAlias)
-
-      expect(actual.length).toBe(0)
-    })
-
-    test('should return dataset templates for a collection', async () => {
-      const templateCreated = await createDatasetTemplateViaApi(testCollectionAlias)
-
-      const actual = await sut.getDatasetTemplates(testCollectionAlias)
-
-      expect(actual.length).toBe(1)
-
-      expect(actual[0].name).toBe(templateCreated.name)
-      expect(actual[0].isDefault).toBe(templateCreated.isDefault)
-      expect(actual[0].datasetMetadataBlocks.length).toBe(1)
-      expect(actual[0].datasetMetadataBlocks[0].name).toBe('citation')
-      expect(actual[0].datasetMetadataBlocks[0].fields.author.length).toBe(1)
-      expect(actual[0].instructions.length).toBe(templateCreated.instructions.length)
-
-      await deleteDatasetTemplateViaApi(actual[0].id)
-    })
-  })
-
   describe('getDatasetAvailableDatasetTypes', () => {
     test('should return available dataset types', async () => {
       const actualDatasetTypes: DatasetType[] = await getDatasetAvailableDatasetTypes.execute()
@@ -1860,8 +1824,11 @@ describe('DatasetsRepository', () => {
         {
           id: 1,
           name: 'dataset',
+          displayName: 'Dataset',
           linkedMetadataBlocks: [],
-          availableLicenses: []
+          availableLicenses: [],
+          description:
+            'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.'
         }
       ]
 
@@ -1878,8 +1845,11 @@ describe('DatasetsRepository', () => {
       const expectedDatasetType = {
         id: 1,
         name: 'dataset',
+        displayName: 'Dataset',
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        description:
+          'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.'
       }
 
       expect(actualDatasetType).toEqual(expectedDatasetType)
@@ -1888,11 +1858,13 @@ describe('DatasetsRepository', () => {
 
   describe('addDatasetType', () => {
     test('should add a dataset type', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
 
       expect(actual.name).toEqual(randomName)
@@ -1901,11 +1873,13 @@ describe('DatasetsRepository', () => {
 
   describe('deleteDatasetType', () => {
     test('should delete a dataset type (after adding it)', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
       expect(actual.name).toEqual(randomName)
 
@@ -1916,11 +1890,13 @@ describe('DatasetsRepository', () => {
 
   describe('linkDatasetTypeWithMetadataBlocks', () => {
     test('should allow for linking a dataset type to metadata blocks', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
       expect(actual.name).toEqual(randomName)
 
@@ -1938,11 +1914,13 @@ describe('DatasetsRepository', () => {
 
   describe('setAvailableLicensesForDatasetType', () => {
     test('should allow for setting available licenses for a dataset type', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
       expect(actual.name).toEqual(randomName)
 
@@ -2242,6 +2220,75 @@ describe('DatasetsRepository', () => {
       ).rejects.toBeInstanceOf(WriteError)
 
       await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+  })
+
+  describe('getDatasetStorageDriver', () => {
+    let testDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return storage driver info for dataset', async () => {
+      const storageDriver = await sut.getDatasetStorageDriver(testDatasetIds.numericId)
+      expect(storageDriver).toHaveProperty('name')
+      expect(storageDriver).toHaveProperty('type')
+      expect(storageDriver).toHaveProperty('label')
+      expect(typeof storageDriver.directUpload).toBe('boolean')
+      expect(typeof storageDriver.directDownload).toBe('boolean')
+      expect(typeof storageDriver.uploadOutOfBand).toBe('boolean')
+    })
+  })
+
+  describe('getDatasetUploadLimits', () => {
+    const testCollectionAlias = 'UploadLimitsQuotaDataset'
+    let testDatasetIds: CreatedDatasetIdentifiers
+    const testCollectionStorageQuotaInBytes = 1000
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testCollectionAlias)
+      await publishCollectionViaApi(testCollectionAlias)
+      testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      await setUseStorageQuotasViaApi(true)
+      await publishDatasetViaApi(testDatasetIds.numericId)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+    })
+
+    afterAll(async () => {
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId).catch(() => undefined)
+      await deleteCollectionViaApi(testCollectionAlias).catch(() => undefined)
+    })
+
+    test('should return empty for dataset (if DatasetStorageSize is not set)', async () => {
+      const uploadLimits = await sut.getDatasetUploadLimits(testDatasetIds.numericId)
+
+      expect(uploadLimits).toEqual({})
+    })
+
+    test('should return upload limits for dataset (if DatasetStorageSize is set)', async () => {
+      await setDatasetStorageSizeViaApi(testDatasetIds.numericId, testCollectionStorageQuotaInBytes)
+      const uploadLimits = await sut.getDatasetUploadLimits(testDatasetIds.numericId)
+
+      expect(uploadLimits).toBeDefined()
+      expect(uploadLimits.storageQuotaRemaining).toBeLessThanOrEqual(
+        testCollectionStorageQuotaInBytes
+      )
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      await expect(sut.getDatasetUploadLimits(nonExistentTestDatasetId)).rejects.toBeInstanceOf(
+        ReadError
+      )
     })
   })
 })

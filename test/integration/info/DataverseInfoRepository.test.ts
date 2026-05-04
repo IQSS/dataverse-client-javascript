@@ -7,7 +7,9 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   deleteApplicationTermsOfUseViaApi,
   setApplicationTermsOfUseViaApi,
-  setMaxEmbargoDurationInMonthsViaApi
+  setDatasetPublishPopupCustomTextViaApi,
+  setMaxEmbargoDurationInMonthsViaApi,
+  setPublishDatasetDisclaimerTextViaApi
 } from '../../testHelpers/info/infoHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 
@@ -53,7 +55,40 @@ describe('DataverseInfoRepository', () => {
       expect(actual).toBe(testMaxEmbargoDurationInMonths)
     })
   })
+  describe('getPublishDatasetDisclaimerText', () => {
+    test('should return error when the setting does not exist', async () => {
+      const errorExpected: ReadError = new ReadError(
+        '[404] Setting :PublishDatasetDisclaimerText not found'
+      )
 
+      await expect(sut.getPublishDatasetDisclaimerText()).rejects.toThrow(errorExpected)
+    })
+
+    test('should return text when the setting exists', async () => {
+      const testPublishDatasetDisclaimerText = 'please read and accept'
+      await setPublishDatasetDisclaimerTextViaApi(testPublishDatasetDisclaimerText)
+      const actual = await sut.getPublishDatasetDisclaimerText()
+
+      expect(actual).toBe(testPublishDatasetDisclaimerText)
+    })
+  })
+  describe('getDatasetPublishPopupCustomText', () => {
+    test('should return error when the setting does not exist', async () => {
+      const errorExpected: ReadError = new ReadError(
+        '[404] Setting :DatasetPublishPopupCustomText not found'
+      )
+
+      await expect(sut.getDatasetPublishPopupCustomText()).rejects.toThrow(errorExpected)
+    })
+
+    test('should return text when the setting exists', async () => {
+      const testDatasetPublishPopupCustomText = 'custom publish popup text'
+      await setDatasetPublishPopupCustomTextViaApi(testDatasetPublishPopupCustomText)
+      const actual = await sut.getDatasetPublishPopupCustomText()
+
+      expect(actual).toBe(testDatasetPublishPopupCustomText)
+    })
+  })
   describe('getApplicationTermsOfUse', () => {
     test('should return no terms message when terms are not set', async () => {
       const defaultNoTermsOfUseMessage =

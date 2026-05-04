@@ -1,13 +1,18 @@
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
-import { getDatasetTemplates } from '../../../src/datasets'
-import { CreateDatasetTemplateDTO } from '../../../src/collections/domain/dtos/CreateDatasetTemplateDTO'
-import { createDatasetTemplate } from '../../../src/collections'
+import {
+  createTemplate,
+  getTemplatesByCollectionId,
+  setTemplateAsDefault
+} from '../../../src/templates'
+import { CreateTemplateDTO } from '../../../src/templates/domain/dtos/CreateTemplateDTO'
 import { MetadataFieldTypeClass } from '../../../src/metadataBlocks/domain/models/MetadataBlock'
 import { deleteDatasetTemplateViaApi } from '../../testHelpers/datasets/datasetTemplatesHelper'
 
-describe('CreateTemplate.execute', () => {
+describe('SetTemplateAsDefault.execute', () => {
+  const collectionIdOrAlias = ':root'
+
   beforeEach(async () => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
@@ -16,10 +21,11 @@ describe('CreateTemplate.execute', () => {
     )
   })
 
-  test('should create a template in :root with provided JSON', async () => {
-    const templateDto: CreateDatasetTemplateDTO = {
-      name: 'TestDataverse template',
-      isDefault: true,
+  test('should set the default template for a collection', async () => {
+    const templateName = `TestDefaultTemplate-${Date.now()}`
+    const templateDto: CreateTemplateDTO = {
+      name: templateName,
+      isDefault: false,
       fields: [
         {
           typeName: 'author',
@@ -48,15 +54,22 @@ describe('CreateTemplate.execute', () => {
         }
       ]
     }
-    await createDatasetTemplate.execute(templateDto)
-    const templates = await getDatasetTemplates.execute(':root')
 
-    expect(templates[templates.length - 1].name).toBe(templateDto.name)
-    expect(templates[templates.length - 1].isDefault).toBe(templateDto.isDefault)
-    expect(templates[templates.length - 1].instructions.length).toBe(
-      templateDto.instructions?.length ?? 0
-    )
+    await createTemplate.execute(templateDto, collectionIdOrAlias)
+    const templatesAfterCreate = await getTemplatesByCollectionId.execute(collectionIdOrAlias)
+    const createdTemplate = templatesAfterCreate.find((template) => template.name === templateName)
 
-    deleteDatasetTemplateViaApi(templates[templates.length - 1].id)
+    if (!createdTemplate) {
+      throw new Error('Created template was not found in collection templates.')
+    }
+
+    await setTemplateAsDefault.execute(createdTemplate.id, collectionIdOrAlias)
+
+    const templatesAfterSet = await getTemplatesByCollectionId.execute(collectionIdOrAlias)
+    const updatedTemplate = templatesAfterSet.find((template) => template.id === createdTemplate.id)
+
+    expect(updatedTemplate?.isDefault).toBe(true)
+
+    await deleteDatasetTemplateViaApi(createdTemplate.id)
   })
 })

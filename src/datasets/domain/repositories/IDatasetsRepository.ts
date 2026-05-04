@@ -12,11 +12,12 @@ import { DatasetVersionSummarySubset } from '../models/DatasetVersionSummaryInfo
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
 import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
-import { DatasetTemplate } from '../models/DatasetTemplate'
 import { DatasetType } from '../models/DatasetType'
 import { TermsOfAccess } from '../models/Dataset'
 import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
+import { StorageDriver } from '../models/StorageDriver'
+import { DatasetUploadLimits } from '../models/DatasetUploadLimits'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -84,7 +85,6 @@ export interface IDatasetsRepository {
     format: CitationFormat,
     includeDeaccessioned?: boolean
   ): Promise<FormattedCitation>
-  getDatasetTemplates(collectionIdOrAlias: number | string): Promise<DatasetTemplate[]>
   getDatasetAvailableDatasetTypes(): Promise<DatasetType[]>
   getDatasetAvailableDatasetType(datasetTypeId: number | string): Promise<DatasetType>
   addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType>
@@ -102,4 +102,6 @@ export interface IDatasetsRepository {
     datasetId: number | string,
     payload: DatasetLicenseUpdateRequest
   ): Promise<void>
+  getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver>
+  getDatasetUploadLimits(datasetId: number | string): Promise<DatasetUploadLimits>
 }

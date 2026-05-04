@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { ApiConfig, DatasetType, addDatasetType, deleteDatasetType } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { TestConstants } from '../../testHelpers/TestConstants'
@@ -13,11 +14,13 @@ describe('DeleteDatasetType', () => {
     })
 
     test('should allow for adding and deleting a dataset type', async () => {
-      const randomName = `datasetType-${crypto.randomUUID().slice(0, 6)}`
+      const randomName = `datasetType-${randomUUID().slice(0, 6)}`
       const actual: DatasetType = await addDatasetType.execute({
         name: randomName,
         linkedMetadataBlocks: [],
-        availableLicenses: []
+        availableLicenses: [],
+        displayName: randomName,
+        description: 'A dataset type created for testing purposes'
       })
       expect(actual.name).toEqual(randomName)
 
