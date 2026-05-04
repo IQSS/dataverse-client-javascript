@@ -9,7 +9,7 @@ import { GetFile } from './domain/useCases/GetFile'
 import { GetFileCitation } from './domain/useCases/GetFileCitation'
 import { GetFileAndDataset } from './domain/useCases/GetFileAndDataset'
 import { UploadFile } from './domain/useCases/UploadFile'
-import { DirectUploadClient, DirectUploadClientConfig } from './infra/clients/DirectUploadClient'
+import { DirectUploadClient } from './infra/clients/DirectUploadClient'
 import { AddUploadedFilesToDataset } from './domain/useCases/AddUploadedFilesToDataset'
 import { DeleteFile } from './domain/useCases/DeleteFile'
 import { ReplaceFile } from './domain/useCases/ReplaceFile'
@@ -20,40 +20,8 @@ import { UpdateFileCategories } from './domain/useCases/UpdateFileCategories'
 import { GetFileVersionSummaries } from './domain/useCases/GetFileVersionSummaries'
 import { IsFileDeleted } from './domain/useCases/IsFileDeleted'
 
-/**
- * Configuration for file upload operations.
- * Use FilesConfig.init() to configure upload behavior before using uploadFile.
- */
-class FilesConfig {
-  private static uploadConfig: DirectUploadClientConfig = {}
-
-  /**
-   * Initialize file upload configuration.
-   * @param config - Configuration options for file uploads
-   * @param config.useS3Tagging - Whether to include S3 tagging header (x-amz-tagging: dv-state=temp).
-   *                              Set to false if your S3 implementation doesn't support object tagging. Default: true
-   * @param config.maxMultipartRetries - Maximum number of retries for multipart upload parts. Default: 5
-   * @param config.fileUploadTimeoutMs - Timeout in milliseconds for file upload operations. Default: 60000
-   */
-  static init(config: DirectUploadClientConfig) {
-    this.uploadConfig = config
-  }
-
-  static getConfig(): DirectUploadClientConfig {
-    return this.uploadConfig
-  }
-}
-
 const filesRepository = new FilesRepository()
-// DirectUploadClient is created lazily to allow configuration before first use
-let directUploadClientInstance: DirectUploadClient | null = null
-
-const getDirectUploadClient = (): DirectUploadClient => {
-  if (!directUploadClientInstance) {
-    directUploadClientInstance = new DirectUploadClient(filesRepository, FilesConfig.getConfig())
-  }
-  return directUploadClientInstance
-}
+const directUploadClient = new DirectUploadClient(filesRepository)
 
 const getDatasetFiles = new GetDatasetFiles(filesRepository)
 const getDatasetFileCounts = new GetDatasetFileCounts(filesRepository)
@@ -73,27 +41,7 @@ const updateFileTabularTags = new UpdateFileTabularTags(filesRepository)
 const updateFileCategories = new UpdateFileCategories(filesRepository)
 const getFileVersionSummaries = new GetFileVersionSummaries(filesRepository)
 const isFileDeleted = new IsFileDeleted(filesRepository)
-
-// uploadFile is created lazily to respect FilesConfig settings
-let uploadFileInstance: UploadFile | null = null
-
-/**
- * Uploads a file to remote storage and returns the storage identifier.
- * Respects FilesConfig settings (call FilesConfig.init() before first upload if you need custom config).
- */
-const uploadFile = {
-  execute: (
-    datasetId: number | string,
-    file: File,
-    progress: (now: number) => void,
-    abortController: AbortController
-  ): Promise<string> => {
-    if (!uploadFileInstance) {
-      uploadFileInstance = new UploadFile(getDirectUploadClient())
-    }
-    return uploadFileInstance.execute(datasetId, file, progress, abortController)
-  }
-}
+const uploadFile = new UploadFile(directUploadClient)
 
 export {
   getDatasetFiles,
@@ -114,8 +62,7 @@ export {
   updateFileCategories,
   replaceFile,
   getFileVersionSummaries,
-  isFileDeleted,
-  FilesConfig
+  isFileDeleted
 }
 
 export { FileModel as File, FileEmbargo, FileChecksum } from './domain/models/FileModel'
