@@ -40,7 +40,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Changed
 
-- Add pagination query parameters to Dataset Version Summeries and File Version Summaries use cases.
+- Add pagination query parameters to Dataset Version Summaries and File Version Summaries use cases.
 - Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
 - Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.
