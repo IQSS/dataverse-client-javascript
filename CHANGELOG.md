@@ -28,10 +28,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Templates: Added `setTemplateAsDefault` use case and repository method to support Dataverse endpoint `POST /dataverses/{id}/template/default/{templateId}`.
 - Templates: Added `unsetTemplateAsDefault` use case and repository method to support Dataverse endpoint `DELETE /dataverses/{id}/template/default`.
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
-- Files: Added `FilesConfig` class for configuring file upload behavior at runtime, including:
-  - `useS3Tagging`: Option to disable S3 object tagging (`x-amz-tagging` header) for S3-compatible storage that doesn't support tagging. Default: `true`.
-  - `maxMultipartRetries`: Configurable maximum retries for multipart upload parts. Default: `5`.
-  - `fileUploadTimeoutMs`: Configurable timeout for file upload operations. Default: `60000`.
+- Files: Direct uploads now forward the `tagging` value returned by the upload destination response as the `x-amz-tagging` header for single-part uploads.
+- Files: Added a `DirectUploadClientConfig` object for configuring multipart upload retries and upload timeout.
 - Guestbooks: Added use cases and repository support for guestbook creation, listing, and enabling/disabling.
 - Guestbooks: Added dataset-level guestbook assignment and removal support via `assignDatasetGuestbook` (`PUT /api/datasets/{identifier}/guestbook`) and `removeDatasetGuestbook` (`DELETE /api/datasets/{identifier}/guestbook`).
 - Datasets/Guestbooks: Added `guestbookId` in `getDataset` responses.

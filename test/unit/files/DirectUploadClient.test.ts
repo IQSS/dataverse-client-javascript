@@ -88,9 +88,12 @@ describe('uploadFile', () => {
       expect(actual).toEqual(testDestination.storageId)
     })
 
-    test('should include S3 tagging header by default', async () => {
+    test('should include S3 tagging header when upload destination provides tagging', async () => {
       const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
-      const testDestination: FileUploadDestination = createSingleFileUploadDestinationModel()
+      const testDestination: FileUploadDestination = {
+        ...createSingleFileUploadDestinationModel(),
+        tagging: 'dv-state=temp'
+      }
       filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
 
       const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)
@@ -113,14 +116,14 @@ describe('uploadFile', () => {
       )
     })
 
-    test('should not include S3 tagging header when useS3Tagging is false', async () => {
+    test('should not include S3 tagging header when upload destination omits tagging', async () => {
       const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
       const testDestination: FileUploadDestination = createSingleFileUploadDestinationModel()
       filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
 
       const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)
 
-      const sut = new DirectUploadClient(filesRepositoryStub, { useS3Tagging: false })
+      const sut = new DirectUploadClient(filesRepositoryStub)
 
       const progressMock = jest.fn()
       const abortController = new AbortController()
@@ -134,6 +137,29 @@ describe('uploadFile', () => {
           headers: expect.not.objectContaining({
             'x-amz-tagging': expect.anything()
           })
+        })
+      )
+    })
+
+    test('should use configured file upload timeout', async () => {
+      const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+      const testDestination: FileUploadDestination = createSingleFileUploadDestinationModel()
+      filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
+
+      const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)
+
+      const sut = new DirectUploadClient(filesRepositoryStub, { fileUploadTimeoutMs: 30_000 })
+
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      await sut.uploadFile(1, testFile, progressMock, abortController)
+
+      expect(axiosPutSpy).toHaveBeenCalledWith(
+        testDestination.urls[0],
+        expect.anything(),
+        expect.objectContaining({
+          timeout: 30_000
         })
       )
     })

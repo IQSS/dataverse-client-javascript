@@ -9,6 +9,7 @@ node_modules
 
 # unit tests
 coverage
+test/environment/docker-dev-volumes
 
 # macOS
 .DS_Store
