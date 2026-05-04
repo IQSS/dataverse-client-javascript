@@ -25,7 +25,7 @@ describe('getDatasetAvailableDatasetTypes', () => {
           displayName: 'Dataset'
         }
       ]
-      expect(actualDatasetTypes).toEqual(expect.arrayContaining(expectedDatasetTypes))
+      expect(actualDatasetTypes).toEqual(expectedDatasetTypes)
     })
   })
 })

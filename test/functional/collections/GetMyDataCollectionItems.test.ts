@@ -76,7 +76,7 @@ describe('execute', () => {
         [PublicationStatus.Deaccessioned],
         undefined,
         undefined,
-        testCollectionAlias
+        undefined
       )
       throw new Error('Use case should throw an error')
     } catch (error) {

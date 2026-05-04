@@ -32,6 +32,7 @@ const getDatasetFilesTotalDownloadSize = new GetDatasetFilesTotalDownloadSize(fi
 const getFile = new GetFile(filesRepository)
 const getFileAndDataset = new GetFileAndDataset(filesRepository)
 const getFileCitation = new GetFileCitation(filesRepository)
+const uploadFile = new UploadFile(directUploadClient)
 const addUploadedFilesToDataset = new AddUploadedFilesToDataset(filesRepository)
 const deleteFile = new DeleteFile(filesRepository)
 const replaceFile = new ReplaceFile(filesRepository)
@@ -41,7 +42,6 @@ const updateFileTabularTags = new UpdateFileTabularTags(filesRepository)
 const updateFileCategories = new UpdateFileCategories(filesRepository)
 const getFileVersionSummaries = new GetFileVersionSummaries(filesRepository)
 const isFileDeleted = new IsFileDeleted(filesRepository)
-const uploadFile = new UploadFile(directUploadClient)
 
 export {
   getDatasetFiles,
