@@ -1,5 +1,11 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
-import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
+import {
+  IDatasetsRepository,
+  ListDatasetTreeNodeParams
+} from '../../domain/repositories/IDatasetsRepository'
+import { DatasetNotNumberedVersion } from '../../domain/models/DatasetNotNumberedVersion'
+import { FileTreeInclude, FileTreeOrder, FileTreePage } from '../../domain/models/FileTreePage'
+import { transformTreeResponseToFileTreePage } from './transformers/fileTreeTransformers'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
 import {
   transformVersionResponseToDataset,
@@ -519,6 +525,35 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true
     )
       .then((response) => (response.data?.data?.uploadLimits ?? {}) as DatasetUploadLimits)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async listDatasetTreeNode(params: ListDatasetTreeNodeParams): Promise<FileTreePage> {
+    const versionId = params.datasetVersionId ?? DatasetNotNumberedVersion.LATEST
+    const queryParams: Record<string, string | number | boolean> = {}
+    if (params.path !== undefined) queryParams.path = params.path
+    if (params.limit !== undefined) queryParams.limit = params.limit
+    if (params.cursor !== undefined) queryParams.cursor = params.cursor
+    queryParams.include = params.include ?? FileTreeInclude.ALL
+    queryParams.order = params.order ?? FileTreeOrder.NAME_AZ
+    if (params.includeDeaccessioned !== undefined) {
+      queryParams.includeDeaccessioned = params.includeDeaccessioned
+    }
+    if (params.originals !== undefined) {
+      queryParams.originals = params.originals
+    }
+    return this.doGet(
+      this.buildApiEndpoint(
+        this.datasetsResourceName,
+        `versions/${versionId}/tree`,
+        params.datasetId
+      ),
+      true,
+      queryParams
+    )
+      .then((response) => transformTreeResponseToFileTreePage(response))
       .catch((error) => {
         throw error
       })

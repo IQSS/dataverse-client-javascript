@@ -18,6 +18,19 @@ import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest
 import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
 import { StorageDriver } from '../models/StorageDriver'
 import { DatasetUploadLimits } from '../models/DatasetUploadLimits'
+import { FileTreePage, FileTreeInclude, FileTreeOrder } from '../models/FileTreePage'
+
+export interface ListDatasetTreeNodeParams {
+  datasetId: number | string
+  datasetVersionId?: string
+  path?: string
+  limit?: number
+  cursor?: string
+  include?: FileTreeInclude
+  order?: FileTreeOrder
+  includeDeaccessioned?: boolean
+  originals?: boolean
+}
 
 export interface IDatasetsRepository {
   getDataset(
@@ -104,4 +117,5 @@ export interface IDatasetsRepository {
   ): Promise<void>
   getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver>
   getDatasetUploadLimits(datasetId: number | string): Promise<DatasetUploadLimits>
+  listDatasetTreeNode(params: ListDatasetTreeNodeParams): Promise<FileTreePage>
 }

@@ -35,6 +35,8 @@ import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits'
+import { ListDatasetTreeNode } from './domain/useCases/ListDatasetTreeNode'
+import { IterateDatasetTreeNode } from './domain/useCases/IterateDatasetTreeNode'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -86,6 +88,8 @@ const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
+const listDatasetTreeNode = new ListDatasetTreeNode(datasetsRepository)
+const iterateDatasetTreeNode = new IterateDatasetTreeNode(datasetsRepository)
 
 export {
   getDataset,
@@ -118,7 +122,9 @@ export {
   deleteDatasetType,
   updateDatasetLicense,
   getDatasetStorageDriver,
-  getDatasetUploadLimits
+  getDatasetUploadLimits,
+  listDatasetTreeNode,
+  iterateDatasetTreeNode
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -159,3 +165,13 @@ export { DatasetType } from './domain/models/DatasetType'
 export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'
 export { StorageDriver } from './domain/models/StorageDriver'
 export { DatasetUploadLimits } from './domain/models/DatasetUploadLimits'
+export {
+  FileTreeNode,
+  FileTreeFolderNode,
+  FileTreeFileNode,
+  FileTreeNodeType,
+  isFileTreeFolderNode,
+  isFileTreeFileNode
+} from './domain/models/FileTreeNode'
+export { FileTreePage, FileTreeInclude, FileTreeOrder } from './domain/models/FileTreePage'
+export { ListDatasetTreeNodeParams } from './domain/repositories/IDatasetsRepository'
