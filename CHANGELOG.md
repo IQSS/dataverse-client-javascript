@@ -10,6 +10,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 - Datasets: `listDatasetTreeNode` use case and repository method backing `GET /datasets/{id}/versions/{versionId}/tree` for paginated, lazy listing of folders/files inside a dataset version. Returns `FileTreePage` with folder-first ordering, opaque keyset cursors, and per-file `downloadUrl`.
 - Datasets: `iterateDatasetTreeNode` async generator that walks the cursor chain so callers can consume one folder's children without driving pagination by hand.
+- Core: re-export `DataverseApiAuthMechanism` from the public surface so consumers of the standalone reusable bundles (e.g. `dv-tree-view`, `dv-uploader`) can import it without reaching into `core/...`.
 
 ### Changed
 

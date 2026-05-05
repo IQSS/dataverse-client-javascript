@@ -53,6 +53,8 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
     - [Get Dataset Upload Limits](#get-dataset-upload-limits)
+    - [List a Folder of a Dataset Version (Tree View)](#list-a-folder-of-a-dataset-version-tree-view)
+    - [Iterate a Folder of a Dataset Version (Tree View)](#iterate-a-folder-of-a-dataset-version-tree-view)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -1618,6 +1620,79 @@ getDatasetUploadLimits.execute(datasetId).then((uploadLimits: DatasetUploadLimit
 _See [use case](../src/datasets/domain/useCases/GetDatasetUploadLimits.ts) implementation_.
 
 If the backend does not define any quota limits for the dataset, the returned object can be empty (`{}`).
+
+#### List a Folder of a Dataset Version (Tree View)
+
+Returns a [FileTreePage](../src/datasets/domain/models/FileTreePage.ts) for the immediate children (folders and files) inside a folder of a dataset version, intended for lazy tree-view UIs that fetch each folder's children on demand.
+
+Folders come first, then files. Both are name-sorted (case-insensitive); files break ties on data file id for stability. The page carries an opaque `nextCursor` token; clients echo it back to fetch the next page and never construct one themselves.
+
+##### Example call:
+
+```typescript
+import { listDatasetTreeNode, FileTreePage } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+listDatasetTreeNode
+  .execute({
+    datasetId,
+    datasetVersionId: '1.0',
+    path: 'data/raw',
+    limit: 100
+  })
+  .then((page: FileTreePage) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/ListDatasetTreeNode.ts) implementation_.
+
+`datasetId` can be a numeric id or a persistent identifier string. `datasetVersionId` is optional and defaults to `DatasetNotNumberedVersion.LATEST`.
+
+Other optional parameters: `cursor` (opaque, from a previous response), `include` (`'all' | 'folders' | 'files'`, default `'all'`), `order` (`'NameAZ' | 'NameZA'`, default `'NameAZ'`), `includeDeaccessioned` (default `false`), and `originals` (when `true`, the per-file `downloadUrl` carries `?format=original`).
+
+For published, non-deaccessioned versions the underlying API emits `ETag` + `Cache-Control: public, immutable` headers. Drafts and deaccessioned versions don't.
+
+#### Iterate a Folder of a Dataset Version (Tree View)
+
+Returns an async generator over [FileTreeNode](../src/datasets/domain/models/FileTreeNode.ts) values for one folder, walking the cursor chain so callers can consume the children without driving pagination by hand.
+
+##### Example call:
+
+```typescript
+import {
+  iterateDatasetTreeNode,
+  FileTreeNode,
+  isFileTreeFileNode
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+for await (const node of iterateDatasetTreeNode.execute({
+  datasetId,
+  datasetVersionId: '1.0',
+  path: 'data/raw'
+})) {
+  if (isFileTreeFileNode(node)) {
+    /* ... */
+  } else {
+    /* node is a folder ... */
+  }
+}
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/IterateDatasetTreeNode.ts) implementation_.
+
+The generator stops after yielding everything in the requested folder; it does **not** descend into subfolders. Pass each subfolder's `path` back through `iterateDatasetTreeNode` if you want a recursive walk.
 
 ## Files
 
