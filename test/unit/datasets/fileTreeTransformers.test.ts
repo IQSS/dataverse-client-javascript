@@ -1,9 +1,6 @@
 import { AxiosResponse } from 'axios'
 import { transformTreeResponseToFileTreePage } from '../../../src/datasets/infra/repositories/transformers/fileTreeTransformers'
-import {
-  FileTreeInclude,
-  FileTreeOrder
-} from '../../../src/datasets/domain/models/FileTreePage'
+import { FileTreeInclude, FileTreeOrder } from '../../../src/datasets/domain/models/FileTreePage'
 import {
   FileTreeNodeType,
   isFileTreeFolderNode,
@@ -17,7 +14,7 @@ const buildResponse = (data: unknown): AxiosResponse =>
     statusText: 'OK',
     headers: {},
     config: {} as never
-  }) as AxiosResponse
+  } as AxiosResponse)
 
 describe('transformTreeResponseToFileTreePage', () => {
   test('maps folder and file payloads to typed FileTreeNodes', () => {

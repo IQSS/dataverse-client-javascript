@@ -34,7 +34,7 @@ describe('IterateDatasetTreeNode (unit)', () => {
     repo.listDatasetTreeNode = jest.fn().mockResolvedValue(page({ items: [file] }))
 
     const sut = new IterateDatasetTreeNode(repo)
-    const collected: typeof file[] = []
+    const collected: (typeof file)[] = []
     for await (const node of sut.execute({ datasetId: 1 })) {
       collected.push(node as typeof file)
     }

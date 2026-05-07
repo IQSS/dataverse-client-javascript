@@ -16,10 +16,10 @@
     "test:coverage": "jest --coverage -c jest.config.ts",
     "test:coverage:check": "jest --coverage --ci --config jest.config.ts",
     "lint": "npm run lint:eslint && npm run lint:prettier",
-    "lint:fix": "eslint --fix --ext .ts --ignore-path .gitignore ./src",
-    "lint:eslint": "eslint --ignore-path .gitignore ./src",
+    "lint:fix": "eslint --fix --ext .ts --ignore-path .gitignore ./src ./test/unit ./test/integration ./test/functional",
+    "lint:eslint": "eslint --ignore-path .gitignore ./src ./test/unit ./test/integration ./test/functional",
     "lint:prettier": "prettier --check '**/*.(yml|json|md)'",
-    "format": "prettier --write './src/**/*.{js,ts,md,json,yml,md}' --config ./.prettierrc",
+    "format": "prettier --write './src/**/*.{js,ts,md,json,yml,md}' './test/{unit,integration,functional}/**/*.{js,ts,json}' --config ./.prettierrc",
     "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
