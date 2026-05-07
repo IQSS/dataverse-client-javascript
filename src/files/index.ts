@@ -100,3 +100,7 @@ export {
   FileMetadataChange,
   FileVersionSummarySubset
 } from './domain/models/FileVersionSummaryInfo'
+// Re-export the direct-upload client config so consumers can construct
+// their own `DirectUploadClient` with custom timeouts / retry counts
+// without reaching into the SDK's `infra/` private path.
+export { DirectUploadClientConfig } from './infra/clients/DirectUploadClient'
