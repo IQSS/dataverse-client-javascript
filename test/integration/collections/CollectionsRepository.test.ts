@@ -1008,7 +1008,7 @@ describe('CollectionsRepository', () => {
       // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
       //  const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
-      const expectedFileName = 'test-file-4.tab'
+      const expectedFileName = 'test-file-4.tsv'
       const expectedCollectionsName = 'Scientific Research'
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
