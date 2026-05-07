@@ -19,12 +19,12 @@ export interface CollectionPayload {
 
 export interface CollectionThemePayload {
   id: number
-  logo: string
-  tagline: string
-  linkUrl: string
-  linkColor: string
-  textColor: string
-  backgroundColor: string
+  logo?: string
+  tagline?: string
+  linkUrl?: string
+  linkColor?: string
+  textColor?: string
+  backgroundColor?: string
   logoBackgroundColor?: string
 }
 
