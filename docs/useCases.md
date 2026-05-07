@@ -900,6 +900,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetVersions.ts) implement
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
 - **excludeMetadataBlocks**: (boolean) Exclude metadata blocks (default: false).
+- Note that the **excludeFiles** parameter, which is available on Dataverse's "List Versions of a Dataset" API, is not available here. The list of files can be retrieved using the separate use case [List Files in a Dataset](#list-files-in-a-dataset).
 
 #### Get Dataset Versions Summaries
 
