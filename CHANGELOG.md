@@ -8,6 +8,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Collections: Added theme information when retrieving a collection using `getCollection`.
 - Datasets: Added `updateDatasetLicense` use case and repository method to support Dataverse endpoint `PUT /datasets/{id}/license`, for updating dataset license or custom terms.
 - Datasets: Added `getDatasetStorageDriver` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/storageDriver`, for retrieving dataset storage driver configuration with properties: name, type, label, directUpload, directDownload, and uploadOutOfBand.
 - Datasets: Added `updateDatasetLicense` use case and repository method to support Dataverse endpoint `PUT /datasets/{id}/license`, for updating dataset license or custom terms
