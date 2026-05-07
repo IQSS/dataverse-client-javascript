@@ -20,7 +20,6 @@ export interface DatasetVersion {
   citationDate: string
   license: DatasetLicense
   fileAccessRequest: boolean
-  files?: Array<FilePayload>
   metadataBlocks?: DatasetMetadataBlocks
 }
 

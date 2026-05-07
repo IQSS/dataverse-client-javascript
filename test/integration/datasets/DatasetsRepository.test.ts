@@ -1746,7 +1746,7 @@ describe('DatasetsRepository', () => {
       expect(allVersions.totalCount).toBe(22)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-    }, 180000)
+    }, 5000)
   })
 
   describe('getDatasetDownloadCount', () => {
