@@ -1656,7 +1656,7 @@ _See [use case](../src/datasets/domain/useCases/ListDatasetTreeNode.ts) implemen
 
 Other optional parameters: `cursor` (opaque, from a previous response), `include` (`'all' | 'folders' | 'files'`, default `'all'`), `order` (`'NameAZ' | 'NameZA'`, default `'NameAZ'`), `includeDeaccessioned` (default `false`), and `originals` (when `true`, the per-file `downloadUrl` carries `?format=original`).
 
-For published, non-deaccessioned versions the underlying API emits `ETag` + `Cache-Control: public, immutable` headers. Drafts and deaccessioned versions don't.
+For published, non-deaccessioned versions the underlying API emits `ETag` + `Cache-Control: private, immutable` headers. The `private` directive keeps responses out of shared proxy caches because the route is auth-required; the browser's own cache still benefits from `immutable`. Drafts and deaccessioned versions don't.
 
 #### Iterate a Folder of a Dataset Version (Tree View)
 
