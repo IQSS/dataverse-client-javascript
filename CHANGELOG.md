@@ -11,8 +11,12 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Datasets: `listDatasetTreeNode` use case and repository method backing `GET /datasets/{id}/versions/{versionId}/tree` for paginated, lazy listing of folders/files inside a dataset version. Returns `FileTreePage` with folder-first ordering, opaque keyset cursors, and per-file `downloadUrl`.
 - Datasets: `iterateDatasetTreeNode` async generator that walks the cursor chain so callers can consume one folder's children without driving pagination by hand.
 - Core: re-export `DataverseApiAuthMechanism` from the public surface so consumers of the standalone reusable bundles (e.g. `dv-tree-view`, `dv-uploader`) can import it without reaching into `core/...`.
+- Files: export `DirectUploadClientConfig` from the public files surface so consumers can construct a `DirectUploadClient` with the new configuration object.
 
 ### Changed
+
+- **BREAKING**: `DirectUploadClient` constructor signature changed from `(filesRepository, maxMultipartRetries = 5)` to `(filesRepository, config: DirectUploadClientConfig = {})`. `config` now holds `maxMultipartRetries` (default 5) and the new `fileUploadTimeoutMs` (default 60000). Existing TypeScript consumers passing the second argument as a number will need to migrate to `{ maxMultipartRetries: N }`.
+- Files: `DirectUploadClient` now reads the `tagging` field from the upload-destination response instead of hard-coding `x-amz-tagging: dv-state=temp`. This lets the server gate tagging per-driver for storage backends that don't support it (e.g. IBM Cloud Object Storage).
 
 ### Fixed
 
