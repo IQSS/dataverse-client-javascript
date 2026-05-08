@@ -16,7 +16,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 ### Changed
 
 - **BREAKING**: `DirectUploadClient` constructor signature changed from `(filesRepository, maxMultipartRetries = 5)` to `(filesRepository, config: DirectUploadClientConfig = {})`. `config` now holds `maxMultipartRetries` (default 5) and the new `fileUploadTimeoutMs` (default 60000). Existing TypeScript consumers passing the second argument as a number will need to migrate to `{ maxMultipartRetries: N }`.
-- Files: `DirectUploadClient` now reads the `tagging` field from the upload-destination response instead of hard-coding `x-amz-tagging: dv-state=temp`. This lets the server gate tagging per-driver for storage backends that don't support it (e.g. IBM Cloud Object Storage).
+- Files: `DirectUploadClient` now reads the `tagging` field from the upload-destination response instead of hard-coding `x-amz-tagging: dv-state=temp`. This lets the server gate tagging per-driver for storage backends that don't support it (e.g. IBM Cloud Object Storage). When the server omits the field (older Dataverse releases that predate it), the client sends no `x-amz-tagging` header — lifecycle policies that previously relied on the client setting `dv-state=temp` need to move to bucket-level rules or wait for the matching server release.
 
 ### Fixed
 
