@@ -116,9 +116,37 @@ describe('uploadFile', () => {
       )
     })
 
-    test('should not include S3 tagging header when upload destination omits tagging', async () => {
+    test('should default to dv-state=temp tagging when upload destination omits tagging', async () => {
       const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
       const testDestination: FileUploadDestination = createSingleFileUploadDestinationModel()
+      filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
+
+      const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)
+
+      const sut = new DirectUploadClient(filesRepositoryStub)
+
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      await sut.uploadFile(1, testFile, progressMock, abortController)
+
+      expect(axiosPutSpy).toHaveBeenCalledWith(
+        testDestination.urls[0],
+        expect.anything(),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'x-amz-tagging': 'dv-state=temp'
+          })
+        })
+      )
+    })
+
+    test('should omit the S3 tagging header when upload destination explicitly returns empty tagging', async () => {
+      const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+      const testDestination: FileUploadDestination = {
+        ...createSingleFileUploadDestinationModel(),
+        tagging: ''
+      }
       filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
 
       const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)

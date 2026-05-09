@@ -69,8 +69,19 @@ export class DirectUploadClient implements IDirectUploadClient {
       const headers: Record<string, string> = {
         'Content-Type': 'application/octet-stream'
       }
-      if (destination.tagging !== undefined) {
-        headers['x-amz-tagging'] = destination.tagging
+      // Default to `dv-state=temp` when the upload destination response
+      // omits the field. That tag is what every Dataverse install emits
+      // today and what every install before this change had hard-coded;
+      // making "omitted" mean "no tag" would silently break uploads
+      // against any S3 bucket whose lifecycle/access policy expects the
+      // `dv-state=temp` marker, including the default IQSS configuration.
+      // Operators with storage that doesn't accept S3 tags opt out
+      // explicitly via `dataverse.files.<id>.disable-tagging=true`,
+      // which causes the server to return an empty `tagging` field and
+      // the client below to skip the header.
+      const tag = destination.tagging ?? 'dv-state=temp'
+      if (tag !== '') {
+        headers['x-amz-tagging'] = tag
       }
       await axios.put(destination.urls[0], arrayBuffer, {
         headers,
