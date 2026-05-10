@@ -21,7 +21,12 @@ describe('transformTreeResponseToFileTreePage', () => {
     const response = buildResponse({
       path: 'data',
       items: [
-        { type: 'folder', name: 'raw', path: 'data/raw', counts: { files: 3, folders: 0 } },
+        {
+          type: 'folder',
+          name: 'raw',
+          path: 'data/raw',
+          counts: { files: 3, folders: 0, bytes: 4096 }
+        },
         {
           type: 'file',
           id: 42,
@@ -55,7 +60,7 @@ describe('transformTreeResponseToFileTreePage', () => {
       throw new Error('expected folder')
     }
     expect(folder.name).toBe('raw')
-    expect(folder.counts).toEqual({ files: 3, folders: 0 })
+    expect(folder.counts).toEqual({ files: 3, folders: 0, bytes: 4096 })
 
     const file = page.items[1]
     if (!isFileTreeFileNode(file)) {

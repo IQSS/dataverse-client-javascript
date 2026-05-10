@@ -11,7 +11,7 @@ interface FolderItemPayload {
   type: 'folder'
   name: string
   path: string
-  counts?: { files: number; folders: number }
+  counts?: { files: number; folders: number; bytes: number }
 }
 
 interface FileItemPayload {

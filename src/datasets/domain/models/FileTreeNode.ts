@@ -8,8 +8,18 @@ export interface FileTreeFolderNode {
   name: string
   path: string
   counts?: {
+    /** Total files anywhere in the folder's subtree (recursive). */
     files: number
+    /** Immediate subfolders only. */
     folders: number
+    /**
+     * Total size of all files in the subtree, in bytes. Uses the
+     * default-form file size — for ingested tabular files that's the
+     * converted TSV, not the original. Intended as a UX hint
+     * ("downloading this folder = N GB"); not authoritative under
+     * `originals=true`.
+     */
+    bytes: number
   }
 }
 
