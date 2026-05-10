@@ -16,7 +16,13 @@ describe('ListDatasetTreeNode (unit)', () => {
         type: FileTreeNodeType.FOLDER,
         name: 'sub',
         path: 'data/sub',
-        counts: { files: 1, folders: 0, bytes: 1024 }
+        counts: {
+          files: 1,
+          folders: 0,
+          bytes: 1024,
+          restricted: 0,
+          embargoed: 0
+        }
       },
       {
         type: FileTreeNodeType.FILE,

@@ -20,6 +20,18 @@ export interface FileTreeFolderNode {
      * `originals=true`.
      */
     bytes: number
+    /**
+     * Files in the subtree marked restricted. Mirrors the per-file
+     * `access` resolution: a row that is both restricted and embargoed
+     * is counted here, not in `embargoed`.
+     */
+    restricted: number
+    /**
+     * Non-restricted files in the subtree whose embargo has not yet
+     * lapsed. The "public" count is implied: `files - restricted -
+     * embargoed`.
+     */
+    embargoed: number
   }
 }
 
