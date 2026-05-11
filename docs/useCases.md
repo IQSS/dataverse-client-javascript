@@ -2932,6 +2932,7 @@ _See [use case](../src/guestbooks/domain/useCases/GetGuestbook.ts) implementatio
 #### Get Guestbooks By Collection Id
 
 Returns all [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) entries available for a collection.
+Set `includeStats` to `true` to include `usageCount` and `responseCount` for each guestbook.
 
 ##### Example call:
 
@@ -2939,10 +2940,13 @@ Returns all [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) entries av
 import { getGuestbooksByCollectionId } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = 'root'
+const includeStats = true
 
-getGuestbooksByCollectionId.execute(collectionIdOrAlias).then((guestbooks: Guestbook[]) => {
-  /* ... */
-})
+getGuestbooksByCollectionId
+  .execute(collectionIdOrAlias, includeStats)
+  .then((guestbooks: Guestbook[]) => {
+    /* ... */
+  })
 ```
 
 _See [use case](../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId.ts) implementation_.

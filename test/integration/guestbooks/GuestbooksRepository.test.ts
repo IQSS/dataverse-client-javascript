@@ -9,15 +9,24 @@ import {
   DatasetNotNumberedVersion,
   getDataset
 } from '../../../src/datasets'
-import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
+import {
+  deletePublishedDatasetViaApi,
+  deleteUnpublishedDatasetViaApi,
+  publishDatasetViaApi,
+  waitForNoLocks
+} from '../../testHelpers/datasets/datasetHelper'
 import {
   createCollectionViaApi,
   deleteCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
+import { AccessRepository } from '../../../src/access/infra/repositories/AccessRepository'
+import { GuestbookResponseDTO } from '../../../src/access/domain/dtos/GuestbookResponseDTO'
+import { testTextFile1Name, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 
 describe('GuestbooksRepository', () => {
   const sut = new GuestbooksRepository()
+  const accessRepository = new AccessRepository()
   const testCollectionAlias = 'testGuestbooksRepository'
   let testCollectionId: number
   let createdGuestbookId: number
@@ -118,10 +127,99 @@ describe('GuestbooksRepository', () => {
       expect(actual.some((guestbook) => guestbook.id === createdByAliasGuestbookId)).toBe(true)
     })
 
+    test('should list guestbooks for collection with stats', async () => {
+      const createdGuestbookIdWithStats = await sut.createGuestbook(
+        testCollectionAlias,
+        createGuestbookDTO
+      )
+      const actual = await sut.getGuestbooksByCollectionId(testCollectionAlias, true)
+      const createdGuestbookWithStats = actual.find(
+        (guestbook) => guestbook.id === createdGuestbookIdWithStats
+      )
+
+      expect(createdGuestbookWithStats).toBeDefined()
+      expect(createdGuestbookWithStats?.usageCount).toEqual(expect.any(Number))
+      expect(createdGuestbookWithStats?.responseCount).toEqual(expect.any(Number))
+    })
+
+    test('should increment usageCount when assigned to a dataset and responseCount when a response is submitted', async () => {
+      let statsDatasetIds: CreatedDatasetIdentifiers | undefined
+      let statsDatasetPublished = false
+      const guestbookResponse: GuestbookResponseDTO = {
+        guestbookResponse: {
+          name: 'Guestbook Stats Test',
+          email: 'guestbook-stats@example.edu'
+        }
+      }
+      const statsGuestbookId = await sut.createGuestbook(testCollectionAlias, {
+        ...createGuestbookDTO,
+        name: 'guestbook stats test',
+        customQuestions: []
+      })
+
+      try {
+        const initialStats = await getGuestbookStats(statsGuestbookId)
+        statsDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          testCollectionAlias
+        )
+        await uploadFileViaApi(statsDatasetIds.numericId, testTextFile1Name)
+
+        await sut.assignDatasetGuestbook(statsDatasetIds.numericId, statsGuestbookId)
+
+        const statsAfterAssignment = await getGuestbookStats(statsGuestbookId)
+        expect(statsAfterAssignment.usageCount).toBe((initialStats.usageCount ?? 0) + 1)
+        expect(statsAfterAssignment.responseCount).toBe(initialStats.responseCount ?? 0)
+
+        await publishDatasetViaApi(statsDatasetIds.numericId)
+        statsDatasetPublished = true
+        await waitForNoLocks(statsDatasetIds.numericId, 10)
+
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
+        await accessRepository.submitGuestbookForDatasetDownload(
+          statsDatasetIds.numericId,
+          guestbookResponse
+        )
+
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
+        const statsAfterResponse = await getGuestbookStats(statsGuestbookId)
+        expect(statsAfterResponse.usageCount).toBe(statsAfterAssignment.usageCount)
+        expect(statsAfterResponse.responseCount).toBe((statsAfterAssignment.responseCount ?? 0) + 1)
+      } finally {
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
+        if (statsDatasetIds !== undefined) {
+          if (statsDatasetPublished) {
+            await deletePublishedDatasetViaApi(statsDatasetIds.persistentId)
+          } else {
+            await deleteUnpublishedDatasetViaApi(statsDatasetIds.numericId)
+          }
+        }
+      }
+    })
+
     test('should return error when collection does not exist', async () => {
       await expect(sut.getGuestbooksByCollectionId(999999)).rejects.toThrow(ReadError)
     })
   })
+
+  const getGuestbookStats = async (guestbookId: number) => {
+    const guestbooks = await sut.getGuestbooksByCollectionId(testCollectionAlias, true)
+    const guestbook = guestbooks.find((guestbook) => guestbook.id === guestbookId)
+
+    if (guestbook === undefined) {
+      throw new Error(`Guestbook ${guestbookId} was not found in collection stats.`)
+    }
+
+    return guestbook
+  }
 
   describe('getGuestbook', () => {
     test('should get guestbook by id', async () => {

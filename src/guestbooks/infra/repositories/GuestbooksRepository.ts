@@ -33,11 +33,13 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
   }
 
   public async getGuestbooksByCollectionId(
-    collectionIdOrAlias: number | string
+    collectionIdOrAlias: number | string,
+    includeStats = false
   ): Promise<Guestbook[]> {
     return this.doGet(
       this.buildApiEndpoint(this.guestbooksResourceName, `${collectionIdOrAlias}/list`),
-      true
+      true,
+      includeStats ? { includeStats } : {}
     )
       .then((response) => response.data.data as Guestbook[])
       .catch((error) => {

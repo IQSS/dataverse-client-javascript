@@ -9,9 +9,17 @@ export class GetGuestbooksByCollectionId implements UseCase<Guestbook[]> {
    * Returns all guestbooks available for a given collection.
    *
    * @param {number | string} collectionIdOrAlias - Collection identifier (numeric id or alias).
+   * @param {boolean} [includeStats=false] - Include usage and response counts for each guestbook.
    * @returns {Promise<Guestbook[]>}
    */
-  async execute(collectionIdOrAlias: number | string): Promise<Guestbook[]> {
-    return await this.guestbooksRepository.getGuestbooksByCollectionId(collectionIdOrAlias)
+  async execute(collectionIdOrAlias: number | string, includeStats = false): Promise<Guestbook[]> {
+    if (!includeStats) {
+      return await this.guestbooksRepository.getGuestbooksByCollectionId(collectionIdOrAlias)
+    }
+
+    return await this.guestbooksRepository.getGuestbooksByCollectionId(
+      collectionIdOrAlias,
+      includeStats
+    )
   }
 }

@@ -15,7 +15,9 @@ describe('GetGuestbooksByCollectionId', () => {
       positionRequired: false,
       customQuestions: [],
       createTime: '2024-01-01T00:00:00Z',
-      dataverseId: 10
+      dataverseId: 10,
+      usageCount: 3,
+      responseCount: 2
     }
   ]
   const collectionId = 'collectionAlias'
@@ -28,6 +30,17 @@ describe('GetGuestbooksByCollectionId', () => {
     const actual = await sut.execute(collectionId)
 
     expect(repository.getGuestbooksByCollectionId).toHaveBeenCalledWith(collectionId)
+    expect(actual).toEqual(guestbooks)
+  })
+
+  test('should request guestbooks with stats when includeStats is true', async () => {
+    const repository: IGuestbooksRepository = {} as IGuestbooksRepository
+    repository.getGuestbooksByCollectionId = jest.fn().mockResolvedValue(guestbooks)
+
+    const sut = new GetGuestbooksByCollectionId(repository)
+    const actual = await sut.execute(collectionId, true)
+
+    expect(repository.getGuestbooksByCollectionId).toHaveBeenCalledWith(collectionId, true)
     expect(actual).toEqual(guestbooks)
   })
 
