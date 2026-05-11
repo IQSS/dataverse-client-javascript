@@ -17,16 +17,20 @@ import {
 } from '../../testHelpers/datasets/datasetHelper'
 import {
   createCollectionViaApi,
-  deleteCollectionViaApi
+  deleteCollectionViaApi,
+  publishCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { AccessRepository } from '../../../src/access/infra/repositories/AccessRepository'
 import { GuestbookResponseDTO } from '../../../src/access/domain/dtos/GuestbookResponseDTO'
 import { testTextFile1Name, uploadFileViaApi } from '../../testHelpers/files/filesHelper'
+import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
+import { FileOrderCriteria } from '../../../src/files/domain/models/FileCriteria'
 
 describe('GuestbooksRepository', () => {
   const sut = new GuestbooksRepository()
   const accessRepository = new AccessRepository()
+  const filesRepository = new FilesRepository()
   const testCollectionAlias = 'testGuestbooksRepository'
   let testCollectionId: number
   let createdGuestbookId: number
@@ -79,6 +83,7 @@ describe('GuestbooksRepository', () => {
     await createCollectionViaApi(testCollectionAlias).then(
       (collectionPayload: CollectionPayload) => (testCollectionId = collectionPayload.id)
     )
+    await publishCollectionViaApi(testCollectionAlias)
   })
 
   afterAll(async () => {
@@ -142,7 +147,7 @@ describe('GuestbooksRepository', () => {
       expect(createdGuestbookWithStats?.responseCount).toEqual(expect.any(Number))
     })
 
-    test('should increment usageCount when assigned to a dataset and responseCount when a response is submitted', async () => {
+    test('should increment usageCount when assigned by the dataset admin and responseCount only when a guest submits a response', async () => {
       let statsDatasetIds: CreatedDatasetIdentifiers | undefined
       let statsDatasetPublished = false
       const guestbookResponse: GuestbookResponseDTO = {
@@ -164,6 +169,13 @@ describe('GuestbooksRepository', () => {
           testCollectionAlias
         )
         await uploadFileViaApi(statsDatasetIds.numericId, testTextFile1Name)
+        const datasetFiles = await filesRepository.getDatasetFiles(
+          statsDatasetIds.numericId,
+          DatasetNotNumberedVersion.LATEST,
+          false,
+          FileOrderCriteria.NAME_AZ
+        )
+        const fileId = datasetFiles.files[0].id
 
         await sut.assignDatasetGuestbook(statsDatasetIds.numericId, statsGuestbookId)
 
@@ -175,11 +187,14 @@ describe('GuestbooksRepository', () => {
         statsDatasetPublished = true
         await waitForNoLocks(statsDatasetIds.numericId, 10)
 
-        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
-        await accessRepository.submitGuestbookForDatasetDownload(
-          statsDatasetIds.numericId,
-          guestbookResponse
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.BEARER_TOKEN,
+          undefined,
+          undefined,
+          () => null
         )
+        await accessRepository.submitGuestbookForDatafileDownload(fileId, guestbookResponse)
 
         ApiConfig.init(
           TestConstants.TEST_API_URL,
