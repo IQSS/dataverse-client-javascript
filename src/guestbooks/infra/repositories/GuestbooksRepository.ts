@@ -1,11 +1,13 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { CreateGuestbookDTO } from '../../domain/dtos/CreateGuestbookDTO'
 import { Guestbook } from '../../domain/models/Guestbook'
+import { GuestbookResponse } from '../../domain/models/GuestbookResponse'
 import { IGuestbooksRepository } from '../../domain/repositories/IGuestbooksRepository'
 
 export class GuestbooksRepository extends ApiRepository implements IGuestbooksRepository {
   private readonly guestbooksResourceName: string = 'guestbooks'
   private readonly datasetsResourceName: string = 'datasets'
+  private readonly dataversesResourceName: string = 'dataverses'
 
   public async createGuestbook(
     collectionIdOrAlias: number | string,
@@ -42,6 +44,34 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
       includeStats ? { includeStats } : {}
     )
       .then((response) => response.data.data as Guestbook[])
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getGuestbookResponsesByDataverseId(
+    dataverseId: number | string,
+    guestbookId?: number
+  ): Promise<GuestbookResponse[]> {
+    const endpoint = `/${this.dataversesResourceName}/${dataverseId}/guestbookResponses`
+    const queryParams = guestbookId === undefined ? {} : { guestbookId }
+
+    return this.doGet(endpoint, true, queryParams)
+      .then((response) => response.data.data as GuestbookResponse[])
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async downloadGuestbookResponsesByDataverseId(
+    dataverseId: number | string,
+    guestbookId?: number
+  ): Promise<string> {
+    const endpoint = `/${this.dataversesResourceName}/${dataverseId}/guestbookResponses`
+    const queryParams = guestbookId === undefined ? {} : { guestbookId }
+
+    return this.doGet(endpoint, true, queryParams)
+      .then((response) => response.data as string)
       .catch((error) => {
         throw error
       })

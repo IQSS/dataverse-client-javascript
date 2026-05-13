@@ -1,5 +1,6 @@
 import { CreateGuestbookDTO } from '../dtos/CreateGuestbookDTO'
 import { Guestbook } from '../models/Guestbook'
+import { GuestbookResponse } from '../models/GuestbookResponse'
 
 export interface IGuestbooksRepository {
   createGuestbook(
@@ -11,6 +12,14 @@ export interface IGuestbooksRepository {
     collectionIdOrAlias: number | string,
     includeStats?: boolean
   ): Promise<Guestbook[]>
+  getGuestbookResponsesByDataverseId(
+    dataverseId: number | string,
+    guestbookId?: number
+  ): Promise<GuestbookResponse[]>
+  downloadGuestbookResponsesByDataverseId(
+    dataverseId: number | string,
+    guestbookId?: number
+  ): Promise<string>
   setGuestbookEnabled(
     collectionIdOrAlias: number | string,
     guestbookId: number,
