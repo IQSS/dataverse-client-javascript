@@ -169,9 +169,9 @@ describe('GuestbooksRepository', () => {
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      await expect(sut.downloadGuestbookResponsesByDataverseId(collectionIdOrAlias)).rejects.toThrow(
-        ReadError
-      )
+      await expect(
+        sut.downloadGuestbookResponsesByDataverseId(collectionIdOrAlias)
+      ).rejects.toThrow(ReadError)
     })
   })
 })
