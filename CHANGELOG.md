@@ -8,6 +8,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Guestbooks: Added `downloadGuestbookResponsesByDataverseId` and `downloadGuestbookResponsesOfAGuestbook` use cases and repository support for exporting guestbook responses as raw CSV content.
 - Guestbooks: Added optional `includeStats` support to `getGuestbooksByCollectionId`, returning `usageCount` and `responseCount` when requested.
 
 ### Changed

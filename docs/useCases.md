@@ -2951,6 +2951,45 @@ getGuestbooksByCollectionId
 
 _See [use case](../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId.ts) implementation_.
 
+#### Download Guestbook Responses By Dataverse Id
+
+Downloads all guestbook responses for a dataverse collection and returns the raw response body, typically CSV content.
+
+##### Example call:
+
+```typescript
+import { downloadGuestbookResponsesByDataverseId } from '@iqss/dataverse-client-javascript'
+
+const dataverseId = 'root'
+
+downloadGuestbookResponsesByDataverseId.execute(dataverseId).then((csvResponse: string) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/DownloadGuestbookResponsesByDataverseId.ts) implementation_.
+
+#### Download Guestbook Responses Of A Guestbook
+
+Downloads guestbook responses for one guestbook in a dataverse collection and returns the raw response body, typically CSV content.
+
+##### Example call:
+
+```typescript
+import { downloadGuestbookResponsesOfAGuestbook } from '@iqss/dataverse-client-javascript'
+
+const dataverseId = 'root'
+const guestbookId = 123
+
+downloadGuestbookResponsesOfAGuestbook
+  .execute(dataverseId, guestbookId)
+  .then((csvResponse: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/guestbooks/domain/useCases/DownloadGuestbookResponsesOfAGuestbook.ts) implementation_.
+
 ### Guestbooks Write Use Cases
 
 #### Create a Guestbook
