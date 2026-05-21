@@ -36,12 +36,18 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
 
   public async getGuestbooksByCollectionId(
     collectionIdOrAlias: number | string,
-    includeStats = false
+    includeStats = false,
+    includeInherited = false
   ): Promise<Guestbook[]> {
+    const queryParams = {
+      ...(includeStats ? { includeStats } : {}),
+      ...(includeInherited ? { includeInherited } : {})
+    }
+
     return this.doGet(
       this.buildApiEndpoint(this.guestbooksResourceName, `${collectionIdOrAlias}/list`),
       true,
-      includeStats ? { includeStats } : {}
+      queryParams
     )
       .then((response) => response.data.data as Guestbook[])
       .catch((error) => {
@@ -53,10 +59,12 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
     dataverseId: number | string,
     guestbookId?: number
   ): Promise<GuestbookResponse[]> {
-    const endpoint = `/${this.dataversesResourceName}/${dataverseId}/guestbookResponses`
-    const queryParams = guestbookId === undefined ? {} : { guestbookId }
+    const endpoint = this.buildApiEndpoint(
+      this.dataversesResourceName,
+      `${dataverseId}/guestbookResponses`
+    )
 
-    return this.doGet(endpoint, true, queryParams)
+    return this.doGet(endpoint, true, guestbookId ? { guestbookId } : {})
       .then((response) => response.data.data as GuestbookResponse[])
       .catch((error) => {
         throw error
@@ -67,10 +75,12 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
     dataverseId: number | string,
     guestbookId?: number
   ): Promise<string> {
-    const endpoint = `/${this.dataversesResourceName}/${dataverseId}/guestbookResponses`
-    const queryParams = guestbookId === undefined ? {} : { guestbookId }
+    const endpoint = this.buildApiEndpoint(
+      this.dataversesResourceName,
+      `${dataverseId}/guestbookResponses`
+    )
 
-    return this.doGet(endpoint, true, queryParams)
+    return this.doGet(endpoint, true, guestbookId ? { guestbookId } : {})
       .then((response) => response.data as string)
       .catch((error) => {
         throw error

@@ -10,6 +10,25 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 describe('GuestbooksRepository', () => {
   const sut = new GuestbooksRepository()
   const collectionIdOrAlias = 'collectionAlias'
+  const guestbooksResponseWithoutStats = {
+    data: {
+      status: 'OK',
+      data: [
+        {
+          id: 12,
+          name: 'test',
+          enabled: true,
+          emailRequired: true,
+          nameRequired: true,
+          institutionRequired: false,
+          positionRequired: false,
+          customQuestions: [],
+          createTime: '2024-01-01T00:00:00Z',
+          dataverseId: 10
+        }
+      ]
+    }
+  }
   const guestbooksResponse = {
     data: {
       status: 'OK',
@@ -59,7 +78,7 @@ describe('GuestbooksRepository', () => {
 
   describe('getGuestbooksByCollectionId', () => {
     test('should list guestbooks without stats by default', async () => {
-      jest.spyOn(axios, 'get').mockResolvedValue(guestbooksResponse)
+      jest.spyOn(axios, 'get').mockResolvedValue(guestbooksResponseWithoutStats)
 
       const actual = await sut.getGuestbooksByCollectionId(collectionIdOrAlias)
 
@@ -67,7 +86,9 @@ describe('GuestbooksRepository', () => {
         `${TestConstants.TEST_API_URL}/guestbooks/${collectionIdOrAlias}/list`,
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
       )
-      expect(actual).toStrictEqual(guestbooksResponse.data.data)
+      expect(actual).toStrictEqual(guestbooksResponseWithoutStats.data.data)
+      expect(actual[0].usageCount).toBeUndefined()
+      expect(actual[0].responseCount).toBeUndefined()
     })
 
     test('should list guestbooks with stats when includeStats is true', async () => {

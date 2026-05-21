@@ -119,7 +119,10 @@ describe('GuestbooksRepository', () => {
       createdGuestbookId = await sut.createGuestbook(testCollectionId, createGuestbookDTO)
       const actual = await sut.getGuestbooksByCollectionId(testCollectionId)
       expect(actual.length).toBeGreaterThan(0)
-      expect(actual.some((guestbook) => guestbook.id === createdGuestbookId)).toBe(true)
+      const createdGuestbook = actual.find((guestbook) => guestbook.id === createdGuestbookId)
+      expect(createdGuestbook).toBeDefined()
+      expect(createdGuestbook?.usageCount).toBeUndefined()
+      expect(createdGuestbook?.responseCount).toBeUndefined()
     })
 
     test('should list guestbooks for collection by collection alias', async () => {
@@ -216,6 +219,132 @@ describe('GuestbooksRepository', () => {
           } else {
             await deleteUnpublishedDatasetViaApi(statsDatasetIds.numericId)
           }
+        }
+      }
+    })
+
+    test('should include hierarchical owner guestbooks when includeInherited is true', async () => {
+      const uniqueSuffix = Date.now().toString()
+      const childCollectionAlias = `testGuestbooksInheritedChild${uniqueSuffix}`
+      const parentGuestbookName = `parent inherited guestbook ${uniqueSuffix}`
+      const childGuestbookName = `child inherited guestbook ${uniqueSuffix}`
+
+      let childCollectionId: number | undefined
+
+      try {
+        await createCollectionViaApi(childCollectionAlias, testCollectionAlias).then(
+          (collectionPayload: CollectionPayload) => (childCollectionId = collectionPayload.id)
+        )
+        await publishCollectionViaApi(childCollectionAlias)
+
+        const parentGuestbookId = await sut.createGuestbook(testCollectionAlias, {
+          ...createGuestbookDTO,
+          name: parentGuestbookName,
+          customQuestions: []
+        })
+        const childGuestbookId = await sut.createGuestbook(childCollectionAlias, {
+          ...createGuestbookDTO,
+          name: childGuestbookName,
+          customQuestions: []
+        })
+
+        const withoutInherited = await sut.getGuestbooksByCollectionId(childCollectionAlias)
+        const withInherited = await sut.getGuestbooksByCollectionId(
+          childCollectionAlias,
+          false,
+          true
+        )
+
+        expect(childCollectionId).toBeDefined()
+        expect(withoutInherited.some((guestbook) => guestbook.id === childGuestbookId)).toBe(true)
+        expect(withoutInherited.some((guestbook) => guestbook.id === parentGuestbookId)).toBe(false)
+
+        expect(withInherited.some((guestbook) => guestbook.id === childGuestbookId)).toBe(true)
+        expect(withInherited.some((guestbook) => guestbook.id === parentGuestbookId)).toBe(true)
+
+        const inheritedGuestbook = withInherited.find(
+          (guestbook) => guestbook.id === parentGuestbookId
+        )
+        expect(inheritedGuestbook?.name).toBe(parentGuestbookName)
+      } finally {
+        if (childCollectionId !== undefined) {
+          await deleteCollectionViaApi(childCollectionAlias)
+        }
+      }
+    })
+
+    test('should not include hierarchical owner guestbooks when includeInherited is false', async () => {
+      const uniqueSuffix = Date.now().toString()
+      const childCollectionAlias = `testGuestbooksNoInheritedChild${uniqueSuffix}`
+      const parentGuestbookName = `parent non inherited guestbook ${uniqueSuffix}`
+      const childGuestbookName = `child non inherited guestbook ${uniqueSuffix}`
+
+      let childCollectionId: number | undefined
+
+      try {
+        await createCollectionViaApi(childCollectionAlias, testCollectionAlias).then(
+          (collectionPayload: CollectionPayload) => (childCollectionId = collectionPayload.id)
+        )
+        await publishCollectionViaApi(childCollectionAlias)
+
+        const parentGuestbookId = await sut.createGuestbook(testCollectionAlias, {
+          ...createGuestbookDTO,
+          name: parentGuestbookName,
+          customQuestions: []
+        })
+        const childGuestbookId = await sut.createGuestbook(childCollectionAlias, {
+          ...createGuestbookDTO,
+          name: childGuestbookName,
+          customQuestions: []
+        })
+
+        const withoutInherited = await sut.getGuestbooksByCollectionId(
+          childCollectionAlias,
+          false,
+          false
+        )
+
+        expect(childCollectionId).toBeDefined()
+        expect(withoutInherited.some((guestbook) => guestbook.id === childGuestbookId)).toBe(true)
+        expect(withoutInherited.some((guestbook) => guestbook.id === parentGuestbookId)).toBe(false)
+      } finally {
+        if (childCollectionId !== undefined) {
+          await deleteCollectionViaApi(childCollectionAlias)
+        }
+      }
+    })
+
+    test('should return inherited guestbooks for unpublished child collection when includeInherited is true', async () => {
+      const uniqueSuffix = Date.now().toString()
+      const unpublishedChildCollectionAlias = `testGuestbooksUnpublishedChild${uniqueSuffix}`
+      const parentGuestbookName = `parent unpublished child guestbook ${uniqueSuffix}`
+      let childCollectionId: number | undefined
+      let parentGuestbookId: number | undefined
+
+      try {
+        await createCollectionViaApi(unpublishedChildCollectionAlias, testCollectionAlias).then(
+          (collectionPayload: CollectionPayload) => (childCollectionId = collectionPayload.id)
+        )
+
+        parentGuestbookId = await sut.createGuestbook(testCollectionAlias, {
+          ...createGuestbookDTO,
+          name: parentGuestbookName,
+          customQuestions: []
+        })
+
+        const actual = await sut.getGuestbooksByCollectionId(
+          unpublishedChildCollectionAlias,
+          false,
+          true
+        )
+
+        expect(childCollectionId).toBeDefined()
+        expect(parentGuestbookId).toBeDefined()
+        expect(actual.some((guestbook) => guestbook.id === parentGuestbookId)).toBe(true)
+        expect(actual.some((guestbook) => guestbook.name === parentGuestbookName)).toBe(true)
+      } finally {
+        if (childCollectionId !== undefined) {
+          await deleteCollectionViaApi(unpublishedChildCollectionAlias)
         }
       }
     })

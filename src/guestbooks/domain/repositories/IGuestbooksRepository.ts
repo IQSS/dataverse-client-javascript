@@ -10,7 +10,8 @@ export interface IGuestbooksRepository {
   getGuestbook(guestbookId: number): Promise<Guestbook>
   getGuestbooksByCollectionId(
     collectionIdOrAlias: number | string,
-    includeStats?: boolean
+    includeStats?: boolean,
+    includeInherited?: boolean
   ): Promise<Guestbook[]>
   getGuestbookResponsesByDataverseId(
     dataverseId: number | string,
