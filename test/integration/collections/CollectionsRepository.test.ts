@@ -2179,4 +2179,74 @@ describe('CollectionsRepository', () => {
       await expect(sut.getCollectionLinks(invalidCollectionId)).rejects.toThrow(expectedError)
     })
   })
+
+  describe('collection storage drivers', () => {
+    const parentCollectionAlias = 'collectionStorageDriverParent'
+    const childCollectionAlias = 'collectionStorageDriverChild'
+    const standaloneCollectionAlias = 'collectionStorageDriverStandalone'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(parentCollectionAlias)
+      await createCollectionViaApi(childCollectionAlias, parentCollectionAlias)
+      await createCollectionViaApi(standaloneCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(childCollectionAlias)
+      await deleteCollectionViaApi(parentCollectionAlias)
+      await deleteCollectionViaApi(standaloneCollectionAlias)
+    })
+
+    test('should return the directly assigned collection storage driver', async () => {
+      await sut.setCollectionStorageDriver(standaloneCollectionAlias, 'LocalStack')
+
+      const storageDriver = await sut.getCollectionStorageDriver(standaloneCollectionAlias)
+
+      expect(storageDriver.name).toBe('localstack1')
+      expect(storageDriver.label).toBe('LocalStack')
+      expect(storageDriver.type).toBe('s3')
+      expect(storageDriver.directUpload).toBe(true)
+      expect(storageDriver.directDownload).toBe(true)
+      expect(storageDriver.uploadOutOfBand).toBe(false)
+    })
+
+    test('should return the effective collection storage driver through inheritance', async () => {
+      await sut.setCollectionStorageDriver(parentCollectionAlias, 'LocalStack')
+
+      const storageDriver = await sut.getCollectionStorageDriver(childCollectionAlias, true)
+
+      expect(storageDriver.name).toBe('localstack1')
+      expect(storageDriver.label).toBe('LocalStack')
+      expect(storageDriver.type).toBe('s3')
+    })
+
+    test('should set and then clear the collection storage driver', async () => {
+      const setMessage = await sut.setCollectionStorageDriver(
+        standaloneCollectionAlias,
+        'LocalStack'
+      )
+      expect(setMessage).toContain('LocalStack')
+
+      const assignedDriver = await sut.getCollectionStorageDriver(standaloneCollectionAlias)
+      expect(assignedDriver.name).toBe('localstack1')
+
+      const deleteMessage = await sut.deleteCollectionStorageDriver(standaloneCollectionAlias)
+      expect(deleteMessage.toLowerCase()).toContain('local')
+
+      const effectiveDriver = await sut.getCollectionStorageDriver(standaloneCollectionAlias, true)
+      expect(effectiveDriver.name).toBe('local')
+      expect(effectiveDriver.label).toBe('Local')
+      expect(effectiveDriver.type).toBe('file')
+    })
+
+    test('should return the allowed collection storage drivers', async () => {
+      const allowedDrivers = await sut.getAllowedCollectionStorageDrivers(standaloneCollectionAlias)
+
+      expect(allowedDrivers).toMatchObject({
+        LocalStack: 'localstack1',
+        Local: 'local',
+        Filesystem: 'file1'
+      })
+    })
+  })
 })

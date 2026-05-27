@@ -134,7 +134,7 @@ export async function setStorageDriverViaApi(
 ): Promise<void> {
   try {
     return await axios.put(
-      `${TestConstants.TEST_API_URL}/admin/dataverse/${collectionAlias}/storageDriver`,
+      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/storageDriver`,
       driverLabel,
       {
         headers: { 'Content-Type': 'text/plain', 'X-Dataverse-Key': process.env.TEST_API_KEY }
