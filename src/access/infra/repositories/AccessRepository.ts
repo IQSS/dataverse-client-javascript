@@ -1,4 +1,11 @@
+import { ApiConfig, DataverseApiAuthMechanism } from '../../../core/infra/repositories/ApiConfig'
+import { WriteError } from '../../../core/domain/repositories/WriteError'
+import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
+import {
+  buildRequestConfig,
+  buildRequestUrl
+} from '../../../core/infra/repositories/apiConfigBuilders'
 import { GuestbookResponseDTO } from '../../domain/dtos/GuestbookResponseDTO'
 import { IAccessRepository } from '../../domain/repositories/IAccessRepository'
 
@@ -13,14 +20,7 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
     const endpoint = this.buildApiEndpoint(`${this.accessResourceName}/datafile`, undefined, fileId)
     const queryParams = format ? { signed: true, format } : { signed: true }
 
-    return this.doPost(endpoint, guestbookResponse, queryParams)
-      .then((response) => {
-        const signedUrl = response.data.data.signedUrl
-        return signedUrl
-      })
-      .catch((error) => {
-        throw error
-      })
+    return await this.submitGuestbookDownload(endpoint, guestbookResponse, queryParams)
   }
 
   public async submitGuestbookForDatafilesDownload(
@@ -30,7 +30,7 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
   ): Promise<string> {
     const queryParams = format ? { signed: true, format } : { signed: true }
 
-    return this.doPost(
+    return await this.submitGuestbookDownload(
       this.buildApiEndpoint(
         this.accessResourceName,
         `datafiles/${Array.isArray(fileIds) ? fileIds.join(',') : fileIds}`
@@ -38,13 +38,6 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
       guestbookResponse,
       queryParams
     )
-      .then((response) => {
-        const signedUrl = response.data.data.signedUrl
-        return signedUrl
-      })
-      .catch((error) => {
-        throw error
-      })
   }
 
   public async submitGuestbookForDatasetDownload(
@@ -59,14 +52,7 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
     )
     const queryParams = format ? { signed: true, format } : { signed: true }
 
-    return this.doPost(endpoint, guestbookResponse, queryParams)
-      .then((response) => {
-        const signedUrl = response.data.data.signedUrl
-        return signedUrl
-      })
-      .catch((error) => {
-        throw error
-      })
+    return await this.submitGuestbookDownload(endpoint, guestbookResponse, queryParams)
   }
 
   public async submitGuestbookForDatasetVersionDownload(
@@ -82,13 +68,112 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
     )
     const queryParams = format ? { signed: true, format } : { signed: true }
 
-    return this.doPost(endpoint, guestbookResponse, queryParams)
-      .then((response) => {
-        const signedUrl = response.data.data.signedUrl
-        return signedUrl
-      })
-      .catch((error) => {
-        throw error
-      })
+    return await this.submitGuestbookDownload(endpoint, guestbookResponse, queryParams)
+  }
+
+  private async submitGuestbookDownload(
+    apiEndpoint: string,
+    guestbookResponse: GuestbookResponseDTO,
+    queryParams: object
+  ): Promise<string> {
+    const requestConfig = buildRequestConfig(
+      true,
+      queryParams,
+      ApiConstants.CONTENT_TYPE_APPLICATION_JSON
+    )
+    const response = await fetch(
+      this.buildUrlWithQueryParams(buildRequestUrl(apiEndpoint), queryParams),
+      {
+        method: 'POST',
+        headers: this.buildFetchHeaders(requestConfig.headers),
+        credentials: this.getFetchCredentials(requestConfig.withCredentials),
+        body: JSON.stringify(guestbookResponse)
+      }
+    ).catch((error) => {
+      throw new WriteError(error instanceof Error ? error.message : String(error))
+    })
+
+    const responseData = await this.parseResponseBody(response)
+
+    if (!response.ok) {
+      throw new WriteError(this.buildFetchErrorMessage(response.status, responseData))
+    }
+
+    return this.getSignedUrlOrThrow(responseData)
+  }
+
+  private getFetchCredentials(withCredentials?: boolean): RequestCredentials | undefined {
+    if (ApiConfig.dataverseApiAuthMechanism === DataverseApiAuthMechanism.BEARER_TOKEN) {
+      return 'omit'
+    }
+
+    if (withCredentials) {
+      return 'include'
+    }
+
+    return undefined
+  }
+
+  private buildUrlWithQueryParams(requestUrl: string, queryParams: object): string {
+    const url = new URL(requestUrl)
+
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url.searchParams.append(key, String(value))
+      }
+    })
+
+    return url.toString()
+  }
+
+  private buildFetchHeaders(headers?: Record<string, unknown>): Record<string, string> {
+    const fetchHeaders: Record<string, string> = {}
+
+    if (!headers) {
+      return fetchHeaders
+    }
+
+    Object.entries(headers).forEach(([key, value]) => {
+      if (value !== undefined) {
+        fetchHeaders[key] = String(value)
+      }
+    })
+
+    return fetchHeaders
+  }
+
+  private async parseResponseBody(response: Response): Promise<any> {
+    const contentType = response.headers.get('content-type') ?? ''
+
+    if (contentType.includes('application/json')) {
+      return await response.json()
+    }
+
+    const responseText = await response.text()
+
+    try {
+      return JSON.parse(responseText)
+    } catch {
+      return responseText
+    }
+  }
+
+  private buildFetchErrorMessage(status: number, responseData: any): string {
+    const message =
+      typeof responseData === 'string'
+        ? responseData
+        : responseData?.message || responseData?.data?.message || 'unknown error'
+
+    return `[${status}] ${message}`
+  }
+
+  private getSignedUrlOrThrow(responseData: any): string {
+    const signedUrl = responseData?.data?.signedUrl
+
+    if (typeof signedUrl !== 'string' || signedUrl.length === 0) {
+      throw new WriteError('Missing signedUrl in access download response.')
+    }
+
+    return signedUrl
   }
 }

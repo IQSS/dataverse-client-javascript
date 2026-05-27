@@ -997,7 +997,7 @@ describe('CollectionsRepository', () => {
       // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
       //  const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
-      const expectedFileName = 'test-file-4.tab'
+      const expectedFileName = 'test-file-4.tsv'
       const expectedCollectionsName = 'Scientific Research'
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
@@ -1108,6 +1108,27 @@ describe('CollectionsRepository', () => {
       expect(updatedInputLevel?.datasetFieldName).toBe('country')
       expect(updatedInputLevel?.include).toBe(true)
       expect(updatedInputLevel?.required).toBe(false)
+    })
+
+    test('should update collection with only partial fields (name and affiliation)', async () => {
+      const collectionDTO = createCollectionDTO('partial-update-test')
+      const testCollectionId = await sut.createCollection(collectionDTO)
+      const createdCollection = await sut.getCollection(testCollectionId)
+      const partialUpdate: Partial<CollectionDTO> = {
+        name: 'Partially Updated Name',
+        affiliation: 'New Affiliation'
+      }
+
+      await sut.updateCollection(testCollectionId, partialUpdate)
+      const updatedCollection = await sut.getCollection(testCollectionId)
+
+      expect(updatedCollection.name).toBe('Partially Updated Name')
+      expect(updatedCollection.affiliation).toBe('New Affiliation')
+      expect(updatedCollection.alias).toBe(createdCollection.alias)
+      expect(updatedCollection.type).toBe(createdCollection.type)
+      expect(updatedCollection.contacts).toEqual(createdCollection.contacts)
+
+      await deleteCollectionViaApi(collectionDTO.alias)
     })
 
     test('should update the collection to inherit metadata blocks from parent collection', async () => {
