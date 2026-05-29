@@ -40,6 +40,12 @@ export interface FileTreeFileNode {
   id: number
   name: string
   path: string
+  /**
+   * File size in bytes. For ingested tabular files this is the
+   * served-form (converted TSV) size by default; when the listing was
+   * requested with `originals=true` it is the saved original's size,
+   * matching the bytes `downloadUrl` then serves.
+   */
   size: number
   contentType?: string
   access?: 'public' | 'restricted' | 'embargoed'

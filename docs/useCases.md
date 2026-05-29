@@ -1654,7 +1654,7 @@ _See [use case](../src/datasets/domain/useCases/ListDatasetTreeNode.ts) implemen
 
 `datasetId` can be a numeric id or a persistent identifier string. `datasetVersionId` is optional and defaults to `DatasetNotNumberedVersion.LATEST`.
 
-Other optional parameters: `cursor` (opaque, from a previous response), `include` (`'all' | 'folders' | 'files'`, default `'all'`), `order` (`'NameAZ' | 'NameZA'`, default `'NameAZ'`), `includeDeaccessioned` (default `false`), and `originals` (when `true`, the per-file `downloadUrl` carries `?format=original`).
+Other optional parameters: `cursor` (opaque, from a previous response), `include` (`'all' | 'folders' | 'files'`, default `'all'`), `order` (`'NameAZ' | 'NameZA'`, default `'NameAZ'`), `includeDeaccessioned` (default `false`), and `originals` (when `true`, ingested tabular files are reported in their original-upload form: the per-file `downloadUrl` carries `?format=original`, and `checksum` and `size` reflect the saved original instead of the converted TSV).
 
 For published, non-deaccessioned versions the underlying API emits `ETag` + `Cache-Control: private, immutable` headers. The `private` directive keeps responses out of shared proxy caches because the route is auth-required; the browser's own cache still benefits from `immutable`. Drafts and deaccessioned versions don't.
 
