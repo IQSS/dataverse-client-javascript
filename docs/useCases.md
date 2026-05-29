@@ -11,6 +11,8 @@ The different use cases currently available in the package are classified below,
 - [Collections](#Collections)
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
+    - [Get Collection Storage Driver](#get-collection-storage-driver)
+    - [Get Allowed Collection Storage Drivers](#get-allowed-collection-storage-drivers)
     - [Get Collection Facets](#get-collection-facets)
     - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
     - [List All Collection Items](#list-all-collection-items)
@@ -19,6 +21,8 @@ The different use cases currently available in the package are classified below,
     - [Get Collections for Linking](#get-collections-for-linking)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
+    - [Set Collection Storage Driver](#set-collection-storage-driver)
+    - [Delete Collection Storage Driver](#delete-collection-storage-driver)
     - [Update a Collection](#update-a-collection)
     - [Publish a Collection](#publish-a-collection)
     - [Delete a Collection](#delete-a-collection)
@@ -191,6 +195,65 @@ _See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+#### Get Collection Storage Driver
+
+Returns a [StorageDriver](../src/core/domain/models/StorageDriver.ts) instance describing the collection's assigned storage driver.
+
+##### Example call:
+
+```typescript
+import { getCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+getCollectionStorageDriver.execute(collectionIdOrAlias).then((storageDriver: StorageDriver) => {
+  /* ... */
+})
+
+// Pass true to resolve the effective driver after inheritance/default fallback
+getCollectionStorageDriver
+  .execute(collectionIdOrAlias, true)
+  .then((storageDriver: StorageDriver) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+The optional `getEffective` parameter defaults to `false`. Set it to `true` to retrieve the effective storage driver after inheritance/default resolution.
+
+#### Get Allowed Collection Storage Drivers
+
+Returns an [AllowedStorageDrivers](../src/collections/domain/models/AllowedStorageDrivers.ts) object whose keys are driver labels and whose values are storage driver ids.
+
+##### Example call:
+
+```typescript
+import { getAllowedCollectionStorageDrivers } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+getAllowedCollectionStorageDrivers
+  .execute(collectionIdOrAlias)
+  .then((storageDrivers: AllowedStorageDrivers) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetAllowedCollectionStorageDrivers.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 #### Get Collection Facets
 
@@ -461,6 +524,57 @@ _See [use case](../src/collections/domain/useCases/CreateCollection.ts) implemen
 The above example creates the new collection in the root collection since no collection identifier is specified. If you want to create the collection in a different collection, you must add the collection identifier as a second parameter in the use case call.
 
 The use case returns a number, which is the identifier of the created collection.
+
+#### Set Collection Storage Driver
+
+Assigns a storage driver to a collection by driver label and returns the backend success message.
+
+##### Example call:
+
+```typescript
+import { setCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+const driverLabel = 'Local Storage'
+
+setCollectionStorageDriver.execute(collectionIdOrAlias, driverLabel).then((message: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/SetCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+The `driverLabel` parameter must match the storage driver's label, not its id.
+
+#### Delete Collection Storage Driver
+
+Clears the directly assigned storage driver from a collection so it falls back to inherited/default storage, and returns the backend success message.
+
+##### Example call:
+
+```typescript
+import { deleteCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+deleteCollectionStorageDriver.execute(collectionIdOrAlias).then((message: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/DeleteCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 #### Update a Collection
 
@@ -1493,7 +1607,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definit
 
 #### Get Dataset Storage Driver
 
-Returns a [StorageDriver](../src/datasets/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
+Returns a [StorageDriver](../src/core/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
 
 ##### Example call:
 

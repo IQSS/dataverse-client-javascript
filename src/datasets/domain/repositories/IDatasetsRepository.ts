@@ -16,7 +16,7 @@ import { DatasetType } from '../models/DatasetType'
 import { TermsOfAccess } from '../models/Dataset'
 import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
-import { StorageDriver } from '../models/StorageDriver'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { DatasetUploadLimits } from '../models/DatasetUploadLimits'
 import { FileTreePage, FileTreeInclude, FileTreeOrder } from '../models/FileTreePage'
 
