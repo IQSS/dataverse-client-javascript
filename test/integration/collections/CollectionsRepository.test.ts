@@ -1720,13 +1720,15 @@ describe('CollectionsRepository', () => {
 
   describe('getMyDataCollectionItems', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
+    let testSubCollectionCreated = false
 
     const testTextFile1Name = 'test-file-2.txt'
     const testSubCollectionAlias = 'collectionsRepositoryMyDataCollection'
     const testCollectionName = 'Scientific Research'
+    const testUserName = `myDataUser${Date.now()}`
     beforeAll(async () => {
       const createSuperUser = true
-      const myDataUserApiToken = await createApiTokenViaApi('myDataUser', createSuperUser)
+      const myDataUserApiToken = await createApiTokenViaApi(testUserName, createSuperUser)
       ApiConfig.init(
         TestConstants.TEST_API_URL,
         DataverseApiAuthMechanism.API_KEY,
@@ -1743,6 +1745,7 @@ describe('CollectionsRepository', () => {
           `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
         )
       })
+      testSubCollectionCreated = true
       try {
         testDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
@@ -1757,19 +1760,23 @@ describe('CollectionsRepository', () => {
     })
 
     afterAll(async () => {
-      try {
-        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
-      } catch (error) {
-        throw new Error(
-          `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
-        )
+      if (testDatasetIds) {
+        try {
+          await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+        } catch (error) {
+          throw new Error(
+            `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
+          )
+        }
       }
-      try {
-        await deleteCollectionViaApi(testSubCollectionAlias)
-      } catch (error) {
-        throw new Error(
-          `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
-        )
+      if (testSubCollectionCreated) {
+        try {
+          await deleteCollectionViaApi(testSubCollectionAlias)
+        } catch (error) {
+          throw new Error(
+            `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
+          )
+        }
       }
     })
     test('should return collection items given valid roleIds', async () => {
@@ -2035,12 +2042,25 @@ describe('CollectionsRepository', () => {
       expect(actual.countPerObjectType.files).toBe(1)
     })
 
-    test('should return error when role, type and publication status params are empty', async () => {
-      const expectedError = new ReadError('No results. Please select at least one Role.')
+    test('should return an empty item subset when role, type and publication status params are empty', async () => {
+      const actual = await sut.getMyDataCollectionItems([], [], [], 0, 0, undefined, undefined)
 
-      await expect(
-        sut.getMyDataCollectionItems([], [], [], 0, 0, undefined, undefined)
-      ).rejects.toThrow(expectedError)
+      expect(actual).toStrictEqual({
+        items: [],
+        publicationStatusCounts: [
+          { publicationStatus: PublicationStatus.Published, count: 0 },
+          { publicationStatus: PublicationStatus.Unpublished, count: 0 },
+          { publicationStatus: PublicationStatus.Draft, count: 0 },
+          { publicationStatus: PublicationStatus.InReview, count: 0 },
+          { publicationStatus: PublicationStatus.Deaccessioned, count: 0 }
+        ],
+        totalItemCount: 0,
+        countPerObjectType: {
+          collections: 0,
+          datasets: 0,
+          files: 0
+        }
+      })
     })
   })
   describe('linkCollection', () => {
