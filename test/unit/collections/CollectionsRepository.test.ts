@@ -18,6 +18,8 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError, WriteError } from '../../../src'
 import { ROOT_COLLECTION_ID, CollectionTheme } from '../../../src/collections/domain/models/Collection'
 import { CollectionThemePayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
+import { AllowedStorageDrivers } from '../../../src/collections/domain/models/AllowedStorageDrivers'
+import { StorageDriver } from '../../../src/core/domain/models/StorageDriver'
 import {
   createCollectionUserPermissionsModel,
   createCollectionUserPermissionsPayload
@@ -46,6 +48,46 @@ import {
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
+  const testStorageDriver: StorageDriver = {
+    name: 'local',
+    type: 'filesystem',
+    label: 'Local Storage',
+    directUpload: true,
+    directDownload: true,
+    uploadOutOfBand: false
+  }
+  const testStorageDriverResponse = {
+    data: {
+      status: 'OK',
+      data: testStorageDriver
+    }
+  }
+  const testStorageDriverList: AllowedStorageDrivers = {
+    Filesystem: 'file1',
+    LocalStack: 'localstack1'
+  }
+  const testStorageDriverListResponse = {
+    data: {
+      status: 'OK',
+      data: testStorageDriverList
+    }
+  }
+  const testStorageDriverMessageResponse = {
+    data: {
+      status: 'OK',
+      data: {
+        message: 'Storage set to: local/Local Storage'
+      }
+    }
+  }
+  const testDeleteStorageDriverMessageResponse = {
+    data: {
+      status: 'OK',
+      data: {
+        message: 'Storage driver cleared. Falling back to default: local'
+      }
+    }
+  }
   const testCollectionSuccessfulResponse = {
     data: {
       status: 'OK',
@@ -167,6 +209,130 @@ describe('CollectionsRepository', () => {
         expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
         expect(error).toBeInstanceOf(Error)
       })
+    })
+  })
+
+  describe('getCollectionStorageDriver', () => {
+    test('should return collection storage driver when request is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testStorageDriverResponse)
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/test-collection/storageDriver`
+      const expectedRequestConfigApiKey = {
+        params: {
+          getEffective: true
+        },
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      const actual = await sut.getCollectionStorageDriver('test-collection')
+
+      expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+      expect(actual).toStrictEqual(testStorageDriver)
+    })
+
+    test('should include getEffective query param when requested', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testStorageDriverResponse)
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/test-collection/storageDriver`
+      const expectedRequestConfigApiKey = {
+        params: {
+          getEffective: true
+        },
+        headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+      }
+
+      await sut.getCollectionStorageDriver('test-collection', true)
+
+      expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, expectedRequestConfigApiKey)
+    })
+
+    test('should return error on repository read error', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+      let error = undefined as unknown as ReadError
+
+      await sut.getCollectionStorageDriver('test-collection').catch((e) => (error = e))
+
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('setCollectionStorageDriver', () => {
+    test('should call the API with a plain text request payload', async () => {
+      jest.spyOn(axios, 'put').mockResolvedValue(testStorageDriverMessageResponse)
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/test-collection/storageDriver`
+      const expectedRequestConfigApiKey = {
+        params: {},
+        headers: {
+          'Content-Type': 'text/plain',
+          'X-Dataverse-Key': TestConstants.TEST_DUMMY_API_KEY
+        }
+      }
+
+      const actual = await sut.setCollectionStorageDriver('test-collection', 'Local Storage')
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        'Local Storage',
+        expectedRequestConfigApiKey
+      )
+      expect(actual).toBe('Storage set to: local/Local Storage')
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'put').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+      let error = undefined as unknown as WriteError
+
+      await sut
+        .setCollectionStorageDriver('test-collection', 'Local Storage')
+        .catch((e) => (error = e))
+
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('deleteCollectionStorageDriver', () => {
+    test('should delete collection storage driver when request is successful', async () => {
+      jest.spyOn(axios, 'delete').mockResolvedValue(testDeleteStorageDriverMessageResponse)
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/test-collection/storageDriver`
+
+      const actual = await sut.deleteCollectionStorageDriver('test-collection')
+
+      expect(axios.delete).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toBe('Storage driver cleared. Falling back to default: local')
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'delete').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+      let error = undefined as unknown as WriteError
+
+      await sut.deleteCollectionStorageDriver('test-collection').catch((e) => (error = e))
+
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('getAllowedCollectionStorageDrivers', () => {
+    test('should return allowed collection storage drivers when request is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testStorageDriverListResponse)
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/test-collection/allowedStorageDrivers`
+
+      const actual = await sut.getAllowedCollectionStorageDrivers('test-collection')
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toStrictEqual(testStorageDriverList)
+    })
+
+    test('should return error on repository read error', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+      let error = undefined as unknown as ReadError
+
+      await sut.getAllowedCollectionStorageDrivers('test-collection').catch((e) => (error = e))
+
+      expect(error).toBeInstanceOf(Error)
     })
   })
 

@@ -19,7 +19,7 @@ export class UpdateCollection implements UseCase<void> {
    */
   async execute(
     collectionIdOrAlias: number | string,
-    updatedCollection: CollectionDTO
+    updatedCollection: Partial<CollectionDTO>
   ): Promise<void> {
     return await this.collectionsRepository.updateCollection(collectionIdOrAlias, updatedCollection)
   }
