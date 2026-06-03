@@ -110,51 +110,46 @@ describe('execute', () => {
     // Give enough time to Solr for indexing
     await new Promise((resolve) => setTimeout(resolve, 5000))
 
-    try {
-      const actual = await getMyDataCollectionItems.execute(
-        testRoleIds,
-        testCollectionItemTypes,
-        testPublishingStatuses,
-        undefined,
-        undefined,
-        testCollectionAlias
-      )
+    const actual = await getMyDataCollectionItems.execute(
+      testRoleIds,
+      testCollectionItemTypes,
+      testPublishingStatuses,
+      undefined,
+      undefined,
+      testCollectionAlias
+    )
 
-      const actualCollectionPreview = actual.items[0] as CollectionPreview
-      expect(actualCollectionPreview.alias).toBe(testCollectionAlias)
+    const actualCollectionPreview = actual.items[0] as CollectionPreview
+    expect(actualCollectionPreview.alias).toBe(testCollectionAlias)
 
-      expect(actual.totalItemCount).toBe(1)
-      expect(actual.publicationStatusCounts).toEqual([
-        {
-          publicationStatus: 'Published',
-          count: 0
-        },
-        {
-          publicationStatus: 'Unpublished',
-          count: 1
-        },
-        {
-          publicationStatus: 'Draft',
-          count: 0
-        },
-        {
-          publicationStatus: 'In Review',
-          count: 0
-        },
-        {
-          publicationStatus: 'Deaccessioned',
-          count: 0
-        }
-      ])
-      expect(actual.countPerObjectType).toEqual({
-        collections: 1,
-        datasets: 0,
-        files: 0
-      })
-    } catch (error) {
-      console.log(error)
-      throw new Error('Item subset should be retrieved')
-    }
+    expect(actual.totalItemCount).toBe(1)
+    expect(actual.publicationStatusCounts).toEqual([
+      {
+        publicationStatus: 'Published',
+        count: 0
+      },
+      {
+        publicationStatus: 'Unpublished',
+        count: 1
+      },
+      {
+        publicationStatus: 'Draft',
+        count: 0
+      },
+      {
+        publicationStatus: 'In Review',
+        count: 0
+      },
+      {
+        publicationStatus: 'Deaccessioned',
+        count: 0
+      }
+    ])
+    expect(actual.countPerObjectType).toEqual({
+      collections: 1,
+      datasets: 0,
+      files: 0
+    })
   })
 
   test('should return an empty item subset when no role is specified', async () => {
