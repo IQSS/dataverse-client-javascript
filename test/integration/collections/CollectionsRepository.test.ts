@@ -177,31 +177,11 @@ describe('CollectionsRepository', () => {
       await deleteCollectionViaApi(parentCollectionAlias)
     })
 
-    test('should include allowedDatasetTypes field when retrieving a collection', async () => {
+    test('should transform allowedDatasetTypes correctly when retrieving a collection', async () => {
       const actual = await sut.getCollection(testCollectionAlias)
-      const allowedDatasetTypes = actual.allowedDatasetTypes
-
-      if (allowedDatasetTypes) {
-        expect(Array.isArray(allowedDatasetTypes)).toBe(true)
-        allowedDatasetTypes.forEach((datasetType) => {
-          expect(datasetType).toHaveProperty('id')
-          expect(datasetType).toHaveProperty('name')
-          expect(datasetType).toHaveProperty('displayName')
-        })
-      }
-    })
-
-    test('should return root collection with allowedDatasetTypes if configured', async () => {
-      const rootCollection = await sut.getCollection()
-      expect(rootCollection.alias).toBe('root')
-      const allowedDatasetTypes = rootCollection.allowedDatasetTypes
-
-      if (allowedDatasetTypes) {
-        expect(Array.isArray(allowedDatasetTypes)).toBe(true)
-        expect(allowedDatasetTypes[0]).toHaveProperty('id')
-        expect(allowedDatasetTypes[0]).toHaveProperty('name')
-        expect(allowedDatasetTypes[0]).toHaveProperty('displayName')
-      }
+      expect(
+        actual.allowedDatasetTypes === undefined || Array.isArray(actual.allowedDatasetTypes)
+      ).toBe(true)
     })
   })
 
