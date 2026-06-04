@@ -176,6 +176,11 @@ describe('CollectionsRepository', () => {
       expect(actualAfterDatasetDeletion.childCount).toBe(0)
       await deleteCollectionViaApi(parentCollectionAlias)
     })
+
+    test('should include allowedDatasetTypes field when retrieving a collection', async () => {
+      const actual = await sut.getCollection(testCollectionAlias)
+      expect(actual).toHaveProperty('allowedDatasetTypes')
+    })
   })
 
   describe('publishCollection', () => {
