@@ -27,6 +27,9 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - New Use Case: [Create a Template](./docs/useCases.md#create-a-template) under Templates.
 - New Use Case: [Get a Template](./docs/useCases.md#get-a-template) under Templates.
 - New Use Case: [Delete a Template](./docs/useCases.md#delete-a-template) under Templates.
+- New Use Case: [Update Template Metadata](./docs/useCases.md#update-template-metadata) under Templates.
+- New Use Case: [Update Template License Terms](./docs/useCases.md#update-template-license-terms) under Templates.
+- New Use Case: [Update Template Terms Of Access](./docs/useCases.md#update-template-terms-of-access) under Templates.
 - Templates: Added `setTemplateAsDefault` use case and repository method to support Dataverse endpoint `POST /dataverses/{id}/template/default/{templateId}`.
 - Templates: Added `unsetTemplateAsDefault` use case and repository method to support Dataverse endpoint `DELETE /dataverses/{id}/template/default`.
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
