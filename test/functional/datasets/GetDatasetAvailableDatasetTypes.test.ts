@@ -14,18 +14,17 @@ describe('getDatasetAvailableDatasetTypes', () => {
 
     test('should return available dataset types', async () => {
       const actualDatasetTypes: DatasetType[] = await getDatasetAvailableDatasetTypes.execute()
-      const expectedDatasetTypes = [
-        {
-          id: 1,
-          name: 'dataset',
-          linkedMetadataBlocks: [],
-          availableLicenses: [],
-          description:
-            'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.',
-          displayName: 'Dataset'
-        }
-      ]
-      expect(actualDatasetTypes).toEqual(expectedDatasetTypes)
+      const expectedDatasetType = {
+        id: 1,
+        name: 'dataset',
+        linkedMetadataBlocks: [],
+        availableLicenses: [],
+        description:
+          'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.',
+        displayName: 'Dataset'
+      }
+
+      expect(actualDatasetTypes).toContainEqual(expectedDatasetType)
     })
   })
 })

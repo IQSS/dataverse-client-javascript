@@ -11,6 +11,8 @@ The different use cases currently available in the package are classified below,
 - [Collections](#Collections)
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
+    - [Get Collection Storage Driver](#get-collection-storage-driver)
+    - [Get Allowed Collection Storage Drivers](#get-allowed-collection-storage-drivers)
     - [Get Collection Facets](#get-collection-facets)
     - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
     - [List All Collection Items](#list-all-collection-items)
@@ -19,6 +21,8 @@ The different use cases currently available in the package are classified below,
     - [Get Collections for Linking](#get-collections-for-linking)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
+    - [Set Collection Storage Driver](#set-collection-storage-driver)
+    - [Delete Collection Storage Driver](#delete-collection-storage-driver)
     - [Update a Collection](#update-a-collection)
     - [Publish a Collection](#publish-a-collection)
     - [Delete a Collection](#delete-a-collection)
@@ -32,6 +36,9 @@ The different use cases currently available in the package are classified below,
   - [Templates write use cases](#templates-write-use-cases)
     - [Create a Template](#create-a-template)
     - [Delete a Template](#delete-a-template)
+    - [Update Template Metadata](#update-template-metadata)
+    - [Update Template License Terms](#update-template-license-terms)
+    - [Update Template Terms Of Access](#update-template-terms-of-access)
     - [Set Template As Default](#set-template-as-default)
     - [Unset Template As Default](#unset-template-as-default)
 - [Datasets](#Datasets)
@@ -203,6 +210,65 @@ getCollection.execute('myCollection').then((collection: Collection) => {
   }
 })
 ```
+
+#### Get Collection Storage Driver
+
+Returns a [StorageDriver](../src/core/domain/models/StorageDriver.ts) instance describing the collection's assigned storage driver.
+
+##### Example call:
+
+```typescript
+import { getCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+getCollectionStorageDriver.execute(collectionIdOrAlias).then((storageDriver: StorageDriver) => {
+  /* ... */
+})
+
+// Pass true to resolve the effective driver after inheritance/default fallback
+getCollectionStorageDriver
+  .execute(collectionIdOrAlias, true)
+  .then((storageDriver: StorageDriver) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+The optional `getEffective` parameter defaults to `false`. Set it to `true` to retrieve the effective storage driver after inheritance/default resolution.
+
+#### Get Allowed Collection Storage Drivers
+
+Returns an [AllowedStorageDrivers](../src/collections/domain/models/AllowedStorageDrivers.ts) object whose keys are driver labels and whose values are storage driver ids.
+
+##### Example call:
+
+```typescript
+import { getAllowedCollectionStorageDrivers } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+getAllowedCollectionStorageDrivers
+  .execute(collectionIdOrAlias)
+  .then((storageDrivers: AllowedStorageDrivers) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetAllowedCollectionStorageDrivers.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 #### Get Collection Facets
 
@@ -474,6 +540,57 @@ The above example creates the new collection in the root collection since no col
 
 The use case returns a number, which is the identifier of the created collection.
 
+#### Set Collection Storage Driver
+
+Assigns a storage driver to a collection by driver label and returns the backend success message.
+
+##### Example call:
+
+```typescript
+import { setCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+const driverLabel = 'Local Storage'
+
+setCollectionStorageDriver.execute(collectionIdOrAlias, driverLabel).then((message: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/SetCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+The `driverLabel` parameter must match the storage driver's label, not its id.
+
+#### Delete Collection Storage Driver
+
+Clears the directly assigned storage driver from a collection so it falls back to inherited/default storage, and returns the backend success message.
+
+##### Example call:
+
+```typescript
+import { deleteCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+deleteCollectionStorageDriver.execute(collectionIdOrAlias).then((message: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/DeleteCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
 #### Update a Collection
 
 Updates an existing collection, given a collection identifier and a [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) including the updated collection data.
@@ -737,6 +854,84 @@ await unsetTemplateAsDefault.execute(collectionIdOrAlias)
 ```
 
 _See [use case](../src/templates/domain/useCases/UnsetTemplateAsDefault.ts)_ definition.
+
+#### Update Template Metadata
+
+Updates template metadata fields and instructions for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateMetadata } from '@iqss/dataverse-client-javascript'
+import { UpdateTemplateMetadataDTO } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+const replace = true
+
+const payload: UpdateTemplateMetadataDTO = {
+  name: 'Dataverse template updated',
+  fields: [
+    {
+      typeName: 'author',
+      typeClass: 'compound',
+      multiple: true,
+      value: [
+        {
+          authorName: { typeName: 'authorName', value: 'Belicheck, Bill' },
+          authorAffiliation: { typeName: 'authorIdentifierScheme', value: 'ORCID' }
+        }
+      ]
+    }
+  ],
+  instructions: [{ instructionField: 'author', instructionText: 'Updated instructions' }]
+}
+
+await updateTemplateMetadata.execute(templateId, payload, replace)
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateMetadata.ts) definition_.
+
+#### Update Template License Terms
+
+Updates either the license name or custom terms of use for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateLicenseTerms } from '@iqss/dataverse-client-javascript'
+import { UpdateTemplateLicenseTermsDTO } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+const payload: UpdateTemplateLicenseTermsDTO = {
+  customTerms: {
+    termsOfUse: 'Updated template terms of use'
+  }
+}
+
+await updateTemplateLicenseTerms.execute(templateId, payload)
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateLicenseTerms.ts) definitition_.
+
+#### Update Template Terms Of Access
+
+Updates terms of access for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateTermsOfAccess } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+await updateTemplateTermsOfAccess.execute(templateId, {
+  fileAccessRequest: true,
+  termsOfAccessForRestrictedFiles: 'Restricted access only'
+})
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateTermsOfAccess.ts) definition_.
 
 ## Datasets
 
@@ -1505,7 +1700,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definit
 
 #### Get Dataset Storage Driver
 
-Returns a [StorageDriver](../src/datasets/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
+Returns a [StorageDriver](../src/core/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
 
 ##### Example call:
 
