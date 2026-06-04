@@ -44,7 +44,7 @@ export interface ICollectionsRepository {
   ): Promise<MyDataCollectionItemSubset>
   updateCollection(
     collectionIdOrAlias: number | string,
-    updatedCollection: CollectionDTO
+    updatedCollection: Partial<CollectionDTO>
   ): Promise<void>
   getCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<FeaturedItem[]>
   updateCollectionFeaturedItems(

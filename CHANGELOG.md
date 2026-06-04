@@ -8,6 +8,16 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [v2.2.0] -- 2026-04-24
+
+### Added
+
 - Datasets: Added `updateDatasetLicense` use case and repository method to support Dataverse endpoint `PUT /datasets/{id}/license`, for updating dataset license or custom terms.
 - Datasets: Added `getDatasetStorageDriver` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/storageDriver`, for retrieving dataset storage driver configuration with properties: name, type, label, directUpload, directDownload, and uploadOutOfBand.
 - Datasets: Added `getDatasetUploadLimits` use case and repository method to support Dataverse endpoint `GET /datasets/{id}/uploadlimits`, for retrieving remaining storage upload quotas, if present.
@@ -32,6 +42,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
 - Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.
+- Collections: `updateCollection` now supports partial updates by accepting `Partial<CollectionDTO>`. Only explicitly provided fields are sent in update requests, aligning with Dataverse API semantics. Metadata blocks handling was adjusted to respect inheritance flags and avoid invalid field combinations.
 
 ### Fixed
 
@@ -42,7 +53,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 - Removed date fields validations in create and update dataset use cases, since validation is already handled in the backend and SPA frontend (other clients should perform client side validation also). This avoids duplicated logic and keeps the package focused on its core responsibility.
 
-[Unreleased]: https://github.com/IQSS/dataverse-client-javascript/compare/v2.1.0...develop
+[Unreleased]: https://github.com/IQSS/dataverse-client-javascript/compare/v2.2.0...develop
 
 ---
 

@@ -3,17 +3,20 @@ export class ApiConfig {
   static dataverseApiAuthMechanism: DataverseApiAuthMechanism
   static dataverseApiKey?: string
   static bearerTokenLocalStorageKey?: string
+  static bearerTokenGetFunction?: () => string | null
 
   static init(
     dataverseApiUrl: string,
     dataverseApiAuthMechanism: DataverseApiAuthMechanism,
     dataverseApiKey?: string,
-    bearerTokenLocalStorageKey?: string
+    bearerTokenLocalStorageKey?: string,
+    bearerTokenGetFunction?: () => string | null
   ) {
     this.dataverseApiUrl = dataverseApiUrl
     this.dataverseApiAuthMechanism = dataverseApiAuthMechanism
     this.dataverseApiKey = dataverseApiKey
     this.bearerTokenLocalStorageKey = bearerTokenLocalStorageKey
+    this.bearerTokenGetFunction = bearerTokenGetFunction
   }
 }
 
