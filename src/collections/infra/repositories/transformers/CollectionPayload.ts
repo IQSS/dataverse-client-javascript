@@ -10,6 +10,7 @@ export interface CollectionPayload {
   isPartOf: OwnerNodePayload
   inputLevels?: CollectionInputLevelPayload[]
   dataverseContacts?: CollectionContactPayload[]
+  allowedDatasetTypes?: AllowedDatasetTypePayload[]
   dataverseType: string
   isMetadataBlockRoot: boolean
   isFacetRoot: boolean
@@ -25,4 +26,11 @@ export interface CollectionInputLevelPayload {
 export interface CollectionContactPayload {
   contactEmail: string
   displayOrder: number
+}
+
+export interface AllowedDatasetTypePayload {
+  id: number
+  name: string
+  displayName: string
+  description?: string
 }

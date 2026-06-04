@@ -1,6 +1,7 @@
 import { DvObjectOwnerNode } from '../../../core'
 import { CollectionContact } from './CollectionContact'
 import { CollectionType } from './CollectionType'
+import { DatasetType } from '../../../datasets'
 
 export interface Collection {
   id: number
@@ -13,6 +14,7 @@ export interface Collection {
   inputLevels?: CollectionInputLevel[]
   type: CollectionType
   contacts?: CollectionContact[]
+  allowedDatasetTypes?: DatasetType[]
   isMetadataBlockRoot: boolean
   isFacetRoot: boolean
   childCount: number

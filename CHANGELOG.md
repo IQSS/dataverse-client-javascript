@@ -8,6 +8,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
+
 ### Changed
 
 ### Fixed

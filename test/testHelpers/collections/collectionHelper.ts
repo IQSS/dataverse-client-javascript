@@ -45,6 +45,14 @@ export const createCollectionModel = (): Collection => {
         displayOrder: 0
       }
     ],
+    allowedDatasetTypes: [
+      {
+        id: 1,
+        name: 'review',
+        displayName: 'Review',
+        description: 'A review of a dataset compiled by the expert community.'
+      }
+    ],
     isMetadataBlockRoot: true,
     isFacetRoot: true,
     childCount: 0
@@ -73,6 +81,14 @@ export const createCollectionPayload = (): CollectionPayload => {
       {
         contactEmail: 'dataverse@test.com',
         displayOrder: 0
+      }
+    ],
+    allowedDatasetTypes: [
+      {
+        id: 1,
+        name: 'review',
+        displayName: 'Review',
+        description: 'A review of a dataset compiled by the expert community.'
       }
     ],
     isMetadataBlockRoot: true,

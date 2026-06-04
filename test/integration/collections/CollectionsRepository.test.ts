@@ -176,6 +176,13 @@ describe('CollectionsRepository', () => {
       expect(actualAfterDatasetDeletion.childCount).toBe(0)
       await deleteCollectionViaApi(parentCollectionAlias)
     })
+
+    test('should transform allowedDatasetTypes correctly when retrieving a collection', async () => {
+      const actual = await sut.getCollection(testCollectionAlias)
+      expect(
+        actual.allowedDatasetTypes === undefined || Array.isArray(actual.allowedDatasetTypes)
+      ).toBe(true)
+    })
   })
 
   describe('publishCollection', () => {

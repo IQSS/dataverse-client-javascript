@@ -3,7 +3,8 @@ import { AxiosResponse } from 'axios'
 import {
   CollectionContactPayload,
   CollectionInputLevelPayload,
-  CollectionPayload
+  CollectionPayload,
+  AllowedDatasetTypePayload
 } from './CollectionPayload'
 import { transformPayloadToOwnerNode } from '../../../../core/infra/repositories/transformers/dvObjectOwnerNodeTransformer'
 import { CollectionFacet } from '../../../domain/models/CollectionFacet'
@@ -13,7 +14,7 @@ import {
   CollectionItemSubset,
   CountPerObjectType
 } from '../../../domain/models/CollectionItemSubset'
-import { DatasetPreview } from '../../../../datasets'
+import { DatasetPreview, DatasetType } from '../../../../datasets'
 import { FilePreview } from '../../../../files'
 import { DatasetPreviewPayload } from '../../../../datasets/infra/repositories/transformers/DatasetPreviewPayload'
 import { FilePreviewPayload } from '../../../../files/infra/repositories/transformers/FilePreviewPayload'
@@ -82,6 +83,11 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     }),
     ...(collectionPayload.dataverseContacts && {
       contacts: transformContactsPayloadToContacts(collectionPayload.dataverseContacts)
+    }),
+    ...(collectionPayload.allowedDatasetTypes && {
+      allowedDatasetTypes: transformAllowedDatasetTypesPayloadToAllowedDatasetTypes(
+        collectionPayload.allowedDatasetTypes
+      )
     })
   }
   return collectionModel
@@ -250,5 +256,16 @@ const transformContactsPayloadToContacts = (
   return contactsPayload.map((contactPayload) => ({
     email: contactPayload.contactEmail,
     displayOrder: contactPayload.displayOrder
+  }))
+}
+
+const transformAllowedDatasetTypesPayloadToAllowedDatasetTypes = (
+  allowedDatasetTypesPayload: AllowedDatasetTypePayload[]
+): DatasetType[] => {
+  return allowedDatasetTypesPayload.map((allowedDatasetType) => ({
+    id: allowedDatasetType.id,
+    name: allowedDatasetType.name,
+    displayName: allowedDatasetType.displayName,
+    description: allowedDatasetType.description
   }))
 }
