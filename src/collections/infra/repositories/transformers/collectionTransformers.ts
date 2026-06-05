@@ -75,6 +75,9 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     isFacetRoot: collectionPayload.isFacetRoot,
     description: collectionPayload.description,
     childCount: collectionPayload.childCount,
+    ...(collectionPayload.theme && {
+      theme: collectionPayload.theme
+    }),
     ...(collectionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(collectionPayload.isPartOf)
     }),

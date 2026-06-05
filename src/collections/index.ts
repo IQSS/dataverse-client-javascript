@@ -70,7 +70,7 @@ export {
   deleteCollectionStorageDriver,
   getAllowedCollectionStorageDrivers
 }
-export { Collection, CollectionInputLevel } from './domain/models/Collection'
+export { Collection, CollectionInputLevel, CollectionTheme } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'
 export { CollectionUserPermissions } from './domain/models/CollectionUserPermissions'
 export { CollectionDTO, CollectionInputLevelDTO } from './domain/dtos/CollectionDTO'

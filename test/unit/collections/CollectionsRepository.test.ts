@@ -12,11 +12,12 @@ import {
   createCollectionFacetRequestPayload,
   createCollectionModel,
   createCollectionPayload,
-  createNewCollectionRequestPayload
+  createNewCollectionRequestPayload,
 } from '../../testHelpers/collections/collectionHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError, WriteError } from '../../../src'
-import { ROOT_COLLECTION_ID } from '../../../src/collections/domain/models/Collection'
+import { ROOT_COLLECTION_ID, CollectionTheme } from '../../../src/collections/domain/models/Collection'
+import { CollectionThemePayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { AllowedStorageDrivers } from '../../../src/collections/domain/models/AllowedStorageDrivers'
 import { StorageDriver } from '../../../src/core/domain/models/StorageDriver'
 import {
@@ -137,6 +138,31 @@ describe('CollectionsRepository', () => {
         expect(error).toBeInstanceOf(Error)
       })
     })
+
+    describe('with theme', () => {
+      test('should return Collection with theme when providing a numeric id and the collection has a theme with only some fields', async () => {
+        const testThemePayload: CollectionThemePayload = {
+          id: 1
+        }
+        const testCollectionPayload = createCollectionPayload(testThemePayload)
+        const testThemeModel: CollectionTheme = {
+          id: 1
+        }
+        const testCollectionModelWithTheme = createCollectionModel(testThemeModel)
+
+        jest.spyOn(axios, 'get').mockResolvedValue({
+          data: {
+            status: 'OK',
+            data: testCollectionPayload
+          }
+        })
+
+        const actual = await sut.getCollection(testCollectionModel.id)
+
+        expect(actual).toStrictEqual(testCollectionModelWithTheme)
+      })
+    })
+
     describe('by alias id', () => {
       test('should return a Collection when providing the Collection alias is successful', async () => {
         jest.spyOn(axios, 'get').mockResolvedValue(testCollectionSuccessfulResponse)

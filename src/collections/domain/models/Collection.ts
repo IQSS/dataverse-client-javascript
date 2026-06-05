@@ -18,6 +18,18 @@ export interface Collection {
   isMetadataBlockRoot: boolean
   isFacetRoot: boolean
   childCount: number
+  theme?: CollectionTheme
+}
+
+export interface CollectionTheme {
+  id: number
+  logo?: string
+  tagline?: string
+  linkUrl?: string
+  linkColor?: string
+  textColor?: string
+  backgroundColor?: string
+  logoBackgroundColor?: string
 }
 
 export interface CollectionInputLevel {
