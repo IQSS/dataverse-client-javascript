@@ -36,6 +36,9 @@ The different use cases currently available in the package are classified below,
   - [Templates write use cases](#templates-write-use-cases)
     - [Create a Template](#create-a-template)
     - [Delete a Template](#delete-a-template)
+    - [Update Template Metadata](#update-template-metadata)
+    - [Update Template License Terms](#update-template-license-terms)
+    - [Update Template Terms Of Access](#update-template-terms-of-access)
     - [Set Template As Default](#set-template-as-default)
     - [Unset Template As Default](#unset-template-as-default)
 - [Datasets](#Datasets)
@@ -193,6 +196,20 @@ _See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+##### Collection Allowed Dataset Types
+
+Collections can optionally restrict which [DatasetType](../src/datasets/domain/models/DatasetType.ts) objects can be created within them. The `allowedDatasetTypes` field contains an array of dataset types allowed on the collection when configured. If not configured on the collection, this field will be `undefined`.
+
+```typescript
+getCollection.execute('myCollection').then((collection: Collection) => {
+  if (collection.allowedDatasetTypes) {
+    collection.allowedDatasetTypes.forEach((datasetType) => {
+      console.log(`Allowed type: ${datasetType.displayName}`)
+    })
+  }
+})
+```
 
 #### Get Collection Storage Driver
 
@@ -837,6 +854,84 @@ await unsetTemplateAsDefault.execute(collectionIdOrAlias)
 ```
 
 _See [use case](../src/templates/domain/useCases/UnsetTemplateAsDefault.ts)_ definition.
+
+#### Update Template Metadata
+
+Updates template metadata fields and instructions for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateMetadata } from '@iqss/dataverse-client-javascript'
+import { UpdateTemplateMetadataDTO } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+const replace = true
+
+const payload: UpdateTemplateMetadataDTO = {
+  name: 'Dataverse template updated',
+  fields: [
+    {
+      typeName: 'author',
+      typeClass: 'compound',
+      multiple: true,
+      value: [
+        {
+          authorName: { typeName: 'authorName', value: 'Belicheck, Bill' },
+          authorAffiliation: { typeName: 'authorIdentifierScheme', value: 'ORCID' }
+        }
+      ]
+    }
+  ],
+  instructions: [{ instructionField: 'author', instructionText: 'Updated instructions' }]
+}
+
+await updateTemplateMetadata.execute(templateId, payload, replace)
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateMetadata.ts) definition_.
+
+#### Update Template License Terms
+
+Updates either the license name or custom terms of use for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateLicenseTerms } from '@iqss/dataverse-client-javascript'
+import { UpdateTemplateLicenseTermsDTO } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+const payload: UpdateTemplateLicenseTermsDTO = {
+  customTerms: {
+    termsOfUse: 'Updated template terms of use'
+  }
+}
+
+await updateTemplateLicenseTerms.execute(templateId, payload)
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateLicenseTerms.ts) definitition_.
+
+#### Update Template Terms Of Access
+
+Updates terms of access for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateTermsOfAccess } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+await updateTemplateTermsOfAccess.execute(templateId, {
+  fileAccessRequest: true,
+  termsOfAccessForRestrictedFiles: 'Restricted access only'
+})
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateTermsOfAccess.ts) definition_.
 
 ## Datasets
 
