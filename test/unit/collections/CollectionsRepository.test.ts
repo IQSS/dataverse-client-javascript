@@ -12,11 +12,14 @@ import {
   createCollectionFacetRequestPayload,
   createCollectionModel,
   createCollectionPayload,
-  createNewCollectionRequestPayload,
+  createNewCollectionRequestPayload
 } from '../../testHelpers/collections/collectionHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { ReadError, WriteError } from '../../../src'
-import { ROOT_COLLECTION_ID, CollectionTheme } from '../../../src/collections/domain/models/Collection'
+import {
+  ROOT_COLLECTION_ID,
+  CollectionTheme
+} from '../../../src/collections/domain/models/Collection'
 import { CollectionThemePayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { AllowedStorageDrivers } from '../../../src/collections/domain/models/AllowedStorageDrivers'
 import { StorageDriver } from '../../../src/core/domain/models/StorageDriver'

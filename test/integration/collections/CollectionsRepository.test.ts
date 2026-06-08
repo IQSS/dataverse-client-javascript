@@ -117,9 +117,10 @@ describe('CollectionsRepository', () => {
         // Root collection might or might not have a theme, but the property should be present if it does
         // and we want to ensure the transformer doesn't fail.
         // In a default Dataverse installation, root theme is usually undefined or has some default values.
-        if (actual.theme) {
-          expect(actual.theme).toHaveProperty('id')
-        }
+        const hasNoThemeOrThemeWithId =
+          actual.theme === undefined || Object.prototype.hasOwnProperty.call(actual.theme, 'id')
+
+        expect(hasNoThemeOrThemeWithId).toBe(true)
       })
     })
     describe('by string alias', () => {
