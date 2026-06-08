@@ -198,6 +198,20 @@ The `collectionIdOrAlias` is a generic collection identifier, which can be eithe
 
 If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
 
+##### Collection Allowed Dataset Types
+
+Collections can optionally restrict which [DatasetType](../src/datasets/domain/models/DatasetType.ts) objects can be created within them. The `allowedDatasetTypes` field contains an array of dataset types allowed on the collection when configured. If not configured on the collection, this field will be `undefined`.
+
+```typescript
+getCollection.execute('myCollection').then((collection: Collection) => {
+  if (collection.allowedDatasetTypes) {
+    collection.allowedDatasetTypes.forEach((datasetType) => {
+      console.log(`Allowed type: ${datasetType.displayName}`)
+    })
+  }
+})
+```
+
 #### Get Collection Storage Driver
 
 Returns a [StorageDriver](../src/core/domain/models/StorageDriver.ts) instance describing the collection's assigned storage driver.

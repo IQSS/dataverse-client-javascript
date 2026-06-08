@@ -682,6 +682,19 @@ describe('FilesRepository', () => {
       expect(citation.trimStart()).toMatch(/^@\w+\{/)
     })
 
+    test('should return BibTeX citation when file is requested by persistent id', async () => {
+      expect(testFilePersistentId).toBeTruthy()
+
+      const citation = await sut.getFileCitationByFormat(
+        testFilePersistentId,
+        FileCitationFormat.BIBTEX
+      )
+
+      expect(typeof citation).toBe('string')
+      // BibTeX entries start with @<entry-type>{
+      expect(citation.trimStart()).toMatch(/^@\w+\{/)
+    })
+
     test('should return CSL citation as JSON', async () => {
       const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.CSL)
 

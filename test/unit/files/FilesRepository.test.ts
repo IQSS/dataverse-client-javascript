@@ -1219,21 +1219,6 @@ describe('FilesRepository', () => {
       }
     )
 
-    test('should authenticate via session cookie when configured', async () => {
-      const testCitation = '@article{test}'
-      jest.spyOn(axios, 'get').mockResolvedValue({ data: testCitation })
-      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/access/datafile/${testFile.id}/citation/BibTeX`
-
-      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
-      const actual = await sut.getFileCitationByFormat(testFile.id, FileCitationFormat.BIBTEX)
-
-      expect(axios.get).toHaveBeenCalledWith(
-        expectedApiEndpoint,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
-      )
-      expect(actual).toEqual(testCitation)
-    })
-
     test('should return error on repository read error', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 

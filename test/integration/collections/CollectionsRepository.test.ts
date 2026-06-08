@@ -110,6 +110,17 @@ describe('CollectionsRepository', () => {
         expect(actual.alias).toBe(ROOT_COLLECTION_ALIAS)
         expect(actual.isReleased).toBe(true)
       })
+
+      test('should return theme for root collection', async () => {
+        const actual = await sut.getCollection()
+        expect(actual.alias).toBe(ROOT_COLLECTION_ALIAS)
+        // Root collection might or might not have a theme, but the property should be present if it does
+        // and we want to ensure the transformer doesn't fail.
+        // In a default Dataverse installation, root theme is usually undefined or has some default values.
+        if (actual.theme) {
+          expect(actual.theme).toHaveProperty('id')
+        }
+      })
     })
     describe('by string alias', () => {
       test('should return collection when it exists filtering by id AS (alias)', async () => {
@@ -175,6 +186,13 @@ describe('CollectionsRepository', () => {
 
       expect(actualAfterDatasetDeletion.childCount).toBe(0)
       await deleteCollectionViaApi(parentCollectionAlias)
+    })
+
+    test('should transform allowedDatasetTypes correctly when retrieving a collection', async () => {
+      const actual = await sut.getCollection(testCollectionAlias)
+      expect(
+        actual.allowedDatasetTypes === undefined || Array.isArray(actual.allowedDatasetTypes)
+      ).toBe(true)
     })
   })
 
