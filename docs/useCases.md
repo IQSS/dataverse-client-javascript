@@ -1944,7 +1944,7 @@ _See [use case](../src/files/domain/useCases/GetFileCitationByFormat.ts) impleme
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-The `format` parameter must be one of the available [FileCitationFormat](../src/files/domain/models/FileCitationFormat.ts) enum values: `EndNote`, `RIS`, `BibTeX`, `CSL`, or `Internal`.
+The `format` parameter must be one of the available [FileCitationFormat](../src/files/domain/models/FileCitationFormat.ts) enum values: `FileCitationFormat.ENDNOTE`, `FileCitationFormat.RIS`, `FileCitationFormat.BIBTEX`, `FileCitationFormat.CSL`, or `FileCitationFormat.INTERNAL`.
 
 #### Get File Counts in a Dataset
 
