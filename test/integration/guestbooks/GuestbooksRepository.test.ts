@@ -378,39 +378,96 @@ describe('GuestbooksRepository', () => {
     })
   })
 
-  describe('downloadGuestbookResponsesByDataverseId', () => {
-    test('should download all guestbook responses for a dataverse collection', async () => {
-      const setup = await createGuestbookDownloadSetup('all responses export test')
+  describe('getGuestbookResponsesByGuestbookId', () => {
+    test('should return responses for one guestbook', async () => {
+      const setup = await createGuestbookDownloadSetup('guestbook responses endpoint test')
 
       try {
-        const actual = await sut.downloadGuestbookResponsesByDataverseId(testCollectionAlias)
+        const actual = await sut.getGuestbookResponsesByGuestbookId(setup.guestbookId)
 
-        expect(actual).toContain('Guestbook, Dataset, Dataset PID, Date, Type, File Name')
-        expect(actual).toContain(setup.guestbookName)
-        expect(actual).toContain(setup.datasetPersistentId)
-        expect(actual).toContain(setup.email)
-        expect(actual).toContain(testTextFile1Name)
+        expect(actual.length).toBeGreaterThan(0)
+        expect(actual[0].datasetPid).toBe(setup.datasetPersistentId.split('/').slice(-2).join('/'))
+        expect(actual[0].email).toBe(setup.email)
+        expect(actual[0].fileName).toBe(testTextFile1Name)
       } finally {
         await cleanupGuestbookDownloadSetup(setup)
       }
     })
 
-    test('should download responses only for the specified guestbook', async () => {
-      const setup = await createGuestbookDownloadSetup('single guestbook export test')
+    test('should return paginated responses for one guestbook', async () => {
+      const setup = await createGuestbookDownloadSetup('paginated guestbook responses test')
+      const secondResponseEmail = `guestbook-pagination-${Date.now()}@example.edu`
 
       try {
-        const actual = await sut.downloadGuestbookResponsesByDataverseId(
+        await submitGuestbookDownloadResponse(
+          setup.fileId,
+          `Guestbook Pagination ${Date.now()}`,
+          secondResponseEmail
+        )
+
+        const firstPage = await sut.getGuestbookResponsesByGuestbookId(setup.guestbookId, 1, 0)
+        const secondPage = await sut.getGuestbookResponsesByGuestbookId(setup.guestbookId, 1, 1)
+
+        expect(firstPage).toHaveLength(1)
+        expect(secondPage).toHaveLength(1)
+        expect(firstPage[0].email).not.toBe(secondPage[0].email)
+        expect([firstPage[0].email, secondPage[0].email]).toEqual(
+          expect.arrayContaining([setup.email, secondResponseEmail])
+        )
+      } finally {
+        await cleanupGuestbookDownloadSetup(setup)
+      }
+    })
+
+    test('should return error when guestbook does not exist', async () => {
+      await expect(sut.getGuestbookResponsesByGuestbookId(999999)).rejects.toThrow(ReadError)
+    })
+  })
+
+  describe('downloadGuestbookResponsesByCollectionId', () => {
+    test('should download all guestbook responses for a collection without guestbook id', async () => {
+      const setups: GuestbookDownloadSetup[] = []
+
+      try {
+        setups.push(await createGuestbookDownloadSetup('all responses export test one'))
+        setups.push(await createGuestbookDownloadSetup('all responses export test two'))
+
+        const actual = await sut.downloadGuestbookResponsesByCollectionId(testCollectionAlias)
+
+        expect(actual).toContain('Guestbook, Dataset, Dataset PID, Date, Type, File Name')
+        expect(actual).toContain(setups[0].guestbookName)
+        expect(actual).toContain(setups[0].datasetPersistentId)
+        expect(actual).toContain(setups[0].email)
+        expect(actual).toContain(setups[1].guestbookName)
+        expect(actual).toContain(setups[1].datasetPersistentId)
+        expect(actual).toContain(setups[1].email)
+      } finally {
+        await cleanupGuestbookDownloadSetups(setups)
+      }
+    })
+
+    test('should download responses only for the specified guestbook with guestbook id', async () => {
+      const setups: GuestbookDownloadSetup[] = []
+
+      try {
+        setups.push(await createGuestbookDownloadSetup('single guestbook export target test'))
+        setups.push(await createGuestbookDownloadSetup('single guestbook export other test'))
+
+        const actual = await sut.downloadGuestbookResponsesByCollectionId(
           testCollectionAlias,
-          setup.guestbookId
+          setups[0].guestbookId
         )
 
         expect(actual).toContain('Guestbook, Dataset, Dataset PID, Date, Type, File Name')
-        expect(actual).toContain(setup.guestbookName)
-        expect(actual).toContain(setup.datasetPersistentId)
-        expect(actual).toContain(setup.email)
+        expect(actual).toContain(setups[0].guestbookName)
+        expect(actual).toContain(setups[0].datasetPersistentId)
+        expect(actual).toContain(setups[0].email)
         expect(actual).toContain(testTextFile1Name)
+        expect(actual).not.toContain(setups[1].guestbookName)
+        expect(actual).not.toContain(setups[1].datasetPersistentId)
+        expect(actual).not.toContain(setups[1].email)
       } finally {
-        await cleanupGuestbookDownloadSetup(setup)
+        await cleanupGuestbookDownloadSetups(setups)
       }
     })
   })
@@ -513,7 +570,18 @@ describe('GuestbooksRepository', () => {
     })
   })
 
-  const createGuestbookDownloadSetup = async (guestbookName: string) => {
+  interface GuestbookDownloadSetup {
+    guestbookId: number
+    guestbookName: string
+    datasetNumericId: number
+    datasetPersistentId: string
+    fileId: number
+    email: string
+  }
+
+  const createGuestbookDownloadSetup = async (
+    guestbookName: string
+  ): Promise<GuestbookDownloadSetup> => {
     const uniqueSuffix = Date.now().toString()
     const guestbookId = await sut.createGuestbook(testCollectionAlias, {
       ...createGuestbookDTO,
@@ -538,6 +606,19 @@ describe('GuestbooksRepository', () => {
     await publishDatasetViaApi(datasetIds.numericId)
     await waitForNoLocks(datasetIds.numericId, 10)
 
+    await submitGuestbookDownloadResponse(fileId, `Guestbook Download ${uniqueSuffix}`, email)
+
+    return {
+      guestbookId,
+      guestbookName: `${guestbookName}-${uniqueSuffix}`,
+      datasetNumericId: datasetIds.numericId,
+      datasetPersistentId: datasetIds.persistentId,
+      fileId,
+      email
+    }
+  }
+
+  const submitGuestbookDownloadResponse = async (fileId: number, name: string, email: string) => {
     ApiConfig.init(
       TestConstants.TEST_API_URL,
       DataverseApiAuthMechanism.BEARER_TOKEN,
@@ -547,7 +628,7 @@ describe('GuestbooksRepository', () => {
     )
     await accessRepository.submitGuestbookForDatafileDownload(fileId, {
       guestbookResponse: {
-        name: `Guestbook Download ${uniqueSuffix}`,
+        name,
         email
       }
     })
@@ -557,14 +638,6 @@ describe('GuestbooksRepository', () => {
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
-
-    return {
-      guestbookId,
-      guestbookName: `${guestbookName}-${uniqueSuffix}`,
-      datasetNumericId: datasetIds.numericId,
-      datasetPersistentId: datasetIds.persistentId,
-      email
-    }
   }
 
   const cleanupGuestbookDownloadSetup = async (setup: {
@@ -577,5 +650,9 @@ describe('GuestbooksRepository', () => {
       process.env.TEST_API_KEY
     )
     await deletePublishedDatasetViaApi(setup.datasetPersistentId)
+  }
+
+  const cleanupGuestbookDownloadSetups = async (setups: GuestbookDownloadSetup[]) => {
+    await Promise.all(setups.map((setup) => cleanupGuestbookDownloadSetup(setup)))
   }
 })

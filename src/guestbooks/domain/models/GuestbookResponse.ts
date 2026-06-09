@@ -1,5 +1,27 @@
 export interface GuestbookResponse {
-  [key: string]: unknown
-  guestbookId?: number
-  dataverseId?: number
+  id: number
+  dataset: string
+  datasetPid: string
+  date: string
+  type: EventType
+  fileName?: string
+  fileId?: number
+  filePid?: string
+  userName: string
+  email?: string
+  institution?: string
+  position?: string
+  customQuestions?: GuestbookResponseCustomQuestion[]
+}
+
+export interface GuestbookResponseCustomQuestion {
+  question: string
+  response: string
+}
+
+export enum EventType {
+  ACCESS_REQUEST = 'AccessRequest',
+  DOWNLOAD = 'Download',
+  SUBSET = 'Subset',
+  EXPLORE = 'Explore'
 }

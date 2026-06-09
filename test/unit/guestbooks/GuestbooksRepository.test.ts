@@ -6,6 +6,7 @@ import {
 import { GuestbooksRepository } from '../../../src/guestbooks/infra/repositories/GuestbooksRepository'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import { TestConstants } from '../../testHelpers/TestConstants'
+import { EventType } from '../../../src/guestbooks/domain/models/GuestbookResponse'
 
 describe('GuestbooksRepository', () => {
   const sut = new GuestbooksRepository()
@@ -55,12 +56,30 @@ describe('GuestbooksRepository', () => {
       status: 'OK',
       data: [
         {
-          guestbookId: 12,
-          dataverseId: 10,
-          name: 'Guest User',
+          id: 13,
+          dataset: 'Replication Data for:',
+          datasetPid: 'FK2/BQEPWW',
+          date: '2026-06-08T23:50:49Z',
+          type: EventType.DOWNLOAD,
+          fileName: 'dp_statistics_for_grade_grouped_by_student_id.html',
+          fileId: 3,
+          userName: 'Guest',
           email: 'guest@example.edu'
         }
       ]
+    }
+  }
+  const guestbookResponsesOfAGuestbookResponse = {
+    data: {
+      status: 'OK',
+      data: {
+        guestbook: guestbooksResponse.data.data[0],
+        responses: guestbookResponsesResponse.data.data,
+        pagination: {
+          next: `${TestConstants.TEST_API_URL}/guestbooks/12/responses?limit=10&offset=10`,
+          totalResponses: 1
+        }
+      }
     }
   }
   const guestbookResponsesCsv =
@@ -118,50 +137,55 @@ describe('GuestbooksRepository', () => {
     })
   })
 
-  describe('getGuestbookResponsesByDataverseId', () => {
-    test('should list guestbook responses for dataverse', async () => {
-      jest.spyOn(axios, 'get').mockResolvedValue(guestbookResponsesResponse)
+  describe('getGuestbookResponsesByGuestbookId', () => {
+    test('should list guestbook responses for a guestbook', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(guestbookResponsesOfAGuestbookResponse)
 
-      const actual = await sut.getGuestbookResponsesByDataverseId(collectionIdOrAlias)
-
-      expect(axios.get).toHaveBeenCalledWith(
-        `${TestConstants.TEST_API_URL}/dataverses/${collectionIdOrAlias}/guestbookResponses`,
-        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
-      )
-      expect(actual).toStrictEqual(guestbookResponsesResponse.data.data)
-    })
-
-    test('should list guestbook responses filtered by guestbook id', async () => {
-      jest.spyOn(axios, 'get').mockResolvedValue(guestbookResponsesResponse)
-
-      const actual = await sut.getGuestbookResponsesByDataverseId(collectionIdOrAlias, 12)
+      const actual = await sut.getGuestbookResponsesByGuestbookId(12)
 
       expect(axios.get).toHaveBeenCalledWith(
-        `${TestConstants.TEST_API_URL}/dataverses/${collectionIdOrAlias}/guestbookResponses`,
+        `${TestConstants.TEST_API_URL}/guestbooks/12/responses`,
         {
           params: {
-            guestbookId: 12
+            limit: 10,
+            offset: 0
           },
           headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
         }
       )
-      expect(actual).toStrictEqual(guestbookResponsesResponse.data.data)
+      expect(actual).toStrictEqual(guestbookResponsesOfAGuestbookResponse.data.data.responses)
+    })
+
+    test('should list guestbook responses with pagination', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(guestbookResponsesOfAGuestbookResponse)
+
+      const actual = await sut.getGuestbookResponsesByGuestbookId(12, 25, 50)
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/guestbooks/12/responses`,
+        {
+          params: {
+            limit: 25,
+            offset: 50
+          },
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        }
+      )
+      expect(actual).toStrictEqual(guestbookResponsesOfAGuestbookResponse.data.data.responses)
     })
 
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
-      await expect(sut.getGuestbookResponsesByDataverseId(collectionIdOrAlias)).rejects.toThrow(
-        ReadError
-      )
+      await expect(sut.getGuestbookResponsesByGuestbookId(12)).rejects.toThrow(ReadError)
     })
   })
 
-  describe('downloadGuestbookResponsesByDataverseId', () => {
-    test('should download guestbook responses for dataverse', async () => {
+  describe('downloadGuestbookResponsesByCollectionId', () => {
+    test('should download guestbook responses for collection', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue({ data: guestbookResponsesCsv })
 
-      const actual = await sut.downloadGuestbookResponsesByDataverseId(collectionIdOrAlias)
+      const actual = await sut.downloadGuestbookResponsesByCollectionId(collectionIdOrAlias)
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/dataverses/${collectionIdOrAlias}/guestbookResponses`,
@@ -173,7 +197,7 @@ describe('GuestbooksRepository', () => {
     test('should download guestbook responses filtered by guestbook id', async () => {
       jest.spyOn(axios, 'get').mockResolvedValue({ data: guestbookResponsesCsv })
 
-      const actual = await sut.downloadGuestbookResponsesByDataverseId(collectionIdOrAlias, 12)
+      const actual = await sut.downloadGuestbookResponsesByCollectionId(collectionIdOrAlias, 12)
 
       expect(axios.get).toHaveBeenCalledWith(
         `${TestConstants.TEST_API_URL}/dataverses/${collectionIdOrAlias}/guestbookResponses`,
@@ -191,7 +215,7 @@ describe('GuestbooksRepository', () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
       await expect(
-        sut.downloadGuestbookResponsesByDataverseId(collectionIdOrAlias)
+        sut.downloadGuestbookResponsesByCollectionId(collectionIdOrAlias)
       ).rejects.toThrow(ReadError)
     })
   })

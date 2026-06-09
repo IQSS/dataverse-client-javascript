@@ -1,23 +1,21 @@
 import { ReadError } from '../../../src'
 import { IGuestbooksRepository } from '../../../src/guestbooks/domain/repositories/IGuestbooksRepository'
-import { DownloadGuestbookResponsesOfAGuestbook } from '../../../src/guestbooks/domain/useCases/DownloadGuestbookResponsesOfAGuestbook'
+import { DownloadGuestbookResponsesByCollectionId } from '../../../src/guestbooks/domain/useCases/DownloadGuestbookResponsesByCollectionId'
 
-describe('DownloadGuestbookResponsesOfAGuestbook', () => {
+describe('DownloadGuestbookResponsesByCollectionId', () => {
   const collectionIdOrAlias = 'collectionAlias'
-  const guestbookId = 12
   const csvResponse =
     'Guestbook,Dataset,Dataset PID,Date,Type,File Name,File Id,File PID,User Name,Email,Institution,Position,Custom Questions'
 
-  test('should download guestbook responses for one guestbook', async () => {
+  test('should download guestbook responses for collection', async () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
     repository.downloadGuestbookResponsesByCollectionId = jest.fn().mockResolvedValue(csvResponse)
 
-    const sut = new DownloadGuestbookResponsesOfAGuestbook(repository)
-    const actual = await sut.execute(collectionIdOrAlias, guestbookId)
+    const sut = new DownloadGuestbookResponsesByCollectionId(repository)
+    const actual = await sut.execute(collectionIdOrAlias)
 
     expect(repository.downloadGuestbookResponsesByCollectionId).toHaveBeenCalledWith(
-      collectionIdOrAlias,
-      guestbookId
+      collectionIdOrAlias
     )
     expect(actual).toEqual(csvResponse)
   })
@@ -27,8 +25,8 @@ describe('DownloadGuestbookResponsesOfAGuestbook', () => {
     repository.downloadGuestbookResponsesByCollectionId = jest
       .fn()
       .mockRejectedValue(new ReadError())
-    const sut = new DownloadGuestbookResponsesOfAGuestbook(repository)
+    const sut = new DownloadGuestbookResponsesByCollectionId(repository)
 
-    await expect(sut.execute(collectionIdOrAlias, guestbookId)).rejects.toThrow(ReadError)
+    await expect(sut.execute(collectionIdOrAlias)).rejects.toThrow(ReadError)
   })
 })

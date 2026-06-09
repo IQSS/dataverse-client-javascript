@@ -1,5 +1,6 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { CreateGuestbookDTO } from '../../domain/dtos/CreateGuestbookDTO'
+import { GuestbookResponsesDTO } from '../../domain/dtos/GuestbookResponsesDTO'
 import { Guestbook } from '../../domain/models/Guestbook'
 import { GuestbookResponse } from '../../domain/models/GuestbookResponse'
 import { IGuestbooksRepository } from '../../domain/repositories/IGuestbooksRepository'
@@ -55,29 +56,29 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
       })
   }
 
-  public async getGuestbookResponsesByDataverseId(
-    dataverseId: number | string,
-    guestbookId?: number
+  public async getGuestbookResponsesByGuestbookId(
+    guestbookId: number,
+    limit = 10,
+    offset = 0
   ): Promise<GuestbookResponse[]> {
-    const endpoint = this.buildApiEndpoint(
-      this.dataversesResourceName,
-      `${dataverseId}/guestbookResponses`
+    return this.doGet(
+      this.buildApiEndpoint(this.guestbooksResourceName, 'responses', guestbookId),
+      true,
+      { limit, offset }
     )
-
-    return this.doGet(endpoint, true, guestbookId ? { guestbookId } : {})
-      .then((response) => response.data.data as GuestbookResponse[])
+      .then((response) => (response.data.data as GuestbookResponsesDTO).responses)
       .catch((error) => {
         throw error
       })
   }
 
-  public async downloadGuestbookResponsesByDataverseId(
-    dataverseId: number | string,
+  public async downloadGuestbookResponsesByCollectionId(
+    collectionIdOrAlias: number | string,
     guestbookId?: number
   ): Promise<string> {
     const endpoint = this.buildApiEndpoint(
       this.dataversesResourceName,
-      `${dataverseId}/guestbookResponses`
+      `${collectionIdOrAlias}/guestbookResponses`
     )
 
     return this.doGet(endpoint, true, guestbookId ? { guestbookId } : {})

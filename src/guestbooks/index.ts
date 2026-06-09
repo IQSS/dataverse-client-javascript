@@ -1,10 +1,9 @@
 import { GuestbooksRepository } from './infra/repositories/GuestbooksRepository'
 import { CreateGuestbook } from './domain/useCases/CreateGuestbook'
-import { DownloadGuestbookResponsesByDataverseId } from './domain/useCases/DownloadGuestbookResponsesByDataverseId'
+import { DownloadGuestbookResponsesByCollectionId } from './domain/useCases/DownloadGuestbookResponsesByCollectionId'
 import { DownloadGuestbookResponsesOfAGuestbook } from './domain/useCases/DownloadGuestbookResponsesOfAGuestbook'
 import { GetGuestbook } from './domain/useCases/GetGuestbook'
-import { GetGuestbookResponsesByDataverseId } from './domain/useCases/GetGuestbookResponsesByDataverseId'
-import { GetGuestbookResponsesOfAGuestbook } from './domain/useCases/GetGuestbookResponsesOfAGuestbook'
+import { GetGuestbookResponsesByGuestbookId } from './domain/useCases/GetGuestbookResponsesByGuestbookId'
 import { GetGuestbooksByCollectionId } from './domain/useCases/GetGuestbooksByCollectionId'
 import { SetGuestbookEnabled } from './domain/useCases/SetGuestbookEnabled'
 import { AssignDatasetGuestbook } from './domain/useCases/AssignDatasetGuestbook'
@@ -13,17 +12,14 @@ import { RemoveDatasetGuestbook } from './domain/useCases/RemoveDatasetGuestbook
 const guestbooksRepository = new GuestbooksRepository()
 
 const createGuestbook = new CreateGuestbook(guestbooksRepository)
-const downloadGuestbookResponsesByDataverseId = new DownloadGuestbookResponsesByDataverseId(
+const downloadGuestbookResponsesByCollectionId = new DownloadGuestbookResponsesByCollectionId(
   guestbooksRepository
 )
 const downloadGuestbookResponsesOfAGuestbook = new DownloadGuestbookResponsesOfAGuestbook(
   guestbooksRepository
 )
 const getGuestbook = new GetGuestbook(guestbooksRepository)
-const getGuestbookResponsesByDataverseId = new GetGuestbookResponsesByDataverseId(
-  guestbooksRepository
-)
-const getGuestbookResponsesOfAGuestbook = new GetGuestbookResponsesOfAGuestbook(
+const getGuestbookResponsesByGuestbookId = new GetGuestbookResponsesByGuestbookId(
   guestbooksRepository
 )
 const getGuestbooksByCollectionId = new GetGuestbooksByCollectionId(guestbooksRepository)
@@ -33,11 +29,10 @@ const removeDatasetGuestbook = new RemoveDatasetGuestbook(guestbooksRepository)
 
 export {
   createGuestbook,
-  downloadGuestbookResponsesByDataverseId,
+  downloadGuestbookResponsesByCollectionId,
   downloadGuestbookResponsesOfAGuestbook,
   getGuestbook,
-  getGuestbookResponsesByDataverseId,
-  getGuestbookResponsesOfAGuestbook,
+  getGuestbookResponsesByGuestbookId,
   getGuestbooksByCollectionId,
   setGuestbookEnabled,
   assignDatasetGuestbook,
@@ -49,5 +44,13 @@ export {
   CreateGuestbookCustomQuestionDTO,
   CreateGuestbookOptionDTO
 } from './domain/dtos/CreateGuestbookDTO'
+export {
+  GuestbookResponsesDTO,
+  GuestbookResponsesPaginationDTO
+} from './domain/dtos/GuestbookResponsesDTO'
 export { Guestbook, GuestbookCustomQuestion, GuestbookOption } from './domain/models/Guestbook'
-export { GuestbookResponse } from './domain/models/GuestbookResponse'
+export {
+  EventType,
+  GuestbookResponse,
+  GuestbookResponseCustomQuestion
+} from './domain/models/GuestbookResponse'

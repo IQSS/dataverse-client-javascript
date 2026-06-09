@@ -13,12 +13,13 @@ export interface IGuestbooksRepository {
     includeStats?: boolean,
     includeInherited?: boolean
   ): Promise<Guestbook[]>
-  getGuestbookResponsesByDataverseId(
-    dataverseId: number | string,
-    guestbookId?: number
+  getGuestbookResponsesByGuestbookId(
+    guestbookId: number,
+    limit?: number,
+    offset?: number
   ): Promise<GuestbookResponse[]>
-  downloadGuestbookResponsesByDataverseId(
-    dataverseId: number | string,
+  downloadGuestbookResponsesByCollectionId(
+    collectionIdOrAlias: number | string,
     guestbookId?: number
   ): Promise<string>
   setGuestbookEnabled(
