@@ -78,6 +78,7 @@ The different use cases currently available in the package are classified below,
     - [Get a File](#get-a-file)
     - [Get a File and its Dataset](#get-a-file-and-its-dataset)
     - [Get File Citation Text](#get-file-citation-text)
+    - [Get File Citation By Format](#get-file-citation-by-format)
     - [Get File Counts in a Dataset](#get-file-counts-in-a-dataset)
     - [Get File Data Tables](#get-file-data-tables)
     - [Get File Download Count](#get-file-download-count)
@@ -1918,6 +1919,32 @@ _See [use case](../src/files/domain/useCases/GetFileCitation.ts) implementation_
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
+
+#### Get File Citation By Format
+
+Returns the File citation in the requested citation export format.
+
+##### Example call:
+
+```typescript
+import { FileCitationFormat, getFileCitationByFormat } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 3
+
+getFileCitationByFormat.execute(fileId, FileCitationFormat.BIBTEX).then((citationText: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileCitationByFormat.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `format` parameter must be one of the available [FileCitationFormat](../src/files/domain/models/FileCitationFormat.ts) enum values: `FileCitationFormat.ENDNOTE`, `FileCitationFormat.RIS`, `FileCitationFormat.BIBTEX`, `FileCitationFormat.CSL`, or `FileCitationFormat.INTERNAL`.
 
 #### Get File Counts in a Dataset
 
