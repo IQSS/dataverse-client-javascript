@@ -138,6 +138,9 @@ The different use cases currently available in the package are classified below,
   - [Guestbooks read use cases](#guestbooks-read-use-cases)
     - [Get a Guestbook](#get-a-guestbook)
     - [Get Guestbooks By Collection Id](#get-guestbooks-by-collection-id)
+    - [Get Guestbook Responses By Guestbook Id](#get-guestbook-responses-by-guestbook-id)
+    - [Download Guestbook Responses By Collection Id](#download-guestbook-responses-by-collection-id)
+    - [Download Guestbook Responses Of A Guestbook](#download-guestbook-responses-of-a-guestbook)
   - [Guestbooks write use cases](#guestbooks-write-use-cases)
     - [Create a Guestbook](#create-a-guestbook)
     - [Set Guestbook Enabled](#set-guestbook-enabled)
@@ -3168,6 +3171,7 @@ _See [use case](../src/guestbooks/domain/useCases/GetGuestbook.ts) implementatio
 #### Get Guestbooks By Collection Id
 
 Returns all [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) entries available for a collection.
+Set `includeStats` to `true` to include `usageCount` and `responseCount` for each guestbook.
 
 ##### Example call:
 
@@ -3175,13 +3179,79 @@ Returns all [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) entries av
 import { getGuestbooksByCollectionId } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = 'root'
+const includeStats = true
 
-getGuestbooksByCollectionId.execute(collectionIdOrAlias).then((guestbooks: Guestbook[]) => {
-  /* ... */
-})
+getGuestbooksByCollectionId
+  .execute(collectionIdOrAlias, includeStats)
+  .then((guestbooks: Guestbook[]) => {
+    /* ... */
+  })
 ```
 
 _See [use case](../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId.ts) implementation_.
+
+#### Get Guestbook Responses By Guestbook Id
+
+Returns a [GuestbookResponseSubset](../src/guestbooks/domain/models/GuestbookResponse.ts) containing paginated guestbook response entries and the total response count for a guestbook.
+
+##### Example call:
+
+```typescript
+import { getGuestbookResponsesByGuestbookId } from '@iqss/dataverse-client-javascript'
+
+const guestbookId = 123
+const limit = 10
+const offset = 0
+
+getGuestbookResponsesByGuestbookId
+  .execute(guestbookId, limit, offset)
+  .then((guestbookResponseSubset: GuestbookResponseSubset) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/guestbooks/domain/useCases/GetGuestbookResponsesByGuestbookId.ts) implementation_.
+
+#### Download Guestbook Responses By Collection Id
+
+Downloads all guestbook responses for a collection and returns the raw response body, typically CSV content.
+
+##### Example call:
+
+```typescript
+import { downloadGuestbookResponsesByCollectionId } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+
+downloadGuestbookResponsesByCollectionId
+  .execute(collectionIdOrAlias)
+  .then((csvResponse: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/guestbooks/domain/useCases/DownloadGuestbookResponsesByCollectionId.ts) implementation_.
+
+#### Download Guestbook Responses Of A Guestbook
+
+Downloads guestbook responses for one guestbook in a collection and returns the raw response body, typically CSV content.
+
+##### Example call:
+
+```typescript
+import { downloadGuestbookResponsesOfAGuestbook } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+const guestbookId = 123
+
+downloadGuestbookResponsesOfAGuestbook
+  .execute(collectionIdOrAlias, guestbookId)
+  .then((csvResponse: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/guestbooks/domain/useCases/DownloadGuestbookResponsesOfAGuestbook.ts) implementation_.
 
 ### Guestbooks Write Use Cases
 
