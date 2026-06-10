@@ -39,6 +39,8 @@ import { PublicationStatus } from '../../../core/domain/models/PublicationStatus
 import { ReadError } from '../../../core/domain/repositories/ReadError'
 import { CollectionLinks } from '../../domain/models/CollectionLinks'
 import { CollectionSummary } from '../../domain/models/CollectionSummary'
+import { AllowedStorageDrivers } from '../../domain/models/AllowedStorageDrivers'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { LinkingObjectType } from '../../domain/useCases/GetCollectionsForLinking'
 
 export interface NewCollectionRequestPayload {
@@ -103,6 +105,62 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       returnChildCount: true
     })
       .then((response) => transformCollectionResponseToCollection(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getCollectionStorageDriver(
+    collectionIdOrAlias: number | string,
+    getEffective = true
+  ): Promise<StorageDriver> {
+    return this.doGet(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/storageDriver`,
+      true,
+      {
+        getEffective
+      }
+    )
+      .then((response) => response.data.data as StorageDriver)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async setCollectionStorageDriver(
+    collectionIdOrAlias: number | string,
+    driverLabel: string
+  ): Promise<string> {
+    return this.doPut(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/storageDriver`,
+      driverLabel,
+      undefined,
+      ApiConstants.CONTENT_TYPE_TEXT_PLAIN
+    )
+      .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deleteCollectionStorageDriver(
+    collectionIdOrAlias: number | string
+  ): Promise<string> {
+    return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}/storageDriver`)
+      .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getAllowedCollectionStorageDrivers(
+    collectionIdOrAlias: number | string
+  ): Promise<AllowedStorageDrivers> {
+    return this.doGet(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/allowedStorageDrivers`,
+      true
+    )
+      .then((response) => response.data.data as AllowedStorageDrivers)
       .catch((error) => {
         throw error
       })
@@ -215,9 +273,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
   public async updateCollection(
     collectionIdOrAlias: string | number,
-    updatedCollection: CollectionDTO
+    updatedCollection: Partial<CollectionDTO>
   ): Promise<void> {
-    const requestBody = this.createCreateOrUpdateRequestBody(updatedCollection)
+    const requestBody = this.createUpdateRequestBody(updatedCollection)
 
     return this.doPut(`/${this.collectionsResourceName}/${collectionIdOrAlias}`, requestBody)
       .then(() => undefined)
@@ -330,6 +388,86 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       ...(collectionDTO.affiliation && { affiliation: collectionDTO.affiliation }),
       metadataBlocks: metadataBlocksRequestBody
     }
+  }
+
+  private createUpdateRequestBody(
+    collectionDTO: Partial<CollectionDTO>
+  ): Partial<NewCollectionRequestPayload> {
+    const dataverseContacts: NewCollectionContactRequestPayload[] | undefined =
+      collectionDTO.contacts?.map((contact) => ({
+        contactEmail: contact
+      }))
+    const inputLevelsRequestBody: NewCollectionInputLevelRequestPayload[] | undefined =
+      collectionDTO.inputLevels?.map((inputLevel) => ({
+        datasetFieldTypeName: inputLevel.datasetFieldName,
+        include: inputLevel.include,
+        required: inputLevel.required
+      }))
+    let metadataBlocksRequestBody: Partial<NewCollectionMetadataBlocksRequestPayload> | undefined
+
+    const hasMetadataBlocksData =
+      collectionDTO.metadataBlockNames !== undefined ||
+      collectionDTO.facetIds !== undefined ||
+      collectionDTO.inputLevels !== undefined ||
+      collectionDTO.inheritMetadataBlocksFromParent !== undefined ||
+      collectionDTO.inheritFacetsFromParent !== undefined
+
+    if (hasMetadataBlocksData) {
+      metadataBlocksRequestBody = {}
+      if (collectionDTO.inheritMetadataBlocksFromParent !== true) {
+        if (collectionDTO.metadataBlockNames !== undefined) {
+          metadataBlocksRequestBody.metadataBlockNames = collectionDTO.metadataBlockNames
+        }
+        if (inputLevelsRequestBody !== undefined) {
+          metadataBlocksRequestBody.inputLevels = inputLevelsRequestBody
+        }
+      }
+      if (collectionDTO.inheritFacetsFromParent !== true) {
+        if (collectionDTO.facetIds !== undefined) {
+          metadataBlocksRequestBody.facetIds = collectionDTO.facetIds
+        }
+      }
+      if (collectionDTO.inheritMetadataBlocksFromParent !== undefined) {
+        metadataBlocksRequestBody.inheritMetadataBlocksFromParent =
+          collectionDTO.inheritMetadataBlocksFromParent
+      }
+      if (collectionDTO.inheritFacetsFromParent !== undefined) {
+        metadataBlocksRequestBody.inheritFacetsFromParent = collectionDTO.inheritFacetsFromParent
+      }
+    }
+
+    // Build the final request body, only including defined fields
+    const requestBody: Partial<NewCollectionRequestPayload> = {}
+
+    if (collectionDTO.alias !== undefined) {
+      requestBody.alias = collectionDTO.alias
+    }
+
+    if (collectionDTO.name !== undefined) {
+      requestBody.name = collectionDTO.name
+    }
+
+    if (dataverseContacts !== undefined) {
+      requestBody.dataverseContacts = dataverseContacts
+    }
+
+    if (collectionDTO.type !== undefined) {
+      requestBody.dataverseType = collectionDTO.type
+    }
+
+    if (collectionDTO.description !== undefined) {
+      requestBody.description = collectionDTO.description
+    }
+
+    if (collectionDTO.affiliation !== undefined) {
+      requestBody.affiliation = collectionDTO.affiliation
+    }
+
+    if (metadataBlocksRequestBody !== undefined) {
+      requestBody.metadataBlocks = metadataBlocksRequestBody
+    }
+
+    return requestBody
   }
 
   private applyCollectionSearchCriteriaToQueryParams(
