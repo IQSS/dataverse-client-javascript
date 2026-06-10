@@ -58,7 +58,7 @@ describe('GetGuestbookResponsesByGuestbookId', () => {
   test('should throw ReadError when repository fails', async () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
     repository.getGuestbookResponsesByGuestbookId = jest.fn().mockRejectedValue(new ReadError())
-    const sut = new getGuestbookResponsesByGuestbookId(repository)
+    const sut = new GetGuestbookResponsesByGuestbookId(repository)
 
     await expect(sut.execute(guestbookId)).rejects.toThrow(ReadError)
   })
