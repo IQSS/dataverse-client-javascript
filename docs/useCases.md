@@ -138,7 +138,7 @@ The different use cases currently available in the package are classified below,
   - [Guestbooks read use cases](#guestbooks-read-use-cases)
     - [Get a Guestbook](#get-a-guestbook)
     - [Get Guestbooks By Collection Id](#get-guestbooks-by-collection-id)
-    - [Get Guestbook Responses Byg Guestbook Id](#get-guestbook-responses-byg-guestbook-id)
+    - [Get Guestbook Responses By Guestbook Id](#get-guestbook-responses-by-guestbook-id)
     - [Download Guestbook Responses By Collection Id](#download-guestbook-responses-by-collection-id)
     - [Download Guestbook Responses Of A Guestbook](#download-guestbook-responses-of-a-guestbook)
   - [Guestbooks write use cases](#guestbooks-write-use-cases)
@@ -3190,7 +3190,7 @@ getGuestbooksByCollectionId
 
 _See [use case](../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId.ts) implementation_.
 
-#### Get Guestbook Responses Byg Guestbook Id
+#### Get Guestbook Responses By Guestbook Id
 
 Returns paginated [GuestbookResponse](../src/guestbooks/domain/models/GuestbookResponse.ts) entries for a guestbook.
 

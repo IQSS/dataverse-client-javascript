@@ -4,9 +4,9 @@ import {
   GuestbookResponse
 } from '../../../src/guestbooks/domain/models/GuestbookResponse'
 import { IGuestbooksRepository } from '../../../src/guestbooks/domain/repositories/IGuestbooksRepository'
-import { getGuestbookResponsesByGuestbookId } from '../../../src/guestbooks/domain/useCases/getGuestbookResponsesByGuestbookId'
+import { GetGuestbookResponsesByGuestbookId } from '../../../src/guestbooks/domain/useCases/GetGuestbookResponsesByGuestbookId'
 
-describe('getGuestbookResponsesByGuestbookId', () => {
+describe('GetGuestbookResponsesByGuestbookId', () => {
   const guestbookId = 12
   const limit = 10
   const offset = 0
@@ -34,7 +34,7 @@ describe('getGuestbookResponsesByGuestbookId', () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
     repository.getGuestbookResponsesByGuestbookId = jest.fn().mockResolvedValue(guestbookResponses)
 
-    const sut = new getGuestbookResponsesByGuestbookId(repository)
+    const sut = new GetGuestbookResponsesByGuestbookId(repository)
     const actual = await sut.execute(guestbookId)
 
     expect(repository.getGuestbookResponsesByGuestbookId).toHaveBeenCalledWith(
@@ -49,7 +49,7 @@ describe('getGuestbookResponsesByGuestbookId', () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
     repository.getGuestbookResponsesByGuestbookId = jest.fn().mockResolvedValue(guestbookResponses)
 
-    const sut = new getGuestbookResponsesByGuestbookId(repository)
+    const sut = new GetGuestbookResponsesByGuestbookId(repository)
     await sut.execute(guestbookId, 25, 50)
 
     expect(repository.getGuestbookResponsesByGuestbookId).toHaveBeenCalledWith(guestbookId, 25, 50)
