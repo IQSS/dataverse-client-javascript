@@ -1,7 +1,8 @@
 import { ReadError } from '../../../src'
 import {
   EventType,
-  GuestbookResponse
+  GuestbookResponse,
+  GuestbookResponseSubset
 } from '../../../src/guestbooks/domain/models/GuestbookResponse'
 import { IGuestbooksRepository } from '../../../src/guestbooks/domain/repositories/IGuestbooksRepository'
 import { GetGuestbookResponsesByGuestbookId } from '../../../src/guestbooks/domain/useCases/GetGuestbookResponsesByGuestbookId'
@@ -29,10 +30,16 @@ describe('GetGuestbookResponsesByGuestbookId', () => {
       ]
     }
   ]
+  const guestbookResponseSubset: GuestbookResponseSubset = {
+    guestbookResponses,
+    totalGuestbookResponseCount: guestbookResponses.length
+  }
 
   test('should return guestbook responses for one guestbook', async () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
-    repository.getGuestbookResponsesByGuestbookId = jest.fn().mockResolvedValue(guestbookResponses)
+    repository.getGuestbookResponsesByGuestbookId = jest
+      .fn()
+      .mockResolvedValue(guestbookResponseSubset)
 
     const sut = new GetGuestbookResponsesByGuestbookId(repository)
     const actual = await sut.execute(guestbookId)
@@ -42,12 +49,14 @@ describe('GetGuestbookResponsesByGuestbookId', () => {
       limit,
       offset
     )
-    expect(actual).toEqual(guestbookResponses)
+    expect(actual).toEqual(guestbookResponseSubset)
   })
 
   test('should pass pagination to repository', async () => {
     const repository: IGuestbooksRepository = {} as IGuestbooksRepository
-    repository.getGuestbookResponsesByGuestbookId = jest.fn().mockResolvedValue(guestbookResponses)
+    repository.getGuestbookResponsesByGuestbookId = jest
+      .fn()
+      .mockResolvedValue(guestbookResponseSubset)
 
     const sut = new GetGuestbookResponsesByGuestbookId(repository)
     await sut.execute(guestbookId, 25, 50)

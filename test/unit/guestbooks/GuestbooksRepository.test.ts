@@ -153,7 +153,11 @@ describe('GuestbooksRepository', () => {
           headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
         }
       )
-      expect(actual).toStrictEqual(guestbookResponsesOfAGuestbookResponse.data.data.responses)
+      expect(actual).toStrictEqual({
+        guestbookResponses: guestbookResponsesOfAGuestbookResponse.data.data.responses,
+        totalGuestbookResponseCount:
+          guestbookResponsesOfAGuestbookResponse.data.data.pagination.totalResponses
+      })
     })
 
     test('should list guestbook responses with pagination', async () => {
@@ -171,7 +175,11 @@ describe('GuestbooksRepository', () => {
           headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
         }
       )
-      expect(actual).toStrictEqual(guestbookResponsesOfAGuestbookResponse.data.data.responses)
+      expect(actual).toStrictEqual({
+        guestbookResponses: guestbookResponsesOfAGuestbookResponse.data.data.responses,
+        totalGuestbookResponseCount:
+          guestbookResponsesOfAGuestbookResponse.data.data.pagination.totalResponses
+      })
     })
 
     test('should return error result on error response', async () => {

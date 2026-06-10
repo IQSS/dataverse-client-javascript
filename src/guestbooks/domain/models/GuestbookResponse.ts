@@ -19,6 +19,11 @@ export interface GuestbookResponseCustomQuestion {
   response: string
 }
 
+export interface GuestbookResponseSubset {
+  guestbookResponses: GuestbookResponse[]
+  totalGuestbookResponseCount: number
+}
+
 export enum EventType {
   ACCESS_REQUEST = 'AccessRequest',
   DOWNLOAD = 'Download',

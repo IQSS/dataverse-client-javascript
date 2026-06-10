@@ -2,7 +2,7 @@ import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { CreateGuestbookDTO } from '../../domain/dtos/CreateGuestbookDTO'
 import { GuestbookResponsesDTO } from '../../domain/dtos/GuestbookResponsesDTO'
 import { Guestbook } from '../../domain/models/Guestbook'
-import { GuestbookResponse } from '../../domain/models/GuestbookResponse'
+import { GuestbookResponseSubset } from '../../domain/models/GuestbookResponse'
 import { IGuestbooksRepository } from '../../domain/repositories/IGuestbooksRepository'
 
 export class GuestbooksRepository extends ApiRepository implements IGuestbooksRepository {
@@ -60,13 +60,20 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
     guestbookId: number,
     limit = 10,
     offset = 0
-  ): Promise<GuestbookResponse[]> {
+  ): Promise<GuestbookResponseSubset> {
     return this.doGet(
       this.buildApiEndpoint(this.guestbooksResourceName, 'responses', guestbookId),
       true,
       { limit, offset }
     )
-      .then((response) => (response.data.data as GuestbookResponsesDTO).responses)
+      .then((response) => {
+        const responseData = response.data.data as GuestbookResponsesDTO
+
+        return {
+          guestbookResponses: responseData.responses,
+          totalGuestbookResponseCount: responseData.pagination?.totalResponses ?? 0
+        }
+      })
       .catch((error) => {
         throw error
       })

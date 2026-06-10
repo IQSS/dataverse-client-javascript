@@ -7,10 +7,6 @@ export class DownloadGuestbookResponsesOfAGuestbook implements UseCase<string> {
   /**
    * Downloads guestbook responses for one guestbook in a collection.
    *
-   * The collection can be identified by either its alias/identifier or numeric database id.
-   * The returned string is the raw response body from the Dataverse API, which is typically
-   * saved by callers as a CSV file or printed directly.
-   *
    * @param {number | string} collectionIdOrAlias - Collection alias/identifier or numeric database id.
    * @param {number} guestbookId - Guestbook identifier to restrict the export.
    * @returns {Promise<string>} Raw response body returned by the Dataverse API.

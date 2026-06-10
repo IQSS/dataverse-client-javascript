@@ -3192,7 +3192,7 @@ _See [use case](../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId.ts
 
 #### Get Guestbook Responses By Guestbook Id
 
-Returns paginated [GuestbookResponse](../src/guestbooks/domain/models/GuestbookResponse.ts) entries for a guestbook.
+Returns a [GuestbookResponseSubset](../src/guestbooks/domain/models/GuestbookResponse.ts) containing paginated guestbook response entries and the total response count for a guestbook.
 
 ##### Example call:
 
@@ -3205,12 +3205,12 @@ const offset = 0
 
 getGuestbookResponsesByGuestbookId
   .execute(guestbookId, limit, offset)
-  .then((guestbookResponses: GuestbookResponse[]) => {
+  .then((guestbookResponseSubset: GuestbookResponseSubset) => {
     /* ... */
   })
 ```
 
-_See [use case](../src/guestbooks/domain/useCases/getGuestbookResponsesByGuestbookId.ts) implementation_.
+_See [use case](../src/guestbooks/domain/useCases/GetGuestbookResponsesByGuestbookId.ts) implementation_.
 
 #### Download Guestbook Responses By Collection Id
 

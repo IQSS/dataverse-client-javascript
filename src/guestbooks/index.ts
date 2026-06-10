@@ -52,5 +52,6 @@ export { Guestbook, GuestbookCustomQuestion, GuestbookOption } from './domain/mo
 export {
   EventType,
   GuestbookResponse,
-  GuestbookResponseCustomQuestion
+  GuestbookResponseCustomQuestion,
+  GuestbookResponseSubset
 } from './domain/models/GuestbookResponse'

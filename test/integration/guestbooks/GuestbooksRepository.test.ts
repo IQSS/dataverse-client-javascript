@@ -385,10 +385,13 @@ describe('GuestbooksRepository', () => {
       try {
         const actual = await sut.getGuestbookResponsesByGuestbookId(setup.guestbookId)
 
-        expect(actual.length).toBeGreaterThan(0)
-        expect(actual[0].datasetPid).toBe(setup.datasetPersistentId.split('/').slice(-2).join('/'))
-        expect(actual[0].email).toBe(setup.email)
-        expect(actual[0].fileName).toBe(testTextFile1Name)
+        expect(actual.guestbookResponses.length).toBeGreaterThan(0)
+        expect(actual.totalGuestbookResponseCount).toBeGreaterThanOrEqual(1)
+        expect(actual.guestbookResponses[0].datasetPid).toBe(
+          setup.datasetPersistentId.split('/').slice(-2).join('/')
+        )
+        expect(actual.guestbookResponses[0].email).toBe(setup.email)
+        expect(actual.guestbookResponses[0].fileName).toBe(testTextFile1Name)
       } finally {
         await cleanupGuestbookDownloadSetup(setup)
       }
@@ -408,12 +411,17 @@ describe('GuestbooksRepository', () => {
         const firstPage = await sut.getGuestbookResponsesByGuestbookId(setup.guestbookId, 1, 0)
         const secondPage = await sut.getGuestbookResponsesByGuestbookId(setup.guestbookId, 1, 1)
 
-        expect(firstPage).toHaveLength(1)
-        expect(secondPage).toHaveLength(1)
-        expect(firstPage[0].email).not.toBe(secondPage[0].email)
-        expect([firstPage[0].email, secondPage[0].email]).toEqual(
-          expect.arrayContaining([setup.email, secondResponseEmail])
+        expect(firstPage.guestbookResponses).toHaveLength(1)
+        expect(secondPage.guestbookResponses).toHaveLength(1)
+        expect(firstPage.totalGuestbookResponseCount).toBeGreaterThanOrEqual(2)
+        expect(secondPage.totalGuestbookResponseCount).toBeGreaterThanOrEqual(2)
+        expect(firstPage.guestbookResponses[0].email).not.toBe(
+          secondPage.guestbookResponses[0].email
         )
+        expect([
+          firstPage.guestbookResponses[0].email,
+          secondPage.guestbookResponses[0].email
+        ]).toEqual(expect.arrayContaining([setup.email, secondResponseEmail]))
       } finally {
         await cleanupGuestbookDownloadSetup(setup)
       }

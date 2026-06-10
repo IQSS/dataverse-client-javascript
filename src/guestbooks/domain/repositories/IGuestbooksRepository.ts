@@ -1,6 +1,6 @@
 import { CreateGuestbookDTO } from '../dtos/CreateGuestbookDTO'
 import { Guestbook } from '../models/Guestbook'
-import { GuestbookResponse } from '../models/GuestbookResponse'
+import { GuestbookResponseSubset } from '../models/GuestbookResponse'
 
 export interface IGuestbooksRepository {
   createGuestbook(
@@ -17,7 +17,7 @@ export interface IGuestbooksRepository {
     guestbookId: number,
     limit?: number,
     offset?: number
-  ): Promise<GuestbookResponse[]>
+  ): Promise<GuestbookResponseSubset>
   downloadGuestbookResponsesByCollectionId(
     collectionIdOrAlias: number | string,
     guestbookId?: number
