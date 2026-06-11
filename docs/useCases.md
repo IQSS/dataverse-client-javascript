@@ -143,6 +143,7 @@ The different use cases currently available in the package are classified below,
     - [Download Guestbook Responses Of A Guestbook](#download-guestbook-responses-of-a-guestbook)
   - [Guestbooks write use cases](#guestbooks-write-use-cases)
     - [Create a Guestbook](#create-a-guestbook)
+    - [Edit a Guestbook](#edit-a-guestbook)
     - [Set Guestbook Enabled](#set-guestbook-enabled)
     - [Assign Dataset Guestbook](#assign-dataset-guestbook)
     - [Remove Dataset Guestbook](#remove-dataset-guestbook)
@@ -3172,6 +3173,7 @@ _See [use case](../src/guestbooks/domain/useCases/GetGuestbook.ts) implementatio
 
 Returns all [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) entries available for a collection.
 Set `includeStats` to `true` to include `usageCount` and `responseCount` for each guestbook.
+Set `includeInherited` to `true` to include the collection's guestbooks and guestbooks from the collection's hierarchical owners.
 
 ##### Example call:
 
@@ -3180,9 +3182,10 @@ import { getGuestbooksByCollectionId } from '@iqss/dataverse-client-javascript'
 
 const collectionIdOrAlias = 'root'
 const includeStats = true
+const includeInherited = true
 
 getGuestbooksByCollectionId
-  .execute(collectionIdOrAlias, includeStats)
+  .execute(collectionIdOrAlias, includeStats, includeInherited)
   .then((guestbooks: Guestbook[]) => {
     /* ... */
   })
@@ -3289,6 +3292,27 @@ createGuestbook.execute(guestbook, collectionIdOrAlias).then(() => {
 ```
 
 _See [use case](../src/guestbooks/domain/useCases/CreateGuestbook.ts) implementation_.
+
+#### Edit a Guestbook
+
+Edits an existing guestbook using [EditGuestbookDTO](../src/guestbooks/domain/dtos/EditGuestbookDTO.ts).
+
+##### Example call:
+
+```typescript
+import { editGuestbook } from '@iqss/dataverse-client-javascript'
+
+const guestbookId = 123
+const guestbook: EditGuestbookDTO = {
+  name: 'new name'
+}
+
+editGuestbook.execute(guestbookId, guestbook).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/EditGuestbook.ts) implementation_.
 
 #### Set Guestbook Enabled
 

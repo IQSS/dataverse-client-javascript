@@ -7,6 +7,7 @@ import { GuestbooksRepository } from '../../../src/guestbooks/infra/repositories
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { EventType } from '../../../src/guestbooks/domain/models/GuestbookResponse'
+import { EditGuestbookDTO } from '../../../src/guestbooks/domain/dtos/EditGuestbookDTO'
 
 describe('GuestbooksRepository', () => {
   const sut = new GuestbooksRepository()
@@ -84,6 +85,35 @@ describe('GuestbooksRepository', () => {
   }
   const guestbookResponsesCsv =
     'Guestbook,Dataset,Dataset PID,Date,Type,File Name,File Id,File PID,User Name,Email,Institution,Position,Custom Questions'
+  const editGuestbookDTO: EditGuestbookDTO = {
+    name: 'edited test',
+    enabled: true,
+    emailRequired: true,
+    nameRequired: true,
+    institutionRequired: false,
+    positionRequired: false,
+    customQuestions: [
+      {
+        id: 1,
+        question: "how's your day",
+        required: true,
+        displayOrder: 0,
+        type: 'text',
+        hidden: false
+      },
+      {
+        question: 'What color car do you drive',
+        required: true,
+        displayOrder: 1,
+        type: 'options',
+        hidden: false,
+        optionValues: [
+          { id: 10, value: 'Red', displayOrder: 0 },
+          { value: 'White', displayOrder: 1 }
+        ]
+      }
+    ]
+  }
 
   beforeEach(() => {
     ApiConfig.init(
@@ -128,12 +158,68 @@ describe('GuestbooksRepository', () => {
       expect(actual[0].responseCount).toBe(2)
     })
 
+    test('should list guestbooks with inherited guestbooks when includeInherited is true', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(guestbooksResponseWithoutStats)
+
+      const actual = await sut.getGuestbooksByCollectionId(collectionIdOrAlias, false, true)
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/guestbooks/${collectionIdOrAlias}/list`,
+        {
+          params: {
+            includeInherited: true
+          },
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        }
+      )
+      expect(actual).toStrictEqual(guestbooksResponseWithoutStats.data.data)
+    })
+
+    test('should list guestbooks with stats and inherited guestbooks when both options are true', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(guestbooksResponse)
+
+      const actual = await sut.getGuestbooksByCollectionId(collectionIdOrAlias, true, true)
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/guestbooks/${collectionIdOrAlias}/list`,
+        {
+          params: {
+            includeStats: true,
+            includeInherited: true
+          },
+          headers: TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY.headers
+        }
+      )
+      expect(actual).toStrictEqual(guestbooksResponse.data.data)
+    })
+
     test('should return error result on error response', async () => {
       jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
       await expect(sut.getGuestbooksByCollectionId(collectionIdOrAlias, true)).rejects.toThrow(
         ReadError
       )
+    })
+  })
+
+  describe('editGuestbook', () => {
+    test('should edit guestbook', async () => {
+      jest.spyOn(axios, 'put').mockResolvedValue({ data: { status: 'OK' } })
+
+      const actual = await sut.editGuestbook(12, editGuestbookDTO)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/guestbooks/12`,
+        JSON.stringify(editGuestbookDTO),
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'put').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      await expect(sut.editGuestbook(12, editGuestbookDTO)).rejects.toThrow()
     })
   })
 
