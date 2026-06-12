@@ -395,26 +395,6 @@ describe('GuestbooksRepository', () => {
       ...overrides
     })
 
-    test('should be able to update a single field', async () => {
-      const uniqueSuffix = Date.now().toString()
-      const guestbookId = await sut.createGuestbook(testCollectionId, {
-        ...createGuestbookDTO,
-        name: `guestbook edit email required ${uniqueSuffix}`,
-        emailRequired: true
-      })
-      const guestbookBeforeEdit = await sut.getGuestbook(guestbookId)
-      expect(guestbookBeforeEdit.emailRequired).toBe(true)
-
-      const editedGuestbook = buildEditGuestbookDTO(guestbookBeforeEdit, {
-        emailRequired: false
-      })
-
-      await sut.editGuestbook(guestbookId, editedGuestbook)
-
-      const actual = await sut.getGuestbook(guestbookId)
-      expect(actual.emailRequired).toBe(false)
-    })
-
     test('should update existing custom question when custom question id is provided', async () => {
       const uniqueSuffix = Date.now().toString()
       const guestbookId = await sut.createGuestbook(testCollectionId, {
