@@ -384,7 +384,6 @@ describe('GuestbooksRepository', () => {
       currentGuestbook: Awaited<ReturnType<GuestbooksRepository['getGuestbook']>>,
       overrides: Partial<EditGuestbookDTO>
     ): EditGuestbookDTO => ({
-      id: currentGuestbook.id,
       name: currentGuestbook.name,
       enabled: currentGuestbook.enabled,
       emailRequired: currentGuestbook.emailRequired,
@@ -394,6 +393,106 @@ describe('GuestbooksRepository', () => {
       createTime: currentGuestbook.createTime,
       customQuestions: currentGuestbook.customQuestions ?? [],
       ...overrides
+    })
+
+    test('should be able to update a single field', async () => {
+      const uniqueSuffix = Date.now().toString()
+      const guestbookId = await sut.createGuestbook(testCollectionId, {
+        ...createGuestbookDTO,
+        name: `guestbook edit email required ${uniqueSuffix}`,
+        emailRequired: true
+      })
+      const guestbookBeforeEdit = await sut.getGuestbook(guestbookId)
+      expect(guestbookBeforeEdit.emailRequired).toBe(true)
+
+      const editedGuestbook = buildEditGuestbookDTO(guestbookBeforeEdit, {
+        emailRequired: false
+      })
+
+      await sut.editGuestbook(guestbookId, editedGuestbook)
+
+      const actual = await sut.getGuestbook(guestbookId)
+      expect(actual.emailRequired).toBe(false)
+    })
+
+    test('should update existing custom question when custom question id is provided', async () => {
+      const uniqueSuffix = Date.now().toString()
+      const guestbookId = await sut.createGuestbook(testCollectionId, {
+        ...createGuestbookDTO,
+        name: `guestbook edit custom question with id ${uniqueSuffix}`
+      })
+      const guestbookBeforeEdit = await sut.getGuestbook(guestbookId)
+      const existingQuestion = guestbookBeforeEdit.customQuestions[0]
+
+      const editedGuestbook = buildEditGuestbookDTO(guestbookBeforeEdit, {
+        name: `edited custom question with id guestbook ${uniqueSuffix}`,
+        customQuestions: [
+          {
+            id: existingQuestion.id,
+            question: `updated custom question ${uniqueSuffix}`,
+            required: false,
+            displayOrder: 0,
+            type: 'textarea',
+            hidden: false
+          }
+        ]
+      })
+
+      await sut.editGuestbook(guestbookId, editedGuestbook)
+
+      const actual = await sut.getGuestbook(guestbookId)
+      expect(actual.name).toBe(editedGuestbook.name)
+      expect(actual.customQuestions).toHaveLength(1)
+      expect(actual.customQuestions[0]).toEqual(
+        expect.objectContaining({
+          id: existingQuestion.id,
+          question: editedGuestbook.customQuestions?.[0].question,
+          required: false,
+          displayOrder: 0,
+          type: 'textarea',
+          hidden: false
+        })
+      )
+    })
+
+    test('should create replacement custom question when custom question id is not provided', async () => {
+      const uniqueSuffix = Date.now().toString()
+      const guestbookId = await sut.createGuestbook(testCollectionId, {
+        ...createGuestbookDTO,
+        name: `guestbook edit custom question without id ${uniqueSuffix}`
+      })
+      const guestbookBeforeEdit = await sut.getGuestbook(guestbookId)
+      const existingQuestion = guestbookBeforeEdit.customQuestions[0]
+
+      const editedGuestbook = buildEditGuestbookDTO(guestbookBeforeEdit, {
+        name: `edited custom question without id guestbook ${uniqueSuffix}`,
+        customQuestions: [
+          {
+            question: `replacement custom question ${uniqueSuffix}`,
+            required: false,
+            displayOrder: 0,
+            type: 'textarea',
+            hidden: false
+          }
+        ]
+      })
+
+      await sut.editGuestbook(guestbookId, editedGuestbook)
+
+      const actual = await sut.getGuestbook(guestbookId)
+      expect(actual.name).toBe(editedGuestbook.name)
+      expect(actual.customQuestions).toHaveLength(1)
+      expect(actual.customQuestions[0]).toEqual(
+        expect.objectContaining({
+          question: editedGuestbook.customQuestions?.[0].question,
+          required: false,
+          displayOrder: 0,
+          type: 'textarea',
+          hidden: false
+        })
+      )
+      expect(actual.customQuestions[0].id).toBeDefined()
+      expect(actual.customQuestions[0].id).not.toBe(existingQuestion.id)
     })
 
     test('should edit guestbook without custom questions', async () => {
@@ -459,7 +558,7 @@ describe('GuestbooksRepository', () => {
       expect(actual.customQuestions).toHaveLength(1)
       expect(actual.customQuestions[0]).toEqual(
         expect.objectContaining({
-          question: editedGuestbook.customQuestions[0].question,
+          question: editedGuestbook.customQuestions?.[0].question,
           required: false,
           displayOrder: 0,
           type: 'textarea',
@@ -501,7 +600,7 @@ describe('GuestbooksRepository', () => {
       expect(actual.customQuestions).toHaveLength(1)
       expect(actual.customQuestions[0]).toEqual(
         expect.objectContaining({
-          question: editedGuestbook.customQuestions[0].question,
+          question: editedGuestbook.customQuestions?.[0].question,
           required: true,
           displayOrder: 0,
           type: 'options',
@@ -536,7 +635,9 @@ describe('GuestbooksRepository', () => {
     })
 
     test('should return error when guestbook does not exist', async () => {
-      await expect(sut.editGuestbook(999999, createGuestbookDTO)).rejects.toThrow(WriteError)
+      await expect(
+        sut.editGuestbook(999999, { ...createGuestbookDTO, createTime: '2026-06-12T00:00:00Z' })
+      ).rejects.toThrow(WriteError)
     })
   })
 

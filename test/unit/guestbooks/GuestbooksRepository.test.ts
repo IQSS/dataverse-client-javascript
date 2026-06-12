@@ -92,6 +92,7 @@ describe('GuestbooksRepository', () => {
     nameRequired: true,
     institutionRequired: false,
     positionRequired: false,
+    createTime: '2026-06-12T00:00:00Z',
     customQuestions: [
       {
         id: 1,
@@ -213,6 +214,12 @@ describe('GuestbooksRepository', () => {
         JSON.stringify(editGuestbookDTO),
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
       )
+      const requestPayload = JSON.parse((axios.put as jest.Mock).mock.calls[0][1] as string) as
+        | EditGuestbookDTO
+        | undefined
+      expect(requestPayload?.id).toBeUndefined()
+      expect(requestPayload?.customQuestions?.[0].id).toBe(1)
+      expect(requestPayload?.customQuestions?.[1].optionValues?.[0].id).toBe(10)
       expect(actual).toBeUndefined()
     })
 

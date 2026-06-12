@@ -1,13 +1,13 @@
 export type EditGuestbookQuestionTypeDTO = 'text' | 'textarea' | 'options'
 
 export interface EditGuestbookOptionDTO {
-  id?: number | string
+  id?: number
   value: string
   displayOrder: number
 }
 
 export interface EditGuestbookCustomQuestionDTO {
-  id?: number | string
+  id?: number
   question: string
   required: boolean
   displayOrder: number
@@ -17,13 +17,13 @@ export interface EditGuestbookCustomQuestionDTO {
 }
 
 export interface EditGuestbookDTO {
-  id?: number | string
+  id?: number
   name: string
   enabled: boolean
   emailRequired: boolean
   nameRequired: boolean
   institutionRequired: boolean
   positionRequired: boolean
-  customQuestions: EditGuestbookCustomQuestionDTO[]
-  createTime?: string
+  createTime: string
+  customQuestions?: EditGuestbookCustomQuestionDTO[]
 }

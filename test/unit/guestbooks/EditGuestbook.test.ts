@@ -11,6 +11,7 @@ describe('EditGuestbook', () => {
     nameRequired: true,
     institutionRequired: false,
     positionRequired: false,
+    createTime: '2026-06-12T00:00:00Z',
     customQuestions: [
       {
         id: 1,
