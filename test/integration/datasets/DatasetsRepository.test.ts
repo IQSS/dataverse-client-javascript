@@ -11,7 +11,8 @@ import {
   deaccessionDatasetViaApi,
   createDatasetLicenseModel,
   setDatasetStorageSizeViaApi,
-  setUseStorageQuotasViaApi
+  setUseStorageQuotasViaApi,
+  loadMetadataBlockViaApi
 } from '../../testHelpers/datasets/datasetHelper'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import {
@@ -32,7 +33,9 @@ import {
   linkDatasetTypeWithMetadataBlocks,
   setAvailableLicensesForDatasetType,
   updateTermsOfAccess,
-  DatasetLicenseUpdateRequest
+  DatasetLicenseUpdateRequest,
+  getDatasetReviews,
+  DatasetReview
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -49,7 +52,8 @@ import {
   deleteCollectionViaApi,
   publishCollectionViaApi,
   ROOT_COLLECTION_ALIAS,
-  setStorageDriverViaApi
+  setStorageDriverViaApi,
+  setCollectionAllowedDatasetTypesViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import {
   calculateBlobChecksum,
@@ -61,6 +65,10 @@ import {
   DatasetVersionSummary,
   DatasetVersionSummaryStringValues
 } from '../../../src/datasets/domain/models/DatasetVersionSummaryInfo'
+import {
+  replaceSolrSchemaWithDataverseGeneratedSchemaViaApi,
+  solrSchemaFieldExistsViaApi
+} from '../../testHelpers/search/solrHelper'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
@@ -103,6 +111,153 @@ const TEST_DIFF_DATASET_DTO: DatasetDTO = {
     }
   ]
 }
+
+const createReviewDatasetDTO = (itemReviewedUrl: string): DatasetDTO => ({
+  license: TestConstants.TEST_NEW_DATASET_DTO.license,
+  metadataBlockValues: [
+    {
+      name: 'citation',
+      fields: {
+        title: 'Review of Dataset with a review',
+        author: [
+          {
+            authorName: 'Reviewer, Dataverse',
+            authorAffiliation: 'Dataverse.org'
+          }
+        ],
+        datasetContact: [
+          {
+            datasetContactEmail: 'reviewer@mailinator.com',
+            datasetContactName: 'Reviewer, Dataverse'
+          }
+        ],
+        dsDescription: [
+          {
+            dsDescriptionValue: 'This is a review of a dataset.'
+          }
+        ],
+        subject: ['Medicine, Health and Life Sciences']
+      }
+    },
+    {
+      name: 'review',
+      fields: {
+        itemReviewed: {
+          itemReviewedUrl,
+          itemReviewedType: 'Dataset',
+          itemReviewedCitation: 'Dataset with a review, Dataverse, 2026'
+        }
+      }
+    },
+    {
+      name: RUBRIC_METADATA_BLOCK_NAME,
+      fields: {
+        rubricDatasetReviewSummary: 'The reviewed dataset is complete enough for reuse.'
+      }
+    }
+  ]
+})
+
+const getPersistentIdUrl = (persistentId: string): string => {
+  return persistentId.startsWith('doi:')
+    ? `https://doi.org/${persistentId.replace(/^doi:/, '')}`
+    : persistentId
+}
+
+const REVIEW_METADATA_BLOCK_TSV = [
+  '#metadataBlock\tname\tdataverseAlias\tdisplayName',
+  '\treview\t\tReview Metadata',
+  [
+    '#datasetField',
+    'name',
+    'title',
+    'description',
+    'watermark',
+    'fieldType',
+    'displayOrder',
+    'displayFormat',
+    'advancedSearchField',
+    'allowControlledVocabulary',
+    'allowmultiples',
+    'facetable',
+    'displayoncreate',
+    'required',
+    'parent',
+    'metadatablock_id',
+    'termURI'
+  ].join('\t'),
+  '\titemReviewed\tItem Reviewed\tThe item being reviewed\t\tnone\t1\t\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tTRUE\t\treview\t',
+  '\titemReviewedUrl\tURL\tThe URL of the item being reviewed\t\turl\t2\t\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tTRUE\titemReviewed\treview\t',
+  '\titemReviewedType\tType\tThe type of the item being reviewed\t\ttext\t3\t\tFALSE\tTRUE\tFALSE\tFALSE\tTRUE\tTRUE\titemReviewed\treview\t',
+  '\titemReviewedCitation\tCitation\tThe full bibliographic citation of the item being reviewed\t\ttextbox\t4\t\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tTRUE\titemReviewed\treview\t',
+  '#controlledVocabulary\tDatasetField\tValue\tidentifier\tdisplayOrder',
+  '\titemReviewedType\tAudiovisual\t\t0',
+  '\titemReviewedType\tAward\t\t1',
+  '\titemReviewedType\tBook\t\t2',
+  '\titemReviewedType\tBook Chapter\t\t3',
+  '\titemReviewedType\tCollection\t\t4',
+  '\titemReviewedType\tComputational Notebook\t\t5',
+  '\titemReviewedType\tConference Paper\t\t6',
+  '\titemReviewedType\tConference Proceeding\t\t7',
+  '\titemReviewedType\tDataPaper\t\t8',
+  '\titemReviewedType\tDataset\t\t9',
+  '\titemReviewedType\tDissertation\t\t10',
+  '\titemReviewedType\tEvent\t\t11',
+  '\titemReviewedType\tImage\t\t12',
+  '\titemReviewedType\tInteractive Resource\t\t13',
+  '\titemReviewedType\tInstrument\t\t14',
+  '\titemReviewedType\tJournal\t\t15',
+  '\titemReviewedType\tJournal Article\t\t16',
+  '\titemReviewedType\tModel\t\t17',
+  '\titemReviewedType\tOutput Management Plan\t\t18',
+  '\titemReviewedType\tPeer Review\t\t19',
+  '\titemReviewedType\tPhysical Object\t\t20',
+  '\titemReviewedType\tPreprint\t\t21',
+  '\titemReviewedType\tProject\t\t22',
+  '\titemReviewedType\tReport\t\t23',
+  '\titemReviewedType\tService\t\t24',
+  '\titemReviewedType\tSoftware\t\t25',
+  '\titemReviewedType\tSound\t\t26',
+  '\titemReviewedType\tStandard\t\t27',
+  '\titemReviewedType\tStudy Registration\t\t28',
+  '\titemReviewedType\tText\t\t29',
+  '\titemReviewedType\tWorkflow\t\t30',
+  '\titemReviewedType\tOther\t\t31'
+].join('\n')
+
+const RUBRIC_METADATA_BLOCK_NAME = 'rubric_dataset_reviews'
+const RUBRIC_METADATA_BLOCK_TSV = [
+  '#metadataBlock\tname\tdataverseAlias\tdisplayName',
+  `\t${RUBRIC_METADATA_BLOCK_NAME}\t\tDataset Review Rubric`,
+  [
+    '#datasetField',
+    'name',
+    'title',
+    'description',
+    'watermark',
+    'fieldType',
+    'displayOrder',
+    'displayFormat',
+    'advancedSearchField',
+    'allowControlledVocabulary',
+    'allowmultiples',
+    'facetable',
+    'displayoncreate',
+    'required',
+    'parent',
+    'metadatablock_id',
+    'termURI'
+  ].join('\t'),
+  `\trubricDatasetReviewSummary\tReview Summary\tA short summary of the dataset review.\t\ttextbox\t1\t\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\t\t${RUBRIC_METADATA_BLOCK_NAME}\t`
+].join('\n')
+
+const REVIEW_SOLR_SCHEMA_FIELD_NAMES = [
+  'itemReviewed',
+  'itemReviewedCitation',
+  'itemReviewedType',
+  'itemReviewedUrl',
+  'rubricDatasetReviewSummary'
+]
 
 describe('DatasetsRepository', () => {
   const testCollectionAlias = 'datasetsRepositoryTestCollection'
@@ -1933,6 +2088,233 @@ describe('DatasetsRepository', () => {
           after: ['CC BY 4.0']
         }
       })
+    })
+  })
+
+  describe('getDatasetReviews use case', () => {
+    const collectionAlias = `datasetReviews${randomUUID().replace(/-/g, '').slice(0, 8)}`
+    const reviewDatasetTypeName = 'review'
+    let targetDatasetIds: CreatedDatasetIdentifiers | undefined
+    let reviewDatasetIds: CreatedDatasetIdentifiers | undefined
+    let reviewDatasetTypeCreatedByTest = false
+    let reviewDatasetTypeIdCreatedByTest: number | undefined
+    let collectionCreated = false
+    let skipReason: string | undefined
+
+    beforeAll(async () => {
+      skipReason = await getDatasetReviewsIntegrationSkipReason()
+      if (skipReason) {
+        return
+      }
+
+      await ensureReviewMetadataBlocksExist()
+      await ensureReviewSolrSchemaFieldsExist()
+      await ensureReviewDatasetTypeExists()
+      await createCollectionViaApi(collectionAlias)
+      collectionCreated = true
+      await setCollectionAllowedDatasetTypesViaApi(collectionAlias, [
+        defaultDatasetType,
+        reviewDatasetTypeName
+      ])
+      await publishCollectionViaApi(collectionAlias)
+
+      targetDatasetIds = await createDataset.execute(
+        {
+          ...TestConstants.TEST_NEW_DATASET_DTO,
+          metadataBlockValues: [
+            {
+              ...TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0],
+              fields: {
+                ...TestConstants.TEST_NEW_DATASET_DTO.metadataBlockValues[0].fields,
+                title: 'Dataset with a review'
+              }
+            }
+          ]
+        },
+        collectionAlias
+      )
+      await publishDatasetViaApi(targetDatasetIds.numericId)
+      await waitForNoLocks(targetDatasetIds.numericId, 10)
+
+      reviewDatasetIds = await createDataset.execute(
+        createReviewDatasetDTO(getPersistentIdUrl(targetDatasetIds.persistentId)),
+        collectionAlias,
+        reviewDatasetTypeName
+      )
+      await publishDatasetViaApi(reviewDatasetIds.numericId)
+      await waitForNoLocks(reviewDatasetIds.numericId, 10)
+      await waitForDatasetsIndexedInSolr(2, collectionAlias)
+    })
+
+    afterAll(async () => {
+      if (reviewDatasetIds) {
+        await deletePublishedDatasetViaApi(reviewDatasetIds.persistentId).catch(() =>
+          deleteUnpublishedDatasetViaApi(reviewDatasetIds?.numericId as number).catch(
+            () => undefined
+          )
+        )
+      }
+      if (targetDatasetIds) {
+        await deletePublishedDatasetViaApi(targetDatasetIds.persistentId).catch(() =>
+          deleteUnpublishedDatasetViaApi(targetDatasetIds?.numericId as number).catch(
+            () => undefined
+          )
+        )
+      }
+      if (collectionCreated) {
+        await deleteCollectionViaApi(collectionAlias).catch(() => undefined)
+      }
+
+      if (reviewDatasetTypeCreatedByTest) {
+        await deleteDatasetType
+          .execute(reviewDatasetTypeIdCreatedByTest as number)
+          .catch(() => undefined)
+      }
+    })
+
+    test('should return reviews when providing a dataset persistent id', async () => {
+      if (skipWhenDatasetReviewsIntegrationIsUnavailable()) {
+        return
+      }
+
+      const actual = await waitForDatasetReviews(targetDatasetIds?.persistentId as string)
+
+      expect(actual).toContainEqual(expect.objectContaining(getExpectedReviewDataset()))
+    })
+
+    test('should return reviews when providing a numeric dataset id', async () => {
+      if (skipWhenDatasetReviewsIntegrationIsUnavailable()) {
+        return
+      }
+
+      const actual = await waitForDatasetReviews(targetDatasetIds?.numericId as number)
+
+      expect(actual).toContainEqual(expect.objectContaining(getExpectedReviewDataset()))
+    })
+
+    const getDatasetReviewsIntegrationSkipReason = async (): Promise<string | undefined> => {
+      if (!(await isDatasetReviewsEndpointAvailable())) {
+        return 'this Dataverse test server does not expose /api/datasets/{id}/reviews'
+      }
+
+      return undefined
+    }
+
+    const isDatasetReviewsEndpointAvailable = async (): Promise<boolean> => {
+      try {
+        await sut.getDatasetReviews(nonExistentTestDatasetId)
+        return true
+      } catch (error) {
+        return !(error as Error).message.includes('API endpoint does not exist')
+      }
+    }
+
+    const isMetadataBlockAvailable = async (metadataBlockName: string): Promise<boolean> => {
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+
+      try {
+        await metadataBlocksRepository.getMetadataBlockByName(metadataBlockName)
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    const ensureReviewMetadataBlocksExist = async (): Promise<void> => {
+      await ensureMetadataBlockExists('review', REVIEW_METADATA_BLOCK_TSV)
+      await ensureMetadataBlockExists(RUBRIC_METADATA_BLOCK_NAME, RUBRIC_METADATA_BLOCK_TSV)
+    }
+
+    const ensureMetadataBlockExists = async (
+      metadataBlockName: string,
+      metadataBlockTsv: string
+    ): Promise<void> => {
+      if (await isMetadataBlockAvailable(metadataBlockName)) {
+        return
+      }
+
+      await loadMetadataBlockViaApi(metadataBlockTsv)
+
+      if (!(await isMetadataBlockAvailable(metadataBlockName))) {
+        throw new Error(`${metadataBlockName} metadata block was loaded but is still unavailable.`)
+      }
+    }
+
+    const ensureReviewSolrSchemaFieldsExist = async (): Promise<void> => {
+      if (await reviewSolrSchemaFieldsExist()) {
+        return
+      }
+
+      await replaceSolrSchemaWithDataverseGeneratedSchemaViaApi()
+
+      if (!(await reviewSolrSchemaFieldsExist())) {
+        throw new Error('Solr schema was regenerated but review metadata fields are unavailable.')
+      }
+    }
+
+    const reviewSolrSchemaFieldsExist = async (): Promise<boolean> => {
+      const fieldExists = await Promise.all(
+        REVIEW_SOLR_SCHEMA_FIELD_NAMES.map((fieldName) => solrSchemaFieldExistsViaApi(fieldName))
+      )
+
+      return fieldExists.every(Boolean)
+    }
+
+    const skipWhenDatasetReviewsIntegrationIsUnavailable = (): boolean => {
+      if (!skipReason) {
+        return false
+      }
+
+      console.warn(`Skipping getDatasetReviews integration assertion because ${skipReason}.`)
+      return true
+    }
+
+    const ensureReviewDatasetTypeExists = async () => {
+      const reviewDatasetType = await getDatasetAvailableDatasetType
+        .execute(reviewDatasetTypeName)
+        .catch(async () => {
+          reviewDatasetTypeCreatedByTest = true
+          return await addDatasetType.execute({
+            name: reviewDatasetTypeName,
+            displayName: 'Review',
+            description: 'A review of a dataset compiled by the expert community.',
+            linkedMetadataBlocks: [],
+            availableLicenses: []
+          })
+        })
+
+      reviewDatasetTypeIdCreatedByTest = reviewDatasetType.id
+
+      await linkDatasetTypeWithMetadataBlocks.execute(reviewDatasetType.id as number, [
+        'review',
+        RUBRIC_METADATA_BLOCK_NAME
+      ])
+    }
+
+    const waitForDatasetReviews = async (
+      datasetId: number | string,
+      maxRetries = 10
+    ): Promise<DatasetReview[]> => {
+      for (let retry = 0; retry < maxRetries; retry++) {
+        const reviews = await getDatasetReviews.execute(datasetId)
+
+        if (reviews.some((review) => review.id === reviewDatasetIds?.numericId)) {
+          return reviews
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }
+
+      return await getDatasetReviews.execute(datasetId)
+    }
+
+    const getExpectedReviewDataset = (): Partial<DatasetReview> => ({
+      id: reviewDatasetIds?.numericId,
+      persistentId: reviewDatasetIds?.persistentId,
+      persistentIdUrl: getPersistentIdUrl(reviewDatasetIds?.persistentId as string),
+      title: 'Review of Dataset with a review',
+      authors: ['Reviewer, Dataverse'],
+      description: 'This is a review of a dataset.'
     })
   })
 

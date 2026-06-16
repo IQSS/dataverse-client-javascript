@@ -27,6 +27,10 @@ import {
   createDatasetPreviewPayload
 } from '../../testHelpers/datasets/datasetPreviewHelper'
 import {
+  createDatasetReviewModel,
+  createDatasetReviewPayload
+} from '../../testHelpers/datasets/datasetReviewHelper'
+import {
   createDatasetDTO,
   createDatasetDeaccessionDTO,
   createDatasetMetadataBlockModel,
@@ -787,6 +791,102 @@ describe('DatasetsRepository', () => {
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
       )
       expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('getDatasetReviews', () => {
+    const testDatasetReviews = [createDatasetReviewModel()]
+    const testDatasetReviewsResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          reviews: [createDatasetReviewPayload()]
+        }
+      }
+    }
+
+    describe('by numeric id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/reviews`
+
+      test('should return dataset reviews when providing id and response is successful', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetReviewsResponse)
+
+        // API Key auth
+        let actual = await sut.getDatasetReviews(testDatasetModel.id)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toStrictEqual(testDatasetReviews)
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        actual = await sut.getDatasetReviews(testDatasetModel.id)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+        expect(actual).toStrictEqual(testDatasetReviews)
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        let error = undefined as unknown as ReadError
+        await sut.getDatasetReviews(testDatasetModel.id).catch((e) => (error = e))
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(error).toBeInstanceOf(Error)
+      })
+    })
+
+    describe('by persistent id', () => {
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/:persistentId/reviews?persistentId=${TestConstants.TEST_DUMMY_PERSISTENT_ID}`
+
+      test('should return dataset reviews when providing persistent id and response is successful', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetReviewsResponse)
+
+        // API Key auth
+        let actual = await sut.getDatasetReviews(TestConstants.TEST_DUMMY_PERSISTENT_ID)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toStrictEqual(testDatasetReviews)
+
+        // Session cookie auth
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+
+        actual = await sut.getDatasetReviews(TestConstants.TEST_DUMMY_PERSISTENT_ID)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+        )
+        expect(actual).toStrictEqual(testDatasetReviews)
+      })
+
+      test('should return error result on error response', async () => {
+        jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+        let error = undefined as unknown as ReadError
+        await sut
+          .getDatasetReviews(TestConstants.TEST_DUMMY_PERSISTENT_ID)
+          .catch((e) => (error = e))
+
+        expect(axios.get).toHaveBeenCalledWith(
+          expectedApiEndpoint,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(error).toBeInstanceOf(Error)
+      })
     })
   })
 

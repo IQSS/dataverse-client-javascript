@@ -353,6 +353,26 @@ export const setDatasetStorageSizeViaApi = async (
   }
 }
 
+export const loadMetadataBlockViaApi = async (metadataBlockTsv: string): Promise<AxiosResponse> => {
+  try {
+    return await axios.post(
+      `${TestConstants.TEST_API_URL}/admin/datasetfield/load`,
+      metadataBlockTsv,
+      {
+        headers: {
+          'Content-Type': 'text/tab-separated-values',
+          'X-Dataverse-Key': process.env.TEST_API_KEY
+        }
+      }
+    )
+  } catch (error) {
+    const message = axios.isAxiosError(error)
+      ? `[${error.response?.status}] ${error.response?.data?.message ?? error.message}`
+      : `${error}`
+    throw new Error(`Error while loading metadata block. Reason was: ${message}`)
+  }
+}
+
 export const deaccessionDatasetViaApi = async (
   datasetId: number,
   versionId: string
