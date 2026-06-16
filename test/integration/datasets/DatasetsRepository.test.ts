@@ -66,8 +66,8 @@ import {
   DatasetVersionSummaryStringValues
 } from '../../../src/datasets/domain/models/DatasetVersionSummaryInfo'
 import {
-  replaceSolrSchemaWithDataverseGeneratedSchemaViaApi,
-  solrSchemaFieldExistsViaApi
+  replaceSolrSchemaWithDataverseGeneratedSchemaViaDocker,
+  solrSchemaFieldExistsViaDocker
 } from '../../testHelpers/search/solrHelper'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
@@ -152,7 +152,7 @@ const createReviewDatasetDTO = (itemReviewedUrl: string): DatasetDTO => ({
     {
       name: RUBRIC_METADATA_BLOCK_NAME,
       fields: {
-        rubricDatasetReviewSummary: 'The reviewed dataset is complete enough for reuse.'
+        authorAndProvenance: 'High'
       }
     }
   ]
@@ -225,10 +225,10 @@ const REVIEW_METADATA_BLOCK_TSV = [
   '\titemReviewedType\tOther\t\t31'
 ].join('\n')
 
-const RUBRIC_METADATA_BLOCK_NAME = 'rubric_dataset_reviews'
+const RUBRIC_METADATA_BLOCK_NAME = 'rubric_trusteddatadimensionsintensities'
 const RUBRIC_METADATA_BLOCK_TSV = [
-  '#metadataBlock\tname\tdataverseAlias\tdisplayName',
-  `\t${RUBRIC_METADATA_BLOCK_NAME}\t\tDataset Review Rubric`,
+  '#metadataBlock\tname\tdataverseAlias\tdisplayName\tblockURI',
+  `\t${RUBRIC_METADATA_BLOCK_NAME}\t\tTrusted Data Dimensions and Intensities\t`,
   [
     '#datasetField',
     'name',
@@ -248,7 +248,11 @@ const RUBRIC_METADATA_BLOCK_TSV = [
     'metadatablock_id',
     'termURI'
   ].join('\t'),
-  `\trubricDatasetReviewSummary\tReview Summary\tA short summary of the dataset review.\t\ttextbox\t1\t\tFALSE\tFALSE\tFALSE\tFALSE\tTRUE\tFALSE\t\t${RUBRIC_METADATA_BLOCK_NAME}\t`
+  `\tauthorAndProvenance\tAuthor and Provenance\tThe level of trust in the data creators and in other provenance information\t\ttext\t1\t\tTRUE\tTRUE\tFALSE\tTRUE\tFALSE\tFALSE\t\t${RUBRIC_METADATA_BLOCK_NAME}\t`,
+  '#controlledVocabulary\tDatasetField\tValue\tidentifier\tdisplayOrder',
+  '\tauthorAndProvenance\tLow\t\t0',
+  '\tauthorAndProvenance\tMedium\t\t1',
+  '\tauthorAndProvenance\tHigh\t\t2'
 ].join('\n')
 
 const REVIEW_SOLR_SCHEMA_FIELD_NAMES = [
@@ -256,7 +260,7 @@ const REVIEW_SOLR_SCHEMA_FIELD_NAMES = [
   'itemReviewedCitation',
   'itemReviewedType',
   'itemReviewedUrl',
-  'rubricDatasetReviewSummary'
+  'authorAndProvenance'
 ]
 
 describe('DatasetsRepository', () => {
@@ -2099,14 +2103,9 @@ describe('DatasetsRepository', () => {
     let reviewDatasetTypeCreatedByTest = false
     let reviewDatasetTypeIdCreatedByTest: number | undefined
     let collectionCreated = false
-    let skipReason: string | undefined
 
     beforeAll(async () => {
-      skipReason = await getDatasetReviewsIntegrationSkipReason()
-      if (skipReason) {
-        return
-      }
-
+      await assertDatasetReviewsEndpointAvailable()
       await ensureReviewMetadataBlocksExist()
       await ensureReviewSolrSchemaFieldsExist()
       await ensureReviewDatasetTypeExists()
@@ -2173,31 +2172,21 @@ describe('DatasetsRepository', () => {
     })
 
     test('should return reviews when providing a dataset persistent id', async () => {
-      if (skipWhenDatasetReviewsIntegrationIsUnavailable()) {
-        return
-      }
-
       const actual = await waitForDatasetReviews(targetDatasetIds?.persistentId as string)
 
       expect(actual).toContainEqual(expect.objectContaining(getExpectedReviewDataset()))
     })
 
     test('should return reviews when providing a numeric dataset id', async () => {
-      if (skipWhenDatasetReviewsIntegrationIsUnavailable()) {
-        return
-      }
-
       const actual = await waitForDatasetReviews(targetDatasetIds?.numericId as number)
 
       expect(actual).toContainEqual(expect.objectContaining(getExpectedReviewDataset()))
     })
 
-    const getDatasetReviewsIntegrationSkipReason = async (): Promise<string | undefined> => {
+    const assertDatasetReviewsEndpointAvailable = async (): Promise<void> => {
       if (!(await isDatasetReviewsEndpointAvailable())) {
-        return 'this Dataverse test server does not expose /api/datasets/{id}/reviews'
+        throw new Error('Expected Dataverse test server to expose /api/datasets/{id}/reviews.')
       }
-
-      return undefined
     }
 
     const isDatasetReviewsEndpointAvailable = async (): Promise<boolean> => {
@@ -2245,7 +2234,7 @@ describe('DatasetsRepository', () => {
         return
       }
 
-      await replaceSolrSchemaWithDataverseGeneratedSchemaViaApi()
+      await replaceSolrSchemaWithDataverseGeneratedSchemaViaDocker()
 
       if (!(await reviewSolrSchemaFieldsExist())) {
         throw new Error('Solr schema was regenerated but review metadata fields are unavailable.')
@@ -2254,19 +2243,10 @@ describe('DatasetsRepository', () => {
 
     const reviewSolrSchemaFieldsExist = async (): Promise<boolean> => {
       const fieldExists = await Promise.all(
-        REVIEW_SOLR_SCHEMA_FIELD_NAMES.map((fieldName) => solrSchemaFieldExistsViaApi(fieldName))
+        REVIEW_SOLR_SCHEMA_FIELD_NAMES.map((fieldName) => solrSchemaFieldExistsViaDocker(fieldName))
       )
 
       return fieldExists.every(Boolean)
-    }
-
-    const skipWhenDatasetReviewsIntegrationIsUnavailable = (): boolean => {
-      if (!skipReason) {
-        return false
-      }
-
-      console.warn(`Skipping getDatasetReviews integration assertion because ${skipReason}.`)
-      return true
     }
 
     const ensureReviewDatasetTypeExists = async () => {

@@ -1,42 +1,62 @@
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import axios from 'axios'
 import { TestConstants } from '../TestConstants'
 
+const execFileAsync = promisify(execFile)
+
+const TEST_SOLR_CONTAINER_NAME = 'test_solr'
+const TEST_SOLR_SCHEMA_PATH = '/var/solr/data/collection1/conf/schema.xml'
 const TEST_SOLR_COLLECTION_URL = 'http://localhost:8983/solr/collection1'
 const TEST_SOLR_CORE_ADMIN_URL = 'http://localhost:8983/solr/admin/cores'
-const TEST_SOLR_SCHEMA_PATHS = [
-  path.resolve(
-    __dirname,
-    '../../environment/docker-dev-volumes/solr/data/data/collection1/conf/schema.xml'
-  ),
-  path.resolve(__dirname, '../../environment/docker-dev-volumes/solr/conf/conf/schema.xml')
-]
 
 const DATAVERSE_API_REQUEST_HEADERS = {
   headers: { 'X-Dataverse-Key': process.env.TEST_API_KEY }
 }
 
-export const solrSchemaFieldExistsViaApi = async (fieldName: string): Promise<boolean> => {
-  try {
-    await axios.get(`${TEST_SOLR_COLLECTION_URL}/schema/fields/${fieldName}`)
-    return true
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return false
-    }
-
-    const message = axios.isAxiosError(error)
-      ? `[${error.response?.status}] ${error.response?.data?.error?.msg ?? error.message}`
-      : `${error}`
-    throw new Error(`Error while checking Solr schema field ${fieldName}. Reason was: ${message}`)
-  }
+type ExecFileError = Error & {
+  stderr?: string
+  stdout?: string
 }
 
-export const replaceSolrSchemaWithDataverseGeneratedSchemaViaApi = async (): Promise<void> => {
+export const solrSchemaFieldExistsViaDocker = async (fieldName: string): Promise<boolean> => {
+  const statusCode = await runDockerCommand([
+    'exec',
+    TEST_SOLR_CONTAINER_NAME,
+    'curl',
+    '-sS',
+    '-o',
+    '/tmp/solr-schema-field-response.json',
+    '-w',
+    '%{http_code}',
+    `${TEST_SOLR_COLLECTION_URL}/schema/fields/${encodeURIComponent(fieldName)}`
+  ])
+
+  if (statusCode.trim() === '200') {
+    return true
+  }
+
+  if (statusCode.trim() === '404') {
+    return false
+  }
+
+  throw new Error(`Unexpected Solr schema field check status for ${fieldName}: ${statusCode}`)
+}
+
+export const replaceSolrSchemaWithDataverseGeneratedSchemaViaDocker = async (): Promise<void> => {
   const generatedSchemaFragment = await getDataverseGeneratedSolrSchemaFragment()
-  writeSolrSchemaFiles(generatedSchemaFragment)
-  await reloadSolrCoreViaApi()
+  const currentSchema = await runDockerCommand([
+    'exec',
+    TEST_SOLR_CONTAINER_NAME,
+    'cat',
+    TEST_SOLR_SCHEMA_PATH
+  ])
+  const mergedSchema = mergeGeneratedSchemaFragment(currentSchema, generatedSchemaFragment)
+  await copySchemaToSolrContainer(mergedSchema)
+  await reloadSolrCoreViaDocker()
 }
 
 const getDataverseGeneratedSolrSchemaFragment = async (): Promise<string> => {
@@ -59,21 +79,30 @@ const getDataverseGeneratedSolrSchemaFragment = async (): Promise<string> => {
   }
 }
 
-const writeSolrSchemaFiles = (generatedSchemaFragment: string): void => {
-  const schemaPathsWritten = TEST_SOLR_SCHEMA_PATHS.filter((schemaPath) =>
-    fs.existsSync(schemaPath)
-  )
+const copySchemaToSolrContainer = async (schemaXml: string): Promise<void> => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dataverse-solr-schema-'))
+  const tempSchemaPath = path.join(tempDir, 'schema.xml')
 
-  if (schemaPathsWritten.length === 0) {
-    throw new Error('Could not find a mounted Solr schema.xml file to update.')
+  try {
+    fs.writeFileSync(tempSchemaPath, schemaXml)
+    await runDockerCommand([
+      'cp',
+      tempSchemaPath,
+      `${TEST_SOLR_CONTAINER_NAME}:${TEST_SOLR_SCHEMA_PATH}`
+    ])
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true })
   }
+}
 
-  schemaPathsWritten.forEach((schemaPath) => {
-    fs.writeFileSync(
-      schemaPath,
-      mergeGeneratedSchemaFragment(fs.readFileSync(schemaPath, 'utf8'), generatedSchemaFragment)
-    )
-  })
+const reloadSolrCoreViaDocker = async (): Promise<void> => {
+  await runDockerCommand([
+    'exec',
+    TEST_SOLR_CONTAINER_NAME,
+    'curl',
+    '-sS',
+    `${TEST_SOLR_CORE_ADMIN_URL}?action=RELOAD&core=collection1&wt=json`
+  ])
 }
 
 const mergeGeneratedSchemaFragment = (
@@ -118,15 +147,16 @@ const replaceSchemaSection = (
   ].join('\n')
 }
 
-const reloadSolrCoreViaApi = async (): Promise<void> => {
+const runDockerCommand = async (args: string[]): Promise<string> => {
   try {
-    await axios.get(TEST_SOLR_CORE_ADMIN_URL, {
-      params: { action: 'RELOAD', core: 'collection1', wt: 'json' }
-    })
+    const { stdout } = await execFileAsync('docker', args, { maxBuffer: 10 * 1024 * 1024 })
+    return stdout
   } catch (error) {
-    const message = axios.isAxiosError(error)
-      ? `[${error.response?.status}] ${error.response?.data?.error?.msg ?? error.message}`
-      : `${error}`
-    throw new Error(`Error while reloading Solr core. Reason was: ${message}`)
+    const execError = error as ExecFileError
+    throw new Error(
+      `Docker command failed: docker ${args.join(' ')}. Reason was: ${
+        execError.stderr ?? execError.stdout ?? execError.message
+      }`
+    )
   }
 }
