@@ -19,5 +19,5 @@ export interface DatasetReviewRubricMetadataBlockPayload {
 
 export interface DatasetReviewRubricMetadataFieldPayload {
   typeName: string
-  value: unknown
+  value: string
 }
