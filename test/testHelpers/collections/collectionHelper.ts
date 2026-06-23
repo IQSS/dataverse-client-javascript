@@ -179,6 +179,28 @@ export async function publishCollectionViaApi(collectionAlias: string): Promise<
   }
 }
 
+export async function setCollectionAllowedDatasetTypesViaApi(
+  collectionAlias: string,
+  allowedDatasetTypes: string[]
+): Promise<void> {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/attribute/allowedDatasetTypes`,
+      undefined,
+      {
+        params: {
+          value: allowedDatasetTypes.join(',')
+        },
+        ...DATAVERSE_API_REQUEST_HEADERS
+      }
+    )
+  } catch (error) {
+    throw new Error(
+      `Error while setting allowed dataset types for test collection ${collectionAlias}`
+    )
+  }
+}
+
 export const createCollectionDTO = (alias = 'test-collection'): CollectionDTO => {
   return {
     alias: alias,

@@ -1098,6 +1098,30 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) implementati
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
+#### Get Dataset Reviews
+
+Returns a [DatasetReview](../src/datasets/domain/models/DatasetReview.ts) array with the local review datasets that review a dataset. Review datasets are matched by their `itemReviewedUrl` metadata field pointing at the URL form of the dataset persistent identifier.
+
+##### Example call:
+
+```typescript
+import { getDatasetReviews } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.5072/FK2/ABCDEF'
+
+getDatasetReviews.execute(datasetId).then((datasetReviews: DatasetReview[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetReviews.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers. An API token is optional when the review dataset has been published, but unpublished targets require permission to view the unpublished dataset.
+
 #### Get Dataset Summary Field Names
 
 Returns the names of the dataset summary fields configured in the installation.

@@ -31,6 +31,8 @@ import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpd
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
 import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { DatasetUploadLimits } from '../../domain/models/DatasetUploadLimits'
+import { DatasetReview } from '../../domain/models/DatasetReview'
+import { transformDatasetReviewsResponseToDatasetReviews } from './transformers/datasetReviewTransformers'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -519,6 +521,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true
     )
       .then((response) => (response.data?.data?.uploadLimits ?? {}) as DatasetUploadLimits)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetReviews(datasetId: number | string): Promise<DatasetReview[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'reviews', datasetId), true)
+      .then((response) => transformDatasetReviewsResponseToDatasetReviews(response))
       .catch((error) => {
         throw error
       })

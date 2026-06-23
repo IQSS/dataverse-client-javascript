@@ -35,6 +35,7 @@ import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits'
+import { GetDatasetReviews } from './domain/useCases/GetDatasetReviews'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -86,6 +87,7 @@ const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
+const getDatasetReviews = new GetDatasetReviews(datasetsRepository)
 
 export {
   getDataset,
@@ -118,7 +120,8 @@ export {
   deleteDatasetType,
   updateDatasetLicense,
   getDatasetStorageDriver,
-  getDatasetUploadLimits
+  getDatasetUploadLimits,
+  getDatasetReviews
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
@@ -158,3 +161,8 @@ export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection
 export { DatasetType } from './domain/models/DatasetType'
 export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'
 export { DatasetUploadLimits } from './domain/models/DatasetUploadLimits'
+export {
+  DatasetReview,
+  DatasetReviewRubricMetadataBlock,
+  DatasetReviewRubricMetadataField
+} from './domain/models/DatasetReview'
