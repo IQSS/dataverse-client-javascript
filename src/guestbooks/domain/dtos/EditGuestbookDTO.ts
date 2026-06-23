@@ -25,5 +25,5 @@ export interface EditGuestbookDTO {
   institutionRequired: boolean
   positionRequired: boolean
   createTime: string
-  customQuestions?: EditGuestbookCustomQuestionDTO[]
+  customQuestions: EditGuestbookCustomQuestionDTO[]
 }

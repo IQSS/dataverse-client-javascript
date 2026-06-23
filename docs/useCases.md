@@ -3304,7 +3304,14 @@ import { editGuestbook } from '@iqss/dataverse-client-javascript'
 
 const guestbookId = 123
 const guestbook: EditGuestbookDTO = {
-  name: 'new name'
+  name: 'new name',
+  enabled: true,
+  emailRequired: true,
+  nameRequired: true,
+  institutionRequired: false,
+  positionRequired: false,
+  createTime: '2026-06-12T00:00:00Z',
+  customQuestions: []
 }
 
 editGuestbook.execute(guestbookId, guestbook).then(() => {

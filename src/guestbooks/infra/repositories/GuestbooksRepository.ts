@@ -26,14 +26,10 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
   }
 
   public async editGuestbook(guestbookId: number, guestbook: EditGuestbookDTO): Promise<void> {
-    return this.doPut(
+    await this.doPut(
       this.buildApiEndpoint(this.guestbooksResourceName, undefined, guestbookId),
       guestbook
     )
-      .then(() => undefined)
-      .catch((error) => {
-        throw error
-      })
   }
 
   public async getGuestbook(guestbookId: number): Promise<Guestbook> {
