@@ -17,7 +17,6 @@ export interface EditGuestbookCustomQuestionDTO {
 }
 
 export interface EditGuestbookDTO {
-  id?: number
   name: string
   enabled: boolean
   emailRequired: boolean
@@ -25,5 +24,5 @@ export interface EditGuestbookDTO {
   institutionRequired: boolean
   positionRequired: boolean
   createTime: string
-  customQuestions: EditGuestbookCustomQuestionDTO[]
+  customQuestions?: EditGuestbookCustomQuestionDTO[]
 }

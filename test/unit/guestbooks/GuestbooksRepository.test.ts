@@ -214,12 +214,38 @@ describe('GuestbooksRepository', () => {
         JSON.stringify(editGuestbookDTO),
         TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
       )
-      const requestPayload = JSON.parse((axios.put as jest.Mock).mock.calls[0][1] as string) as
-        | EditGuestbookDTO
-        | undefined
-      expect(requestPayload?.id).toBeUndefined()
+      const requestPayload = JSON.parse(
+        (axios.put as jest.Mock).mock.calls[0][1] as string
+      ) as EditGuestbookDTO & { id?: number }
+      expect(requestPayload.id).toBeUndefined()
       expect(requestPayload?.customQuestions?.[0].id).toBe(1)
       expect(requestPayload?.customQuestions?.[1].optionValues?.[0].id).toBe(10)
+      expect(actual).toBeUndefined()
+    })
+
+    test('should edit guestbook without custom questions in payload', async () => {
+      jest.spyOn(axios, 'put').mockResolvedValue({ data: { status: 'OK' } })
+      const editGuestbookDTOWithoutCustomQuestions: EditGuestbookDTO = {
+        name: editGuestbookDTO.name,
+        enabled: editGuestbookDTO.enabled,
+        emailRequired: editGuestbookDTO.emailRequired,
+        nameRequired: editGuestbookDTO.nameRequired,
+        institutionRequired: editGuestbookDTO.institutionRequired,
+        positionRequired: editGuestbookDTO.positionRequired,
+        createTime: editGuestbookDTO.createTime
+      }
+
+      const actual = await sut.editGuestbook(12, editGuestbookDTOWithoutCustomQuestions)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/guestbooks/12`,
+        JSON.stringify(editGuestbookDTOWithoutCustomQuestions),
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      const requestPayload = JSON.parse(
+        (axios.put as jest.Mock).mock.calls[0][1] as string
+      ) as EditGuestbookDTO
+      expect(requestPayload.customQuestions).toBeUndefined()
       expect(actual).toBeUndefined()
     })
 
