@@ -1,5 +1,6 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { CreateGuestbookDTO } from '../../domain/dtos/CreateGuestbookDTO'
+import { EditGuestbookDTO } from '../../domain/dtos/EditGuestbookDTO'
 import { GuestbookResponsesDTO } from '../../domain/dtos/GuestbookResponsesDTO'
 import { Guestbook } from '../../domain/models/Guestbook'
 import { GuestbookResponseSubset } from '../../domain/models/GuestbookResponse'
@@ -22,6 +23,13 @@ export class GuestbooksRepository extends ApiRepository implements IGuestbooksRe
       .catch((error) => {
         throw error
       })
+  }
+
+  public async editGuestbook(guestbookId: number, guestbook: EditGuestbookDTO): Promise<void> {
+    await this.doPut(
+      this.buildApiEndpoint(this.guestbooksResourceName, undefined, guestbookId),
+      guestbook
+    )
   }
 
   public async getGuestbook(guestbookId: number): Promise<Guestbook> {

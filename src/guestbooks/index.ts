@@ -1,5 +1,6 @@
 import { GuestbooksRepository } from './infra/repositories/GuestbooksRepository'
 import { CreateGuestbook } from './domain/useCases/CreateGuestbook'
+import { EditGuestbook } from './domain/useCases/EditGuestbook'
 import { DownloadGuestbookResponsesByCollectionId } from './domain/useCases/DownloadGuestbookResponsesByCollectionId'
 import { DownloadGuestbookResponsesOfAGuestbook } from './domain/useCases/DownloadGuestbookResponsesOfAGuestbook'
 import { GetGuestbook } from './domain/useCases/GetGuestbook'
@@ -12,6 +13,7 @@ import { RemoveDatasetGuestbook } from './domain/useCases/RemoveDatasetGuestbook
 const guestbooksRepository = new GuestbooksRepository()
 
 const createGuestbook = new CreateGuestbook(guestbooksRepository)
+const editGuestbook = new EditGuestbook(guestbooksRepository)
 const downloadGuestbookResponsesByCollectionId = new DownloadGuestbookResponsesByCollectionId(
   guestbooksRepository
 )
@@ -29,6 +31,7 @@ const removeDatasetGuestbook = new RemoveDatasetGuestbook(guestbooksRepository)
 
 export {
   createGuestbook,
+  editGuestbook,
   downloadGuestbookResponsesByCollectionId,
   downloadGuestbookResponsesOfAGuestbook,
   getGuestbook,
@@ -44,6 +47,11 @@ export {
   CreateGuestbookCustomQuestionDTO,
   CreateGuestbookOptionDTO
 } from './domain/dtos/CreateGuestbookDTO'
+export {
+  EditGuestbookDTO,
+  EditGuestbookCustomQuestionDTO,
+  EditGuestbookOptionDTO
+} from './domain/dtos/EditGuestbookDTO'
 export {
   GuestbookResponsesDTO,
   GuestbookResponsesPaginationDTO

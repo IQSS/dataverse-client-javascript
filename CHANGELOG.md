@@ -8,6 +8,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Guestbooks: Added `editGuestbook` use case.
 - Guestbooks: Added `getGuestbookResponsesByGuestbookId` use case and repository support for retrieving paginated guestbook responses with total count as structured JSON.
 - Guestbooks: Added `downloadGuestbookResponsesByCollectionId` and `downloadGuestbookResponsesOfAGuestbook` use cases and repository support for exporting guestbook responses as raw CSV content.
 - Guestbooks: Added optional `includeStats` support to `getGuestbooksByCollectionId`, returning `usageCount` and `responseCount` when requested.

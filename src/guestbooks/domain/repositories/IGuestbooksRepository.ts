@@ -1,4 +1,5 @@
 import { CreateGuestbookDTO } from '../dtos/CreateGuestbookDTO'
+import { EditGuestbookDTO } from '../dtos/EditGuestbookDTO'
 import { Guestbook } from '../models/Guestbook'
 import { GuestbookResponseSubset } from '../models/GuestbookResponse'
 
@@ -7,6 +8,7 @@ export interface IGuestbooksRepository {
     collectionIdOrAlias: number | string,
     guestbook: CreateGuestbookDTO
   ): Promise<number>
+  editGuestbook(guestbookId: number, guestbook: EditGuestbookDTO): Promise<void>
   getGuestbook(guestbookId: number): Promise<Guestbook>
   getGuestbooksByCollectionId(
     collectionIdOrAlias: number | string,
