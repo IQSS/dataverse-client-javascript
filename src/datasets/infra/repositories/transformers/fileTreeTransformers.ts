@@ -17,6 +17,7 @@ interface FolderItemPayload {
     bytes: number
     restricted: number
     embargoed: number
+    retentionExpired: number
   }
 }
 
@@ -27,7 +28,7 @@ interface FileItemPayload {
   path: string
   size: number
   contentType?: string
-  access?: 'public' | 'restricted' | 'embargoed'
+  access?: 'public' | 'restricted' | 'embargoed' | 'retentionExpired'
   checksum?: { type: string; value: string }
   downloadUrl: string
 }

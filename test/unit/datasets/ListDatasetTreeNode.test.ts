@@ -21,7 +21,8 @@ describe('ListDatasetTreeNode (unit)', () => {
           folders: 0,
           bytes: 1024,
           restricted: 0,
-          embargoed: 0
+          embargoed: 0,
+          retentionExpired: 0
         }
       },
       {

@@ -30,7 +30,8 @@ describe('transformTreeResponseToFileTreePage', () => {
             folders: 0,
             bytes: 4096,
             restricted: 0,
-            embargoed: 0
+            embargoed: 0,
+            retentionExpired: 0
           }
         },
         {
@@ -71,7 +72,8 @@ describe('transformTreeResponseToFileTreePage', () => {
       folders: 0,
       bytes: 4096,
       restricted: 0,
-      embargoed: 0
+      embargoed: 0,
+      retentionExpired: 0
     })
 
     const file = page.items[1]

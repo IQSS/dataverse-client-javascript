@@ -126,6 +126,10 @@ export class DirectUploadClient implements IDirectUploadClient {
       const fileSlice = file.slice(offset, offset + partSize)
 
       try {
+        // No `x-amz-tagging` here, ever: part-upload URLs are not signed
+        // for the header (sending it fails the S3 signature check). The
+        // server applies the temporary tag itself when it initiates the
+        // multipart upload, so `destination.tagging` is single-part-only.
         const response = await axios.put(destinationUrl, fileSlice, {
           headers: {
             'Content-Type': 'application/octet-stream'

@@ -1770,7 +1770,9 @@ _See [use case](../src/datasets/domain/useCases/ListDatasetTreeNode.ts) implemen
 
 Other optional parameters: `cursor` (opaque, from a previous response), `include` (`'all' | 'folders' | 'files'`, default `'all'`), `order` (`'NameAZ' | 'NameZA'`, default `'NameAZ'`), `includeDeaccessioned` (default `false`), and `originals` (when `true`, ingested tabular files are reported in their original-upload form: the per-file `downloadUrl` carries `?format=original`, and `checksum` and `size` reflect the saved original instead of the converted TSV).
 
-For published, non-deaccessioned versions the underlying API emits `ETag` + `Cache-Control: private, immutable` headers. The `private` directive keeps responses out of shared proxy caches because the route is auth-required; the browser's own cache still benefits from `immutable`. Drafts and deaccessioned versions don't.
+The `path` value is normalized by the server with the same rules applied to folder names at upload time (slash/backslash runs collapse, leading dots/dashes/spaces are stripped); paths emitted by the endpoint itself always round-trip, and a path that normalizes to nothing (for example `..`) is rejected with a `400` error.
+
+For published, non-deaccessioned versions the underlying API emits an `ETag` (derived from the request inputs plus the current date) and `Cache-Control: private, no-cache` headers. A released version's file list is frozen, but the response is still time-dependent — the per-file `access` marker flips when an embargo lapses or a retention period expires — so the contract is revalidate-always (`no-cache`) with a date-scoped validator: passing the ETag back in `If-None-Match` yields a body-less `304 Not Modified` while it still matches. The `private` directive keeps responses out of shared proxy caches because the route is auth-required. Drafts and deaccessioned versions emit no caching headers.
 
 #### Iterate a Folder of a Dataset Version (Tree View)
 
