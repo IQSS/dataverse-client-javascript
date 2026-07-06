@@ -28,9 +28,15 @@ export class DirectUploadClient implements IDirectUploadClient {
   private readonly fileUploadTimeoutMs: number
 
   constructor(filesRepository: IFilesRepository, config: DirectUploadClientConfig = {}) {
+    // Pre-2.x callers passed maxMultipartRetries as a bare number in this
+    // position. TypeScript consumers get a compile error and migrate, but
+    // plain-JS callers would have their setting silently ignored — honor
+    // the legacy form instead.
+    const normalized: DirectUploadClientConfig =
+      typeof config === 'number' ? { maxMultipartRetries: config } : config
     this.filesRepository = filesRepository
-    this.maxMultipartRetries = config.maxMultipartRetries ?? 5
-    this.fileUploadTimeoutMs = config.fileUploadTimeoutMs ?? 60_000
+    this.maxMultipartRetries = normalized.maxMultipartRetries ?? 5
+    this.fileUploadTimeoutMs = normalized.fileUploadTimeoutMs ?? 60_000
   }
 
   public async uploadFile(
@@ -110,17 +116,12 @@ export class DirectUploadClient implements IDirectUploadClient {
     const eTags: Record<number, string> = {}
     const maxRetries = this.maxMultipartRetries
     const limitConcurrency = pLimit(1)
-    let uploadFailed = false
 
     const uploadPart = async (
       destinationUrl: string,
       index: number,
       retries = 0
     ): Promise<void> => {
-      if (uploadFailed) {
-        return
-      }
-
       const offset = index * partMaxSize
       const partSize = Math.min(partMaxSize, file.size - offset)
       const fileSlice = file.slice(offset, offset + partSize)
@@ -145,7 +146,8 @@ export class DirectUploadClient implements IDirectUploadClient {
         eTags[`${index + 1}`] = eTag
       } catch (error) {
         if (axios.isCancel(error)) {
-          uploadFailed = true
+          // Drop the not-yet-started parts so nothing keeps uploading
+          // against a multipart upload we are about to abort server-side.
           limitConcurrency.clearQueue()
           await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint as string)
           throw new FileUploadCancelError(file.name, datasetId)
@@ -155,7 +157,6 @@ export class DirectUploadClient implements IDirectUploadClient {
           await new Promise((resolve) => setTimeout(resolve, backoffDelay))
           await uploadPart(destinationUrl, index, retries + 1)
         } else {
-          uploadFailed = true
           limitConcurrency.clearQueue()
           await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint as string)
 

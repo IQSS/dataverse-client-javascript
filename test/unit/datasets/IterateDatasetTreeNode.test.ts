@@ -73,4 +73,23 @@ describe('IterateDatasetTreeNode (unit)', () => {
     expect(ids).toEqual([1, 2, 3, 4])
     expect(calls.map((c) => c.cursor)).toEqual([undefined, 'c2', 'c3'])
   })
+
+  test('throws instead of looping forever when the cursor does not advance', async () => {
+    const repo: IDatasetsRepository = {} as IDatasetsRepository
+    // First page hands out cursor 'stuck'; the second page echoes the
+    // same cursor back — a misbehaving server or intermediary cache.
+    repo.listDatasetTreeNode = jest
+      .fn()
+      .mockResolvedValueOnce(page({ nextCursor: 'stuck' }))
+      .mockResolvedValue(page({ nextCursor: 'stuck' }))
+
+    const sut = new IterateDatasetTreeNode(repo)
+    const iterate = async () => {
+      for await (const node of sut.execute({ datasetId: 1 })) {
+        void node
+      }
+    }
+    await expect(iterate()).rejects.toThrow('cursor did not advance')
+    expect(repo.listDatasetTreeNode).toHaveBeenCalledTimes(2)
+  })
 })

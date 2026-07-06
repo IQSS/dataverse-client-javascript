@@ -24,7 +24,16 @@ export class IterateDatasetTreeNode {
       for (const item of page.items) {
         yield item
       }
-      cursor = page.nextCursor ?? undefined
+      const nextCursor = page.nextCursor ?? undefined
+      // A keyset cursor must always advance. A server (or intermediary
+      // cache) echoing the cursor we just sent would otherwise loop this
+      // generator forever, re-fetching and re-yielding the same page.
+      if (nextCursor !== undefined && nextCursor === cursor) {
+        throw new Error(
+          `Dataset tree pagination cursor did not advance ("${nextCursor}"); aborting iteration`
+        )
+      }
+      cursor = nextCursor
     } while (cursor)
   }
 }

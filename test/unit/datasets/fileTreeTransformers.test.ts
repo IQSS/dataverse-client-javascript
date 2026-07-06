@@ -100,30 +100,24 @@ describe('transformTreeResponseToFileTreePage', () => {
     expect(page.include).toBe(FileTreeInclude.ALL)
   })
 
-  test('handles undecorated payload (no .data envelope)', () => {
-    const response = {
-      data: {
-        path: 'docs',
-        items: [
-          {
-            type: 'file',
-            id: 1,
-            name: 'README.md',
-            path: 'docs/README.md',
-            size: 200,
-            downloadUrl: '/api/access/datafile/1'
-          }
-        ],
-        nextCursor: null,
-        limit: 100,
-        order: 'NameZA',
-        include: 'files'
-      },
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {} as never
-    } as AxiosResponse
+  test('parses non-default order/include echoed by the server', () => {
+    const response = buildResponse({
+      path: 'docs',
+      items: [
+        {
+          type: 'file',
+          id: 1,
+          name: 'README.md',
+          path: 'docs/README.md',
+          size: 200,
+          downloadUrl: '/api/access/datafile/1'
+        }
+      ],
+      nextCursor: null,
+      limit: 100,
+      order: 'NameZA',
+      include: 'files'
+    })
 
     const page = transformTreeResponseToFileTreePage(response)
     expect(page.order).toBe(FileTreeOrder.NAME_ZA)

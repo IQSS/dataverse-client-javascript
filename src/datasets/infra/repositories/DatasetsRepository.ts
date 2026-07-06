@@ -4,7 +4,7 @@ import {
   ListDatasetTreeNodeParams
 } from '../../domain/repositories/IDatasetsRepository'
 import { DatasetNotNumberedVersion } from '../../domain/models/DatasetNotNumberedVersion'
-import { FileTreeInclude, FileTreeOrder, FileTreePage } from '../../domain/models/FileTreePage'
+import { FileTreePage } from '../../domain/models/FileTreePage'
 import { transformTreeResponseToFileTreePage } from './transformers/fileTreeTransformers'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
 import {
@@ -536,8 +536,8 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     if (params.path !== undefined) queryParams.path = params.path
     if (params.limit !== undefined) queryParams.limit = params.limit
     if (params.cursor !== undefined) queryParams.cursor = params.cursor
-    queryParams.include = params.include ?? FileTreeInclude.ALL
-    queryParams.order = params.order ?? FileTreeOrder.NAME_AZ
+    if (params.include !== undefined) queryParams.include = params.include
+    if (params.order !== undefined) queryParams.order = params.order
     if (params.includeDeaccessioned !== undefined) {
       queryParams.includeDeaccessioned = params.includeDeaccessioned
     }

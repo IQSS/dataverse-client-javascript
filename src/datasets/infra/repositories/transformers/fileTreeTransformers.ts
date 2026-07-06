@@ -45,15 +45,8 @@ interface TreeResponsePayload {
   approximateCount?: number
 }
 
-const ALLOWED_ORDERS: FileTreeOrder[] = [FileTreeOrder.NAME_AZ, FileTreeOrder.NAME_ZA]
-const ALLOWED_INCLUDES: FileTreeInclude[] = [
-  FileTreeInclude.ALL,
-  FileTreeInclude.FOLDERS,
-  FileTreeInclude.FILES
-]
-
 export const transformTreeResponseToFileTreePage = (response: AxiosResponse): FileTreePage => {
-  const payload = unwrap<TreeResponsePayload>(response.data)
+  const payload = response.data.data as TreeResponsePayload
   return {
     path: payload.path,
     items: payload.items.map(transformItem),
@@ -92,20 +85,13 @@ const transformFile = (item: FileItemPayload): FileTreeFileNode => ({
 })
 
 const parseOrder = (value: string): FileTreeOrder => {
-  return (ALLOWED_ORDERS as string[]).includes(value)
+  return (Object.values(FileTreeOrder) as string[]).includes(value)
     ? (value as FileTreeOrder)
     : FileTreeOrder.NAME_AZ
 }
 
 const parseInclude = (value: string): FileTreeInclude => {
-  return (ALLOWED_INCLUDES as string[]).includes(value)
+  return (Object.values(FileTreeInclude) as string[]).includes(value)
     ? (value as FileTreeInclude)
     : FileTreeInclude.ALL
-}
-
-const unwrap = <T>(value: { data: T } | T): T => {
-  if (value && typeof value === 'object' && 'data' in (value as Record<string, unknown>)) {
-    return (value as { data: T }).data
-  }
-  return value as T
 }
