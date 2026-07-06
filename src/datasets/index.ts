@@ -35,6 +35,7 @@ import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits'
+import { GetDatasetReviews } from './domain/useCases/GetDatasetReviews'
 import { ListDatasetTreeNode } from './domain/useCases/ListDatasetTreeNode'
 import { IterateDatasetTreeNode } from './domain/useCases/IterateDatasetTreeNode'
 
@@ -88,6 +89,7 @@ const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
+const getDatasetReviews = new GetDatasetReviews(datasetsRepository)
 const listDatasetTreeNode = new ListDatasetTreeNode(datasetsRepository)
 const iterateDatasetTreeNode = new IterateDatasetTreeNode(datasetsRepository)
 
@@ -123,6 +125,7 @@ export {
   updateDatasetLicense,
   getDatasetStorageDriver,
   getDatasetUploadLimits,
+  getDatasetReviews,
   listDatasetTreeNode,
   iterateDatasetTreeNode
 }
@@ -164,6 +167,11 @@ export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection
 export { DatasetType } from './domain/models/DatasetType'
 export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'
 export { DatasetUploadLimits } from './domain/models/DatasetUploadLimits'
+export {
+  DatasetReview,
+  DatasetReviewRubricMetadataBlock,
+  DatasetReviewRubricMetadataField
+} from './domain/models/DatasetReview'
 export {
   FileTreeNode,
   FileTreeFolderNode,

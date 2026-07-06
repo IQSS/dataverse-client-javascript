@@ -8,6 +8,14 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Guestbooks: Added `editGuestbook` use case.
+- Guestbooks: Added `getGuestbookResponsesByGuestbookId` use case and repository support for retrieving paginated guestbook responses with total count as structured JSON.
+- Guestbooks: Added `downloadGuestbookResponsesByCollectionId` and `downloadGuestbookResponsesOfAGuestbook` use cases and repository support for exporting guestbook responses as raw CSV content.
+- Guestbooks: Added optional `includeStats` support to `getGuestbooksByCollectionId`, returning `usageCount` and `responseCount` when requested.
+- Files: Added `getFileCitationByFormat` use case, repository method, and `FileCitationFormat` enum to support Dataverse file citation exports in `EndNote`, `RIS`, `BibTeX`, `CSL`, and `Internal` formats.
+- Datasets: Added `getDatasetReviews` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/reviews`, for retrieving review datasets associated with a dataset by persistent id or numeric id.
+- Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
+- Collections: Added theme information when retrieving a collection using `getCollection`.
 - Datasets: `listDatasetTreeNode` use case and repository method backing `GET /datasets/{id}/versions/{versionId}/tree` for paginated, lazy listing of folders/files inside a dataset version. Returns `FileTreePage` with folder-first ordering, opaque keyset cursors, and per-file `downloadUrl`. The per-file `access` marker is one of `retentionExpired`, `restricted`, `embargoed`, or `public` (resolved in that order), and folder `counts` carry the matching mutually exclusive `restricted`/`embargoed`/`retentionExpired` buckets.
 - Datasets: `iterateDatasetTreeNode` async generator that walks the cursor chain so callers can consume one folder's children without driving pagination by hand.
 - Core: re-export `DataverseApiAuthMechanism` from the public surface so consumers of the standalone reusable bundles (e.g. `dv-tree-view`, `dv-uploader`) can import it without reaching into `core/...`.
@@ -33,6 +41,9 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - New Use Case: [Create a Template](./docs/useCases.md#create-a-template) under Templates.
 - New Use Case: [Get a Template](./docs/useCases.md#get-a-template) under Templates.
 - New Use Case: [Delete a Template](./docs/useCases.md#delete-a-template) under Templates.
+- New Use Case: [Update Template Metadata](./docs/useCases.md#update-template-metadata) under Templates.
+- New Use Case: [Update Template License Terms](./docs/useCases.md#update-template-license-terms) under Templates.
+- New Use Case: [Update Template Terms Of Access](./docs/useCases.md#update-template-terms-of-access) under Templates.
 - Templates: Added `setTemplateAsDefault` use case and repository method to support Dataverse endpoint `POST /dataverses/{id}/template/default/{templateId}`.
 - Templates: Added `unsetTemplateAsDefault` use case and repository method to support Dataverse endpoint `DELETE /dataverses/{id}/template/default`.
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).

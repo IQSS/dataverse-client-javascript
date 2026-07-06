@@ -29,6 +29,7 @@ import {
 } from '../../../src/datasets'
 import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
+import { FileCitationFormat } from '../../../src/files/domain/models/FileCitationFormat'
 import { FileDownloadSizeMode, WriteError } from '../../../src'
 import {
   deaccessionDatasetViaApi,
@@ -653,6 +654,68 @@ describe('FilesRepository', () => {
       await expect(
         sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
       ).rejects.toThrow(errorExpected)
+    })
+  })
+
+  describe('getFileCitationByFormat', () => {
+    test('should return EndNote citation as XML', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.ENDNOTE)
+
+      expect(typeof citation).toBe('string')
+      expect(citation.trimStart()).toMatch(/^<\?xml/)
+    })
+
+    test('should return RIS citation as plain text', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.RIS)
+
+      expect(typeof citation).toBe('string')
+      // RIS records use TY (type) and ER (end of record) tags
+      expect(citation).toMatch(/TY\s+-/)
+      expect(citation).toMatch(/ER\s+-/)
+    })
+
+    test('should return BibTeX citation as plain text', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.BIBTEX)
+
+      expect(typeof citation).toBe('string')
+      // BibTeX entries start with @<entry-type>{
+      expect(citation.trimStart()).toMatch(/^@\w+\{/)
+    })
+
+    test('should return BibTeX citation when file is requested by persistent id', async () => {
+      expect(testFilePersistentId).toBeTruthy()
+
+      const citation = await sut.getFileCitationByFormat(
+        testFilePersistentId,
+        FileCitationFormat.BIBTEX
+      )
+
+      expect(typeof citation).toBe('string')
+      // BibTeX entries start with @<entry-type>{
+      expect(citation.trimStart()).toMatch(/^@\w+\{/)
+    })
+
+    test('should return CSL citation as JSON', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.CSL)
+
+      expect(typeof citation).toBe('string')
+      const parsed = JSON.parse(citation)
+      expect(typeof parsed).toBe('object')
+      expect(parsed).not.toBeNull()
+    })
+
+    test('should return Internal citation as HTML', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.INTERNAL)
+
+      expect(typeof citation).toBe('string')
+      // Internal HTML format includes anchor tags linking to the dataset
+      expect(citation).toMatch(/<a\s+href=/i)
+    })
+
+    test('should return error when file does not exist', async () => {
+      await expect(
+        sut.getFileCitationByFormat(nonExistentFiledId, FileCitationFormat.BIBTEX)
+      ).rejects.toThrow(ReadError)
     })
   })
 
