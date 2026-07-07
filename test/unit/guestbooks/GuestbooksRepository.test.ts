@@ -64,7 +64,7 @@ describe('GuestbooksRepository', () => {
           type: EventType.DOWNLOAD,
           fileName: 'dp_statistics_for_grade_grouped_by_student_id.html',
           fileId: 3,
-          userName: 'Guest',
+          name: 'Guest',
           email: 'guest@example.edu'
         }
       ]
