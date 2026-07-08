@@ -35,8 +35,7 @@ import {
   updateTermsOfAccess,
   DatasetLicenseUpdateRequest,
   getDatasetReviews,
-  DatasetReview,
-  DatasetMetadataExportVersion
+  DatasetReview
 } from '../../../src/datasets'
 import { ApiConfig, WriteError } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -801,7 +800,7 @@ describe('DatasetsRepository', () => {
       const metadata = await sut.exportDatasetMetadata(
         draftDatasetIds.numericId,
         'ddi',
-        DatasetMetadataExportVersion.DRAFT
+        DatasetNotNumberedVersion.DRAFT
       )
 
       expect(typeof metadata.content).toBe('string')

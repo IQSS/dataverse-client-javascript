@@ -127,10 +127,7 @@ export {
   exportDatasetMetadata
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
-export {
-  DatasetMetadataExportVersion,
-  ExportedDatasetMetadata
-} from './domain/models/ExportedDatasetMetadata'
+export { ExportedDatasetMetadata } from './domain/models/ExportedDatasetMetadata'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
 export { DatasetLock, DatasetLockType } from './domain/models/DatasetLock'
 export {

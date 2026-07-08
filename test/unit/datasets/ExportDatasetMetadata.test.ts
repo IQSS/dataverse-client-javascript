@@ -2,7 +2,7 @@ import { ExportDatasetMetadata } from '../../../src/datasets/domain/useCases/Exp
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 import { ExportedDatasetMetadata } from '../../../src/datasets/domain/models/ExportedDatasetMetadata'
-import { DatasetMetadataExportVersion } from '../../../src/datasets/domain/models/ExportedDatasetMetadata'
+import { DatasetNotNumberedVersion } from '../../../src/datasets/domain/models/DatasetNotNumberedVersion'
 
 describe('ExportDatasetMetadata.execute', () => {
   const testDatasetId = 1
@@ -20,17 +20,13 @@ describe('ExportDatasetMetadata.execute', () => {
 
     const sut = new ExportDatasetMetadata(datasetsRepositoryStub)
 
-    const actual = await sut.execute(
-      testDatasetId,
-      testExporter,
-      DatasetMetadataExportVersion.DRAFT
-    )
+    const actual = await sut.execute(testDatasetId, testExporter, DatasetNotNumberedVersion.DRAFT)
 
     expect(actual).toEqual(expectedMetadata)
     expect(datasetsRepositoryStub.exportDatasetMetadata).toHaveBeenCalledWith(
       testDatasetId,
       testExporter,
-      DatasetMetadataExportVersion.DRAFT
+      DatasetNotNumberedVersion.DRAFT
     )
   })
 

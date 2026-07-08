@@ -1064,7 +1064,7 @@ Exports dataset metadata in a specified metadata export format.
 ```typescript
 import {
   exportDatasetMetadata,
-  DatasetMetadataExportVersion,
+  DatasetNotNumberedVersion,
   ExportedDatasetMetadata
 } from '@iqss/dataverse-client-javascript'
 
@@ -1074,7 +1074,7 @@ const datasetId = 'doi:10.77777/FK2/AAAAAA'
 const exporter = 'ddi'
 
 exportDatasetMetadata
-  .execute(datasetId, exporter, DatasetMetadataExportVersion.DRAFT)
+  .execute(datasetId, exporter, DatasetNotNumberedVersion.DRAFT)
   .then((metadata: ExportedDatasetMetadata) => {
     /* ... */
   })
@@ -1083,6 +1083,8 @@ exportDatasetMetadata
 ```
 
 _See [use case](../src/datasets/domain/useCases/ExportDatasetMetadata.ts) implementation_.
+
+The `datasetId` parameter can be a string for persistent identifiers or a number for numeric identifiers. The optional `version` parameter accepts `DatasetNotNumberedVersion.LATEST_PUBLISHED` or `DatasetNotNumberedVersion.DRAFT`. If not set, Dataverse defaults to `DatasetNotNumberedVersion.LATEST_PUBLISHED`. Draft exports require configured authentication with access to the draft.
 
 #### Get Dataset Citation Text By Private URL Token
 

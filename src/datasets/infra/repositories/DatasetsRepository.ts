@@ -35,7 +35,6 @@ import { DatasetUploadLimits } from '../../domain/models/DatasetUploadLimits'
 import { DatasetReview } from '../../domain/models/DatasetReview'
 import { transformDatasetReviewsResponseToDatasetReviews } from './transformers/datasetReviewTransformers'
 import { ExportedDatasetMetadata } from '../../domain/models/ExportedDatasetMetadata'
-import { DatasetMetadataExportVersion } from '../../domain/models/ExportedDatasetMetadata'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -139,7 +138,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async exportDatasetMetadata(
     datasetId: number | string,
     exporter: string,
-    version?: DatasetMetadataExportVersion
+    version?: DatasetNotNumberedVersion.LATEST_PUBLISHED | DatasetNotNumberedVersion.DRAFT
   ): Promise<ExportedDatasetMetadata> {
     const persistentId =
       typeof datasetId === 'number'
