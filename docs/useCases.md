@@ -46,6 +46,8 @@ The different use cases currently available in the package are classified below,
     - [Get a Dataset](#get-a-dataset)
     - [Get Dataset By Private URL Token](#get-dataset-by-private-url-token)
     - [Get Dataset Citation Text](#get-dataset-citation-text)
+    - [Get Dataset Citation In Other Formats](#get-dataset-citation-in-other-formats)
+    - [Export Dataset Metadata](#export-dataset-metadata)
     - [Get Dataset Citation Text By Private URL Token](#get-dataset-citation-text-by-private-url-token)
     - [Get Dataset Locks](#get-dataset-locks)
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
@@ -1052,6 +1054,35 @@ Supported formats include 'EndNote' (XML), 'RIS' (plain text), 'BibTeX' (plain t
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
+#### Export Dataset Metadata
+
+Exports dataset metadata in a specified metadata export format.
+
+##### Example call:
+
+```typescript
+import {
+  exportDatasetMetadata,
+  DatasetMetadataExportVersion,
+  ExportedDatasetMetadata
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+const exporter = 'ddi'
+
+exportDatasetMetadata
+  .execute(datasetId, exporter, DatasetMetadataExportVersion.DRAFT)
+  .then((metadata: ExportedDatasetMetadata) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/ExportDatasetMetadata.ts) implementation_.
 
 #### Get Dataset Citation Text By Private URL Token
 

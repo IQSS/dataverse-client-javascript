@@ -26,6 +26,7 @@ import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } fr
 import { FormattedCitation } from '../../domain/models/FormattedCitation'
 import { DatasetType } from '../../domain/models/DatasetType'
 import { TermsOfAccess } from '../../domain/models/Dataset'
+import { DatasetNotNumberedVersion } from '../../domain/models/DatasetNotNumberedVersion'
 import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
 import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
@@ -33,6 +34,8 @@ import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { DatasetUploadLimits } from '../../domain/models/DatasetUploadLimits'
 import { DatasetReview } from '../../domain/models/DatasetReview'
 import { transformDatasetReviewsResponseToDatasetReviews } from './transformers/datasetReviewTransformers'
+import { ExportedDatasetMetadata } from '../../domain/models/ExportedDatasetMetadata'
+import { DatasetMetadataExportVersion } from '../../domain/models/ExportedDatasetMetadata'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -126,6 +129,39 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     } else {
       content = response.data
     }
+
+    return {
+      content,
+      contentType
+    }
+  }
+
+  public async exportDatasetMetadata(
+    datasetId: number | string,
+    exporter: string,
+    version?: DatasetMetadataExportVersion
+  ): Promise<ExportedDatasetMetadata> {
+    const persistentId =
+      typeof datasetId === 'number'
+        ? (
+            await this.getDataset(
+              datasetId,
+              version ?? DatasetNotNumberedVersion.LATEST_PUBLISHED,
+              false,
+              false
+            )
+          ).persistentId
+        : datasetId
+
+    const response = await this.doGet('/datasets/export', true, {
+      exporter,
+      persistentId,
+      ...(version && { version })
+    })
+
+    const contentType = response.headers['content-type']
+    const content =
+      typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
 
     return {
       content,

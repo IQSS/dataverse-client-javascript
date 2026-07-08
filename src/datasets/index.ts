@@ -36,6 +36,7 @@ import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits'
 import { GetDatasetReviews } from './domain/useCases/GetDatasetReviews'
+import { ExportDatasetMetadata } from './domain/useCases/ExportDatasetMetadata'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -88,6 +89,7 @@ const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
 const getDatasetReviews = new GetDatasetReviews(datasetsRepository)
+const exportDatasetMetadata = new ExportDatasetMetadata(datasetsRepository)
 
 export {
   getDataset,
@@ -121,9 +123,14 @@ export {
   updateDatasetLicense,
   getDatasetStorageDriver,
   getDatasetUploadLimits,
-  getDatasetReviews
+  getDatasetReviews,
+  exportDatasetMetadata
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
+export {
+  DatasetMetadataExportVersion,
+  ExportedDatasetMetadata
+} from './domain/models/ExportedDatasetMetadata'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
 export { DatasetLock, DatasetLockType } from './domain/models/DatasetLock'
 export {
