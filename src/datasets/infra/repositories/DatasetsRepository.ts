@@ -158,7 +158,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       ...(version && { version })
     })
 
-    const contentType = response.headers['content-type']
+    const contentType = String(response.headers['content-type'] ?? '')
     const content =
       typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
 
