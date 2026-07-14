@@ -2143,12 +2143,16 @@ describe('CollectionsRepository', () => {
       const firstCollection = await sut.getCollection(firstCollectionAlias)
       const secondCollection = await sut.getCollection(secondCollectionAlias)
 
+      const collectionLinksBefore = await sut.getCollectionLinks(firstCollection.id)
+      expect(
+        collectionLinksBefore.linkedCollections.map((collection) => collection.alias)
+      ).toContain(secondCollection.alias)
+
       await sut.unlinkCollection(secondCollection.id, firstCollection.id)
-      await new Promise((res) => setTimeout(res, 2000))
 
       await sut.getCollection(secondCollectionAlias)
-      const collectionItemSubset = await sut.getCollectionItems(firstCollection.alias)
-      expect(collectionItemSubset.items).toStrictEqual([])
+      const collectionLinksAfter = await sut.getCollectionLinks(firstCollection.id)
+      expect(collectionLinksAfter.linkedCollections).toStrictEqual([])
     })
 
     test('should throw error when unlinking a non-existent collection', async () => {
