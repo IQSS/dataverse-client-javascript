@@ -21,6 +21,7 @@ export class GetDatasetFiles implements UseCase<FilesSubset> {
    * @param {number} [offset] - Offset for pagination (optional).
    * @param {FileSearchCriteria} [fileSearchCriteria] - Supports filtering the files by different file properties (optional).
    * @param {FileOrderCriteria} [fileOrderCriteria=FileOrderCriteria.NAME_AZ] - Supports ordering the results according to different criteria. If not set, the defalt value is FileOrderCriteria.NAME_AZ.
+   * @param {string} [previewUrlToken] - The token identifying a Preview URL, allowing a reviewer without credentials to access an unpublished dataset (optional).
    * @returns {Promise<FilesSubset>}
    */
   async execute(
@@ -30,7 +31,8 @@ export class GetDatasetFiles implements UseCase<FilesSubset> {
     limit?: number,
     offset?: number,
     fileSearchCriteria?: FileSearchCriteria,
-    fileOrderCriteria: FileOrderCriteria = FileOrderCriteria.NAME_AZ
+    fileOrderCriteria: FileOrderCriteria = FileOrderCriteria.NAME_AZ,
+    previewUrlToken?: string
   ): Promise<FilesSubset> {
     return await this.filesRepository.getDatasetFiles(
       datasetId,
@@ -39,7 +41,8 @@ export class GetDatasetFiles implements UseCase<FilesSubset> {
       fileOrderCriteria,
       limit,
       offset,
-      fileSearchCriteria
+      fileSearchCriteria,
+      previewUrlToken
     )
   }
 }

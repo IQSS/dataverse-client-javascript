@@ -27,6 +27,7 @@ describe('execute', () => {
       DatasetNotNumberedVersion.LATEST,
       false,
       FileDownloadSizeMode.ALL,
+      undefined,
       undefined
     )
   })
@@ -58,7 +59,36 @@ describe('execute', () => {
       testVersionId,
       false,
       FileDownloadSizeMode.ARCHIVAL,
-      testFileSearchCriteria
+      testFileSearchCriteria,
+      undefined
+    )
+  })
+
+  test('should forward the preview URL token to the repository when provided', async () => {
+    const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+    filesRepositoryStub.getDatasetFilesTotalDownloadSize = jest
+      .fn()
+      .mockResolvedValue(testDatasetTotalDownloadSize)
+    const sut = new GetDatasetFilesTotalDownloadSize(filesRepositoryStub)
+    const testPreviewUrlToken = 'testToken'
+
+    const actual = await sut.execute(
+      1,
+      DatasetNotNumberedVersion.LATEST,
+      FileDownloadSizeMode.ALL,
+      undefined,
+      false,
+      testPreviewUrlToken
+    )
+
+    expect(actual).toEqual(testDatasetTotalDownloadSize)
+    expect(filesRepositoryStub.getDatasetFilesTotalDownloadSize).toHaveBeenCalledWith(
+      1,
+      DatasetNotNumberedVersion.LATEST,
+      false,
+      FileDownloadSizeMode.ALL,
+      undefined,
+      testPreviewUrlToken
     )
   })
 

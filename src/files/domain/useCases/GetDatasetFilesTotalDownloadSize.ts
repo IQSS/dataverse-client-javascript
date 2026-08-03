@@ -19,6 +19,7 @@ export class GetDatasetFilesTotalDownloadSize implements UseCase<number> {
    * @param {FileDownloadSizeMode} [fileDownloadSizeMode=FileDownloadSizeMode.ALL] - Applies a filter mode to the operation to consider only archival sizes, original or both (all). The default value is FileDownloadSizeMode.ALL.
    * @param {FileSearchCriteria} [fileSearchCriteria] - Supports filtering the files to obtain their combined size by different file properties (optional).
    * @param {boolean} [includeDeaccessioned=false] - Indicates whether to consider deaccessioned versions in the dataset search or not. The default value is false.
+   * @param {string} [previewUrlToken] - The token identifying a Preview URL, allowing a reviewer without credentials to access an unpublished dataset (optional).
    * @returns {Promise<number>}
    */
   async execute(
@@ -26,14 +27,16 @@ export class GetDatasetFilesTotalDownloadSize implements UseCase<number> {
     datasetVersionId: string | DatasetNotNumberedVersion = DatasetNotNumberedVersion.LATEST,
     fileDownloadSizeMode: FileDownloadSizeMode = FileDownloadSizeMode.ALL,
     fileSearchCriteria?: FileSearchCriteria,
-    includeDeaccessioned = false
+    includeDeaccessioned = false,
+    previewUrlToken?: string
   ): Promise<number> {
     return await this.filesRepository.getDatasetFilesTotalDownloadSize(
       datasetId,
       datasetVersionId,
       includeDeaccessioned,
       fileDownloadSizeMode,
-      fileSearchCriteria
+      fileSearchCriteria,
+      previewUrlToken
     )
   }
 }

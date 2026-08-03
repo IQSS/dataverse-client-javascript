@@ -1,7 +1,7 @@
 import { DatasetDTO } from '../../src/datasets/domain/dtos/DatasetDTO'
 
 export class TestConstants {
-  static readonly TEST_API_URL = 'http://localhost:8080/api/v1'
+  static readonly TEST_API_URL = 'http://localhost:8081/api/v1'
   static readonly BUILTIN_USER_KEY = 'builtInS3kretKey'
   static readonly TEST_DUMMY_API_KEY = 'dummyApiKey'
   static readonly TEST_DUMMY_PERSISTENT_ID = 'doi:11.1111/AA1/AA1AAA'

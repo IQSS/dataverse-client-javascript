@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
-  createPrivateUrlViaApi,
   publishDatasetViaApi,
   waitForNoLocks,
   deleteUnpublishedDatasetViaApi,
@@ -73,6 +72,7 @@ import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepo
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
 import { createTestFileUploadDestination } from '../../testHelpers/files/fileUploadDestinationHelper'
 import { CitationFormat } from '../../../src/datasets/domain/models/CitationFormat'
+import { createBuiltInUser } from '../../testHelpers/users/builtinUserApiHelper'
 
 const TEST_DIFF_DATASET_DTO: DatasetDTO = {
   license: {
@@ -525,8 +525,8 @@ describe('DatasetsRepository', () => {
 
     beforeAll(async () => {
       testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
-      const response = await createPrivateUrlViaApi(testDatasetIds.numericId)
-      privateUrlToken = response.data.data.token
+      const previewUrl = await sut.createPreviewUrl(testDatasetIds.numericId)
+      privateUrlToken = previewUrl.token
     })
 
     afterAll(async () => {
@@ -556,6 +556,197 @@ describe('DatasetsRepository', () => {
         await expect(sut.getPrivateUrlDatasetCitation('invalidToken')).rejects.toThrow(
           expectedError
         )
+      })
+    })
+
+    describe('createPreviewUrl, getPreviewUrl, and deletePreviewUrl', () => {
+      let lifecycleDatasetIds: CreatedDatasetIdentifiers
+
+      beforeAll(async () => {
+        lifecycleDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      })
+
+      afterAll(async () => {
+        await deleteUnpublishedDatasetViaApi(lifecycleDatasetIds.numericId)
+      })
+
+      test('should create, retrieve, and delete a Preview URL for a dataset', async () => {
+        const created = await sut.createPreviewUrl(lifecycleDatasetIds.numericId)
+
+        expect(created.token).toBeTruthy()
+        expect(created.link).toContain(created.token)
+        expect(created.isAnonymizedAccess).toBe(false)
+
+        const fetched = await sut.getPreviewUrl(lifecycleDatasetIds.numericId)
+        expect(fetched.token).toBe(created.token)
+        expect(fetched.link).toBe(created.link)
+
+        await sut.deletePreviewUrl(lifecycleDatasetIds.numericId)
+
+        await expect(sut.getPreviewUrl(lifecycleDatasetIds.numericId)).rejects.toBeInstanceOf(
+          ReadError
+        )
+      })
+
+      test('should return error when getting a Preview URL that was never created', async () => {
+        const noPreviewUrlDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO
+        )
+
+        await expect(sut.getPreviewUrl(noPreviewUrlDatasetIds.numericId)).rejects.toBeInstanceOf(
+          ReadError
+        )
+
+        await deleteUnpublishedDatasetViaApi(noPreviewUrlDatasetIds.numericId)
+      })
+
+      test('should return error when deleting a Preview URL that does not exist', async () => {
+        const noPreviewUrlDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO
+        )
+
+        await expect(sut.deletePreviewUrl(noPreviewUrlDatasetIds.numericId)).rejects.toBeInstanceOf(
+          Error
+        )
+
+        await deleteUnpublishedDatasetViaApi(noPreviewUrlDatasetIds.numericId)
+      })
+
+      test('should return error when creating a Preview URL for a dataset that does not exist', async () => {
+        await expect(sut.createPreviewUrl(nonExistentTestDatasetId)).rejects.toBeInstanceOf(Error)
+      })
+
+      test('should return error when getting a Preview URL for a dataset that does not exist', async () => {
+        await expect(sut.getPreviewUrl(nonExistentTestDatasetId)).rejects.toBeInstanceOf(ReadError)
+      })
+
+      test('should return error when deleting a Preview URL for a dataset that does not exist', async () => {
+        await expect(sut.deletePreviewUrl(nonExistentTestDatasetId)).rejects.toBeInstanceOf(Error)
+      })
+
+      test('should create, retrieve, and delete a Preview URL for a dataset identified by persistent id', async () => {
+        const persistentIdDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO
+        )
+
+        const created = await sut.createPreviewUrl(persistentIdDatasetIds.persistentId)
+        expect(created.token).toBeTruthy()
+
+        const fetched = await sut.getPreviewUrl(persistentIdDatasetIds.persistentId)
+        expect(fetched.token).toBe(created.token)
+
+        await sut.deletePreviewUrl(persistentIdDatasetIds.persistentId)
+
+        await expect(sut.getPreviewUrl(persistentIdDatasetIds.persistentId)).rejects.toBeInstanceOf(
+          ReadError
+        )
+
+        await deleteUnpublishedDatasetViaApi(persistentIdDatasetIds.numericId)
+      })
+
+      test('should return error when a user without permission to manage the dataset creates a Preview URL', async () => {
+        const noPermissionDatasetIds = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO
+        )
+        const noPermissionUserApiToken = await createBuiltInUser(`noPermUser${randomUUID()}`)
+
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          noPermissionUserApiToken
+        )
+
+        await expect(sut.createPreviewUrl(noPermissionDatasetIds.numericId)).rejects.toBeInstanceOf(
+          Error
+        )
+
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
+        await deleteUnpublishedDatasetViaApi(noPermissionDatasetIds.numericId)
+      })
+    })
+
+    describe('getDataset with a preview URL token', () => {
+      let previewUrlToken: string
+
+      beforeEach(() => {
+        previewUrlToken = privateUrlToken
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
+      })
+
+      afterEach(() => {
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
+      })
+
+      test('should return the draft dataset when accessed unauthenticated with a valid preview URL token', async () => {
+        const actual = await sut.getDataset(
+          testDatasetIds.numericId,
+          DatasetNotNumberedVersion.LATEST,
+          false,
+          false,
+          previewUrlToken
+        )
+
+        expect(actual.id).toBe(testDatasetIds.numericId)
+      })
+
+      test('should return error when accessed unauthenticated without a preview URL token', async () => {
+        await expect(
+          sut.getDataset(testDatasetIds.numericId, DatasetNotNumberedVersion.LATEST, false, false)
+        ).rejects.toBeInstanceOf(ReadError)
+      })
+
+      test('should return error when accessed unauthenticated with an invalid preview URL token', async () => {
+        await expect(
+          sut.getDataset(
+            testDatasetIds.numericId,
+            DatasetNotNumberedVersion.LATEST,
+            false,
+            false,
+            'invalidToken'
+          )
+        ).rejects.toBeInstanceOf(ReadError)
+      })
+
+      describe('when accessed by an authenticated user with no permission on the dataset', () => {
+        let noPermissionUserApiToken: string
+
+        beforeAll(async () => {
+          noPermissionUserApiToken = await createBuiltInUser(`noPermUser${randomUUID()}`)
+        })
+
+        beforeEach(() => {
+          ApiConfig.init(
+            TestConstants.TEST_API_URL,
+            DataverseApiAuthMechanism.API_KEY,
+            noPermissionUserApiToken
+          )
+        })
+
+        test('should return error when the user has no permission and does not provide a preview URL token', async () => {
+          await expect(
+            sut.getDataset(testDatasetIds.numericId, DatasetNotNumberedVersion.LATEST, false, false)
+          ).rejects.toBeInstanceOf(ReadError)
+        })
+
+        test('should return the draft dataset when a valid preview URL token is provided, regardless of the caller having their own (permissionless) credentials configured', async () => {
+          const actual = await sut.getDataset(
+            testDatasetIds.numericId,
+            DatasetNotNumberedVersion.LATEST,
+            false,
+            false,
+            previewUrlToken
+          )
+
+          expect(actual.id).toBe(testDatasetIds.numericId)
+        })
       })
     })
   })

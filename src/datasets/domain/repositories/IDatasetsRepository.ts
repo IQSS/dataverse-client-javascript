@@ -21,13 +21,15 @@ import { DatasetUploadLimits } from '../models/DatasetUploadLimits'
 import { DatasetReview } from '../models/DatasetReview'
 import { ExportedDatasetMetadata } from '../models/ExportedDatasetMetadata'
 import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion'
+import { PreviewUrl } from '../models/PreviewUrl'
 
 export interface IDatasetsRepository {
   getDataset(
     datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
-    keepRawFields: boolean
+    keepRawFields: boolean,
+    previewUrlToken?: string
   ): Promise<Dataset>
   getDatasetLocks(datasetId: number | string): Promise<DatasetLock[]>
   getDatasetCitation(
@@ -36,6 +38,9 @@ export interface IDatasetsRepository {
     includeDeaccessioned: boolean
   ): Promise<string>
   getPrivateUrlDataset(token: string, keepRawFields: boolean): Promise<Dataset>
+  createPreviewUrl(datasetId: number | string, anonymizedAccess?: boolean): Promise<PreviewUrl>
+  getPreviewUrl(datasetId: number | string): Promise<PreviewUrl>
+  deletePreviewUrl(datasetId: number | string): Promise<void>
   getAllDatasetPreviews(
     limit?: number,
     offset?: number,

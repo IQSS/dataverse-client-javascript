@@ -22,7 +22,8 @@ describe('execute', () => {
       1,
       DatasetNotNumberedVersion.LATEST,
       true,
-      false
+      false,
+      undefined
     )
   })
 
@@ -39,7 +40,8 @@ describe('execute', () => {
       'doi:10.5072/FK2/J8SJZB',
       DatasetNotNumberedVersion.LATEST,
       true,
-      false
+      false,
+      undefined
     )
   })
 
@@ -56,7 +58,8 @@ describe('execute', () => {
       'doi:10.5072/FK2/J8SJZB',
       '2.0',
       true,
-      false
+      false,
+      undefined
     )
   })
 
@@ -77,7 +80,32 @@ describe('execute', () => {
       'doi:10.5072/FK2/J8SJZB',
       DatasetNotNumberedVersion.LATEST,
       true,
-      true
+      true,
+      undefined
+    )
+  })
+
+  test('should forward the preview URL token to the repository when provided', async () => {
+    const filesRepositoryStub = <IFilesRepository>{}
+    filesRepositoryStub.getFile = jest.fn().mockResolvedValue(testTuple)
+    const sut = new GetFileAndDataset(filesRepositoryStub)
+    const testPreviewUrlToken = 'testToken'
+
+    const actual = await sut.execute(
+      1,
+      DatasetNotNumberedVersion.LATEST,
+      false,
+      testPreviewUrlToken
+    )
+
+    expect(actual[0]).toEqual(testFile)
+    expect(actual[1]).toEqual(testDataset)
+    expect(filesRepositoryStub.getFile).toHaveBeenCalledWith(
+      1,
+      DatasetNotNumberedVersion.LATEST,
+      true,
+      false,
+      testPreviewUrlToken
     )
   })
 

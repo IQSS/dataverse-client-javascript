@@ -36,6 +36,7 @@ export interface GetFilesQueryParams {
   categoryName?: string
   tabularTagName?: string
   searchText?: string
+  previewUrlToken?: string
 }
 
 export interface GetFilesTotalDownloadSizeQueryParams {
@@ -46,6 +47,7 @@ export interface GetFilesTotalDownloadSizeQueryParams {
   categoryName?: string
   tabularTagName?: string
   searchText?: string
+  previewUrlToken?: string
 }
 
 export interface UploadedFileRequestBody {
@@ -81,7 +83,8 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     fileOrderCriteria: FileOrderCriteria,
     limit?: number,
     offset?: number,
-    fileSearchCriteria?: FileSearchCriteria
+    fileSearchCriteria?: FileSearchCriteria,
+    previewUrlToken?: string
   ): Promise<FilesSubset> {
     const queryParams: GetFilesQueryParams = {
       includeDeaccessioned: includeDeaccessioned,
@@ -96,14 +99,17 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     if (fileSearchCriteria !== undefined) {
       this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria)
     }
+    if (previewUrlToken !== undefined) {
+      queryParams.previewUrlToken = previewUrlToken
+    }
     return this.doGet(
       this.buildApiEndpoint(
         this.datasetsResourceName,
         `versions/${datasetVersionId}/files`,
         datasetId
       ),
-      true,
-      queryParams
+      previewUrlToken === undefined,
+      this.toApiQueryParams(queryParams)
     )
       .then((response) => transformFilesResponseToFilesSubset(response))
       .catch((error) => {
@@ -115,7 +121,8 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     datasetId: string | number,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
-    fileSearchCriteria?: FileSearchCriteria
+    fileSearchCriteria?: FileSearchCriteria,
+    previewUrlToken?: string
   ): Promise<FileCounts> {
     const queryParams: GetFilesQueryParams = {
       includeDeaccessioned: includeDeaccessioned
@@ -123,14 +130,17 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     if (fileSearchCriteria !== undefined) {
       this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria)
     }
+    if (previewUrlToken !== undefined) {
+      queryParams.previewUrlToken = previewUrlToken
+    }
     return this.doGet(
       this.buildApiEndpoint(
         this.datasetsResourceName,
         `versions/${datasetVersionId}/files/counts`,
         datasetId
       ),
-      true,
-      queryParams
+      previewUrlToken === undefined,
+      this.toApiQueryParams(queryParams)
     )
       .then((response) => transformFileCountsResponseToFileCounts(response))
       .catch((error) => {
@@ -143,7 +153,8 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     datasetVersionId: string,
     includeDeaccessioned: boolean,
     fileDownloadSizeMode: FileDownloadSizeMode,
-    fileSearchCriteria?: FileSearchCriteria
+    fileSearchCriteria?: FileSearchCriteria,
+    previewUrlToken?: string
   ): Promise<number> {
     const queryParams: GetFilesTotalDownloadSizeQueryParams = {
       includeDeaccessioned: includeDeaccessioned,
@@ -152,14 +163,17 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     if (fileSearchCriteria !== undefined) {
       this.applyFileSearchCriteriaToQueryParams(queryParams, fileSearchCriteria)
     }
+    if (previewUrlToken !== undefined) {
+      queryParams.previewUrlToken = previewUrlToken
+    }
     return this.doGet(
       this.buildApiEndpoint(
         this.datasetsResourceName,
         `versions/${datasetVersionId}/downloadsize`,
         datasetId
       ),
-      true,
-      queryParams
+      previewUrlToken === undefined,
+      this.toApiQueryParams(queryParams)
     )
       .then((response) => response.data.data.storageSize)
       .catch((error) => {
@@ -198,15 +212,17 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     fileId: number | string,
     datasetVersionId: string,
     returnDatasetVersion: boolean,
-    includeDeaccessioned: boolean
+    includeDeaccessioned: boolean,
+    previewUrlToken?: string
   ): Promise<FileModel | [FileModel, Dataset]> {
     return this.doGet(
       this.buildApiEndpoint(this.filesResourceName, `versions/${datasetVersionId}`, fileId),
-      true,
+      previewUrlToken === undefined,
       {
         returnDatasetVersion: returnDatasetVersion,
         returnOwners: true,
-        includeDeaccessioned: includeDeaccessioned
+        includeDeaccessioned: includeDeaccessioned,
+        ...(previewUrlToken && { key: previewUrlToken })
       }
     )
       .then((response) => transformFileResponseToFile(response, returnDatasetVersion))
@@ -320,6 +336,17 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
     }
     if (fileSearchCriteria.searchText !== undefined) {
       queryParams.searchText = fileSearchCriteria.searchText
+    }
+  }
+
+  private toApiQueryParams(
+    queryParams: GetFilesQueryParams | GetFilesTotalDownloadSizeQueryParams
+  ): object {
+    const { previewUrlToken, ...apiQueryParams } = queryParams
+
+    return {
+      ...apiQueryParams,
+      ...(previewUrlToken !== undefined && { key: previewUrlToken })
     }
   }
 

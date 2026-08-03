@@ -42,7 +42,7 @@
   },
   "homepage": "https://github.com/IQSS/dataverse-client-javascript#readme",
   "devDependencies": {
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "5.51.0",
     "@typescript-eslint/parser": "5.51.0",
     "@web-std/file": "3.0.3",

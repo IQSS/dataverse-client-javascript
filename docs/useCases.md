@@ -62,6 +62,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
     - [Get Dataset Upload Limits](#get-dataset-upload-limits)
+    - [Get Preview URL for a Dataset](#get-preview-url-for-a-dataset)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -75,6 +76,8 @@ The different use cases currently available in the package are classified below,
     - [Link Dataset Type with Metadata Blocks](#link-dataset-type-with-metadata-blocks)
     - [Set Available Licenses For Dataset Type](#set-available-licenses-for-dataset-type)
     - [Delete a Dataset Type](#delete-a-dataset-type)
+    - [Create a Preview URL for a Dataset](#create-a-preview-url-for-a-dataset)
+    - [Delete a Preview URL from a Dataset](#delete-a-preview-url-from-a-dataset)
 - [Files](#Files)
   - [Files read use cases](#files-read-use-cases)
     - [Get a File](#get-a-file)
@@ -974,6 +977,8 @@ The optional `datasetVersionId` parameter can correspond to a numeric version id
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
 There is an optional fourth parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to Markdown. The default value is `false`.
+
+There is an optional fifth parameter called `previewUrlToken`, which allows a reviewer using a [Preview URL](#get-preview-url-for-a-dataset) to access an unpublished dataset without needing to log in. When provided, it takes priority over any other credentials that may be configured, so the Preview URL grants access on its own.
 
 #### Get Dataset By Private URL Token
 
@@ -1890,6 +1895,86 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetUploadLimits.ts) imple
 
 If the backend does not define any quota limits for the dataset, the returned object can be empty (`{}`).
 
+#### Get Preview URL for a Dataset
+
+Returns a [PreviewUrl](../src/datasets/domain/models/PreviewUrl.ts) instance (`token`, `link`, and `isAnonymizedAccess`) for the given dataset's existing Preview URL, if one has been created.
+
+##### Example call:
+
+```typescript
+import { getPreviewUrl } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getPreviewUrl.execute(datasetId).then((previewUrl: PreviewUrl) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/previewUrl/GetPreviewUrl.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+Requires permission to manage the dataset's permissions. Throws an error if no Preview URL exists yet for the dataset; see [Create a Preview URL for a Dataset](#create-a-preview-url-for-a-dataset).
+
+#### Create a Preview URL for a Dataset
+
+Creates a Preview URL for the given dataset, returning a [PreviewUrl](../src/datasets/domain/models/PreviewUrl.ts) instance. The token in the returned `PreviewUrl` allows a reviewer without credentials to access the dataset's latest (unpublished) version — see the `previewUrlToken` parameter on the read use cases above (for example, [Get a Dataset](#get-a-dataset)).
+
+##### Example call:
+
+```typescript
+import { createPreviewUrl } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+createPreviewUrl.execute(datasetId).then((previewUrl: PreviewUrl) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/previewUrl/CreatePreviewUrl.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+There is an optional second parameter called `anonymizedAccess`. If set to `true`, and Anonymized Access has been enabled on the installation, the created Preview URL will only allow an anonymized view of the dataset.
+
+Requires permission to manage the dataset's permissions.
+
+#### Delete a Preview URL from a Dataset
+
+Deletes the Preview URL for the given dataset, if one exists.
+
+##### Example call:
+
+```typescript
+import { deletePreviewUrl } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+deletePreviewUrl.execute(datasetId).then(() => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/previewUrl/DeletePreviewUrl.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+Requires permission to manage the dataset's permissions. Throws an error if no Preview URL exists for the dataset.
+
 ## Files
 
 ### Files read use cases
@@ -1923,6 +2008,8 @@ The optional `datasetVersionId` parameter can correspond to a numeric version id
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
 
+There is an optional fourth parameter called `previewUrlToken`, which allows a reviewer using a [Preview URL](#get-preview-url-for-a-dataset) to access a file in an unpublished dataset without needing to log in.
+
 #### Get a File and its Dataset
 
 Returns a tuple of [FileModel](../src/files/domain/models/FileModel.ts) and [Dataset](../src/datasets/domain/models/Dataset.ts) objects (`[FileModel, Dataset]`), given the search parameters to identify the file.
@@ -1953,6 +2040,8 @@ The `fileId` parameter can be a string, for persistent identifiers, or a number,
 The optional `datasetVersionId` parameter can correspond to a numeric version identifier, as in the previous example, or a [DatasetNotNumberedVersion](../src/datasets/domain/models/DatasetNotNumberedVersion.ts) enum value. If not set, the default value is `DatasetNotNumberedVersion.LATEST`.
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
+
+There is an optional fourth parameter called `previewUrlToken`, which allows a reviewer using a [Preview URL](#get-preview-url-for-a-dataset) to access a file in an unpublished dataset without needing to log in.
 
 #### Get File Citation Text
 
@@ -2040,6 +2129,8 @@ The optional `datasetVersionId` parameter can correspond to a numeric version id
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
 An optional fourth parameter `fileSearchCriteria` receives a [FileSearchCriteria](../src/files/domain/models/FileCriteria.ts) object to retrieve counts only for files that match the specified criteria.
+
+An optional fifth parameter called `previewUrlToken` allows a reviewer using a [Preview URL](#get-preview-url-for-a-dataset) to access file counts in an unpublished dataset without needing to log in.
 
 ##### Example call using optional parameters:
 
@@ -2147,6 +2238,8 @@ An optional fourth parameter called `fileSearchCriteria` receives a [FileSearchC
 
 An optional fifth parameter called `includeDeaccessioned` indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
+An optional sixth parameter called `previewUrlToken` allows a reviewer using a [Preview URL](#get-preview-url-for-a-dataset) to get the download size for an unpublished dataset without needing to log in.
+
 ##### Example call using optional parameters:
 
 ```typescript
@@ -2233,6 +2326,7 @@ This use case supports the following optional parameters depending on the search
 - **offset**: (number) Offset for pagination.
 - **fileSearchCriteria**: ([FileSearchCriteria](../src/files/domain/models/FileCriteria.ts)) Supports filtering the files by different file properties.
 - **fileOrderCriteria**: ([FileOrderCriteria](../src/files/domain/models/FileCriteria.ts)) Supports ordering the results according to different criteria. If not set, the defalt value is `FileOrderCriteria.NAME_AZ`.
+- **previewUrlToken**: (string) Allows a reviewer using a [Preview URL](#get-preview-url-for-a-dataset) to list the files of an unpublished dataset without needing to log in.
 
 ##### Example call using optional parameters:
 
