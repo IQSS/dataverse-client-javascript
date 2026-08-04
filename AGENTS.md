@@ -1,6 +1,6 @@
 # Agent guide: dataverse-client-javascript
 
-This file is the canonical reference for any AI agent or tool working in this repository: Claude Code, GitHub Copilot, or otherwise. Keep it in sync with `.github/copilot-instructions.md` if you update one.
+This file is the canonical reference for any AI agent or tool working in this repository: Claude Code, GitHub Copilot, or otherwise.
 
 `@iqss/dataverse-client-javascript` is a use-case-driven TypeScript SDK for the [Dataverse API](https://guides.dataverse.org/en/latest/api/native-api.html). It's part of the Dataverse Frontend ecosystem: the `dataverse-frontend` SPA and other consumers import use cases from this package instead of calling the REST API directly. Every public capability is exposed as a `use case` object with an `.execute(...)` method, documented one by one in [docs/useCases.md](docs/useCases.md).
 
