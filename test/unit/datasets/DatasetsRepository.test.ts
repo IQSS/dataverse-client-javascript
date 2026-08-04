@@ -497,14 +497,14 @@ describe('DatasetsRepository', () => {
         status: 'OK',
         data: {
           token: testPrivateUrlToken,
-          link: `https://demo.dataverse.org/previewurl.xhtml?token=${testPrivateUrlToken}`,
+          link: `http://dataverse.com/previewurl.xhtml?token=${testPrivateUrlToken}`,
           isAnonymizedAccess: false
         }
       }
     }
     const expectedPreviewUrl = {
       token: testPrivateUrlToken,
-      link: `https://demo.dataverse.org/previewurl.xhtml?token=${testPrivateUrlToken}`,
+      link: `http://dataverse.com/previewurl.xhtml?token=${testPrivateUrlToken}`,
       isAnonymizedAccess: false
     }
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/previewUrl`
@@ -549,14 +549,14 @@ describe('DatasetsRepository', () => {
         status: 'OK',
         data: {
           token: testPrivateUrlToken,
-          link: `https://demo.dataverse.org/previewurl.xhtml?token=${testPrivateUrlToken}`,
+          link: `http://dataverse.com/previewurl.xhtml?token=${testPrivateUrlToken}`,
           isAnonymizedAccess: false
         }
       }
     }
     const expectedPreviewUrl = {
       token: testPrivateUrlToken,
-      link: `https://demo.dataverse.org/previewurl.xhtml?token=${testPrivateUrlToken}`,
+      link: `http://dataverse.com/previewurl.xhtml?token=${testPrivateUrlToken}`,
       isAnonymizedAccess: false
     }
     const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/previewUrl`

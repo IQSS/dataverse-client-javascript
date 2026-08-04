@@ -6,7 +6,7 @@ import { PreviewUrl } from '../../../src/datasets/domain/models/PreviewUrl'
 describe('execute', () => {
   const testPreviewUrl: PreviewUrl = {
     token: 'testToken',
-    link: 'https://demo.dataverse.org/previewurl.xhtml?token=testToken',
+    link: 'http://dataverse.com/previewurl.xhtml?token=testToken',
     isAnonymizedAccess: false
   }
 

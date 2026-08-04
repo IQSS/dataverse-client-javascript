@@ -17,8 +17,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Datasets: Added `exportDatasetMetadata` use case, repository method, and `ExportedDatasetMetadata` response type to support exporting dataset metadata by numeric id or persistent id through Dataverse endpoint `GET /datasets/export`.
 - Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
 - Collections: Added theme information when retrieving a collection using `getCollection`.
-- Datasets/Files: Added optional Preview URL (`previewUrlToken`) support to `getDataset`, `getDatasetFiles`, `getDatasetFileCounts`, `getDatasetFilesTotalDownloadSize`, `getFile`, and `getFileAndDataset`, so a reviewer using a Preview URL can access an unpublished dataset's metadata and files without needing to log in. When a `previewUrlToken` is provided, it takes priority over any other credentials the caller may have configured (e.g. an already-logged-in user's session), so the Preview URL reliably grants access on its own.
-- Datasets: Added `createPreviewUrl`, `getPreviewUrl`, and `deletePreviewUrl` use cases and repository methods to support Dataverse endpoint `/datasets/{id}/previewUrl`, for creating, retrieving, and deleting a dataset's Preview URL.
+- Datasets/Files: Added optional Preview URL (`previewUrlToken`) support to `getDataset`, `getDatasetFiles`, `getDatasetFileCounts`, `getDatasetFilesTotalDownloadSize`, `getFile`, and `getFileAndDataset`.
+- Datasets: Added `createPreviewUrl`, `getPreviewUrl`, and `deletePreviewUrl` use cases and repository methods to support Dataverse endpoint `/datasets/{id}/previewUrl`.
 
 ### Changed
 

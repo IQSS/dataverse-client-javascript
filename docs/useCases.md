@@ -1919,11 +1919,9 @@ _See [use case](../src/datasets/domain/useCases/previewUrl/GetPreviewUrl.ts) imp
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-Requires permission to manage the dataset's permissions. Throws an error if no Preview URL exists yet for the dataset; see [Create a Preview URL for a Dataset](#create-a-preview-url-for-a-dataset).
-
 #### Create a Preview URL for a Dataset
 
-Creates a Preview URL for the given dataset, returning a [PreviewUrl](../src/datasets/domain/models/PreviewUrl.ts) instance. The token in the returned `PreviewUrl` allows a reviewer without credentials to access the dataset's latest (unpublished) version — see the `previewUrlToken` parameter on the read use cases above (for example, [Get a Dataset](#get-a-dataset)).
+Creates a Preview URL for the given dataset, returning a [PreviewUrl](../src/datasets/domain/models/PreviewUrl.ts) instance.
 
 ##### Example call:
 
@@ -1946,8 +1944,6 @@ _See [use case](../src/datasets/domain/useCases/previewUrl/CreatePreviewUrl.ts) 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 There is an optional second parameter called `anonymizedAccess`. If set to `true`, and Anonymized Access has been enabled on the installation, the created Preview URL will only allow an anonymized view of the dataset.
-
-Requires permission to manage the dataset's permissions.
 
 #### Delete a Preview URL from a Dataset
 
@@ -1972,8 +1968,6 @@ deletePreviewUrl.execute(datasetId).then(() => {
 _See [use case](../src/datasets/domain/useCases/previewUrl/DeletePreviewUrl.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
-
-Requires permission to manage the dataset's permissions. Throws an error if no Preview URL exists for the dataset.
 
 ## Files
 
