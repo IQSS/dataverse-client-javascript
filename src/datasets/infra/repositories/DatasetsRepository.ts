@@ -117,7 +117,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         includeDeaccessioned: includeDeaccessioned,
         excludeFiles: true,
         returnOwners: true,
-        ...(previewUrlToken && { key: previewUrlToken })
+        ...(previewUrlToken !== undefined && { key: previewUrlToken })
       }
     )
       .then((response) => transformVersionResponseToDataset(response, keepRawFields))

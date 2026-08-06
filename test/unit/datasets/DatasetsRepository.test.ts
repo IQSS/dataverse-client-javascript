@@ -331,6 +331,29 @@ describe('DatasetsRepository', () => {
         })
         expect(actual).toStrictEqual(testDatasetModel)
       })
+
+      test('should include an empty preview URL token as a key query param', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`
+
+        await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned,
+          false,
+          ''
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: {
+            includeDeaccessioned: testIncludeDeaccessioned,
+            excludeFiles: true,
+            returnOwners: true,
+            key: ''
+          },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
+      })
     })
     describe('by persistent id', () => {
       test('should return Dataset when providing persistent id, version id, and response is successful', async () => {

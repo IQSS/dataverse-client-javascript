@@ -1152,6 +1152,17 @@ describe('FilesRepository', () => {
         })
         expect(actual).toEqual(createFileModel())
       })
+
+      test('should include an empty preview URL token as a key query param', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testGetFileResponse)
+
+        await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false, false, '')
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: { ...expectedRequestParams, key: '' },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
+      })
     })
 
     describe('by persistent id', () => {

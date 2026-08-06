@@ -222,7 +222,7 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
         returnDatasetVersion: returnDatasetVersion,
         returnOwners: true,
         includeDeaccessioned: includeDeaccessioned,
-        ...(previewUrlToken && { key: previewUrlToken })
+        ...(previewUrlToken !== undefined && { key: previewUrlToken })
       }
     )
       .then((response) => transformFileResponseToFile(response, returnDatasetVersion))

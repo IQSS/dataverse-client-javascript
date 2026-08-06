@@ -518,15 +518,15 @@ describe('DatasetsRepository', () => {
     })
   })
 
-  describe('Private URLs', () => {
+  describe('Private and Preview URLs', () => {
     const expectedErrorInvalidToken = '[404] Private URL user not found'
     let testDatasetIds: CreatedDatasetIdentifiers
-    let privateUrlToken: string
+    let previewUrlToken: string
 
     beforeAll(async () => {
       testDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
       const previewUrl = await sut.createPreviewUrl(testDatasetIds.numericId)
-      privateUrlToken = previewUrl.token
+      previewUrlToken = previewUrl.token
     })
 
     afterAll(async () => {
@@ -535,7 +535,7 @@ describe('DatasetsRepository', () => {
 
     describe('getPrivateUrlDataset', () => {
       test('should return dataset when token is valid', async () => {
-        const actual = await sut.getPrivateUrlDataset(privateUrlToken, false)
+        const actual = await sut.getPrivateUrlDataset(previewUrlToken, false)
         expect(actual.id).toBe(testDatasetIds.numericId)
       })
 
@@ -547,7 +547,7 @@ describe('DatasetsRepository', () => {
 
     describe('getPrivateUrlDatasetCitation', () => {
       test('should return dataset citation when token is valid', async () => {
-        const actual = await sut.getPrivateUrlDatasetCitation(privateUrlToken)
+        const actual = await sut.getPrivateUrlDatasetCitation(previewUrlToken)
         expect(typeof actual).toBe('string')
       })
 
@@ -670,10 +670,7 @@ describe('DatasetsRepository', () => {
     })
 
     describe('getDataset with a preview URL token', () => {
-      let previewUrlToken: string
-
       beforeEach(() => {
-        previewUrlToken = privateUrlToken
         ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
       })
 
