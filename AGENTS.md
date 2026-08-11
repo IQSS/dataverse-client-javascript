@@ -45,8 +45,8 @@ Grouping related use cases in a subfolder: when several use cases form one cohes
 
 - `ApiRepository`, in `src/core/infra/repositories/`, is the base class every `<Domain>Repository` extends. It exposes `doGet`, `doPost`, `doPut`, `doDelete`, thin wrappers around axios.
 - `ApiConfig` is a global singleton holding the configured `dataverseApiUrl` and auth mechanism (`API_KEY`, `SESSION_COOKIE`, or `BEARER_TOKEN`), set once via `ApiConfig.init(...)`.
-- Every `doGet`/`doPost` call takes an `authRequired: boolean` as an explicit argument. When `true`, `buildRequestConfig` (in `apiConfigBuilders.ts`) attaches whichever credential `ApiConfig` currently holds: an `X-Dataverse-key` header for `API_KEY`, a cookie for `SESSION_COOKIE`, or an `Authorization: Bearer` header for `BEARER_TOKEN`. When `false`, no ambient credential is attached at all, regardless of what's configured.
-- Dataverse itself accepts an API key, or any equivalent token, via the `X-Dataverse-key` header or a `?key=` query parameter; either works, for any authenticated endpoint. That equivalence is why token-based access (see Preview URLs below) can be threaded through as a query param without touching the auth-mechanism plumbing at all.
+- `doGet` accepts an `authRequired: boolean` argument, defaulted to `false`. `doPost`, `doPut`, and `doDelete` always call `buildRequestConfig` with `authRequired: true` in the current implementation. When auth is required, `buildRequestConfig` (in `apiConfigBuilders.ts`) attaches whichever credential `ApiConfig` currently holds: an `X-Dataverse-Key` header for `API_KEY`, a cookie for `SESSION_COOKIE`, or an `Authorization: Bearer` header for `BEARER_TOKEN`. When `doGet` passes `false`, no ambient credential is attached at all, regardless of what's configured.
+- Dataverse itself accepts an API key, or any equivalent token, via the `X-Dataverse-Key` header or a `?key=` query parameter; either works, for any authenticated endpoint. That equivalence is why token-based access (see Preview URLs below) can be threaded through as a query param without touching the auth-mechanism plumbing at all.
 
 ### Gotcha: ambient credentials silently beat an explicit token
 
@@ -139,7 +139,7 @@ Integration and functional runs spin up Postgres, Solr, LocalStack, and a Datave
 
 ## Git hygiene
 
-The `.husky/pre-commit` hook runs `npm run format && npm run typecheck && npm run lint:fix && git add .`. That final `git add .` stages every modified or untracked file in the working tree, not just what got `git add`ed deliberately. Unrelated in-progress edits sitting in the working tree at commit time get swept in regardless of intent. Set aside anything that shouldn't be bundled before committing, for example with `git stash push -- <path>`, or by copying it elsewhere and restoring it after.
+The `.husky/pre-commit` hook runs `npm run format`, `npm run typecheck`, `npm run lint:fix`, and then `git add .` as separate commands. That final `git add .` stages every modified or untracked file in the working tree, not just what got `git add`ed deliberately. Unrelated in-progress edits sitting in the working tree at commit time get swept in regardless of intent. Set aside anything that shouldn't be bundled before committing, for example with `git stash push -- <path>`, or by copying it elsewhere and restoring it after.
 
 ## Creating a pull request
 
@@ -153,7 +153,7 @@ The `.husky/pre-commit` hook runs `npm run format && npm run typecheck && npm ru
 5. **Link the backend PR** in the "Related Dataverse PRs" field when this SDK change depends on one, the same PR the "Finding the API spec" section above points to when an endpoint isn't documented yet.
 6. **Match the existing commit-message convention**: recent history uses a `type: description` prefix (`feat: ...`, `fix: ...`, `chore(deps): ...`), even though it isn't formally enforced.
 
-`deploy_pr.yml` runs three CI jobs on every PR: `test-unit`, `test-integration`, and `test-functional` (the last only after integration passes). This is the actual enforcement behind step 7 of the use-case recipe: skipping integration tests locally still means CI runs them before merge.
+`deploy_pr.yml` runs three test jobs on every PR: `test-unit`, `test-integration`, and `test-functional` (the last only after integration passes), then `publish-gpr` builds and publishes the PR package after all test jobs pass. This is the actual enforcement behind step 7 of the use-case recipe: skipping integration tests locally still means CI runs them before merge.
 
 ## Where the rest of the documentation lives
 
