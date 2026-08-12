@@ -20,6 +20,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Changed
 
+- Datasets: Updated dataset metadata transformation to support deeply nested metadata fields returned by the Dataverse API, e.g., using the `getDataset` use case.
+
 ### Fixed
 
 ### Removed
