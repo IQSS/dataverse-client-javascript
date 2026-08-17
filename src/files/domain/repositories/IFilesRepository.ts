@@ -11,6 +11,7 @@ import { UploadedFileDTO } from '../dtos/UploadedFileDTO'
 import { UpdateFileMetadataDTO } from '../dtos/UpdateFileMetadataDTO'
 import { RestrictFileDTO } from '../dtos/RestrictFileDTO'
 import { FileVersionSummarySubset } from '../models/FileVersionSummaryInfo'
+import { FileCitationFormat } from '../models/FileCitationFormat'
 
 export interface IFilesRepository {
   getDatasetFiles(
@@ -56,6 +57,8 @@ export interface IFilesRepository {
     datasetVersionId: string,
     includeDeaccessioned: boolean
   ): Promise<string>
+
+  getFileCitationByFormat(fileId: number | string, format: FileCitationFormat): Promise<string>
 
   getFileUploadDestination(datasetId: number | string, file: File): Promise<FileUploadDestination>
 

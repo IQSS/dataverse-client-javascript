@@ -11,6 +11,8 @@ The different use cases currently available in the package are classified below,
 - [Collections](#Collections)
   - [Collections read use cases](#collections-read-use-cases)
     - [Get a Collection](#get-a-collection)
+    - [Get Collection Storage Driver](#get-collection-storage-driver)
+    - [Get Allowed Collection Storage Drivers](#get-allowed-collection-storage-drivers)
     - [Get Collection Facets](#get-collection-facets)
     - [Get User Permissions on a Collection](#get-user-permissions-on-a-collection)
     - [List All Collection Items](#list-all-collection-items)
@@ -20,6 +22,8 @@ The different use cases currently available in the package are classified below,
     - [Get Collections for Creating](#get-collections-for-creating)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
+    - [Set Collection Storage Driver](#set-collection-storage-driver)
+    - [Delete Collection Storage Driver](#delete-collection-storage-driver)
     - [Update a Collection](#update-a-collection)
     - [Publish a Collection](#publish-a-collection)
     - [Delete a Collection](#delete-a-collection)
@@ -33,11 +37,18 @@ The different use cases currently available in the package are classified below,
   - [Templates write use cases](#templates-write-use-cases)
     - [Create a Template](#create-a-template)
     - [Delete a Template](#delete-a-template)
+    - [Update Template Metadata](#update-template-metadata)
+    - [Update Template License Terms](#update-template-license-terms)
+    - [Update Template Terms Of Access](#update-template-terms-of-access)
+    - [Set Template As Default](#set-template-as-default)
+    - [Unset Template As Default](#unset-template-as-default)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
     - [Get a Dataset](#get-a-dataset)
     - [Get Dataset By Private URL Token](#get-dataset-by-private-url-token)
     - [Get Dataset Citation Text](#get-dataset-citation-text)
+    - [Get Dataset Citation In Other Formats](#get-dataset-citation-in-other-formats)
+    - [Export Dataset Metadata](#export-dataset-metadata)
     - [Get Dataset Citation Text By Private URL Token](#get-dataset-citation-text-by-private-url-token)
     - [Get Dataset Locks](#get-dataset-locks)
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
@@ -51,6 +62,7 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Storage Driver](#get-dataset-storage-driver)
     - [Get Dataset Available Dataset Types](#get-dataset-available-dataset-types)
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
+    - [Get Dataset Upload Limits](#get-dataset-upload-limits)
   - [Datasets write use cases](#datasets-write-use-cases)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
@@ -69,6 +81,7 @@ The different use cases currently available in the package are classified below,
     - [Get a File](#get-a-file)
     - [Get a File and its Dataset](#get-a-file-and-its-dataset)
     - [Get File Citation Text](#get-file-citation-text)
+    - [Get File Citation By Format](#get-file-citation-by-format)
     - [Get File Counts in a Dataset](#get-file-counts-in-a-dataset)
     - [Get File Data Tables](#get-file-data-tables)
     - [Get File Download Count](#get-file-download-count)
@@ -124,6 +137,25 @@ The different use cases currently available in the package are classified below,
     - [Get External Tools](#get-external-tools)
     - [Get Dataset External Tool Resolved](#get-dataset-external-tool-resolved)
     - [Get File External Tool Resolved](#get-file-external-tool-resolved)
+- [Guestbooks](#Guestbooks)
+  - [Guestbooks read use cases](#guestbooks-read-use-cases)
+    - [Get a Guestbook](#get-a-guestbook)
+    - [Get Guestbooks By Collection Id](#get-guestbooks-by-collection-id)
+    - [Get Guestbook Responses By Guestbook Id](#get-guestbook-responses-by-guestbook-id)
+    - [Download Guestbook Responses By Collection Id](#download-guestbook-responses-by-collection-id)
+    - [Download Guestbook Responses Of A Guestbook](#download-guestbook-responses-of-a-guestbook)
+  - [Guestbooks write use cases](#guestbooks-write-use-cases)
+    - [Create a Guestbook](#create-a-guestbook)
+    - [Edit a Guestbook](#edit-a-guestbook)
+    - [Set Guestbook Enabled](#set-guestbook-enabled)
+    - [Assign Dataset Guestbook](#assign-dataset-guestbook)
+    - [Remove Dataset Guestbook](#remove-dataset-guestbook)
+- [Access](#Access)
+  - [Access write use cases](#access-write-use-cases)
+    - [Submit Guestbook For Datafile Download](#submit-guestbook-for-datafile-download)
+    - [Submit Guestbook For Datafiles Download](#submit-guestbook-for-datafiles-download)
+    - [Submit Guestbook For Dataset Download](#submit-guestbook-for-dataset-download)
+    - [Submit Guestbook For Dataset Version Download](#submit-guestbook-for-dataset-version-download)
 
 ## Collections
 
@@ -172,6 +204,79 @@ _See [use case](../src/collections/domain/useCases/GetCollection.ts)_ definition
 The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 If no collection identifier is specified, the default collection identifier; `:root` will be used. If you want to search for a different collection, you must add the collection identifier as a parameter in the use case call.
+
+##### Collection Allowed Dataset Types
+
+Collections can optionally restrict which [DatasetType](../src/datasets/domain/models/DatasetType.ts) objects can be created within them. The `allowedDatasetTypes` field contains an array of dataset types allowed on the collection when configured. If not configured on the collection, this field will be `undefined`.
+
+```typescript
+getCollection.execute('myCollection').then((collection: Collection) => {
+  if (collection.allowedDatasetTypes) {
+    collection.allowedDatasetTypes.forEach((datasetType) => {
+      console.log(`Allowed type: ${datasetType.displayName}`)
+    })
+  }
+})
+```
+
+#### Get Collection Storage Driver
+
+Returns a [StorageDriver](../src/core/domain/models/StorageDriver.ts) instance describing the collection's assigned storage driver.
+
+##### Example call:
+
+```typescript
+import { getCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+getCollectionStorageDriver.execute(collectionIdOrAlias).then((storageDriver: StorageDriver) => {
+  /* ... */
+})
+
+// Pass true to resolve the effective driver after inheritance/default fallback
+getCollectionStorageDriver
+  .execute(collectionIdOrAlias, true)
+  .then((storageDriver: StorageDriver) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+The optional `getEffective` parameter defaults to `false`. Set it to `true` to retrieve the effective storage driver after inheritance/default resolution.
+
+#### Get Allowed Collection Storage Drivers
+
+Returns an [AllowedStorageDrivers](../src/collections/domain/models/AllowedStorageDrivers.ts) object whose keys are driver labels and whose values are storage driver ids.
+
+##### Example call:
+
+```typescript
+import { getAllowedCollectionStorageDrivers } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+getAllowedCollectionStorageDrivers
+  .execute(collectionIdOrAlias)
+  .then((storageDrivers: AllowedStorageDrivers) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetAllowedCollectionStorageDrivers.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
 
 #### Get Collection Facets
 
@@ -483,6 +588,57 @@ The above example creates the new collection in the root collection since no col
 
 The use case returns a number, which is the identifier of the created collection.
 
+#### Set Collection Storage Driver
+
+Assigns a storage driver to a collection by driver label and returns the backend success message.
+
+##### Example call:
+
+```typescript
+import { setCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+const driverLabel = 'Local Storage'
+
+setCollectionStorageDriver.execute(collectionIdOrAlias, driverLabel).then((message: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/SetCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+The `driverLabel` parameter must match the storage driver's label, not its id.
+
+#### Delete Collection Storage Driver
+
+Clears the directly assigned storage driver from a collection so it falls back to inherited/default storage, and returns the backend success message.
+
+##### Example call:
+
+```typescript
+import { deleteCollectionStorageDriver } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+deleteCollectionStorageDriver.execute(collectionIdOrAlias).then((message: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/DeleteCollectionStorageDriver.ts) implementation_.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
 #### Update a Collection
 
 Updates an existing collection, given a collection identifier and a [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) including the updated collection data.
@@ -710,6 +866,121 @@ await deleteTemplate.execute(templateId)
 
 _See [use case](../src/templates/domain/useCases/DeleteTemplate.ts)_ definition.
 
+#### Set Template As Default
+
+Sets the default template for a given Dataverse collection.
+
+You must have edit permissions on the collection in order to use this endpoint.
+
+##### Example call:
+
+```typescript
+import { setTemplateAsDefault } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = ':root'
+const templateId = 12345
+
+await setTemplateAsDefault.execute(templateId, collectionIdOrAlias)
+```
+
+_See [use case](../src/templates/domain/useCases/SetTemplateAsDefault.ts)_ definition.
+
+#### Unset Template As Default
+
+Removes the default template from a given Dataverse collection.
+
+You must have edit permissions on the collection in order to use this endpoint.
+
+##### Example call:
+
+```typescript
+import { unsetTemplateAsDefault } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = ':root'
+
+await unsetTemplateAsDefault.execute(collectionIdOrAlias)
+```
+
+_See [use case](../src/templates/domain/useCases/UnsetTemplateAsDefault.ts)_ definition.
+
+#### Update Template Metadata
+
+Updates template metadata fields and instructions for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateMetadata } from '@iqss/dataverse-client-javascript'
+import { UpdateTemplateMetadataDTO } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+const replace = true
+
+const payload: UpdateTemplateMetadataDTO = {
+  name: 'Dataverse template updated',
+  fields: [
+    {
+      typeName: 'author',
+      typeClass: 'compound',
+      multiple: true,
+      value: [
+        {
+          authorName: { typeName: 'authorName', value: 'Belicheck, Bill' },
+          authorAffiliation: { typeName: 'authorIdentifierScheme', value: 'ORCID' }
+        }
+      ]
+    }
+  ],
+  instructions: [{ instructionField: 'author', instructionText: 'Updated instructions' }]
+}
+
+await updateTemplateMetadata.execute(templateId, payload, replace)
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateMetadata.ts) definition_.
+
+#### Update Template License Terms
+
+Updates either the license name or custom terms of use for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateLicenseTerms } from '@iqss/dataverse-client-javascript'
+import { UpdateTemplateLicenseTermsDTO } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+const payload: UpdateTemplateLicenseTermsDTO = {
+  customTerms: {
+    termsOfUse: 'Updated template terms of use'
+  }
+}
+
+await updateTemplateLicenseTerms.execute(templateId, payload)
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateLicenseTerms.ts) definitition_.
+
+#### Update Template Terms Of Access
+
+Updates terms of access for a template id.
+
+##### Example call:
+
+```typescript
+import { updateTemplateTermsOfAccess } from '@iqss/dataverse-client-javascript'
+
+const templateId = 12345
+
+await updateTemplateTermsOfAccess.execute(templateId, {
+  fileAccessRequest: true,
+  termsOfAccessForRestrictedFiles: 'Restricted access only'
+})
+```
+
+_See [use case](../src/templates/domain/useCases/UpdateTemplateTermsOfAccess.ts) definition_.
+
 ## Datasets
 
 ### Datasets Read Use Cases
@@ -825,6 +1096,37 @@ The `datasetId` parameter can be a string, for persistent identifiers, or a numb
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
 
+#### Export Dataset Metadata
+
+Exports dataset metadata in a specified metadata export format.
+
+##### Example call:
+
+```typescript
+import {
+  exportDatasetMetadata,
+  DatasetNotNumberedVersion,
+  ExportedDatasetMetadata
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+const exporter = 'ddi'
+
+exportDatasetMetadata
+  .execute(datasetId, exporter, DatasetNotNumberedVersion.DRAFT)
+  .then((metadata: ExportedDatasetMetadata) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/ExportDatasetMetadata.ts) implementation_.
+
+The `datasetId` parameter can be a string for persistent identifiers or a number for numeric identifiers. The optional `version` parameter accepts `DatasetNotNumberedVersion.LATEST_PUBLISHED` or `DatasetNotNumberedVersion.DRAFT`. If not set, Dataverse defaults to `DatasetNotNumberedVersion.LATEST_PUBLISHED`. Draft exports require configured authentication with access to the draft.
+
 #### Get Dataset Citation Text By Private URL Token
 
 Returns the Dataset citation text, given an associated Private URL Token.
@@ -870,6 +1172,30 @@ getDatasetLocks.execute(datasetId).then((datasetLocks: DatasetLock[]) => {
 _See [use case](../src/datasets/domain/useCases/GetDatasetLocks.ts) implementation_.
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+#### Get Dataset Reviews
+
+Returns a [DatasetReview](../src/datasets/domain/models/DatasetReview.ts) array with the local review datasets that review a dataset. Review datasets are matched by their `itemReviewedUrl` metadata field pointing at the URL form of the dataset persistent identifier.
+
+##### Example call:
+
+```typescript
+import { getDatasetReviews } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.5072/FK2/ABCDEF'
+
+getDatasetReviews.execute(datasetId).then((datasetReviews: DatasetReview[]) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetReviews.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers. An API token is optional when the review dataset has been published, but unpublished targets require permission to view the unpublished dataset.
 
 #### Get Dataset Summary Field Names
 
@@ -1049,7 +1375,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetTypes.
 
 #### Get Dataset Available Dataset Type
 
-Returns an available dataset types that can be used at dataset creation.
+Returns a single available dataset type that can be used at dataset creation.
 
 ###### Example call:
 
@@ -1058,12 +1384,30 @@ import { getDatasetAvailableDatasetType } from '@iqss/dataverse-client-javascrip
 
 /* ... */
 
-getDatasetAvailableDatasetType.execute().then((datasetType: DatasetType) => {
+const datasetTypeIdOrName = 'dataset'
+
+getDatasetAvailableDatasetType.execute(datasetTypeIdOrName).then((datasetType: DatasetType) => {
   /* ... */
 })
 ```
 
 _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableDatasetType.ts) implementation_.
+
+The `datasetTypeIdOrName` parameter can be either the numeric dataset type id or its name.
+
+Example returned value:
+
+```typescript
+{
+  id: 1,
+  name: 'dataset',
+  displayName: 'Dataset',
+  linkedMetadataBlocks: [],
+  availableLicenses: [],
+  description:
+    'A study, experiment, set of observations, or publication. A dataset can comprise a single file or multiple files.'
+}
+```
 
 ### Datasets Write Use Cases
 
@@ -1439,8 +1783,6 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetAvailableCategories.ts
 
 The `datasetId` parameter is a number for numeric identifiers or string for persistent identifiers.
 
-# <<<<<<< HEAD
-
 #### Get Dataset Templates
 
 Returns a [DatasetTemplate](../src/datasets/domain/models/DatasetTemplate.ts) array containing the dataset templates of the requested collection, given the collection identifier or alias.
@@ -1461,7 +1803,7 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetTemplates.ts)_ definit
 
 #### Get Dataset Storage Driver
 
-Returns a [StorageDriver](../src/datasets/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
+Returns a [StorageDriver](../src/core/domain/models/StorageDriver.ts) instance with storage driver configuration for a dataset, including properties like name, type, label, and upload/download capabilities.
 
 ##### Example call:
 
@@ -1483,11 +1825,9 @@ _See [use case](../src/datasets/domain/useCases/GetDatasetStorageDriver.ts) impl
 
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
-> > > > > > > develop
-
 #### Add a Dataset Type
 
-Adds a dataset types that can be used at dataset creation.
+Adds a dataset type that can be used at dataset creation.
 
 ###### Example call:
 
@@ -1496,12 +1836,22 @@ import { addDatasetType } from '@iqss/dataverse-client-javascript'
 
 /* ... */
 
+const datasetType = {
+  name: 'software',
+  displayName: 'Software',
+  linkedMetadataBlocks: ['codeMeta20'],
+  availableLicenses: ['MIT', 'Apache-2.0'],
+  description: 'Software data and metadata.'
+}
+
 addDatasetType.execute(datasetType).then((datasetType: DatasetType) => {
   /* ... */
 })
 ```
 
 _See [use case](../src/datasets/domain/useCases/AddDatasetType.ts) implementation_.
+
+The `datasetType` parameter must match [DatasetTypeDTO](../src/datasets/domain/dtos/DatasetTypeDTO.ts) and includes all [DatasetType](../src/datasets/domain/models/DatasetType.ts) fields except `id`.
 
 #### Link Dataset Type with Metadata Blocks
 
@@ -1556,6 +1906,30 @@ deleteDatasetType.execute(datasetTypeId).then(() => {
 ```
 
 _See [use case](../src/datasets/domain/useCases/DeleteDatasetType.ts) implementation_.
+
+#### Get Dataset Upload Limits
+
+Returns a [DatasetUploadLimits](../src/datasets/domain/models/DatasetUploadLimits.ts) instance with the remaining dataset storage and/or file upload quotas, if present.
+
+##### Example call:
+
+```typescript
+import { getDatasetUploadLimits } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetUploadLimits.execute(datasetId).then((uploadLimits: DatasetUploadLimits) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetUploadLimits.ts) implementation_.
+
+If the backend does not define any quota limits for the dataset, the returned object can be empty (`{}`).
 
 ## Files
 
@@ -1647,6 +2021,32 @@ _See [use case](../src/files/domain/useCases/GetFileCitation.ts) implementation_
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the file search. If not set, the default value is `false`.
+
+#### Get File Citation By Format
+
+Returns the File citation in the requested citation export format.
+
+##### Example call:
+
+```typescript
+import { FileCitationFormat, getFileCitationByFormat } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const fileId = 3
+
+getFileCitationByFormat.execute(fileId, FileCitationFormat.BIBTEX).then((citationText: string) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/files/domain/useCases/GetFileCitationByFormat.ts) implementation_.
+
+The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `format` parameter must be one of the available [FileCitationFormat](../src/files/domain/models/FileCitationFormat.ts) enum values: `FileCitationFormat.ENDNOTE`, `FileCitationFormat.RIS`, `FileCitationFormat.BIBTEX`, `FileCitationFormat.CSL`, or `FileCitationFormat.INTERNAL`.
 
 #### Get File Counts in a Dataset
 
@@ -2566,6 +2966,42 @@ getAvailableDatasetMetadataExportFormats
 
 _See [use case](../src/info/domain/useCases/GetAvailableDatasetMetadataExportFormats.ts) implementation_.
 
+#### Get Dataset Publish Popup Custom Text
+
+Returns the custom text displayed in the dataset publish confirmation popup
+
+##### Example call:
+
+```typescript
+import { getDatasetPublishPopupCustomText } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getDatasetPublishPopupCustomText.execute().then((text: string) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/info/domain/useCases/GetDatasetPublishPopupCustomText.ts) implementation_.
+
+#### Get Publish Dataset Disclaimer Text
+
+Returns the disclaimer text displayed in the dataset publish flow.
+
+##### Example calls:
+
+```typescript
+import { getPublishDatasetDisclaimerText } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+getPublishDatasetDisclaimerText.execute().then((disclaimerText: string) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/info/domain/useCases/GetPublishDatasetDisclaimerText.ts) implementation_.
+
 ## Licenses
 
 ### Get Available Standard License Terms
@@ -2600,7 +3036,7 @@ import { submitContactInfo } from '@iqss/dataverse-client-javascript'
 /* ... */
 
 const contactDTO: ContactDTO = {
-  targedId: 1
+  targetId: 1,
   subject: 'Data Question',
   body: 'Please help me understand your data. Thank you!',
   fromEmail: 'test@gmail.com'
@@ -2808,3 +3244,374 @@ getFileExternalToolResolved
 ```
 
 _See [use case](../src/externalTools/domain/useCases/GetfileExternalToolResolved.ts) implementation_.
+
+## Guestbooks
+
+### Guestbooks Read Use Cases
+
+#### Get a Guestbook
+
+Returns a [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) by its id.
+
+##### Example call:
+
+```typescript
+import { getGuestbook } from '@iqss/dataverse-client-javascript'
+
+const guestbookId = 123
+
+getGuestbook.execute(guestbookId).then((guestbook: Guestbook) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/GetGuestbook.ts) implementation_.
+
+#### Get Guestbooks By Collection Id
+
+Returns all [Guestbook](../src/guestbooks/domain/models/Guestbook.ts) entries available for a collection.
+Set `includeStats` to `true` to include `usageCount` and `responseCount` for each guestbook.
+Set `includeInherited` to `true` to include the collection's guestbooks and guestbooks from the collection's hierarchical owners.
+
+##### Example call:
+
+```typescript
+import { getGuestbooksByCollectionId } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+const includeStats = true
+const includeInherited = true
+
+getGuestbooksByCollectionId
+  .execute(collectionIdOrAlias, includeStats, includeInherited)
+  .then((guestbooks: Guestbook[]) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/guestbooks/domain/useCases/GetGuestbooksByCollectionId.ts) implementation_.
+
+#### Get Guestbook Responses By Guestbook Id
+
+Returns a [GuestbookResponseSubset](../src/guestbooks/domain/models/GuestbookResponse.ts) containing paginated guestbook response entries and the total response count for a guestbook.
+
+##### Example call:
+
+```typescript
+import { getGuestbookResponsesByGuestbookId } from '@iqss/dataverse-client-javascript'
+
+const guestbookId = 123
+const limit = 10
+const offset = 0
+
+getGuestbookResponsesByGuestbookId
+  .execute(guestbookId, limit, offset)
+  .then((guestbookResponseSubset: GuestbookResponseSubset) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/guestbooks/domain/useCases/GetGuestbookResponsesByGuestbookId.ts) implementation_.
+
+#### Download Guestbook Responses By Collection Id
+
+Downloads all guestbook responses for a collection and returns the raw response body, typically CSV content.
+
+##### Example call:
+
+```typescript
+import { downloadGuestbookResponsesByCollectionId } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+
+downloadGuestbookResponsesByCollectionId
+  .execute(collectionIdOrAlias)
+  .then((csvResponse: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/guestbooks/domain/useCases/DownloadGuestbookResponsesByCollectionId.ts) implementation_.
+
+#### Download Guestbook Responses Of A Guestbook
+
+Downloads guestbook responses for one guestbook in a collection and returns the raw response body, typically CSV content.
+
+##### Example call:
+
+```typescript
+import { downloadGuestbookResponsesOfAGuestbook } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+const guestbookId = 123
+
+downloadGuestbookResponsesOfAGuestbook
+  .execute(collectionIdOrAlias, guestbookId)
+  .then((csvResponse: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/guestbooks/domain/useCases/DownloadGuestbookResponsesOfAGuestbook.ts) implementation_.
+
+### Guestbooks Write Use Cases
+
+#### Create a Guestbook
+
+Creates a guestbook on a collection using [CreateGuestbookDTO](../src/guestbooks/domain/dtos/CreateGuestbookDTO.ts).
+
+##### Example call:
+
+```typescript
+import { createGuestbook } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+const guestbook: CreateGuestbookDTO = {
+  name: 'my test guestbook',
+  enabled: true,
+  emailRequired: true,
+  nameRequired: true,
+  institutionRequired: false,
+  positionRequired: false,
+  customQuestions: [
+    {
+      question: 'Describe yourself',
+      required: false,
+      displayOrder: 1,
+      type: 'textarea',
+      hidden: false
+    }
+  ]
+}
+
+createGuestbook.execute(guestbook, collectionIdOrAlias).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/CreateGuestbook.ts) implementation_.
+
+#### Edit a Guestbook
+
+Edits an existing guestbook using [EditGuestbookDTO](../src/guestbooks/domain/dtos/EditGuestbookDTO.ts).
+
+##### Example call:
+
+```typescript
+import { editGuestbook } from '@iqss/dataverse-client-javascript'
+
+const guestbookId = 123
+const guestbook: EditGuestbookDTO = {
+  name: 'new name',
+  enabled: true,
+  emailRequired: true,
+  nameRequired: true,
+  institutionRequired: false,
+  positionRequired: false,
+  createTime: '2026-06-12T00:00:00Z',
+  customQuestions: []
+}
+
+editGuestbook.execute(guestbookId, guestbook).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/EditGuestbook.ts) implementation_.
+
+#### Set Guestbook Enabled
+
+Enables or disables a guestbook in a collection.
+
+##### Example call:
+
+```typescript
+import { setGuestbookEnabled } from '@iqss/dataverse-client-javascript'
+
+const collectionIdOrAlias = 'root'
+const guestbookId = 123
+const enabled = false
+
+setGuestbookEnabled.execute(collectionIdOrAlias, guestbookId, false).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/SetGuestbookEnabled.ts) implementation_.
+
+#### Assign Dataset Guestbook
+
+Assigns a guestbook to a dataset using `PUT /api/datasets/{identifier}/guestbook`.
+
+##### Example call:
+
+```typescript
+import { assignDatasetGuestbook } from '@iqss/dataverse-client-javascript'
+
+const datasetIdOrPersistentId = 123
+const guestbookId = 456
+
+assignDatasetGuestbook.execute(datasetIdOrPersistentId, guestbookId).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/AssignDatasetGuestbook.ts) implementation_.
+
+#### Remove Dataset Guestbook
+
+Removes the guestbook assignment for a dataset using `DELETE /api/datasets/{identifier}/guestbook`.
+
+##### Example call:
+
+```typescript
+import { removeDatasetGuestbook } from '@iqss/dataverse-client-javascript'
+
+const datasetIdOrPersistentId = 123
+
+removeDatasetGuestbook.execute(datasetIdOrPersistentId).then(() => {
+  /* ... */
+})
+```
+
+_See [use case](../src/guestbooks/domain/useCases/RemoveDatasetGuestbook.ts) implementation_.
+
+## Access
+
+### Access Read Use Cases
+
+### Access Write Use Cases
+
+#### Submit Guestbook For Datafile Download
+
+Submits guestbook answers for a datafile and returns a signed URL.
+
+##### Example call:
+
+```typescript
+import { submitGuestbookForDatafileDownload } from '@iqss/dataverse-client-javascript'
+
+submitGuestbookForDatafileDownload
+  .execute(
+    10,
+    {
+      guestbookResponse: {
+        answers: [
+          { id: 123, value: 'Good' },
+          { id: 124, value: ['Multi', 'Line'] }
+        ]
+      }
+    },
+    'original'
+  )
+  .then((signedUrl: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/access/domain/useCases/SubmitGuestbookForDatafileDownload.ts) implementation_.
+
+#### Submit Guestbook For Datafiles Download
+
+Submits guestbook answers for multiple files and returns a signed URL.
+
+##### Example call:
+
+```typescript
+import { submitGuestbookForDatafilesDownload } from '@iqss/dataverse-client-javascript'
+
+submitGuestbookForDatafilesDownload
+  .execute(
+    [10, 11],
+    {
+      guestbookResponse: {
+        answers: [
+          { id: 123, value: 'Good' },
+          { id: 124, value: ['Multi', 'Line'] },
+          { id: 125, value: 'Yellow' }
+        ]
+      }
+    },
+    'original'
+  )
+  .then((signedUrl: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/access/domain/useCases/SubmitGuestbookForDatafilesDownload.ts) implementation_.
+
+#### Submit Guestbook For Dataset Download
+
+Submits guestbook answers for dataset download and returns a signed URL.
+
+##### Example call:
+
+```typescript
+import { submitGuestbookForDatasetDownload } from '@iqss/dataverse-client-javascript'
+
+submitGuestbookForDatasetDownload
+  .execute(
+    'doi:10.5072/FK2/XXXXXX',
+    {
+      guestbookResponse: {
+        answers: [
+          { id: 123, value: 'Good' },
+          { id: 124, value: ['Multi', 'Line'] },
+          { id: 125, value: 'Yellow' }
+        ]
+      }
+    },
+    'original'
+  )
+  .then((signedUrl: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/access/domain/useCases/SubmitGuestbookForDatasetDownload.ts) implementation_.
+
+#### Submit Guestbook For Dataset Version Download
+
+Submits guestbook answers for a specific dataset version and returns a signed URL.
+
+##### Example call:
+
+```typescript
+import { submitGuestbookForDatasetVersionDownload } from '@iqss/dataverse-client-javascript'
+
+submitGuestbookForDatasetVersionDownload
+  .execute(
+    10,
+    ':latest',
+    {
+      guestbookResponse: {
+        name: 'Jane Doe',
+        email: 'jane@example.org',
+        institution: 'Example University',
+        position: 'Researcher',
+        answers: [
+          { id: 123, value: 'Good' },
+          { id: 124, value: ['Multi', 'Line'] },
+          { id: 125, value: 'Yellow' }
+        ]
+      }
+    },
+    'original'
+  )
+  .then((signedUrl: string) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/access/domain/useCases/SubmitGuestbookForDatasetVersionDownload.ts) implementation_.
+
+The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The `versionId` parameter accepts a numbered version such as `'1.0'` or a non-numbered version such as `':latest'`.
+
+The `guestbookResponse` parameter must match [GuestbookResponseDTO](../src/access/domain/dtos/GuestbookResponseDTO.ts).
+
+The optional `format` parameter is sent as a query parameter on the download endpoint. For example, pass `'original'` to request the original dataset or file format.
+
+The resolved value is a signed download URL as a string.

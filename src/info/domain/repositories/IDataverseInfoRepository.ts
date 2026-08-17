@@ -7,4 +7,6 @@ export interface IDataverseInfoRepository {
   getMaxEmbargoDurationInMonths(): Promise<number>
   getApplicationTermsOfUse(lang?: string): Promise<string>
   getAvailableDatasetMetadataExportFormats(): Promise<DatasetMetadataExportFormats>
+  getDatasetPublishPopupCustomText(): Promise<string>
+  getPublishDatasetDisclaimerText(): Promise<string>
 }

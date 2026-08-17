@@ -34,6 +34,9 @@ import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCi
 import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
+import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits'
+import { GetDatasetReviews } from './domain/useCases/GetDatasetReviews'
+import { ExportDatasetMetadata } from './domain/useCases/ExportDatasetMetadata'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -84,6 +87,9 @@ const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(da
 const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
+const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
+const getDatasetReviews = new GetDatasetReviews(datasetsRepository)
+const exportDatasetMetadata = new ExportDatasetMetadata(datasetsRepository)
 
 export {
   getDataset,
@@ -115,9 +121,13 @@ export {
   setAvailableLicensesForDatasetType,
   deleteDatasetType,
   updateDatasetLicense,
-  getDatasetStorageDriver
+  getDatasetStorageDriver,
+  getDatasetUploadLimits,
+  getDatasetReviews,
+  exportDatasetMetadata
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
+export { ExportedDatasetMetadata } from './domain/models/ExportedDatasetMetadata'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
 export { DatasetLock, DatasetLockType } from './domain/models/DatasetLock'
 export {
@@ -154,4 +164,9 @@ export {
 export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
 export { DatasetType } from './domain/models/DatasetType'
 export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'
-export { StorageDriver } from './domain/models/StorageDriver'
+export { DatasetUploadLimits } from './domain/models/DatasetUploadLimits'
+export {
+  DatasetReview,
+  DatasetReviewRubricMetadataBlock,
+  DatasetReviewRubricMetadataField
+} from './domain/models/DatasetReview'

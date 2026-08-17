@@ -10,10 +10,23 @@ export interface CollectionPayload {
   isPartOf: OwnerNodePayload
   inputLevels?: CollectionInputLevelPayload[]
   dataverseContacts?: CollectionContactPayload[]
+  allowedDatasetTypes?: AllowedDatasetTypePayload[]
   dataverseType: string
   isMetadataBlockRoot: boolean
   isFacetRoot: boolean
   childCount: number
+  theme?: CollectionThemePayload
+}
+
+export interface CollectionThemePayload {
+  id: number
+  logo?: string
+  tagline?: string
+  linkUrl?: string
+  linkColor?: string
+  textColor?: string
+  backgroundColor?: string
+  logoBackgroundColor?: string
 }
 
 export interface CollectionInputLevelPayload {
@@ -25,4 +38,11 @@ export interface CollectionInputLevelPayload {
 export interface CollectionContactPayload {
   contactEmail: string
   displayOrder: number
+}
+
+export interface AllowedDatasetTypePayload {
+  id: number
+  name: string
+  displayName: string
+  description?: string
 }

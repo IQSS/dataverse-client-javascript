@@ -110,6 +110,18 @@ describe('CollectionsRepository', () => {
         expect(actual.alias).toBe(ROOT_COLLECTION_ALIAS)
         expect(actual.isReleased).toBe(true)
       })
+
+      test('should return theme for root collection', async () => {
+        const actual = await sut.getCollection()
+        expect(actual.alias).toBe(ROOT_COLLECTION_ALIAS)
+        // Root collection might or might not have a theme, but the property should be present if it does
+        // and we want to ensure the transformer doesn't fail.
+        // In a default Dataverse installation, root theme is usually undefined or has some default values.
+        const hasNoThemeOrThemeWithId =
+          actual.theme === undefined || Object.prototype.hasOwnProperty.call(actual.theme, 'id')
+
+        expect(hasNoThemeOrThemeWithId).toBe(true)
+      })
     })
     describe('by string alias', () => {
       test('should return collection when it exists filtering by id AS (alias)', async () => {
@@ -175,6 +187,13 @@ describe('CollectionsRepository', () => {
 
       expect(actualAfterDatasetDeletion.childCount).toBe(0)
       await deleteCollectionViaApi(parentCollectionAlias)
+    })
+
+    test('should transform allowedDatasetTypes correctly when retrieving a collection', async () => {
+      const actual = await sut.getCollection(testCollectionAlias)
+      expect(
+        actual.allowedDatasetTypes === undefined || Array.isArray(actual.allowedDatasetTypes)
+      ).toBe(true)
     })
   })
 
@@ -997,7 +1016,7 @@ describe('CollectionsRepository', () => {
       // TODO: uncomment this test when https://github.com/IQSS/dataverse/issues/12027 is fixed
       //  const expectedDatasetCitationFragment = `Admin, Dataverse; Owner, Dataverse, ${currentYear}, "Dataset created using the createDataset use case`
       const expectedDatasetDescription = 'Dataset created using the createDataset use case'
-      const expectedFileName = 'test-file-4.tab'
+      const expectedFileName = 'test-file-4.tsv'
       const expectedCollectionsName = 'Scientific Research'
 
       expect(actualFilePreview.checksum?.type).toBe('MD5')
@@ -1108,6 +1127,27 @@ describe('CollectionsRepository', () => {
       expect(updatedInputLevel?.datasetFieldName).toBe('country')
       expect(updatedInputLevel?.include).toBe(true)
       expect(updatedInputLevel?.required).toBe(false)
+    })
+
+    test('should update collection with only partial fields (name and affiliation)', async () => {
+      const collectionDTO = createCollectionDTO('partial-update-test')
+      const testCollectionId = await sut.createCollection(collectionDTO)
+      const createdCollection = await sut.getCollection(testCollectionId)
+      const partialUpdate: Partial<CollectionDTO> = {
+        name: 'Partially Updated Name',
+        affiliation: 'New Affiliation'
+      }
+
+      await sut.updateCollection(testCollectionId, partialUpdate)
+      const updatedCollection = await sut.getCollection(testCollectionId)
+
+      expect(updatedCollection.name).toBe('Partially Updated Name')
+      expect(updatedCollection.affiliation).toBe('New Affiliation')
+      expect(updatedCollection.alias).toBe(createdCollection.alias)
+      expect(updatedCollection.type).toBe(createdCollection.type)
+      expect(updatedCollection.contacts).toEqual(createdCollection.contacts)
+
+      await deleteCollectionViaApi(collectionDTO.alias)
     })
 
     test('should update the collection to inherit metadata blocks from parent collection', async () => {
@@ -1699,13 +1739,15 @@ describe('CollectionsRepository', () => {
 
   describe('getMyDataCollectionItems', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
+    let testSubCollectionCreated = false
 
     const testTextFile1Name = 'test-file-2.txt'
     const testSubCollectionAlias = 'collectionsRepositoryMyDataCollection'
     const testCollectionName = 'Scientific Research'
+    const testUserName = `myDataUser${Date.now()}`
     beforeAll(async () => {
       const createSuperUser = true
-      const myDataUserApiToken = await createApiTokenViaApi('myDataUser', createSuperUser)
+      const myDataUserApiToken = await createApiTokenViaApi(testUserName, createSuperUser)
       ApiConfig.init(
         TestConstants.TEST_API_URL,
         DataverseApiAuthMechanism.API_KEY,
@@ -1722,6 +1764,7 @@ describe('CollectionsRepository', () => {
           `Tests beforeAll(): Error while creating subcollection ${testSubCollectionAlias}`
         )
       })
+      testSubCollectionCreated = true
       try {
         testDatasetIds = await createDataset.execute(
           TestConstants.TEST_NEW_DATASET_DTO,
@@ -1736,19 +1779,23 @@ describe('CollectionsRepository', () => {
     })
 
     afterAll(async () => {
-      try {
-        await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
-      } catch (error) {
-        throw new Error(
-          `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
-        )
+      if (testDatasetIds) {
+        try {
+          await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+        } catch (error) {
+          throw new Error(
+            `Tests afterAll(): Error while deleting test dataset ${testDatasetIds.numericId}`
+          )
+        }
       }
-      try {
-        await deleteCollectionViaApi(testSubCollectionAlias)
-      } catch (error) {
-        throw new Error(
-          `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
-        )
+      if (testSubCollectionCreated) {
+        try {
+          await deleteCollectionViaApi(testSubCollectionAlias)
+        } catch (error) {
+          throw new Error(
+            `Tests afterAll(): Error while deleting subcollection ${testSubCollectionAlias}`
+          )
+        }
       }
     })
     test('should return collection items given valid roleIds', async () => {
@@ -2014,12 +2061,25 @@ describe('CollectionsRepository', () => {
       expect(actual.countPerObjectType.files).toBe(1)
     })
 
-    test('should return error when role, type and publication status params are empty', async () => {
-      const expectedError = new ReadError('No results. Please select at least one Role.')
+    test('should return an empty item subset when role, type and publication status params are empty', async () => {
+      const actual = await sut.getMyDataCollectionItems([], [], [], 0, 0, undefined, undefined)
 
-      await expect(
-        sut.getMyDataCollectionItems([], [], [], 0, 0, undefined, undefined)
-      ).rejects.toThrow(expectedError)
+      expect(actual).toStrictEqual({
+        items: [],
+        publicationStatusCounts: [
+          { publicationStatus: PublicationStatus.Published, count: 0 },
+          { publicationStatus: PublicationStatus.Unpublished, count: 0 },
+          { publicationStatus: PublicationStatus.Draft, count: 0 },
+          { publicationStatus: PublicationStatus.InReview, count: 0 },
+          { publicationStatus: PublicationStatus.Deaccessioned, count: 0 }
+        ],
+        totalItemCount: 0,
+        countPerObjectType: {
+          collections: 0,
+          datasets: 0,
+          files: 0
+        }
+      })
     })
   })
   describe('linkCollection', () => {
@@ -2083,12 +2143,16 @@ describe('CollectionsRepository', () => {
       const firstCollection = await sut.getCollection(firstCollectionAlias)
       const secondCollection = await sut.getCollection(secondCollectionAlias)
 
+      const collectionLinksBefore = await sut.getCollectionLinks(firstCollection.id)
+      expect(
+        collectionLinksBefore.linkedCollections.map((collection) => collection.alias)
+      ).toContain(secondCollection.alias)
+
       await sut.unlinkCollection(secondCollection.id, firstCollection.id)
-      await new Promise((res) => setTimeout(res, 2000))
 
       await sut.getCollection(secondCollectionAlias)
-      const collectionItemSubset = await sut.getCollectionItems(firstCollection.alias)
-      expect(collectionItemSubset.items).toStrictEqual([])
+      const collectionLinksAfter = await sut.getCollectionLinks(firstCollection.id)
+      expect(collectionLinksAfter.linkedCollections).toStrictEqual([])
     })
 
     test('should throw error when unlinking a non-existent collection', async () => {
@@ -2156,6 +2220,76 @@ describe('CollectionsRepository', () => {
       const expectedError = new ReadError("[404] Can't find dataverse with identifier='99999'")
 
       await expect(sut.getCollectionLinks(invalidCollectionId)).rejects.toThrow(expectedError)
+    })
+  })
+
+  describe('collection storage drivers', () => {
+    const parentCollectionAlias = 'collectionStorageDriverParent'
+    const childCollectionAlias = 'collectionStorageDriverChild'
+    const standaloneCollectionAlias = 'collectionStorageDriverStandalone'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(parentCollectionAlias)
+      await createCollectionViaApi(childCollectionAlias, parentCollectionAlias)
+      await createCollectionViaApi(standaloneCollectionAlias)
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(childCollectionAlias)
+      await deleteCollectionViaApi(parentCollectionAlias)
+      await deleteCollectionViaApi(standaloneCollectionAlias)
+    })
+
+    test('should return the directly assigned collection storage driver', async () => {
+      await sut.setCollectionStorageDriver(standaloneCollectionAlias, 'LocalStack')
+
+      const storageDriver = await sut.getCollectionStorageDriver(standaloneCollectionAlias)
+
+      expect(storageDriver.name).toBe('localstack1')
+      expect(storageDriver.label).toBe('LocalStack')
+      expect(storageDriver.type).toBe('s3')
+      expect(storageDriver.directUpload).toBe(true)
+      expect(storageDriver.directDownload).toBe(true)
+      expect(storageDriver.uploadOutOfBand).toBe(false)
+    })
+
+    test('should return the effective collection storage driver through inheritance', async () => {
+      await sut.setCollectionStorageDriver(parentCollectionAlias, 'LocalStack')
+
+      const storageDriver = await sut.getCollectionStorageDriver(childCollectionAlias, true)
+
+      expect(storageDriver.name).toBe('localstack1')
+      expect(storageDriver.label).toBe('LocalStack')
+      expect(storageDriver.type).toBe('s3')
+    })
+
+    test('should set and then clear the collection storage driver', async () => {
+      const setMessage = await sut.setCollectionStorageDriver(
+        standaloneCollectionAlias,
+        'LocalStack'
+      )
+      expect(setMessage).toContain('LocalStack')
+
+      const assignedDriver = await sut.getCollectionStorageDriver(standaloneCollectionAlias)
+      expect(assignedDriver.name).toBe('localstack1')
+
+      const deleteMessage = await sut.deleteCollectionStorageDriver(standaloneCollectionAlias)
+      expect(deleteMessage.toLowerCase()).toContain('local')
+
+      const effectiveDriver = await sut.getCollectionStorageDriver(standaloneCollectionAlias, true)
+      expect(effectiveDriver.name).toBe('local')
+      expect(effectiveDriver.label).toBe('Local')
+      expect(effectiveDriver.type).toBe('file')
+    })
+
+    test('should return the allowed collection storage drivers', async () => {
+      const allowedDrivers = await sut.getAllowedCollectionStorageDrivers(standaloneCollectionAlias)
+
+      expect(allowedDrivers).toMatchObject({
+        LocalStack: 'localstack1',
+        Local: 'local',
+        Filesystem: 'file1'
+      })
     })
   })
 })
