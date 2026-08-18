@@ -97,6 +97,14 @@ describe('CollectionsRepository', () => {
       data: createCollectionPayload()
     }
   }
+  const testSetDefaultContributorRoleResponse = {
+    data: {
+      status: 'OK',
+      data: {
+        message: 'Default contributor role has been set'
+      }
+    }
+  }
   const testCollectionModel = createCollectionModel()
 
   beforeEach(() => {
@@ -891,6 +899,34 @@ describe('CollectionsRepository', () => {
         )
         expect(error).toBeInstanceOf(WriteError)
       })
+    })
+  })
+
+  describe('setDefaultContributorRole', () => {
+    const testRoleAlias = 'curator'
+
+    test('should call the API', async () => {
+      jest.spyOn(axios, 'put').mockResolvedValue(testSetDefaultContributorRoleResponse)
+      const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/dataverses/test-collection/defaultContributorRole/${testRoleAlias}`
+
+      await sut.setDefaultContributorRole('test-collection', testRoleAlias)
+
+      expect(axios.put).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        '{}',
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'put').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+      let error = undefined as unknown as WriteError
+
+      await sut
+        .setDefaultContributorRole('test-collection', testRoleAlias)
+        .catch((e) => (error = e))
+
+      expect(error).toBeInstanceOf(Error)
     })
   })
 })
