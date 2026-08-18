@@ -399,8 +399,7 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       queryParams
     )
       .then((response) => ({
-        versions: response.data.data,
-        totalCount: response.data.totalCount
+        versions: response.data.data
       }))
       .catch((error) => {
         throw error

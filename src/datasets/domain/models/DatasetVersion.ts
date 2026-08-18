@@ -25,5 +25,4 @@ export interface DatasetVersion {
 
 export interface DatasetVersionSubset {
   versions: DatasetVersion[]
-  totalCount: number
 }

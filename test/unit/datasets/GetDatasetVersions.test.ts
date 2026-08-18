@@ -9,8 +9,7 @@ const testDatasetId = 1
 describe('execute', () => {
   test('should return dataset versions on repository success', async () => {
     const testDatasetVersionsSubset: DatasetVersionSubset = {
-      versions: [createDatasetVersionModel()],
-      totalCount: 1
+      versions: [createDatasetVersionModel()]
     }
     const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
     datasetsRepositoryStub.getDatasetVersions = jest

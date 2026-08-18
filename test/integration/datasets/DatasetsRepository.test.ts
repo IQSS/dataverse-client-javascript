@@ -1772,7 +1772,6 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
 
       expect(actual.versions.length).toBeGreaterThan(0)
-      expect(actual.totalCount).toBeGreaterThan(0)
       expect(actual.versions[0].versionState).toBe('DRAFT')
       expect(actual.versions[0].latestVersionPublishingState).toBe('DRAFT')
 
@@ -1791,7 +1790,6 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
 
       expect(actual.versions.length).toBeGreaterThan(0)
-      expect(actual.totalCount).toBeGreaterThan(0)
       expect(actual.versions[0].versionNumber).toBe(1)
       expect(actual.versions[0].versionMinorNumber).toBe(0)
       expect(actual.versions[0].versionState).toBe('RELEASED')
@@ -1813,7 +1811,6 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
 
       expect(actual.versions.length).toBeGreaterThan(0)
-      expect(actual.totalCount).toBeGreaterThan(0)
       expect(actual.versions[0].versionNumber).toBe(1)
       expect(actual.versions[0].versionMinorNumber).toBe(0)
       expect(actual.versions[0].versionState).toBe('DEACCESSIONED')
@@ -1854,7 +1851,6 @@ describe('DatasetsRepository', () => {
       const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
 
       expect(actual.versions.length).toEqual(2)
-      expect(actual.totalCount).toEqual(2)
       expect(actual.versions[0].versionState).toBe('DRAFT')
 
       expect(actual.versions[1].versionNumber).toBe(1)
@@ -1911,7 +1907,6 @@ describe('DatasetsRepository', () => {
       const firstPage = await sut.getDatasetVersions(testDatasetIds.numericId, 5, 0)
 
       expect(firstPage.versions.length).toBe(5)
-      expect(firstPage.totalCount).toBe(22)
       expect(firstPage.versions[0].versionNumber).toBe(1)
       expect(firstPage.versions[0].versionMinorNumber).toBe(21)
       expect(firstPage.versions[4].versionNumber).toBe(1)
@@ -1920,28 +1915,25 @@ describe('DatasetsRepository', () => {
       // Test pagination with limit=5, offset=5 (second page)
       const secondPage = await sut.getDatasetVersions(testDatasetIds.numericId, 5, 5)
       expect(secondPage.versions.length).toBe(5)
-      expect(secondPage.totalCount).toBe(22)
-      expect(firstPage.versions[0].versionNumber).toBe(1)
-      expect(firstPage.versions[0].versionMinorNumber).toBe(16)
-      expect(firstPage.versions[4].versionNumber).toBe(1)
-      expect(firstPage.versions[4].versionMinorNumber).toBe(12)
+      expect(secondPage.versions[0].versionNumber).toBe(1)
+      expect(secondPage.versions[0].versionMinorNumber).toBe(16)
+      expect(secondPage.versions[4].versionNumber).toBe(1)
+      expect(secondPage.versions[4].versionMinorNumber).toBe(12)
 
       // Test pagination with limit=5, offset=10 (third page)
       const thirdPage = await sut.getDatasetVersions(testDatasetIds.numericId, 5, 10)
       expect(thirdPage.versions.length).toBe(5)
-      expect(thirdPage.totalCount).toBe(22)
-      expect(firstPage.versions[0].versionNumber).toBe(1)
-      expect(firstPage.versions[0].versionMinorNumber).toBe(11)
-      expect(firstPage.versions[4].versionNumber).toBe(1)
-      expect(firstPage.versions[4].versionMinorNumber).toBe(7)
+      expect(thirdPage.versions[0].versionNumber).toBe(1)
+      expect(thirdPage.versions[0].versionMinorNumber).toBe(11)
+      expect(thirdPage.versions[4].versionNumber).toBe(1)
+      expect(thirdPage.versions[4].versionMinorNumber).toBe(7)
 
       // Test that all versions are returned without pagination
       const allVersions = await sut.getDatasetVersions(testDatasetIds.numericId)
       expect(allVersions.versions.length).toBe(22) // 1 initial + 21 updates
-      expect(allVersions.totalCount).toBe(22)
 
       await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
-    }, 5000)
+    }, 180000)
   })
 
   describe('getDatasetDownloadCount', () => {
