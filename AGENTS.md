@@ -1,6 +1,6 @@
 # Agent guide: dataverse-client-javascript
 
-This file is the canonical reference for any AI agent or tool working in this repository: Claude Code, GitHub Copilot, or otherwise.
+This file is the canonical reference for any AI agent or tool working in this repository: Claude Code, GitHub Copilot, or otherwise. Tools that support `AGENTS.md` may load it automatically; point other tools here before they make changes.
 
 `@iqss/dataverse-client-javascript` is a use-case-driven TypeScript SDK for the [Dataverse API](https://guides.dataverse.org/en/latest/api/native-api.html). It's part of the Dataverse Frontend ecosystem: the `dataverse-frontend` SPA and other consumers import use cases from this package instead of calling the REST API directly. Every public capability is exposed as a `use case` object with an `.execute(...)` method, documented one by one in [docs/useCases.md](docs/useCases.md).
 
@@ -94,8 +94,9 @@ Follow this sequence:
 5. **Wire it up** in the domain's `index.ts`: instantiate and export.
 6. **Unit tests**: one test file per use case (stub the repository interface, assert delegation) plus coverage of the new repository method in `<Domain>Repository.test.ts` (mock `axios`, assert the exact URL, `params`, and `headers` sent). Both live in `test/unit/<domain>/`.
 7. **Integration tests**: not optional, even when the unit tests already pass. Real assertions against a live Dataverse instance, in `test/integration/<domain>/`. See "What integration tests must cover" below for what "done" means here. Prefer exercising the SDK's own use cases for test setup and fixtures over raw `axios` test helpers when a suitable use case already exists; dogfooding catches real response-shape bugs early.
-8. **Docs**: add a section to [docs/useCases.md](docs/useCases.md) matching an existing entry's format, plus a line in its table of contents.
-9. **Changelog**: a line under `## [Unreleased] > ### Added` (or `Changed`/`Fixed`) in [CHANGELOG.md](CHANGELOG.md).
+8. **Functional tests**: add or update a test in `test/functional/<domain>/` when the change affects a public use case's end-to-end behavior. Functional tests exercise the exported SDK against a live Dataverse instance; cover the user-visible workflow rather than implementation details.
+9. **Docs**: add a section to [docs/useCases.md](docs/useCases.md) matching an existing entry's format, plus a line in its table of contents.
+10. **Changelog**: a line under `## [Unreleased] > ### Added` (or `Changed`/`Fixed`) in [CHANGELOG.md](CHANGELOG.md).
 
 This recipe assumes a single request-response call. File upload doesn't fit it: it's a multi-step flow through `DirectUploadClient` (`src/files/infra/clients/`), not one repository method. Look there first if the new use case is upload-shaped rather than a plain CRUD call.
 
