@@ -14,6 +14,7 @@ import { CollectionSummary } from '../models/CollectionSummary'
 import { AllowedStorageDrivers } from '../models/AllowedStorageDrivers'
 import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { LinkingObjectType } from '../useCases/GetCollectionsForLinking'
+import { Role } from '../../../roles/domain/models/Role'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -39,6 +40,9 @@ export interface ICollectionsRepository {
   getCollectionUserPermissions(
     collectionIdOrAlias: number | string
   ): Promise<CollectionUserPermissions>
+  getDefaultContributorRole(
+    collectionIdOrAlias: number | string
+  ): Promise<Role>
   getCollectionItems(
     collectionId?: string,
     limit?: number,
