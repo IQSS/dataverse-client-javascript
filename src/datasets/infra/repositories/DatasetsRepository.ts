@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios'
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
 import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
@@ -26,14 +25,17 @@ import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollec
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
 import { FormattedCitation } from '../../domain/models/FormattedCitation'
-import { DatasetTemplate } from '../../domain/models/DatasetTemplate'
-import { DatasetTemplatePayload } from './transformers/DatasetTemplatePayload'
-import { transformDatasetTemplatePayloadToDatasetTemplate } from './transformers/datasetTemplateTransformers'
 import { DatasetType } from '../../domain/models/DatasetType'
 import { TermsOfAccess } from '../../domain/models/Dataset'
+import { DatasetNotNumberedVersion } from '../../domain/models/DatasetNotNumberedVersion'
 import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
 import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
+import { DatasetUploadLimits } from '../../domain/models/DatasetUploadLimits'
+import { DatasetReview } from '../../domain/models/DatasetReview'
+import { transformDatasetReviewsResponseToDatasetReviews } from './transformers/datasetReviewTransformers'
+import { ExportedDatasetMetadata } from '../../domain/models/ExportedDatasetMetadata'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -127,6 +129,39 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     } else {
       content = response.data
     }
+
+    return {
+      content,
+      contentType
+    }
+  }
+
+  public async exportDatasetMetadata(
+    datasetId: number | string,
+    exporter: string,
+    version?: DatasetNotNumberedVersion.LATEST_PUBLISHED | DatasetNotNumberedVersion.DRAFT
+  ): Promise<ExportedDatasetMetadata> {
+    const persistentId =
+      typeof datasetId === 'number'
+        ? (
+            await this.getDataset(
+              datasetId,
+              version ?? DatasetNotNumberedVersion.LATEST_PUBLISHED,
+              false,
+              false
+            )
+          ).persistentId
+        : datasetId
+
+    const response = await this.doGet('/datasets/export', true, {
+      exporter,
+      persistentId,
+      ...(version && { version })
+    })
+
+    const contentType = String(response.headers['content-type'] ?? '')
+    const content =
+      typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
 
     return {
       content,
@@ -437,18 +472,6 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
-  public async getDatasetTemplates(
-    collectionIdOrAlias: number | string
-  ): Promise<DatasetTemplate[]> {
-    return this.doGet(`/dataverses/${collectionIdOrAlias}/templates`, true)
-      .then((response: AxiosResponse<{ data: DatasetTemplatePayload[] }>) =>
-        transformDatasetTemplatePayloadToDatasetTemplate(response.data.data)
-      )
-      .catch((error) => {
-        throw error
-      })
-  }
-
   public async getDatasetAvailableDatasetTypes(): Promise<DatasetType[]> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'datasetTypes'))
       .then((response) => response.data.data)
@@ -546,6 +569,36 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       payload
     )
       .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'storageDriver', datasetId),
+      true
+    )
+      .then((response) => response.data.data as StorageDriver)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetUploadLimits(datasetId: number | string): Promise<DatasetUploadLimits> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'uploadlimits', datasetId),
+      true
+    )
+      .then((response) => (response.data?.data?.uploadLimits ?? {}) as DatasetUploadLimits)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetReviews(datasetId: number | string): Promise<DatasetReview[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'reviews', datasetId), true)
+      .then((response) => transformDatasetReviewsResponseToDatasetReviews(response))
       .catch((error) => {
         throw error
       })

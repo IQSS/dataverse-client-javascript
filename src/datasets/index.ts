@@ -32,9 +32,12 @@ import { LinkDatasetTypeWithMetadataBlocks } from './domain/useCases/LinkDataset
 import { SetAvailableLicensesForDatasetType } from './domain/useCases/SetAvailableLicensesForDatasetType'
 import { DeleteDatasetType } from './domain/useCases/DeleteDatasetType'
 import { GetDatasetCitationInOtherFormats } from './domain/useCases/GetDatasetCitationInOtherFormats'
-import { GetDatasetTemplates } from './domain/useCases/GetDatasetTemplates'
 import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
+import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
+import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits'
+import { GetDatasetReviews } from './domain/useCases/GetDatasetReviews'
+import { ExportDatasetMetadata } from './domain/useCases/ExportDatasetMetadata'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -83,9 +86,12 @@ const setAvailableLicensesForDatasetType = new SetAvailableLicensesForDatasetTyp
 )
 const deleteDatasetType = new DeleteDatasetType(datasetsRepository)
 const getDatasetCitationInOtherFormats = new GetDatasetCitationInOtherFormats(datasetsRepository)
-const getDatasetTemplates = new GetDatasetTemplates(datasetsRepository)
 const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
+const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
+const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
+const getDatasetReviews = new GetDatasetReviews(datasetsRepository)
+const exportDatasetMetadata = new ExportDatasetMetadata(datasetsRepository)
 
 export {
   getDataset,
@@ -110,7 +116,6 @@ export {
   getDatasetLinkedCollections,
   getDatasetAvailableCategories,
   getDatasetCitationInOtherFormats,
-  getDatasetTemplates,
   updateTermsOfAccess,
   getDatasetAvailableDatasetTypes,
   getDatasetAvailableDatasetType,
@@ -118,9 +123,14 @@ export {
   linkDatasetTypeWithMetadataBlocks,
   setAvailableLicensesForDatasetType,
   deleteDatasetType,
-  updateDatasetLicense
+  updateDatasetLicense,
+  getDatasetStorageDriver,
+  getDatasetUploadLimits,
+  getDatasetReviews,
+  exportDatasetMetadata
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
+export { ExportedDatasetMetadata } from './domain/models/ExportedDatasetMetadata'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
 export { DatasetLock, DatasetLockType } from './domain/models/DatasetLock'
 export {
@@ -158,3 +168,9 @@ export {
 export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
 export { DatasetType } from './domain/models/DatasetType'
 export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'
+export { DatasetUploadLimits } from './domain/models/DatasetUploadLimits'
+export {
+  DatasetReview,
+  DatasetReviewRubricMetadataBlock,
+  DatasetReviewRubricMetadataField
+} from './domain/models/DatasetReview'

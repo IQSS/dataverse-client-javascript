@@ -11,11 +11,24 @@ import { PublicationStatus } from '../../../core/domain/models/PublicationStatus
 import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
 import { CollectionLinks } from '../models/CollectionLinks'
 import { CollectionSummary } from '../models/CollectionSummary'
+import { AllowedStorageDrivers } from '../models/AllowedStorageDrivers'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { LinkingObjectType } from '../useCases/GetCollectionsForLinking'
-import { CreateDatasetTemplateDTO } from '../dtos/CreateDatasetTemplateDTO'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
+  getCollectionStorageDriver(
+    collectionIdOrAlias: number | string,
+    getEffective?: boolean
+  ): Promise<StorageDriver>
+  setCollectionStorageDriver(
+    collectionIdOrAlias: number | string,
+    driverLabel: string
+  ): Promise<string>
+  deleteCollectionStorageDriver(collectionIdOrAlias: number | string): Promise<string>
+  getAllowedCollectionStorageDrivers(
+    collectionIdOrAlias: number | string
+  ): Promise<AllowedStorageDrivers>
   createCollection(
     collectionDTO: CollectionDTO,
     parentCollectionId: number | string
@@ -45,7 +58,7 @@ export interface ICollectionsRepository {
   ): Promise<MyDataCollectionItemSubset>
   updateCollection(
     collectionIdOrAlias: number | string,
-    updatedCollection: CollectionDTO
+    updatedCollection: Partial<CollectionDTO>
   ): Promise<void>
   getCollectionFeaturedItems(collectionIdOrAlias: number | string): Promise<FeaturedItem[]>
   updateCollectionFeaturedItems(
@@ -69,8 +82,4 @@ export interface ICollectionsRepository {
     searchTerm: string,
     alreadyLinked: boolean
   ): Promise<CollectionSummary[]>
-  createDatasetTemplate(
-    collectionIdOrAlias: number | string,
-    template: CreateDatasetTemplateDTO
-  ): Promise<void>
 }
