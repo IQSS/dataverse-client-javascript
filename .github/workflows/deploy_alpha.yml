@@ -9,10 +9,10 @@ jobs:
   test-unit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -23,10 +23,10 @@ jobs:
   test-integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -35,12 +35,13 @@ jobs:
         run: npm run test:integration
 
   test-functional:
+    needs: [test-integration]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -54,10 +55,10 @@ jobs:
     permissions:
       packages: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
           registry-url: https://npm.pkg.github.com/
 
       - name: Install npm dependencies
@@ -71,17 +72,19 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+          CURRENT_PACKAGE_VERSION=$(jq -r '.version' package.json)
+          BASE_VERSION=${CURRENT_PACKAGE_VERSION%%-alpha.*}
 
-          LATEST_VERSION=$(npm show @IQSS/dataverse-client-javascript versions --registry=https://npm.pkg.github.com/ --json | jq -r '.[]' | grep "^2.0.0-alpha." | sort -V | tail -n 1)
+          LATEST_VERSION=$(npm show @iqss/dataverse-client-javascript versions --registry=https://npm.pkg.github.com/ --json | jq -r '.[]' | grep "^${BASE_VERSION}-alpha\\." | sort -V | tail -n 1)
 
           if [ -z "$LATEST_VERSION" ]; then
             NEW_INCREMENTAL_NUMBER=1
           else
-            CURRENT_INCREMENTAL_NUMBER=$(echo $LATEST_VERSION | sed 's/2.0.0-alpha.//')
+            CURRENT_INCREMENTAL_NUMBER=$(echo "$LATEST_VERSION" | sed "s/^${BASE_VERSION}-alpha\\.//")
             NEW_INCREMENTAL_NUMBER=$((CURRENT_INCREMENTAL_NUMBER + 1))
           fi
 
-          NEW_VERSION="2.0.0-alpha.${NEW_INCREMENTAL_NUMBER}"
+          NEW_VERSION="${BASE_VERSION}-alpha.${NEW_INCREMENTAL_NUMBER}"
 
           echo "Latest version: $LATEST_VERSION"
           echo "New version: $NEW_VERSION"
@@ -92,7 +95,6 @@ jobs:
       - name: Publish package
         run: |
           echo "$(jq '.publishConfig.registry = "https://npm.pkg.github.com"' package.json)" > package.json
-          echo "$( jq '.name = "@IQSS/dataverse-client-javascript"' package.json )" > package.json
-          npm publish --@IQSS:registry=https://npm.pkg.github.com
+          npm publish --@iqss:registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

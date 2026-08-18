@@ -5,6 +5,7 @@ import {
   linkCollection,
   deleteCollection,
   getCollectionItems,
+  getCollectionLinks,
   unlinkCollection
 } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
@@ -43,12 +44,14 @@ describe('execute', () => {
     // Verify that the collections are linked
     const collectionItemSubset = await getCollectionItems.execute(firstCollectionAlias)
     expect(collectionItemSubset.items.length).toBe(1)
+    const collectionLinksBefore = await getCollectionLinks.execute(firstCollectionId)
+    expect(collectionLinksBefore.linkedCollections.map((collection) => collection.alias)).toContain(
+      secondCollectionAlias
+    )
 
     await unlinkCollection.execute(secondCollectionAlias, firstCollectionAlias)
-    // Wait for the unlinking to be processed by Solr
-    await new Promise((resolve) => setTimeout(resolve, 5000))
-    const collectionItemSubset2 = await getCollectionItems.execute(firstCollectionAlias)
-    expect(collectionItemSubset2.items.length).toBe(0)
+    const collectionLinksAfter = await getCollectionLinks.execute(firstCollectionId)
+    expect(collectionLinksAfter.linkedCollections).toStrictEqual([])
   })
 
   test('should throw an error when unlinking a non-existent collection', async () => {

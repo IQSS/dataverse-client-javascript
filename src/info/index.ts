@@ -4,6 +4,8 @@ import { GetZipDownloadLimit } from './domain/useCases/GetZipDownloadLimit'
 import { GetMaxEmbargoDurationInMonths } from './domain/useCases/GetMaxEmbargoDurationInMonths'
 import { GetApplicationTermsOfUse } from './domain/useCases/GetApplicationTermsOfUse'
 import { GetAvailableDatasetMetadataExportFormats } from './domain/useCases/GetAvailableDatasetMetadataExportFormats'
+import { GetDatasetPublishPopupCustomText } from './domain/useCases/GetDatasetPublishPopupCustomText'
+import { GetPublishDatasetDisclaimerText } from './domain/useCases/GetPublishDatasetDisclaimerText'
 
 const dataverseInfoRepository = new DataverseInfoRepository()
 
@@ -14,13 +16,19 @@ const getApplicationTermsOfUse = new GetApplicationTermsOfUse(dataverseInfoRepos
 const getAvailableDatasetMetadataExportFormats = new GetAvailableDatasetMetadataExportFormats(
   dataverseInfoRepository
 )
+const getPublishDatasetDisclaimerText = new GetPublishDatasetDisclaimerText(dataverseInfoRepository)
+const getDatasetPublishPopupCustomText = new GetDatasetPublishPopupCustomText(
+  dataverseInfoRepository
+)
 
 export {
   getDataverseVersion,
   getZipDownloadLimit,
   getMaxEmbargoDurationInMonths,
   getApplicationTermsOfUse,
-  getAvailableDatasetMetadataExportFormats
+  getAvailableDatasetMetadataExportFormats,
+  getDatasetPublishPopupCustomText,
+  getPublishDatasetDisclaimerText
 }
 
 export { DatasetMetadataExportFormats } from './domain/models/DatasetMetadataExportFormats'
