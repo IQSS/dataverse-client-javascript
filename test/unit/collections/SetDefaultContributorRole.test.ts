@@ -1,6 +1,7 @@
 import { ICollectionsRepository } from '../../../src/collections/domain/repositories/ICollectionsRepository'
 import { WriteError } from '../../../src'
 import { SetDefaultContributorRole } from '../../../src/collections/domain/useCases/SetDefaultContributorRole'
+import { RoleAlias } from '../../../src/roles/domain/models/RoleAlias'
 
 describe('execute', () => {
   test('should set default contributor role on repository success', async () => {
@@ -8,7 +9,7 @@ describe('execute', () => {
     collectionRepositoryStub.setDefaultContributorRole = jest.fn().mockResolvedValue(undefined)
     const testSetDefaultContributorRole = new SetDefaultContributorRole(collectionRepositoryStub)
 
-    await expect(testSetDefaultContributorRole.execute(1, 'curator')).resolves.toBeUndefined()
+    await expect(testSetDefaultContributorRole.execute(1, RoleAlias.CURATOR)).resolves.toBeUndefined()
     expect(collectionRepositoryStub.setDefaultContributorRole).toHaveBeenCalledWith(1, 'curator')
   })
 
@@ -19,7 +20,7 @@ describe('execute', () => {
       .mockRejectedValue(new WriteError())
     const testSetDefaultContributorRole = new SetDefaultContributorRole(collectionRepositoryStub)
 
-    await expect(testSetDefaultContributorRole.execute(1, 'curator')).rejects.toThrow(WriteError)
+    await expect(testSetDefaultContributorRole.execute(1, RoleAlias.CURATOR)).rejects.toThrow(WriteError)
     expect(collectionRepositoryStub.setDefaultContributorRole).toHaveBeenCalledWith(1, 'curator')
   })
 })

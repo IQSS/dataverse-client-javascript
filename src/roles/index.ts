@@ -8,3 +8,4 @@ const getUserSelectableRoles = new GetUserSelectableRoles(rolesRepository)
 export { getUserSelectableRoles }
 
 export { Role } from './domain/models/Role'
+export { RoleAlias } from './domain/models/RoleAlias'

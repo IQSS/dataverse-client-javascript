@@ -48,6 +48,7 @@ import {
   OrderType,
   SortType
 } from '../../../src/collections/domain/models/CollectionSearchCriteria'
+import { RoleAlias } from '../../../src/roles/domain/models/RoleAlias'
 
 describe('CollectionsRepository', () => {
   const sut: CollectionsRepository = new CollectionsRepository()
@@ -903,7 +904,7 @@ describe('CollectionsRepository', () => {
   })
 
   describe('setDefaultContributorRole', () => {
-    const testRoleAlias = 'curator'
+    const testRoleAlias = RoleAlias.CURATOR
 
     test('should call the API', async () => {
       jest.spyOn(axios, 'put').mockResolvedValue(testSetDefaultContributorRoleResponse)
