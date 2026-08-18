@@ -17,7 +17,10 @@ export class GetCollection implements UseCase<Collection> {
    * @param {boolean} ignoreSettingExcludeEmailFromExport - This prevents the contact emails from being excluded when the setting `ExcludeEmailFromExport` is set to true and the user has EditDataverse permissions.
    * @returns {Promise<Collection>}
    */
-  async execute(collectionIdOrAlias: number | string = ROOT_COLLECTION_ID, ignoreSettingExcludeEmailFromExport?: boolean): Promise<Collection> {
+  async execute(
+    collectionIdOrAlias: number | string = ROOT_COLLECTION_ID,
+    ignoreSettingExcludeEmailFromExport?: boolean
+  ): Promise<Collection> {
     return await this.collectionsRepository.getCollection(
       collectionIdOrAlias,
       ignoreSettingExcludeEmailFromExport
