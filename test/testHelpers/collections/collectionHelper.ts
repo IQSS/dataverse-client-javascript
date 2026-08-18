@@ -1,6 +1,9 @@
-import { Collection, CollectionFacet } from '../../../src/collections'
+import { Collection, CollectionFacet, CollectionTheme } from '../../../src/collections'
 import { DvObjectType } from '../../../src'
-import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
+import {
+  CollectionPayload,
+  CollectionThemePayload
+} from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { TestConstants } from '../TestConstants'
 import axios from 'axios'
 import { CollectionDTO } from '../../../src/collections/domain/dtos/CollectionDTO'
@@ -22,7 +25,7 @@ const DATAVERSE_API_REQUEST_HEADERS = {
   headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
 }
 
-export const createCollectionModel = (): Collection => {
+export const createCollectionModel = (theme?: CollectionTheme): Collection => {
   const collectionModel: Collection = {
     id: COLLECTION_ID,
     alias: COLLECTION_ALIAS_STR,
@@ -45,14 +48,23 @@ export const createCollectionModel = (): Collection => {
         displayOrder: 0
       }
     ],
+    allowedDatasetTypes: [
+      {
+        id: 1,
+        name: 'review',
+        displayName: 'Review',
+        description: 'A review of a dataset compiled by the expert community.'
+      }
+    ],
     isMetadataBlockRoot: true,
     isFacetRoot: true,
-    childCount: 0
+    childCount: 0,
+    ...(theme && { theme })
   }
   return collectionModel
 }
 
-export const createCollectionPayload = (): CollectionPayload => {
+export const createCollectionPayload = (theme?: CollectionThemePayload): CollectionPayload => {
   const collectionPayload: CollectionPayload = {
     id: COLLECTION_ID,
     alias: COLLECTION_ALIAS_STR,
@@ -75,9 +87,18 @@ export const createCollectionPayload = (): CollectionPayload => {
         displayOrder: 0
       }
     ],
+    allowedDatasetTypes: [
+      {
+        id: 1,
+        name: 'review',
+        displayName: 'Review',
+        description: 'A review of a dataset compiled by the expert community.'
+      }
+    ],
     isMetadataBlockRoot: true,
     isFacetRoot: true,
-    childCount: 0
+    childCount: 0,
+    ...(theme && { theme })
   }
   return collectionPayload
 }
@@ -134,7 +155,7 @@ export async function setStorageDriverViaApi(
 ): Promise<void> {
   try {
     return await axios.put(
-      `${TestConstants.TEST_API_URL}/admin/dataverse/${collectionAlias}/storageDriver`,
+      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/storageDriver`,
       driverLabel,
       {
         headers: { 'Content-Type': 'text/plain', 'X-Dataverse-Key': process.env.TEST_API_KEY }
@@ -155,6 +176,28 @@ export async function publishCollectionViaApi(collectionAlias: string): Promise<
     )
   } catch (error) {
     throw new Error(`Error while publishing test collection ${collectionAlias}`)
+  }
+}
+
+export async function setCollectionAllowedDatasetTypesViaApi(
+  collectionAlias: string,
+  allowedDatasetTypes: string[]
+): Promise<void> {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/attribute/allowedDatasetTypes`,
+      undefined,
+      {
+        params: {
+          value: allowedDatasetTypes.join(',')
+        },
+        ...DATAVERSE_API_REQUEST_HEADERS
+      }
+    )
+  } catch (error) {
+    throw new Error(
+      `Error while setting allowed dataset types for test collection ${collectionAlias}`
+    )
   }
 }
 

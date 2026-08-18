@@ -6,10 +6,10 @@ jobs:
   test-unit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -20,10 +20,10 @@ jobs:
   test-integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -32,12 +32,13 @@ jobs:
         run: npm run test:integration
 
   test-functional:
+    needs: [test-integration]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -52,10 +53,10 @@ jobs:
       packages: write
       contents: read
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
           registry-url: https://npm.pkg.github.com/
 
       - name: Install npm dependencies
@@ -73,7 +74,6 @@ jobs:
       - name: Publish package
         run: |
           echo "$(jq '.publishConfig.registry = "https://npm.pkg.github.com"' package.json)" > package.json
-          echo "$( jq '.name = "@IQSS/dataverse-client-javascript"' package.json )" > package.json
-          npm publish --@IQSS:registry=https://npm.pkg.github.com
+          npm publish --@iqss:registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
