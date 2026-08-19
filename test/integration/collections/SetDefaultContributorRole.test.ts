@@ -50,6 +50,8 @@ describe('SetDefaultContributorRole', () => {
   test('should throw an error when the role alias does not exist', async () => {
     const nonExistentRoleAlias = 'invalidRoleAlias'
 
-    await expect(useCase.execute(testCollectionAlias, nonExistentRoleAlias)).rejects.toThrow(WriteError)
+    await expect(useCase.execute(testCollectionAlias, nonExistentRoleAlias)).rejects.toThrow(
+      WriteError
+    )
   })
 })

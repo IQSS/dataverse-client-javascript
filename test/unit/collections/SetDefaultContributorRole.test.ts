@@ -9,7 +9,9 @@ describe('execute', () => {
     collectionRepositoryStub.setDefaultContributorRole = jest.fn().mockResolvedValue(undefined)
     const testSetDefaultContributorRole = new SetDefaultContributorRole(collectionRepositoryStub)
 
-    await expect(testSetDefaultContributorRole.execute(1, RoleAlias.CURATOR)).resolves.toBeUndefined()
+    await expect(
+      testSetDefaultContributorRole.execute(1, RoleAlias.CURATOR)
+    ).resolves.toBeUndefined()
     expect(collectionRepositoryStub.setDefaultContributorRole).toHaveBeenCalledWith(1, 'curator')
   })
 
@@ -20,7 +22,9 @@ describe('execute', () => {
       .mockRejectedValue(new WriteError())
     const testSetDefaultContributorRole = new SetDefaultContributorRole(collectionRepositoryStub)
 
-    await expect(testSetDefaultContributorRole.execute(1, RoleAlias.CURATOR)).rejects.toThrow(WriteError)
+    await expect(testSetDefaultContributorRole.execute(1, RoleAlias.CURATOR)).rejects.toThrow(
+      WriteError
+    )
     expect(collectionRepositoryStub.setDefaultContributorRole).toHaveBeenCalledWith(1, 'curator')
   })
 })

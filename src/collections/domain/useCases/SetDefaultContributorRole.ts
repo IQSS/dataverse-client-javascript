@@ -22,6 +22,9 @@ export class SetDefaultContributorRole implements UseCase<void> {
     collectionIdOrAlias: number | string = ROOT_COLLECTION_ID,
     roleAlias: RoleAlias | string
   ): Promise<void> {
-    return await this.collectionsRepository.setDefaultContributorRole(collectionIdOrAlias, roleAlias)
+    return await this.collectionsRepository.setDefaultContributorRole(
+      collectionIdOrAlias,
+      roleAlias
+    )
   }
 }
