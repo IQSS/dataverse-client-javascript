@@ -131,6 +131,13 @@ The different use cases currently available in the package are classified below,
   - [Mark As Read](#mark-as-read)
 - [Search](#Search)
   - [Get Search Services](#get-search-services)
+- [External Vocabularies](#external-vocabularies)
+  - [External Vocabularies read use cases](#external-vocabularies-read-use-cases)
+    - [Get Configured External Vocabularies](#get-configured-external-vocabularies)
+    - [Get External Vocabulary Config](#get-external-vocabulary-config)
+    - [Search External Vocabulary Terms](#search-external-vocabulary-terms)
+    - [Resolve External Vocabulary Term](#resolve-external-vocabulary-term)
+    - [Validate External Vocabulary Value](#validate-external-vocabulary-value)
 - [External Tools](#external-tools)
   - [External Tools read use cases](#external-tools-read-use-cases)
     - [Get External Tools](#get-external-tools)
@@ -3125,6 +3132,98 @@ getSearchServices.execute().then((searchServices: SearchService[]) => {
 ```
 
 _See [use case](../src/search/domain/useCases/GetSearchServices.ts) implementation_.
+
+## External Vocabularies
+
+### External Vocabularies Read Use Cases
+
+#### Get Configured External Vocabularies
+
+Returns sanitized external vocabulary configurations derived from the Dataverse `:CVocConf` setting.
+
+##### Example call:
+
+```typescript
+import { getConfiguredExternalVocabularies } from '@iqss/dataverse-client-javascript'
+
+getConfiguredExternalVocabularies.execute().then((configs: ExternalVocabularyConfig[]) => {
+  /* ... */
+})
+```
+
+_See [use case](../src/externalVocabularies/domain/useCases/GetConfiguredExternalVocabularies.ts) implementation_.
+
+#### Get External Vocabulary Config
+
+Returns the sanitized external vocabulary configuration for a field.
+
+##### Example call:
+
+```typescript
+import { getExternalVocabularyConfig } from '@iqss/dataverse-client-javascript'
+
+getExternalVocabularyConfig
+  .execute('authorAffiliation')
+  .then((config: ExternalVocabularyConfig) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/externalVocabularies/domain/useCases/GetExternalVocabularyConfig.ts) implementation_.
+
+#### Search External Vocabulary Terms
+
+Searches terms for a configured external vocabulary field.
+
+##### Example call:
+
+```typescript
+import { searchExternalVocabularyTerms } from '@iqss/dataverse-client-javascript'
+
+searchExternalVocabularyTerms
+  .execute('authorAffiliation', 'harvard', 'ror', 'en')
+  .then((terms: ExternalVocabularyTerm[]) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/externalVocabularies/domain/useCases/SearchExternalVocabularyTerms.ts) implementation_.
+
+#### Resolve External Vocabulary Term
+
+Resolves a stored external vocabulary URI to its label and mapped metadata.
+
+##### Example call:
+
+```typescript
+import { resolveExternalVocabularyTerm } from '@iqss/dataverse-client-javascript'
+
+resolveExternalVocabularyTerm
+  .execute('authorAffiliation', 'https://ror.org/03vek6s52', 'en')
+  .then((term: ExternalVocabularyTerm | null) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/externalVocabularies/domain/useCases/ResolveExternalVocabularyTerm.ts) implementation_.
+
+#### Validate External Vocabulary Value
+
+Validates a value against the configured vocabulary URI spaces and free-text rules for a field.
+
+##### Example call:
+
+```typescript
+import { validateExternalVocabularyValue } from '@iqss/dataverse-client-javascript'
+
+validateExternalVocabularyValue
+  .execute('authorAffiliation', 'https://ror.org/03vek6s52')
+  .then((valid: boolean) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/externalVocabularies/domain/useCases/ValidateExternalVocabularyValue.ts) implementation_.
 
 ## External Tools
 
