@@ -42,6 +42,7 @@ import { CollectionSummary } from '../../domain/models/CollectionSummary'
 import { AllowedStorageDrivers } from '../../domain/models/AllowedStorageDrivers'
 import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { LinkingObjectType } from '../../domain/useCases/GetCollectionsForLinking'
+import { RoleAlias } from '../../../roles/domain/models/RoleAlias'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -220,6 +221,20 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       .then((response) =>
         transformCollectionUserPermissionsResponseToCollectionUserPermissions(response)
       )
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async setDefaultContributorRole(
+    collectionIdOrAlias: number | string,
+    roleAlias: RoleAlias | string
+  ): Promise<void> {
+    return this.doPut(
+      `/${this.collectionsResourceName}/${collectionIdOrAlias}/defaultContributorRole/${roleAlias}`,
+      {}
+    )
+      .then(() => undefined)
       .catch((error) => {
         throw error
       })
