@@ -1,3 +1,4 @@
+import { describe, test, beforeEach, jest } from '@jest/globals'
 import { DatasetsRepository } from '../../../src/datasets/infra/repositories/DatasetsRepository'
 import axios from 'axios'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
@@ -305,6 +306,54 @@ describe('DatasetsRepository', () => {
         )
         expect(error).toBeInstanceOf(Error)
       })
+
+      test('should include the preview URL token as a key query param when provided', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`
+        const testPreviewUrlToken = 'testToken'
+
+        const actual = await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned,
+          false,
+          testPreviewUrlToken
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: {
+            includeDeaccessioned: testIncludeDeaccessioned,
+            excludeFiles: true,
+            returnOwners: true,
+            key: testPreviewUrlToken
+          },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
+        expect(actual).toStrictEqual(testDatasetModel)
+      })
+
+      test('should include an empty preview URL token as a key query param', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testDatasetVersionSuccessfulResponse)
+        const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/versions/${testVersionId}`
+
+        await sut.getDataset(
+          testDatasetModel.id,
+          testVersionId,
+          testIncludeDeaccessioned,
+          false,
+          ''
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: {
+            includeDeaccessioned: testIncludeDeaccessioned,
+            excludeFiles: true,
+            returnOwners: true,
+            key: ''
+          },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
+      })
     })
     describe('by persistent id', () => {
       test('should return Dataset when providing persistent id, version id, and response is successful', async () => {
@@ -461,6 +510,123 @@ describe('DatasetsRepository', () => {
         `${TestConstants.TEST_API_URL}/datasets/privateUrlDatasetVersion/${testPrivateUrlToken}/citation`,
         TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG
       )
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('createPreviewUrl', () => {
+    const testPreviewUrlResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          token: testPrivateUrlToken,
+          link: `http://dataverse.com/previewurl.xhtml?token=${testPrivateUrlToken}`,
+          isAnonymizedAccess: false
+        }
+      }
+    }
+    const expectedPreviewUrl = {
+      token: testPrivateUrlToken,
+      link: `http://dataverse.com/previewurl.xhtml?token=${testPrivateUrlToken}`,
+      isAnonymizedAccess: false
+    }
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/previewUrl`
+
+    test('should return the created PreviewUrl when response is successful', async () => {
+      jest.spyOn(axios, 'post').mockResolvedValue(testPreviewUrlResponse)
+
+      const actual = await sut.createPreviewUrl(testDatasetModel.id)
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        '{}',
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toStrictEqual(expectedPreviewUrl)
+    })
+
+    test('should include the anonymizedAccess query param when provided', async () => {
+      jest.spyOn(axios, 'post').mockResolvedValue(testPreviewUrlResponse)
+
+      await sut.createPreviewUrl(testDatasetModel.id, true)
+
+      expect(axios.post).toHaveBeenCalledWith(expectedApiEndpoint, '{}', {
+        ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+        params: { anonymizedAccess: true }
+      })
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'post').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: WriteError | undefined = undefined
+      await sut.createPreviewUrl(testDatasetModel.id).catch((e) => (error = e))
+
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('getPreviewUrl', () => {
+    const testPreviewUrlResponse = {
+      data: {
+        status: 'OK',
+        data: {
+          token: testPrivateUrlToken,
+          link: `http://dataverse.com/previewurl.xhtml?token=${testPrivateUrlToken}`,
+          isAnonymizedAccess: false
+        }
+      }
+    }
+    const expectedPreviewUrl = {
+      token: testPrivateUrlToken,
+      link: `http://dataverse.com/previewurl.xhtml?token=${testPrivateUrlToken}`,
+      isAnonymizedAccess: false
+    }
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/previewUrl`
+
+    test('should return the PreviewUrl when response is successful', async () => {
+      jest.spyOn(axios, 'get').mockResolvedValue(testPreviewUrlResponse)
+
+      const actual = await sut.getPreviewUrl(testDatasetModel.id)
+
+      expect(axios.get).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toStrictEqual(expectedPreviewUrl)
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error = undefined as unknown as ReadError
+      await sut.getPreviewUrl(testDatasetModel.id).catch((e) => (error = e))
+
+      expect(error).toBeInstanceOf(Error)
+    })
+  })
+
+  describe('deletePreviewUrl', () => {
+    const expectedApiEndpoint = `${TestConstants.TEST_API_URL}/datasets/${testDatasetModel.id}/previewUrl`
+
+    test('should return nothing when response is successful', async () => {
+      jest.spyOn(axios, 'delete').mockResolvedValue(undefined)
+
+      const actual = await sut.deletePreviewUrl(testDatasetModel.id)
+
+      expect(axios.delete).toHaveBeenCalledWith(
+        expectedApiEndpoint,
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+      expect(actual).toBeUndefined()
+    })
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'delete').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+
+      let error: WriteError | undefined = undefined
+      await sut.deletePreviewUrl(testDatasetModel.id).catch((e) => (error = e))
+
       expect(error).toBeInstanceOf(Error)
     })
   })

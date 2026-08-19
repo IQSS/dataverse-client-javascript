@@ -21,14 +21,16 @@ export interface IFilesRepository {
     fileOrderCriteria: FileOrderCriteria,
     limit?: number,
     offset?: number,
-    fileSearchCriteria?: FileSearchCriteria
+    fileSearchCriteria?: FileSearchCriteria,
+    previewUrlToken?: string
   ): Promise<FilesSubset>
 
   getDatasetFileCounts(
     datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
-    fileSearchCriteria?: FileSearchCriteria
+    fileSearchCriteria?: FileSearchCriteria,
+    previewUrlToken?: string
   ): Promise<FileCounts>
 
   getDatasetFilesTotalDownloadSize(
@@ -36,7 +38,8 @@ export interface IFilesRepository {
     datasetVersionId: string,
     includeDeaccessioned: boolean,
     fileDownloadSizeMode: FileDownloadSizeMode,
-    fileSearchCriteria?: FileSearchCriteria
+    fileSearchCriteria?: FileSearchCriteria,
+    previewUrlToken?: string
   ): Promise<number>
 
   getFileDownloadCount(fileId: number | string): Promise<number>
@@ -49,7 +52,8 @@ export interface IFilesRepository {
     fileId: number | string,
     datasetVersionId: string,
     returnDatasetVersion: boolean,
-    includeDeaccessioned: boolean
+    includeDeaccessioned: boolean,
+    previewUrlToken?: string
   ): Promise<FileModel | [FileModel, Dataset]>
 
   getFileCitation(

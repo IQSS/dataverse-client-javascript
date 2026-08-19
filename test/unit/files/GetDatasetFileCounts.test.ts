@@ -20,7 +20,34 @@ describe('execute', () => {
       1,
       DatasetNotNumberedVersion.LATEST,
       false,
+      undefined,
       undefined
+    )
+  })
+
+  test('should forward the preview URL token to the repository when provided', async () => {
+    const testFileCounts: FileCounts = createFileCountsModel()
+    const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+    filesRepositoryStub.getDatasetFileCounts = jest.fn().mockResolvedValue(testFileCounts)
+    const testPreviewUrlToken = 'testToken'
+
+    const sut = new GetDatasetFileCounts(filesRepositoryStub)
+
+    const actual = await sut.execute(
+      1,
+      DatasetNotNumberedVersion.LATEST,
+      false,
+      undefined,
+      testPreviewUrlToken
+    )
+
+    expect(actual).toEqual(testFileCounts)
+    expect(filesRepositoryStub.getDatasetFileCounts).toHaveBeenCalledWith(
+      1,
+      DatasetNotNumberedVersion.LATEST,
+      false,
+      undefined,
+      testPreviewUrlToken
     )
   })
 

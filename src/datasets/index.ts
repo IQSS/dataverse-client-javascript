@@ -5,6 +5,9 @@ import { CreateDataset } from './domain/useCases/CreateDataset'
 import { GetDatasetLocks } from './domain/useCases/GetDatasetLocks'
 import { GetDatasetCitation } from './domain/useCases/GetDatasetCitation'
 import { GetPrivateUrlDataset } from './domain/useCases/GetPrivateUrlDataset'
+import { CreatePreviewUrl } from './domain/useCases/previewUrl/CreatePreviewUrl'
+import { GetPreviewUrl } from './domain/useCases/previewUrl/GetPreviewUrl'
+import { DeletePreviewUrl } from './domain/useCases/previewUrl/DeletePreviewUrl'
 import { GetAllDatasetPreviews } from './domain/useCases/GetAllDatasetPreviews'
 import { MetadataFieldValidator } from './domain/useCases/validators/MetadataFieldValidator'
 import { GetDatasetUserPermissions } from './domain/useCases/GetDatasetUserPermissions'
@@ -44,6 +47,9 @@ const getDataset = new GetDataset(datasetsRepository)
 const getDatasetLocks = new GetDatasetLocks(datasetsRepository)
 const getDatasetCitation = new GetDatasetCitation(datasetsRepository)
 const getPrivateUrlDataset = new GetPrivateUrlDataset(datasetsRepository)
+const createPreviewUrl = new CreatePreviewUrl(datasetsRepository)
+const getPreviewUrl = new GetPreviewUrl(datasetsRepository)
+const deletePreviewUrl = new DeletePreviewUrl(datasetsRepository)
 const getAllDatasetPreviews = new GetAllDatasetPreviews(datasetsRepository)
 const getDatasetUserPermissions = new GetDatasetUserPermissions(datasetsRepository)
 const getDatasetSummaryFieldNames = new GetDatasetSummaryFieldNames(datasetsRepository)
@@ -96,6 +102,9 @@ export {
   getDatasetLocks,
   getDatasetCitation,
   getPrivateUrlDataset,
+  createPreviewUrl,
+  getPreviewUrl,
+  deletePreviewUrl,
   getAllDatasetPreviews,
   getDatasetUserPermissions,
   getDatasetSummaryFieldNames,
@@ -130,6 +139,7 @@ export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVer
 export { ExportedDatasetMetadata } from './domain/models/ExportedDatasetMetadata'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
 export { DatasetLock, DatasetLockType } from './domain/models/DatasetLock'
+export { PreviewUrl } from './domain/models/PreviewUrl'
 export {
   Dataset,
   DatasetLicense,

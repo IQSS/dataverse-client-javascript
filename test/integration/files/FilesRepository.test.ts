@@ -64,6 +64,7 @@ describe('FilesRepository', () => {
 
   let testFileId: number
   let testFilePersistentId: string
+  let previewUrlToken: string
 
   beforeAll(async () => {
     ApiConfig.init(
@@ -107,6 +108,11 @@ describe('FilesRepository', () => {
     )
     testFileId = filesSubset.files[0].id
     testFilePersistentId = filesSubset.files[0].persistentId
+
+    const previewUrl = await sutDataset.createPreviewUrl(testDatasetIds.numericId).catch(() => {
+      throw new Error('Tests beforeAll(): Error while creating preview URL for test dataset')
+    })
+    previewUrlToken = previewUrl.token
   })
 
   afterAll(async () => {
@@ -257,6 +263,62 @@ describe('FilesRepository', () => {
         ).rejects.toThrow(errorExpected)
       })
     })
+
+    describe('with a preview URL token', () => {
+      beforeEach(() => {
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
+      })
+
+      afterEach(() => {
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
+      })
+
+      test('should return the draft dataset files when accessed unauthenticated with a valid preview URL token', async () => {
+        const actual = await sut.getDatasetFiles(
+          testDatasetIds.numericId,
+          latestDatasetVersionId,
+          false,
+          FileOrderCriteria.NAME_AZ,
+          undefined,
+          undefined,
+          undefined,
+          previewUrlToken
+        )
+
+        expect(actual.files).toHaveLength(4)
+        expect(actual.totalFilesCount).toBe(4)
+      })
+
+      test('should return error when accessed unauthenticated without a preview URL token', async () => {
+        await expect(
+          sut.getDatasetFiles(
+            testDatasetIds.numericId,
+            latestDatasetVersionId,
+            false,
+            FileOrderCriteria.NAME_AZ
+          )
+        ).rejects.toBeInstanceOf(ReadError)
+      })
+
+      test('should return error when accessed unauthenticated with an invalid preview URL token', async () => {
+        await expect(
+          sut.getDatasetFiles(
+            testDatasetIds.numericId,
+            latestDatasetVersionId,
+            false,
+            FileOrderCriteria.NAME_AZ,
+            undefined,
+            undefined,
+            undefined,
+            'invalidToken'
+          )
+        ).rejects.toBeInstanceOf(ReadError)
+      })
+    })
   })
 
   describe('getDatasetFileCounts', () => {
@@ -351,6 +413,50 @@ describe('FilesRepository', () => {
       expect(actual.perAccessStatus).toEqual(expectedFileCounts.perAccessStatus)
       expect(actual.perCategoryName).toEqual(expectedFileCounts.perCategoryName)
     })
+
+    describe('with a preview URL token', () => {
+      beforeEach(() => {
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
+      })
+
+      afterEach(() => {
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
+      })
+
+      test('should return the draft dataset file counts when accessed unauthenticated with a valid preview URL token', async () => {
+        const actual = await sut.getDatasetFileCounts(
+          testDatasetIds.numericId,
+          latestDatasetVersionId,
+          false,
+          undefined,
+          previewUrlToken
+        )
+
+        expect(actual.total).toBe(expectedFileCounts.total)
+      })
+
+      test('should return error when accessed unauthenticated without a preview URL token', async () => {
+        await expect(
+          sut.getDatasetFileCounts(testDatasetIds.numericId, latestDatasetVersionId, false)
+        ).rejects.toBeInstanceOf(ReadError)
+      })
+
+      test('should return error when accessed unauthenticated with an invalid preview URL token', async () => {
+        await expect(
+          sut.getDatasetFileCounts(
+            testDatasetIds.numericId,
+            latestDatasetVersionId,
+            false,
+            undefined,
+            'invalidToken'
+          )
+        ).rejects.toBeInstanceOf(ReadError)
+      })
+    })
   })
 
   describe('getDatasetFilesTotalDownloadSize', () => {
@@ -387,6 +493,56 @@ describe('FilesRepository', () => {
         testCriteria
       )
       expect(actual).toBe(expectedTotalDownloadSizeForCriteria)
+    })
+
+    describe('with a preview URL token', () => {
+      beforeEach(() => {
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
+      })
+
+      afterEach(() => {
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
+      })
+
+      test('should return the draft dataset total download size when accessed unauthenticated with a valid preview URL token', async () => {
+        const actual = await sut.getDatasetFilesTotalDownloadSize(
+          testDatasetIds.numericId,
+          latestDatasetVersionId,
+          false,
+          FileDownloadSizeMode.ORIGINAL,
+          undefined,
+          previewUrlToken
+        )
+        expect(actual).toBe(expectedTotalDownloadSize)
+      })
+
+      test('should return error when accessed unauthenticated without a preview URL token', async () => {
+        await expect(
+          sut.getDatasetFilesTotalDownloadSize(
+            testDatasetIds.numericId,
+            latestDatasetVersionId,
+            false,
+            FileDownloadSizeMode.ORIGINAL
+          )
+        ).rejects.toBeInstanceOf(ReadError)
+      })
+
+      test('should return error when accessed unauthenticated with an invalid preview URL token', async () => {
+        await expect(
+          sut.getDatasetFilesTotalDownloadSize(
+            testDatasetIds.numericId,
+            latestDatasetVersionId,
+            false,
+            FileDownloadSizeMode.ORIGINAL,
+            undefined,
+            'invalidToken'
+          )
+        ).rejects.toBeInstanceOf(ReadError)
+      })
     })
   })
 
@@ -511,6 +667,44 @@ describe('FilesRepository', () => {
         await expect(
           sut.getFile(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false, false)
         ).rejects.toThrow(expectedError)
+      })
+
+      describe('with a preview URL token', () => {
+        beforeEach(() => {
+          ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, undefined)
+        })
+
+        afterEach(() => {
+          ApiConfig.init(
+            TestConstants.TEST_API_URL,
+            DataverseApiAuthMechanism.API_KEY,
+            process.env.TEST_API_KEY
+          )
+        })
+
+        test('should return the draft file when accessed unauthenticated with a valid preview URL token', async () => {
+          const actual = (await sut.getFile(
+            testFileId,
+            DatasetNotNumberedVersion.LATEST,
+            false,
+            false,
+            previewUrlToken
+          )) as FileModel
+
+          expect(actual.name).toBe(testTextFile1Name)
+        })
+
+        test('should return error when accessed unauthenticated without a preview URL token', async () => {
+          await expect(
+            sut.getFile(testFileId, DatasetNotNumberedVersion.LATEST, false, false)
+          ).rejects.toBeInstanceOf(ReadError)
+        })
+
+        test('should return error when accessed unauthenticated with an invalid preview URL token', async () => {
+          await expect(
+            sut.getFile(testFileId, DatasetNotNumberedVersion.LATEST, false, false, 'invalidToken')
+          ).rejects.toBeInstanceOf(ReadError)
+        })
       })
     })
 

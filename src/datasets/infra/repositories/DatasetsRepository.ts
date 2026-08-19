@@ -3,8 +3,10 @@ import { IDatasetsRepository } from '../../domain/repositories/IDatasetsReposito
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
 import {
   transformVersionResponseToDataset,
-  transformDatasetModelToUpdateDatasetRequestPayload
+  transformDatasetModelToUpdateDatasetRequestPayload,
+  transformPreviewUrlResponseToPreviewUrl
 } from './transformers/datasetTransformers'
+import { PreviewUrl } from '../../domain/models/PreviewUrl'
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
 import { DatasetLock } from '../../domain/models/DatasetLock'
@@ -67,19 +69,55 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
+  public async createPreviewUrl(
+    datasetId: number | string,
+    anonymizedAccess?: boolean
+  ): Promise<PreviewUrl> {
+    return this.doPost(
+      this.buildApiEndpoint(this.datasetsResourceName, 'previewUrl', datasetId),
+      {},
+      anonymizedAccess !== undefined ? { anonymizedAccess } : {}
+    )
+      .then((response) => transformPreviewUrlResponseToPreviewUrl(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getPreviewUrl(datasetId: number | string): Promise<PreviewUrl> {
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'previewUrl', datasetId),
+      true
+    )
+      .then((response) => transformPreviewUrlResponseToPreviewUrl(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async deletePreviewUrl(datasetId: number | string): Promise<void> {
+    return this.doDelete(this.buildApiEndpoint(this.datasetsResourceName, 'previewUrl', datasetId))
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
   public async getDataset(
     datasetId: number | string,
     datasetVersionId: string,
     includeDeaccessioned: boolean,
-    keepRawFields: boolean
+    keepRawFields: boolean,
+    previewUrlToken?: string
   ): Promise<Dataset> {
     return this.doGet(
       this.buildApiEndpoint(this.datasetsResourceName, `versions/${datasetVersionId}`, datasetId),
-      true,
+      previewUrlToken === undefined,
       {
         includeDeaccessioned: includeDeaccessioned,
         excludeFiles: true,
-        returnOwners: true
+        returnOwners: true,
+        ...(previewUrlToken !== undefined && { key: previewUrlToken })
       }
     )
       .then((response) => transformVersionResponseToDataset(response, keepRawFields))

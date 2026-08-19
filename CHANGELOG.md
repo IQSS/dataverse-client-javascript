@@ -17,6 +17,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Datasets: Added `exportDatasetMetadata` use case, repository method, and `ExportedDatasetMetadata` response type to support exporting dataset metadata by numeric id or persistent id through Dataverse endpoint `GET /datasets/export`.
 - Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
 - Collections: Added theme information when retrieving a collection using `getCollection`.
+- Datasets/Files: Added optional Preview URL (`previewUrlToken`) support to `getDataset`, `getDatasetFiles`, `getDatasetFileCounts`, `getDatasetFilesTotalDownloadSize`, `getFile`, and `getFileAndDataset`.
+- Datasets: Added `createPreviewUrl`, `getPreviewUrl`, and `deletePreviewUrl` use cases and repository methods to support Dataverse endpoint `/datasets/{id}/previewUrl`.
 
 ### Changed
 

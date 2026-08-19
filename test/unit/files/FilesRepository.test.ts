@@ -55,6 +55,7 @@ describe('FilesRepository', () => {
     .withContentType(testContentType)
     .withAccessStatus(FileAccessStatus.PUBLIC)
     .withTabularTagName(testTabularTagName)
+  const testPreviewUrlToken = 'testToken'
 
   beforeEach(() => {
     ApiConfig.init(
@@ -328,6 +329,31 @@ describe('FilesRepository', () => {
         expect(actual).toStrictEqual(expectedFiles)
       })
 
+      test('should include the preview URL token as a key query param when provided', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testFilesSuccessfulResponse)
+
+        const actual = await sut.getDatasetFiles(
+          testDatasetId,
+          testDatasetVersionId,
+          testIncludeDeaccessioned,
+          testFileOrderCriteria,
+          undefined,
+          undefined,
+          undefined,
+          testPreviewUrlToken
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: {
+            includeDeaccessioned: testIncludeDeaccessioned,
+            orderCriteria: testFileOrderCriteria,
+            key: testPreviewUrlToken
+          },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
+        expect(actual).toStrictEqual(expectedFiles)
+      })
+
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
@@ -502,6 +528,24 @@ describe('FilesRepository', () => {
         expect(actual).toStrictEqual(expectedCount)
       })
 
+      test('should include the preview URL token as a key query param when provided', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testFileCountsSuccessfulResponse)
+
+        const actual = await sut.getDatasetFileCounts(
+          testDatasetId,
+          testDatasetVersionId,
+          testIncludeDeaccessioned,
+          undefined,
+          testPreviewUrlToken
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: { includeDeaccessioned: testIncludeDeaccessioned, key: testPreviewUrlToken },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
+        expect(actual).toStrictEqual(expectedCount)
+      })
+
       test('should return error result on error response', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
 
@@ -651,6 +695,29 @@ describe('FilesRepository', () => {
           expectedApiEndpoint,
           expectedRequestConfigApiKeyWithOptional
         )
+        expect(actual).toStrictEqual(expectedSize)
+      })
+
+      test('should include the preview URL token as a key query param when provided', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testFilesTotalDownloadSizeSuccessfulResponse)
+
+        const actual = await sut.getDatasetFilesTotalDownloadSize(
+          testDatasetId,
+          testDatasetVersionId,
+          testIncludeDeaccessioned,
+          testFileDownloadSizeMode,
+          undefined,
+          testPreviewUrlToken
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: {
+            mode: FileDownloadSizeMode.ARCHIVAL.toString(),
+            includeDeaccessioned: testIncludeDeaccessioned,
+            key: testPreviewUrlToken
+          },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
         expect(actual).toStrictEqual(expectedSize)
       })
 
@@ -1065,6 +1132,36 @@ describe('FilesRepository', () => {
         await expect(
           sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false, false)
         ).rejects.toThrow(ReadError)
+      })
+
+      test('should include the preview URL token as a key query param when provided', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testGetFileResponse)
+        const testPreviewUrlToken = 'testToken'
+
+        const actual = await sut.getFile(
+          testFile.id,
+          DatasetNotNumberedVersion.LATEST,
+          false,
+          false,
+          testPreviewUrlToken
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: { ...expectedRequestParams, key: testPreviewUrlToken },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
+        expect(actual).toEqual(createFileModel())
+      })
+
+      test('should include an empty preview URL token as a key query param', async () => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testGetFileResponse)
+
+        await sut.getFile(testFile.id, DatasetNotNumberedVersion.LATEST, false, false, '')
+
+        expect(axios.get).toHaveBeenCalledWith(expectedApiEndpoint, {
+          params: { ...expectedRequestParams, key: '' },
+          headers: TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG.headers
+        })
       })
     })
 

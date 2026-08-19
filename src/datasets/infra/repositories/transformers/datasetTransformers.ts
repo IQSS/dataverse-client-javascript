@@ -8,6 +8,7 @@ import {
   DatasetMetadataFieldValue,
   ANONYMIZED_FIELD_VALUE
 } from '../../../domain/models/Dataset'
+import { PreviewUrl } from '../../../domain/models/PreviewUrl'
 import { AxiosResponse } from 'axios'
 import {
   DatasetPayload,
@@ -417,4 +418,13 @@ const transformPayloadToDatasetMetadataSubfieldValue = (
 
 export const transformHtmlToMarkdown = (source: string): string => {
   return turndownService.turndown(source)
+}
+
+export const transformPreviewUrlResponseToPreviewUrl = (response: AxiosResponse): PreviewUrl => {
+  const data = response.data.data
+  return {
+    token: data.token,
+    link: data.link,
+    isAnonymizedAccess: data.isAnonymizedAccess ?? false
+  }
 }
