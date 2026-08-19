@@ -225,6 +225,32 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
+  public async assignRoleOnCollection(
+    collectionIdOrAlias: number | string,
+    roleAssignee: string,
+    roleAlias: string
+  ): Promise<void> {
+    return this.doPost(`/${this.collectionsResourceName}/${collectionIdOrAlias}/assignments`, {
+      assignee: roleAssignee,
+      role: roleAlias
+    })
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async unassignRoleOnCollection(
+    collectionIdOrAlias: number | string,
+    roleAssignmentId: number
+  ): Promise<void> {
+    return this.doDelete(`/${this.collectionsResourceName}/${collectionIdOrAlias}/assignments/${roleAssignmentId}`)
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
   public async getCollectionItems(
     collectionId?: string,
     limit?: number,

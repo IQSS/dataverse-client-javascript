@@ -568,4 +568,30 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
         throw error
       })
   }
+
+  public async assignRoleOnDataset(
+    datasetId: number | string,
+    roleAssignee: string,
+    roleAlias: string
+  ): Promise<void> {
+    return this.doPost(this.buildApiEndpoint(this.datasetsResourceName, 'assignments', datasetId), {
+      assignee: roleAssignee,
+      role: roleAlias
+    })
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async unassignRoleOnDataset(
+    datasetId: number | string,
+    roleAssignmentId: number
+  ): Promise<void> {
+    return this.doDelete(this.buildApiEndpoint(this.datasetsResourceName, `assignments/${roleAssignmentId}`, datasetId))
+      .then(() => undefined)
+      .catch((error) => {
+        throw error
+      })
+  }
 }

@@ -20,6 +20,8 @@ import { GetCollectionsForLinking } from './domain/useCases/GetCollectionsForLin
 import { SetCollectionStorageDriver } from './domain/useCases/SetCollectionStorageDriver'
 import { DeleteCollectionStorageDriver } from './domain/useCases/DeleteCollectionStorageDriver'
 import { GetAllowedCollectionStorageDrivers } from './domain/useCases/GetAllowedCollectionStorageDrivers'
+import { AssignRoleOnCollection } from './domain/useCases/AssignRoleOnCollection'
+import { UnassignRoleOnCollection } from './domain/useCases/UnassignRoleOnCollection'
 
 const collectionsRepository = new CollectionsRepository()
 
@@ -46,6 +48,8 @@ const deleteCollectionStorageDriver = new DeleteCollectionStorageDriver(collecti
 const getAllowedCollectionStorageDrivers = new GetAllowedCollectionStorageDrivers(
   collectionsRepository
 )
+const assignRoleOnCollection = new AssignRoleOnCollection(collectionsRepository)
+const unassignRoleOnCollection = new UnassignRoleOnCollection(collectionsRepository)
 
 export {
   getCollection,
@@ -68,7 +72,9 @@ export {
   getCollectionsForLinking,
   setCollectionStorageDriver,
   deleteCollectionStorageDriver,
-  getAllowedCollectionStorageDrivers
+  getAllowedCollectionStorageDrivers,
+  assignRoleOnCollection,
+  unassignRoleOnCollection
 }
 export { Collection, CollectionInputLevel, CollectionTheme } from './domain/models/Collection'
 export { CollectionFacet } from './domain/models/CollectionFacet'
