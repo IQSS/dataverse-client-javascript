@@ -1750,6 +1750,192 @@ describe('DatasetsRepository', () => {
     }, 180000)
   })
 
+  describe('getDatasetVersions', () => {
+    const testDatasetVersionsCollectionAlias = 'testDatasetVersionsCollection'
+
+    beforeAll(async () => {
+      await createCollectionViaApi(testDatasetVersionsCollectionAlias)
+      await publishCollectionViaApi(testDatasetVersionsCollectionAlias)
+      await setStorageDriverViaApi(testDatasetVersionsCollectionAlias, 'LocalStack')
+    })
+
+    afterAll(async () => {
+      await deleteCollectionViaApi(testDatasetVersionsCollectionAlias)
+    })
+
+    test('should return dataset versions when dataset exists', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+
+      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+
+      expect(actual.versions.length).toBeGreaterThan(0)
+      expect(actual.versions[0].versionState).toBe('DRAFT')
+      expect(actual.versions[0].latestVersionPublishingState).toBe('DRAFT')
+
+      await deleteUnpublishedDatasetViaApi(testDatasetIds.numericId)
+    })
+
+    test('should return dataset versions correctly after first publish', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+
+      expect(actual.versions.length).toBeGreaterThan(0)
+      expect(actual.versions[0].versionNumber).toBe(1)
+      expect(actual.versions[0].versionMinorNumber).toBe(0)
+      expect(actual.versions[0].versionState).toBe('RELEASED')
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return dataset versions correctly after deaccessioned', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      await deaccessionDatasetViaApi(testDatasetIds.numericId, '1.0')
+
+      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+
+      expect(actual.versions.length).toBeGreaterThan(0)
+      expect(actual.versions[0].versionNumber).toBe(1)
+      expect(actual.versions[0].versionMinorNumber).toBe(0)
+      expect(actual.versions[0].versionState).toBe('DEACCESSIONED')
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return dataset versions correctly after 1st publish and metadata fields update', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+
+      await sut.updateDataset(
+        testDatasetIds.numericId,
+        {
+          license: createDatasetLicenseModel(true),
+          metadataBlockValues: [
+            {
+              name: 'citation',
+              fields: {
+                title: 'Updated Dataset Title'
+              }
+            }
+          ]
+        },
+        [citationMetadataBlock]
+      )
+
+      const actual = await sut.getDatasetVersions(testDatasetIds.numericId)
+
+      expect(actual.versions.length).toEqual(2)
+      expect(actual.versions[0].versionState).toBe('DRAFT')
+
+      expect(actual.versions[1].versionNumber).toBe(1)
+      expect(actual.versions[1].versionMinorNumber).toBe(0)
+      expect(actual.versions[1].versionState).toBe('RELEASED')
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    })
+
+    test('should return error when dataset does not exist', async () => {
+      const expectedError = new ReadError(
+        `[404] Dataset with ID ${nonExistentTestDatasetId} not found.`
+      )
+
+      await expect(sut.getDatasetVersions(nonExistentTestDatasetId)).rejects.toThrow(
+        expectedError
+      )
+    })
+
+    test('should return dataset versions with pagination', async () => {
+      const testDatasetIds = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testDatasetVersionsCollectionAlias
+      )
+
+      await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(testDatasetIds.numericId, 10)
+
+      const metadataBlocksRepository = new MetadataBlocksRepository()
+      const citationMetadataBlock = await metadataBlocksRepository.getMetadataBlockByName(
+        'citation'
+      )
+
+      for (let i = 1; i <= 21; i++) {
+        await sut.updateDataset(
+          testDatasetIds.numericId,
+          {
+            metadataBlockValues: [
+              {
+                name: 'citation',
+                fields: {
+                  title: `Updated Dataset Title - Version ${i}`
+                }
+              }
+            ]
+          },
+          [citationMetadataBlock]
+        )
+
+        await publishDataset.execute(testDatasetIds.numericId, VersionUpdateType.MINOR)
+        await waitForNoLocks(testDatasetIds.numericId, 10)
+      }
+
+      const firstPage = await sut.getDatasetVersions(testDatasetIds.numericId, 5, 0)
+
+      expect(firstPage.versions.length).toBe(5)
+      expect(firstPage.versions[0].versionNumber).toBe(1)
+      expect(firstPage.versions[0].versionMinorNumber).toBe(21)
+      expect(firstPage.versions[4].versionNumber).toBe(1)
+      expect(firstPage.versions[4].versionMinorNumber).toBe(17)
+
+      // Test pagination with limit=5, offset=5 (second page)
+      const secondPage = await sut.getDatasetVersions(testDatasetIds.numericId, 5, 5)
+      expect(secondPage.versions.length).toBe(5)
+      expect(secondPage.versions[0].versionNumber).toBe(1)
+      expect(secondPage.versions[0].versionMinorNumber).toBe(16)
+      expect(secondPage.versions[4].versionNumber).toBe(1)
+      expect(secondPage.versions[4].versionMinorNumber).toBe(12)
+
+      // Test pagination with limit=5, offset=10 (third page)
+      const thirdPage = await sut.getDatasetVersions(testDatasetIds.numericId, 5, 10)
+      expect(thirdPage.versions.length).toBe(5)
+      expect(thirdPage.versions[0].versionNumber).toBe(1)
+      expect(thirdPage.versions[0].versionMinorNumber).toBe(11)
+      expect(thirdPage.versions[4].versionNumber).toBe(1)
+      expect(thirdPage.versions[4].versionMinorNumber).toBe(7)
+
+      // Test that all versions are returned without pagination
+      const allVersions = await sut.getDatasetVersions(testDatasetIds.numericId)
+      expect(allVersions.versions.length).toBe(22) // 1 initial + 21 updates
+
+      await deletePublishedDatasetViaApi(testDatasetIds.persistentId)
+    }, 180000)
+  })
+
   describe('getDatasetDownloadCount', () => {
     const testGetDatasetDownloadCountCollectionAlias = 'testGetDatasetDownloadCountCollection'
     let testDatasetIds: CreatedDatasetIdentifiers

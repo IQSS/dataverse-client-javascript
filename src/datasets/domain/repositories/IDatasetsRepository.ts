@@ -9,6 +9,7 @@ import { MetadataBlock } from '../../../metadataBlocks'
 import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 import { DatasetDownloadCount } from '../models/DatasetDownloadCount'
 import { DatasetVersionSummarySubset } from '../models/DatasetVersionSummaryInfo'
+import { DatasetVersionSubset } from '../models/DatasetVersion'
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
 import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
@@ -77,6 +78,12 @@ export interface IDatasetsRepository {
     limit?: number,
     offset?: number
   ): Promise<DatasetVersionSummarySubset>
+  getDatasetVersions(
+    datasetId: number | string,
+    limit?: number,
+    offset?: number,
+    excludeMetadataBlocks?: boolean
+  ): Promise<DatasetVersionSubset>
   deleteDatasetDraft(datasetId: number | string): Promise<void>
   linkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
   unlinkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
