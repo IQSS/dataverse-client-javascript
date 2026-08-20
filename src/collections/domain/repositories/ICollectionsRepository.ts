@@ -87,4 +87,5 @@ export interface ICollectionsRepository {
     searchTerm: string,
     alreadyLinked: boolean
   ): Promise<CollectionSummary[]>
+  getCollectionsForCreating(userIdentifier?: string): Promise<CollectionSummary[]>
 }

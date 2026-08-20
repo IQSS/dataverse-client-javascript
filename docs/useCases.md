@@ -19,6 +19,7 @@ The different use cases currently available in the package are classified below,
     - [List My Data Collection Items](#list-my-data-collection-items)
     - [Get Collection Featured Items](#get-collection-featured-items)
     - [Get Collections for Linking](#get-collections-for-linking)
+    - [Get Collections for Creating](#get-collections-for-creating)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
     - [Set Collection Storage Driver](#set-collection-storage-driver)
@@ -514,6 +515,46 @@ Notes:
 
 - When the first argument is `'collection'`, the second argument can be a numeric collection id or a collection alias.
 - When the first argument is `'dataset'`, the second argument must be the dataset persistent identifier string (e.g., `doi:...`).
+
+#### Get Collections for Creating
+
+Returns an array of [CollectionSummary](../src/collections/domain/models/CollectionSummary.ts) (id, alias, displayName) representing the Dataverse collections which an authenticated user may create a new dataset in.
+
+##### Example calls:
+
+```typescript
+import { getCollectionsForCreating } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+// Case 1: For the user who is currently authenticated
+getCollectionsForCreating
+  .execute()
+  .then((collections) => {
+    // collections: CollectionSummary[]
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+
+/* ... */
+
+// Case 2: For a given user (by username)
+const username = 'anotherUser'
+
+getCollectionsForCreating
+  .execute(username)
+  .then((collections) => {
+    // collections: CollectionSummary[]
+    /* ... */
+  })
+  .catch((error: Error) => {
+    /* ... */
+  })
+```
+
+_See [use case](../src/collections/domain/useCases/GetCollectionsForCreating.ts) implementation_.
 
 ### Collections Write Use Cases
 
