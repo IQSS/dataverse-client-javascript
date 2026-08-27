@@ -997,6 +997,8 @@ There is an optional third parameter called `includeDeaccessioned`, which indica
 
 There is an optional fourth parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to Markdown. The default value is `false`.
 
+When the dataset is associated with a template, the returned `Dataset` includes the optional `templateId` field containing that template's numeric identifier.
+
 #### Get Dataset By Private URL Token
 
 Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given an associated Private URL Token.
@@ -1449,7 +1451,7 @@ createDataset.execute(datasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers
 
 _See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
 
-The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call. If you want the dataset type to be anything other than dataset, first [check available dataset types](#get-dataset-available-dataset-types) and then add the name of the dataset type as the third parameter.
+The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call. If you want the dataset type to be anything other than dataset, first [check available dataset types](#get-dataset-available-dataset-types) and then add the name of the dataset type as the third parameter. To create from an applicable metadata template, set its numeric identifier as `datasetDTO.templateId`; the SDK sends it as the top-level `templateId` field in the request body.
 
 The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 

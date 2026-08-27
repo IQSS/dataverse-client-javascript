@@ -2,6 +2,7 @@ import { DatasetLicense } from '../models/Dataset'
 
 export interface DatasetDTO {
   license?: DatasetLicense
+  templateId?: number
   metadataBlockValues: DatasetMetadataBlockValuesDTO[]
 }
 
