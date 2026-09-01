@@ -20,6 +20,8 @@ import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { DatasetUploadLimits } from '../models/DatasetUploadLimits'
 import { DatasetReview } from '../models/DatasetReview'
 import { FileTreePage, FileTreeInclude, FileTreeOrder } from '../models/FileTreePage'
+import { ExportedDatasetMetadata } from '../models/ExportedDatasetMetadata'
+import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion'
 
 export interface ListDatasetTreeNodeParams {
   datasetId: number | string
@@ -99,6 +101,11 @@ export interface IDatasetsRepository {
     format: CitationFormat,
     includeDeaccessioned?: boolean
   ): Promise<FormattedCitation>
+  exportDatasetMetadata(
+    datasetId: number | string,
+    exporter: string,
+    version?: DatasetNotNumberedVersion.LATEST_PUBLISHED | DatasetNotNumberedVersion.DRAFT
+  ): Promise<ExportedDatasetMetadata>
   getDatasetAvailableDatasetTypes(): Promise<DatasetType[]>
   getDatasetAvailableDatasetType(datasetTypeId: number | string): Promise<DatasetType>
   addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType>

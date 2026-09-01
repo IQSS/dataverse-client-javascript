@@ -29,6 +29,7 @@ The different use cases currently available in the package are classified below,
     - [Update Collection Featured Items](#update-collection-featured-items)
     - [Delete Collection Featured Items](#delete-collection-featured-items)
     - [Delete a Collection Featured Item](#delete-a-collection-featured-item)
+    - [Set Default Contributor Role](#set-default-contributor-role)
 - [Templates](#Templates)
   - [Templates read use cases](#templates-read-use-cases)
     - [Get a Template](#get-a-template)
@@ -46,6 +47,8 @@ The different use cases currently available in the package are classified below,
     - [Get a Dataset](#get-a-dataset)
     - [Get Dataset By Private URL Token](#get-dataset-by-private-url-token)
     - [Get Dataset Citation Text](#get-dataset-citation-text)
+    - [Get Dataset Citation In Other Formats](#get-dataset-citation-in-other-formats)
+    - [Export Dataset Metadata](#export-dataset-metadata)
     - [Get Dataset Citation Text By Private URL Token](#get-dataset-citation-text-by-private-url-token)
     - [Get Dataset Locks](#get-dataset-locks)
     - [Get Dataset Summary Field Names](#get-dataset-summary-field-names)
@@ -732,6 +735,27 @@ deleteCollectionFeaturedItem.execute(featuredItemId)
 
 _See [use case](../src/collections/domain/useCases/DeleteCollectionFeaturedItem.ts)_ definition.
 
+#### Set Default Contributor Role
+
+Sets the default contributor role of a collection, given a collection identifier and a role alias.
+
+##### Example call:
+
+```typescript
+import { setDefaultContributorRole } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 12345
+const roleAlias = 'curator'
+
+setDefaultContributorRole.execute(collectionIdOrAlias, roleAlias)
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/SetDefaultContributorRole.ts)_ definition.
+
 ## Templates
 
 ### Templates Read Use Cases
@@ -1054,6 +1078,37 @@ Supported formats include 'EndNote' (XML), 'RIS' (plain text), 'BibTeX' (plain t
 The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
 
 There is an optional third parameter called `includeDeaccessioned`, which indicates whether to consider deaccessioned versions or not in the dataset search. If not set, the default value is `false`.
+
+#### Export Dataset Metadata
+
+Exports dataset metadata in a specified metadata export format.
+
+##### Example call:
+
+```typescript
+import {
+  exportDatasetMetadata,
+  DatasetNotNumberedVersion,
+  ExportedDatasetMetadata
+} from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+const exporter = 'ddi'
+
+exportDatasetMetadata
+  .execute(datasetId, exporter, DatasetNotNumberedVersion.DRAFT)
+  .then((metadata: ExportedDatasetMetadata) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/ExportDatasetMetadata.ts) implementation_.
+
+The `datasetId` parameter can be a string for persistent identifiers or a number for numeric identifiers. The optional `version` parameter accepts `DatasetNotNumberedVersion.LATEST_PUBLISHED` or `DatasetNotNumberedVersion.DRAFT`. If not set, Dataverse defaults to `DatasetNotNumberedVersion.LATEST_PUBLISHED`. Draft exports require configured authentication with access to the draft.
 
 #### Get Dataset Citation Text By Private URL Token
 

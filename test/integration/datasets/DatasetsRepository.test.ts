@@ -772,6 +772,43 @@ describe('DatasetsRepository', () => {
     })
   })
 
+  describe('exportDatasetMetadata', () => {
+    let draftDatasetIds: CreatedDatasetIdentifiers
+    let publishedDatasetIds: CreatedDatasetIdentifiers
+
+    beforeAll(async () => {
+      draftDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      publishedDatasetIds = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+      await publishDatasetViaApi(publishedDatasetIds.numericId)
+      await waitForNoLocks(publishedDatasetIds.numericId, 10)
+    })
+
+    afterAll(async () => {
+      await deleteUnpublishedDatasetViaApi(draftDatasetIds.numericId)
+      await deletePublishedDatasetViaApi(publishedDatasetIds.persistentId)
+    })
+
+    test('should export latest published dataset metadata in DDI format by default', async () => {
+      const metadata = await sut.exportDatasetMetadata(publishedDatasetIds.persistentId, 'ddi')
+
+      expect(typeof metadata.content).toBe('string')
+      expect(metadata.content.length).toBeGreaterThan(0)
+      expect(metadata.contentType).toMatch(/xml/)
+    })
+
+    test('should export draft dataset metadata in DDI format', async () => {
+      const metadata = await sut.exportDatasetMetadata(
+        draftDatasetIds.numericId,
+        'ddi',
+        DatasetNotNumberedVersion.DRAFT
+      )
+
+      expect(typeof metadata.content).toBe('string')
+      expect(metadata.content.length).toBeGreaterThan(0)
+      expect(metadata.contentType).toMatch(/xml/)
+    })
+  })
+
   describe('getDatasetVersionDiff', () => {
     let testDatasetIds: CreatedDatasetIdentifiers
 

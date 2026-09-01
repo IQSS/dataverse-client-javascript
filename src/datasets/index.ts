@@ -38,6 +38,7 @@ import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits
 import { GetDatasetReviews } from './domain/useCases/GetDatasetReviews'
 import { ListDatasetTreeNode } from './domain/useCases/ListDatasetTreeNode'
 import { IterateDatasetTreeNode } from './domain/useCases/IterateDatasetTreeNode'
+import { ExportDatasetMetadata } from './domain/useCases/ExportDatasetMetadata'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -92,6 +93,7 @@ const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
 const getDatasetReviews = new GetDatasetReviews(datasetsRepository)
 const listDatasetTreeNode = new ListDatasetTreeNode(datasetsRepository)
 const iterateDatasetTreeNode = new IterateDatasetTreeNode(datasetsRepository)
+const exportDatasetMetadata = new ExportDatasetMetadata(datasetsRepository)
 
 export {
   getDataset,
@@ -127,9 +129,11 @@ export {
   getDatasetUploadLimits,
   getDatasetReviews,
   listDatasetTreeNode,
-  iterateDatasetTreeNode
+  iterateDatasetTreeNode,
+  exportDatasetMetadata
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
+export { ExportedDatasetMetadata } from './domain/models/ExportedDatasetMetadata'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
 export { DatasetLock, DatasetLockType } from './domain/models/DatasetLock'
 export {

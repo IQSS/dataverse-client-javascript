@@ -7,7 +7,7 @@ export interface GuestbookResponse {
   fileName?: string
   fileId?: number
   filePid?: string
-  userName: string
+  name: string
   email?: string
   institution?: string
   position?: string
