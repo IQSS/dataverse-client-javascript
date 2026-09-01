@@ -18,8 +18,15 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
 - Collections: Added theme information when retrieving a collection using `getCollection`.
 - Collections: Added `setDefaultContributorRole` use case.
+- Datasets: `listDatasetTreeNode` use case and repository method backing `GET /datasets/{id}/versions/{versionId}/tree` for paginated, lazy listing of folders/files inside a dataset version. Returns `FileTreePage` with folder-first ordering, opaque keyset cursors, and per-file `downloadUrl`. The per-file `access` marker is one of `retentionExpired`, `restricted`, `embargoed`, or `public` (resolved in that order), and folder `counts` carry the matching mutually exclusive `restricted`/`embargoed`/`retentionExpired` buckets.
+- Datasets: `iterateDatasetTreeNode` async generator that walks the cursor chain so callers can consume one folder's children without driving pagination by hand.
+- Core: re-export `DataverseApiAuthMechanism` from the public surface so consumers of the standalone reusable bundles (e.g. `dv-tree-view`, `dv-uploader`) can import it without reaching into `core/...`.
+- Files: export `DirectUploadClient` and `DirectUploadClientConfig` from the public files surface so consumers can construct their own client with custom timeouts / retry counts without reaching into the SDK's `infra/` path.
 
 ### Changed
+
+- **BREAKING**: `DirectUploadClient` constructor signature changed from `(filesRepository, maxMultipartRetries = 5)` to `(filesRepository, config: DirectUploadClientConfig = {})`. `config` now holds `maxMultipartRetries` (default 5) and the new `fileUploadTimeoutMs` (default 60000). Existing TypeScript consumers passing the second argument as a number will need to migrate to `{ maxMultipartRetries: N }`; a bare number passed by plain-JS callers is still honored at runtime as `maxMultipartRetries`.
+- Files: `DirectUploadClient` now reads the `tagging` field from the upload-destination response so operators on storage that doesn't accept S3 tags can opt out per-driver via `dataverse.files.<id>.disable-tagging=true`. The default behaviour is unchanged: when the server omits the field the client still sends `x-amz-tagging: dv-state=temp` (the same tag that earlier SDK versions hard-coded), so the new SDK is backwards-compatible with Dataverse releases that predate the response field. A server that explicitly returns an empty `tagging` value tells the client to skip the header entirely. Multipart uploads never send `x-amz-tagging` on part uploads — the part URLs are not signed for the header; the matching Dataverse server applies the temporary tag itself when it initiates the multipart upload.
 
 ### Fixed
 
@@ -52,7 +59,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Changed
 
-- Add pagination query parameters to Dataset Version Summeries and File Version Summaries use cases.
+- Add pagination query parameters to Dataset Version Summaries and File Version Summaries use cases.
 - Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
 - Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.

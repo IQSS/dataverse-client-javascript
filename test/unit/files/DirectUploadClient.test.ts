@@ -19,6 +19,19 @@ import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { FileUploadDestination } from '../../../src/files/domain/models/FileUploadDestination'
 
+describe('constructor', () => {
+  test('honors a legacy numeric second argument as maxMultipartRetries', () => {
+    const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+    // Plain-JS callers written against the pre-config-object signature
+    // still pass a bare number here; it must not be silently ignored.
+    const sut = new DirectUploadClient(
+      filesRepositoryStub,
+      1 as unknown as ConstructorParameters<typeof DirectUploadClient>[1]
+    )
+    expect((sut as unknown as { maxMultipartRetries: number }).maxMultipartRetries).toBe(1)
+  })
+})
+
 describe('uploadFile', () => {
   beforeEach(() => {
     ApiConfig.init(
@@ -87,6 +100,110 @@ describe('uploadFile', () => {
 
       expect(actual).toEqual(testDestination.storageId)
     })
+
+    test('should include S3 tagging header when upload destination provides tagging', async () => {
+      const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+      const testDestination: FileUploadDestination = {
+        ...createSingleFileUploadDestinationModel(),
+        tagging: 'dv-state=temp'
+      }
+      filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
+
+      const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)
+
+      const sut = new DirectUploadClient(filesRepositoryStub)
+
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      await sut.uploadFile(1, testFile, progressMock, abortController)
+
+      expect(axiosPutSpy).toHaveBeenCalledWith(
+        testDestination.urls[0],
+        expect.anything(),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'x-amz-tagging': 'dv-state=temp'
+          })
+        })
+      )
+    })
+
+    test('should default to dv-state=temp tagging when upload destination omits tagging', async () => {
+      const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+      const testDestination: FileUploadDestination = createSingleFileUploadDestinationModel()
+      filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
+
+      const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)
+
+      const sut = new DirectUploadClient(filesRepositoryStub)
+
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      await sut.uploadFile(1, testFile, progressMock, abortController)
+
+      expect(axiosPutSpy).toHaveBeenCalledWith(
+        testDestination.urls[0],
+        expect.anything(),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'x-amz-tagging': 'dv-state=temp'
+          })
+        })
+      )
+    })
+
+    test('should omit the S3 tagging header when upload destination explicitly returns empty tagging', async () => {
+      const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+      const testDestination: FileUploadDestination = {
+        ...createSingleFileUploadDestinationModel(),
+        tagging: ''
+      }
+      filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
+
+      const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)
+
+      const sut = new DirectUploadClient(filesRepositoryStub)
+
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      await sut.uploadFile(1, testFile, progressMock, abortController)
+
+      expect(axiosPutSpy).toHaveBeenCalledWith(
+        testDestination.urls[0],
+        expect.anything(),
+        expect.objectContaining({
+          headers: expect.not.objectContaining({
+            'x-amz-tagging': expect.anything()
+          })
+        })
+      )
+    })
+
+    test('should use configured file upload timeout', async () => {
+      const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
+      const testDestination: FileUploadDestination = createSingleFileUploadDestinationModel()
+      filesRepositoryStub.getFileUploadDestination = jest.fn().mockResolvedValue(testDestination)
+
+      const axiosPutSpy = jest.spyOn(axios, 'put').mockResolvedValue(undefined)
+
+      const sut = new DirectUploadClient(filesRepositoryStub, { fileUploadTimeoutMs: 30_000 })
+
+      const progressMock = jest.fn()
+      const abortController = new AbortController()
+
+      await sut.uploadFile(1, testFile, progressMock, abortController)
+
+      expect(axiosPutSpy).toHaveBeenCalledWith(
+        testDestination.urls[0],
+        expect.anything(),
+        expect.objectContaining({
+          timeout: 30_000
+        })
+      )
+    })
   })
 
   describe('Multiple parts file', () => {
@@ -113,7 +230,7 @@ describe('uploadFile', () => {
       jest.spyOn(axios, 'delete').mockResolvedValue(undefined)
       jest.spyOn(axios, 'put').mockRejectedValue('error')
 
-      const sut = new DirectUploadClient(filesRepositoryStub, 1)
+      const sut = new DirectUploadClient(filesRepositoryStub, { maxMultipartRetries: 1 })
 
       const progressMock = jest.fn()
       const abortController = new AbortController()
@@ -143,7 +260,7 @@ describe('uploadFile', () => {
       const progressMock = jest.fn()
       const abortController = new AbortController()
 
-      const sut = new DirectUploadClient(filesRepositoryStub, 1)
+      const sut = new DirectUploadClient(filesRepositoryStub, { maxMultipartRetries: 1 })
 
       await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
         MultipartAbortError
@@ -165,7 +282,7 @@ describe('uploadFile', () => {
       const progressMock = jest.fn()
       const abortController = new AbortController()
 
-      const sut = new DirectUploadClient(filesRepositoryStub, 1)
+      const sut = new DirectUploadClient(filesRepositoryStub, { maxMultipartRetries: 1 })
       await expect(sut.uploadFile(1, testFile, progressMock, abortController)).rejects.toThrow(
         MultipartCompletionError
       )
@@ -187,7 +304,7 @@ describe('uploadFile', () => {
         .mockResolvedValueOnce(successfulPartResponse)
         .mockResolvedValueOnce(undefined)
 
-      const sut = new DirectUploadClient(filesRepositoryStub, 1)
+      const sut = new DirectUploadClient(filesRepositoryStub, { maxMultipartRetries: 1 })
 
       const progressMock = jest.fn()
       const abortController = new AbortController()
