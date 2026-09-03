@@ -33,6 +33,7 @@ import {
   deletePublishedDatasetViaApi,
   deleteUnpublishedDatasetViaApi,
   publishDatasetViaApi,
+  waitForDatasetsIndexedInSolr,
   waitForNoLocks
 } from '../../testHelpers/datasets/datasetHelper'
 import { PublicationStatus } from '../../../src/core/domain/models/PublicationStatus'
@@ -1799,8 +1800,7 @@ describe('CollectionsRepository', () => {
       }
     })
     test('should return collection items given valid roleIds', async () => {
-      // Give enough time to Solr for indexing
-      await new Promise((resolve) => setTimeout(resolve, 5000))
+      await waitForDatasetsIndexedInSolr(1, testSubCollectionAlias)
       await getCollection.execute(testSubCollectionAlias).then((collection) => {
         expect(collection).toBeDefined()
         expect(collection.name).toBe('Test Collection')
