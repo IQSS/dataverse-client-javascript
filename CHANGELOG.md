@@ -18,6 +18,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Datasets: Added `assignRoleOnDataset` and `unassignRoleOnDataset` use cases.
 - Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
 - Collections: Added theme information when retrieving a collection using `getCollection`.
+- Collections: Added `setDefaultContributorRole` use case.
 - Collections: Added `assignRoleOnCollection` and `unassignRoleOnCollection` use cases.
 
 ### Changed
