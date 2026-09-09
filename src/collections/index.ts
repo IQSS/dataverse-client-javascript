@@ -20,6 +20,8 @@ import { GetCollectionsForLinking } from './domain/useCases/GetCollectionsForLin
 import { SetCollectionStorageDriver } from './domain/useCases/SetCollectionStorageDriver'
 import { DeleteCollectionStorageDriver } from './domain/useCases/DeleteCollectionStorageDriver'
 import { GetAllowedCollectionStorageDrivers } from './domain/useCases/GetAllowedCollectionStorageDrivers'
+import { AssignRoleOnCollection } from './domain/useCases/AssignRoleOnCollection'
+import { UnassignRoleOnCollection } from './domain/useCases/UnassignRoleOnCollection'
 import { SetDefaultContributorRole } from './domain/useCases/SetDefaultContributorRole'
 
 const collectionsRepository = new CollectionsRepository()
@@ -47,6 +49,8 @@ const deleteCollectionStorageDriver = new DeleteCollectionStorageDriver(collecti
 const getAllowedCollectionStorageDrivers = new GetAllowedCollectionStorageDrivers(
   collectionsRepository
 )
+const assignRoleOnCollection = new AssignRoleOnCollection(collectionsRepository)
+const unassignRoleOnCollection = new UnassignRoleOnCollection(collectionsRepository)
 const setDefaultContributorRole = new SetDefaultContributorRole(collectionsRepository)
 
 export {
@@ -71,6 +75,8 @@ export {
   setCollectionStorageDriver,
   deleteCollectionStorageDriver,
   getAllowedCollectionStorageDrivers,
+  assignRoleOnCollection,
+  unassignRoleOnCollection,
   setDefaultContributorRole
 }
 export { Collection, CollectionInputLevel, CollectionTheme } from './domain/models/Collection'
