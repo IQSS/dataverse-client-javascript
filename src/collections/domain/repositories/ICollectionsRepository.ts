@@ -44,7 +44,7 @@ export interface ICollectionsRepository {
     collectionIdOrAlias: number | string,
     roleAssignee: string,
     roleAlias: string
-  ): Promise<void>
+  ): Promise<number>
   unassignRoleOnCollection(
     collectionIdOrAlias: number | string,
     roleAssignmentId: number

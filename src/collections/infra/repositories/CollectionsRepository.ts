@@ -244,12 +244,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     collectionIdOrAlias: number | string,
     roleAssignee: string,
     roleAlias: string
-  ): Promise<void> {
+  ): Promise<number> {
     return this.doPost(`/${this.collectionsResourceName}/${collectionIdOrAlias}/assignments`, {
       assignee: roleAssignee,
       role: roleAlias
     })
-      .then(() => undefined)
+      .then((response) => response.data.data.id)
       .catch((error) => {
         throw error
       })

@@ -5,11 +5,11 @@ import { AssignRoleOnDataset } from '../../../src/datasets/domain/useCases/Assig
 describe('execute', () => {
   test('should assign role successfully on repository success', async () => {
     const datasetsRepositoryStub: IDatasetsRepository = {} as IDatasetsRepository
-    datasetsRepositoryStub.assignRoleOnDataset = jest.fn().mockResolvedValue(undefined)
+    datasetsRepositoryStub.assignRoleOnDataset = jest.fn().mockResolvedValue(123)
 
     const testAssignRoleOnDataset = new AssignRoleOnDataset(datasetsRepositoryStub)
 
-    await expect(testAssignRoleOnDataset.execute(1, "@testUser", "curator")).resolves.toBeUndefined()
+    await expect(testAssignRoleOnDataset.execute(1, "@testUser", "curator")).resolves.toBe(123)
     expect(datasetsRepositoryStub.assignRoleOnDataset).toHaveBeenCalledWith(1, "@testUser", "curator")
   })
 

@@ -573,12 +573,12 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     datasetId: number | string,
     roleAssignee: string,
     roleAlias: string
-  ): Promise<void> {
+  ): Promise<number> {
     return this.doPost(this.buildApiEndpoint(this.datasetsResourceName, 'assignments', datasetId), {
       assignee: roleAssignee,
       role: roleAlias
     })
-      .then(() => undefined)
+      .then((response) => response.data.data.id)
       .catch((error) => {
         throw error
       })

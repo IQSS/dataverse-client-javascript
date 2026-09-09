@@ -5,11 +5,11 @@ import { AssignRoleOnCollection } from '../../../src/collections/domain/useCases
 describe('execute', () => {
   test('should assign role successfully on repository success', async () => {
     const collectionRepositoryStub: ICollectionsRepository = {} as ICollectionsRepository
-    collectionRepositoryStub.assignRoleOnCollection = jest.fn().mockResolvedValue(undefined)
+    collectionRepositoryStub.assignRoleOnCollection = jest.fn().mockResolvedValue(123)
 
     const testAssignRoleOnCollection = new AssignRoleOnCollection(collectionRepositoryStub)
 
-    await expect(testAssignRoleOnCollection.execute(1, "@testUser", "curator")).resolves.toBeUndefined()
+    await expect(testAssignRoleOnCollection.execute(1, "@testUser", "curator")).resolves.toBe(123)
     expect(collectionRepositoryStub.assignRoleOnCollection).toHaveBeenCalledWith(1, "@testUser", "curator")
   })
 

@@ -1,7 +1,7 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
 import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
 
-export class AssignRoleOnDataset implements UseCase<void> {
+export class AssignRoleOnDataset implements UseCase<number> {
   private datasetsRepository: IDatasetsRepository
 
   constructor(datasetsRepository: IDatasetsRepository) {
@@ -14,13 +14,13 @@ export class AssignRoleOnDataset implements UseCase<void> {
    * @param {number | string} [datasetId] - The dataset identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {string} [roleAssignee] - To whom the role should be assigned
    * @param {string} [roleAlias] - The alias of the role to be assigned
-   * @returns {Promise<void>}
+   * @returns {Promise<number>} - The created role assignment's identifier
    */
   async execute(
     datasetId: number | string,
     roleAssignee: string,
     roleAlias: string
-  ): Promise<void> {
+  ): Promise<number> {
     return await this.datasetsRepository.assignRoleOnDataset(datasetId, roleAssignee, roleAlias)
   }
 }
