@@ -58,11 +58,10 @@ export const transformTreeResponseToFileTreePage = (response: AxiosResponse): Fi
   }
 }
 
-const transformItem = (item: ItemPayload): FileTreeNode => {
-  if (item.type === 'folder') {
-    return transformFolder(item)
-  }
-  return transformFile(item)
+const transformItem = (item: any): FileTreeNode => {
+  if (item?.type === 'folder') return transformFolder(item as FolderItemPayload)
+  if (item?.type === 'file') return transformFile(item as FileItemPayload)
+  throw new Error(`Unknown dataset tree node type "${String(item?.type)}"`)
 }
 
 const transformFolder = (item: FolderItemPayload): FileTreeFolderNode => ({
