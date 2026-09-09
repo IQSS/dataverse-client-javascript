@@ -76,8 +76,6 @@ describe('IterateDatasetTreeNode (unit)', () => {
 
   test('throws instead of looping forever when the cursor does not advance', async () => {
     const repo: IDatasetsRepository = {} as IDatasetsRepository
-    // First page hands out cursor 'stuck'; the second page echoes the
-    // same cursor back — a misbehaving server or intermediary cache.
     repo.listDatasetTreeNode = jest
       .fn()
       .mockResolvedValueOnce(page({ nextCursor: 'stuck' }))

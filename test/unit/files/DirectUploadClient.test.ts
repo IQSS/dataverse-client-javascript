@@ -22,8 +22,6 @@ import { FileUploadDestination } from '../../../src/files/domain/models/FileUplo
 describe('constructor', () => {
   test('honors a legacy numeric second argument as maxMultipartRetries', () => {
     const filesRepositoryStub: IFilesRepository = {} as IFilesRepository
-    // Plain-JS callers written against the pre-config-object signature
-    // still pass a bare number here; it must not be silently ignored.
     const sut = new DirectUploadClient(
       filesRepositoryStub,
       1 as unknown as ConstructorParameters<typeof DirectUploadClient>[1]

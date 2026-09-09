@@ -16,9 +16,7 @@ import { FileUploadCancelError } from './errors/FileUploadCancelError'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
 export interface DirectUploadClientConfig {
-  /** Maximum number of retries for multipart upload parts. Default: 5 */
   maxMultipartRetries?: number
-  /** Timeout in milliseconds for file upload operations. Default: 60000 */
   fileUploadTimeoutMs?: number
 }
 
@@ -28,10 +26,6 @@ export class DirectUploadClient implements IDirectUploadClient {
   private readonly fileUploadTimeoutMs: number
 
   constructor(filesRepository: IFilesRepository, config: DirectUploadClientConfig = {}) {
-    // Pre-2.x callers passed maxMultipartRetries as a bare number in this
-    // position. TypeScript consumers get a compile error and migrate, but
-    // plain-JS callers would have their setting silently ignored — honor
-    // the legacy form instead.
     const normalized: DirectUploadClientConfig =
       typeof config === 'number' ? { maxMultipartRetries: config } : config
     this.filesRepository = filesRepository
@@ -75,16 +69,6 @@ export class DirectUploadClient implements IDirectUploadClient {
       const headers: Record<string, string> = {
         'Content-Type': 'application/octet-stream'
       }
-      // Default to `dv-state=temp` when the upload destination response
-      // omits the field. That tag is what every Dataverse install emits
-      // today and what every install before this change had hard-coded;
-      // making "omitted" mean "no tag" would silently break uploads
-      // against any S3 bucket whose lifecycle/access policy expects the
-      // `dv-state=temp` marker, including the default IQSS configuration.
-      // Operators with storage that doesn't accept S3 tags opt out
-      // explicitly via `dataverse.files.<id>.disable-tagging=true`,
-      // which causes the server to return an empty `tagging` field and
-      // the client below to skip the header.
       const tag = destination.tagging ?? 'dv-state=temp'
       if (tag !== '') {
         headers['x-amz-tagging'] = tag
@@ -127,10 +111,6 @@ export class DirectUploadClient implements IDirectUploadClient {
       const fileSlice = file.slice(offset, offset + partSize)
 
       try {
-        // No `x-amz-tagging` here, ever: part-upload URLs are not signed
-        // for the header (sending it fails the S3 signature check). The
-        // server applies the temporary tag itself when it initiates the
-        // multipart upload, so `destination.tagging` is single-part-only.
         const response = await axios.put(destinationUrl, fileSlice, {
           headers: {
             'Content-Type': 'application/octet-stream'
@@ -146,8 +126,6 @@ export class DirectUploadClient implements IDirectUploadClient {
         eTags[`${index + 1}`] = eTag
       } catch (error) {
         if (axios.isCancel(error)) {
-          // Drop the not-yet-started parts so nothing keeps uploading
-          // against a multipart upload we are about to abort server-side.
           limitConcurrency.clearQueue()
           await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint as string)
           throw new FileUploadCancelError(file.name, datasetId)
