@@ -10,6 +10,8 @@ import {
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import { FilesRepository } from '../../../src/files/infra/repositories/FilesRepository'
 import { DirectUploadClient } from '../../../src/files/infra/clients/DirectUploadClient'
+import { DirectUploadClientConfig } from '../../../src/files'
+import { FileUploadDestination } from '../../../src/files/domain/models/FileUploadDestination'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
   createCollectionViaApi,
@@ -20,10 +22,15 @@ import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datas
 import axios from 'axios'
 import {
   createMultipartFileBlob,
-  createSinglepartFileBlob
+  createSinglepartFileBlob,
+  getObjectTagsFromBucket
 } from '../../testHelpers/files/filesHelper'
 import { FileUploadCancelError } from '../../../src/files/infra/clients/errors/FileUploadCancelError'
+import { FileUploadError } from '../../../src/files/infra/clients/errors/FileUploadError'
+import { FilePartUploadError } from '../../../src/files/infra/clients/errors/FilePartUploadError'
 import * as crypto from 'crypto'
+import * as http from 'http'
+import { AddressInfo } from 'net'
 
 describe('Direct Upload', () => {
   const testCollectionAlias = 'directUploadTestCollection'
@@ -33,6 +40,7 @@ describe('Direct Upload', () => {
   let testDatset4Ids: CreatedDatasetIdentifiers
   let testDataset5Ids: CreatedDatasetIdentifiers
   let testDataset6Ids: CreatedDatasetIdentifiers
+  let testDataset7Ids: CreatedDatasetIdentifiers
 
   const filesRepositorySut = new FilesRepository()
   const directUploadSut: DirectUploadClient = new DirectUploadClient(filesRepositorySut)
@@ -79,6 +87,10 @@ describe('Direct Upload', () => {
         TestConstants.TEST_NEW_DATASET_DTO,
         testCollectionAlias
       )
+      testDataset7Ids = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
     } catch (error) {
       throw new Error('Tests beforeAll(): Error while creating test dataset')
     }
@@ -93,6 +105,7 @@ describe('Direct Upload', () => {
     await deleteUnpublishedDatasetViaApi(testDatset4Ids.numericId)
     await deleteUnpublishedDatasetViaApi(testDataset5Ids.numericId)
     await deleteUnpublishedDatasetViaApi(testDataset6Ids.numericId)
+    await deleteUnpublishedDatasetViaApi(testDataset7Ids.numericId)
     await deleteCollectionViaApi(testCollectionAlias)
   })
 
@@ -662,6 +675,143 @@ describe('Direct Upload', () => {
     await expect(filesRepositorySut.replaceFile(currentFileId, newUploadedFileDTO)).rejects.toThrow(
       expectedError
     )
+  })
+
+  describe('Server-driven S3 tagging', () => {
+    test('should tag the uploaded object with dv-state=temp when the server omits a tagging value', async () => {
+      const destination: FileUploadDestination = {
+        ...(await createTestFileUploadDestination(singlepartFile, testDataset7Ids.numericId)),
+        tagging: undefined
+      }
+
+      await directUploadSut.uploadFile(
+        testDataset7Ids.numericId,
+        singlepartFile,
+        jest.fn(),
+        new AbortController(),
+        destination
+      )
+
+      expect(await getObjectTagsFromBucket(destination.urls[0])).toEqual({ 'dv-state': 'temp' })
+    })
+
+    test('should tag the uploaded object with the tagging value the server returned', async () => {
+      const destination: FileUploadDestination = {
+        ...(await createTestFileUploadDestination(singlepartFile, testDataset7Ids.numericId)),
+        tagging: 'dv-state=temp&sdk-integration-test=true'
+      }
+
+      await directUploadSut.uploadFile(
+        testDataset7Ids.numericId,
+        singlepartFile,
+        jest.fn(),
+        new AbortController(),
+        destination
+      )
+
+      expect(await getObjectTagsFromBucket(destination.urls[0])).toEqual({
+        'dv-state': 'temp',
+        'sdk-integration-test': 'true'
+      })
+    })
+
+    test('should store the object untagged when the server returns an empty tagging value', async () => {
+      const destination: FileUploadDestination = {
+        ...(await createTestFileUploadDestination(singlepartFile, testDataset7Ids.numericId)),
+        tagging: ''
+      }
+
+      await directUploadSut.uploadFile(
+        testDataset7Ids.numericId,
+        singlepartFile,
+        jest.fn(),
+        new AbortController(),
+        destination
+      )
+
+      expect(await getObjectTagsFromBucket(destination.urls[0])).toEqual({})
+    })
+  })
+
+  describe('DirectUploadClientConfig', () => {
+    const allowQueuedPartsToRun = async (): Promise<void> => {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+    }
+
+    test('should give up on a single-part upload once the configured timeout elapses', async () => {
+      const destination = await createTestFileUploadDestination(
+        singlepartFile,
+        testDataset7Ids.numericId
+      )
+      const config: DirectUploadClientConfig = { fileUploadTimeoutMs: 1 }
+      const sut = new DirectUploadClient(filesRepositorySut, config)
+
+      await expect(
+        sut.uploadFile(
+          testDataset7Ids.numericId,
+          singlepartFile,
+          jest.fn(),
+          new AbortController(),
+          destination
+        )
+      ).rejects.toThrow(
+        new FileUploadError(
+          singlepartFile.name,
+          testDataset7Ids.numericId,
+          'timeout of 1ms exceeded'
+        )
+      )
+    })
+
+    test('should retry a failing part exactly as many times as configured, then abort the upload', async () => {
+      const partRequestPaths: string[] = []
+      const failingPartStore = http.createServer((request, response) => {
+        partRequestPaths.push(request.url as string)
+        request.resume()
+        request.on('end', () => {
+          response.writeHead(500).end('part upload rejected by test server')
+        })
+      })
+      await new Promise<void>((resolve) => failingPartStore.listen(0, '127.0.0.1', resolve))
+      const failingPartStoreUrl = `http://127.0.0.1:${
+        (failingPartStore.address() as AddressInfo).port
+      }`
+
+      try {
+        const serverDestination = await createTestFileUploadDestination(
+          multipartFile,
+          testDataset7Ids.numericId
+        )
+        expect(serverDestination.urls.length).toBeGreaterThan(1)
+
+        const destination: FileUploadDestination = {
+          ...serverDestination,
+          urls: serverDestination.urls.map(
+            (_, index) => `${failingPartStoreUrl}/part-${index + 1}`
+          ),
+          partSize: 100
+        }
+
+        const config: DirectUploadClientConfig = { maxMultipartRetries: 1 }
+        const sut = new DirectUploadClient(filesRepositorySut, config)
+
+        await expect(
+          sut.uploadFile(
+            testDataset7Ids.numericId,
+            singlepartFile,
+            jest.fn(),
+            new AbortController(),
+            destination
+          )
+        ).rejects.toThrow(FilePartUploadError)
+
+        await allowQueuedPartsToRun()
+
+        expect(partRequestPaths).toEqual(['/part-1', '/part-1'])
+      } finally {
+        await new Promise<void>((resolve) => failingPartStore.close(() => resolve()))
+      }
+    })
   })
 
   const createTestFileUploadDestination = async (file: File, testDatasetId: number) => {

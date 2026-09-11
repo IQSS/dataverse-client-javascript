@@ -104,3 +104,4 @@ export {
   FileMetadataChange,
   FileVersionSummarySubset
 } from './domain/models/FileVersionSummaryInfo'
+export { DirectUploadClient, DirectUploadClientConfig } from './infra/clients/DirectUploadClient'

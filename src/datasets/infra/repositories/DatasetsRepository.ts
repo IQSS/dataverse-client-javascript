@@ -1,5 +1,11 @@
 import { ApiRepository } from '../../../core/infra/repositories/ApiRepository'
-import { IDatasetsRepository } from '../../domain/repositories/IDatasetsRepository'
+import {
+  IDatasetsRepository,
+  ListDatasetTreeNodeParams
+} from '../../domain/repositories/IDatasetsRepository'
+import { DatasetNotNumberedVersion } from '../../domain/models/DatasetNotNumberedVersion'
+import { FileTreePage } from '../../domain/models/FileTreePage'
+import { transformTreeResponseToFileTreePage } from './transformers/fileTreeTransformers'
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
 import {
   transformVersionResponseToDataset,
@@ -26,7 +32,6 @@ import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } fr
 import { FormattedCitation } from '../../domain/models/FormattedCitation'
 import { DatasetType } from '../../domain/models/DatasetType'
 import { TermsOfAccess } from '../../domain/models/Dataset'
-import { DatasetNotNumberedVersion } from '../../domain/models/DatasetNotNumberedVersion'
 import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
 import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
@@ -564,6 +569,35 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
   public async getDatasetReviews(datasetId: number | string): Promise<DatasetReview[]> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'reviews', datasetId), true)
       .then((response) => transformDatasetReviewsResponseToDatasetReviews(response))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async listDatasetTreeNode(params: ListDatasetTreeNodeParams): Promise<FileTreePage> {
+    const versionId = params.datasetVersionId ?? DatasetNotNumberedVersion.LATEST
+    const queryParams: Record<string, string | number | boolean> = {}
+    if (params.path !== undefined) queryParams.path = params.path
+    if (params.limit !== undefined) queryParams.limit = params.limit
+    if (params.cursor !== undefined) queryParams.cursor = params.cursor
+    if (params.include !== undefined) queryParams.include = params.include
+    if (params.order !== undefined) queryParams.order = params.order
+    if (params.includeDeaccessioned !== undefined) {
+      queryParams.includeDeaccessioned = params.includeDeaccessioned
+    }
+    if (params.originals !== undefined) {
+      queryParams.originals = params.originals
+    }
+    return this.doGet(
+      this.buildApiEndpoint(
+        this.datasetsResourceName,
+        `versions/${versionId}/tree`,
+        params.datasetId
+      ),
+      true,
+      queryParams
+    )
+      .then((response) => transformTreeResponseToFileTreePage(response))
       .catch((error) => {
         throw error
       })

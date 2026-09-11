@@ -4,4 +4,5 @@ export interface FileUploadDestination {
   partSize: number
   abortEndpoint?: string
   completeEndpoint?: string
+  tagging?: string
 }
