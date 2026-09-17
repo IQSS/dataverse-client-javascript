@@ -40,6 +40,15 @@ export interface ICollectionsRepository {
   getCollectionUserPermissions(
     collectionIdOrAlias: number | string
   ): Promise<CollectionUserPermissions>
+  assignRoleOnCollection(
+    collectionIdOrAlias: number | string,
+    roleAssignee: string,
+    roleAlias: string
+  ): Promise<number>
+  unassignRoleOnCollection(
+    collectionIdOrAlias: number | string,
+    roleAssignmentId: number
+  ): Promise<void>
   setDefaultContributorRole(
     collectionIdOrAlias: number | string,
     roleAlias: RoleAlias | string
