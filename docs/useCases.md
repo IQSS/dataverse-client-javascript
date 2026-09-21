@@ -2016,9 +2016,11 @@ import { FileCitationFormat, getFileCitationByFormat } from '@iqss/dataverse-cli
 
 const fileId = 3
 
-getFileCitationByFormat.execute(fileId, FileCitationFormat.BIBTEX).then((citationText: string) => {
-  /* ... */
-})
+getFileCitationByFormat
+  .execute(fileId, FileCitationFormat.BIBTEX, '1.0')
+  .then((citationText: string) => {
+    /* ... */
+  })
 
 /* ... */
 ```
@@ -2026,6 +2028,8 @@ getFileCitationByFormat.execute(fileId, FileCitationFormat.BIBTEX).then((citatio
 _See [use case](../src/files/domain/useCases/GetFileCitationByFormat.ts) implementation_.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The optional third parameter, `version`, selects the **dataset version** whose file metadata is used in the citation. It accepts a numbered version such as `1.0`, or `DatasetNotNumberedVersion.DRAFT`, `LATEST`, or `LATEST_PUBLISHED` (`:draft`, `:latest`, `:latest-published`). When omitted, no version query parameter is sent, it will return the `:latest`.
 
 The `format` parameter must be one of the available [FileCitationFormat](../src/files/domain/models/FileCitationFormat.ts) enum values: `FileCitationFormat.ENDNOTE`, `FileCitationFormat.RIS`, `FileCitationFormat.BIBTEX`, `FileCitationFormat.CSL`, or `FileCitationFormat.INTERNAL`.
 

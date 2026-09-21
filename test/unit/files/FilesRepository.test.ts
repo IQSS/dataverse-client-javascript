@@ -1166,6 +1166,30 @@ describe('FilesRepository', () => {
   })
 
   describe('getFileCitationByFormat', () => {
+    describe.each([123, 'doi:10.5072/FK2/TEST/FILE'])('file identifier %s', (fileId) => {
+      test.each([undefined, '1.0', ':draft', ':latest', ':latest-published'])(
+        'should send version %s with authentication',
+        async (version) => {
+          jest.spyOn(axios, 'get').mockResolvedValue({ data: 'citation' })
+          const identifier =
+            typeof fileId === 'number'
+              ? `${fileId}/citation/EndNote`
+              : `:persistentId/citation/EndNote?persistentId=${fileId}`
+
+          await expect(
+            sut.getFileCitationByFormat(fileId, FileCitationFormat.ENDNOTE, version)
+          ).resolves.toBe('citation')
+          expect(axios.get).toHaveBeenCalledWith(
+            `${TestConstants.TEST_API_URL}/access/datafile/${identifier}`,
+            {
+              ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+              params: version === undefined ? {} : { version }
+            }
+          )
+        }
+      )
+    })
+
     test.each([
       {
         format: FileCitationFormat.ENDNOTE,
