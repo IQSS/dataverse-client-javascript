@@ -69,5 +69,5 @@ export type MetadataFieldValuePayload =
   | MetadataSubfieldValuePayload[]
 
 export interface MetadataSubfieldValuePayload {
-  [key: string]: { value: string; typeName: string; multiple: boolean; typeClass: string }
+  [key: string]: MetadataFieldPayload
 }
