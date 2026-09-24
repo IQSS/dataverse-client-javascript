@@ -254,10 +254,12 @@ export const transformVersionPayloadToDataset = (
         studyCompletion: transformPayloadText(keepRawFields, versionPayload.studyCompletion)
       }
     },
-    metadataBlocks: transformPayloadToDatasetMetadataBlocks(
-      versionPayload.metadataBlocks,
-      keepRawFields
-    ),
+    ...(versionPayload.metadataBlocks && {
+      metadataBlocks: transformPayloadToDatasetMetadataBlocks(
+        versionPayload.metadataBlocks,
+        keepRawFields
+      )
+    }),
     ...(versionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf)
     })

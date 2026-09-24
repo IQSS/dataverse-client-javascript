@@ -15,6 +15,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Files: Added `getFileCitationByFormat` use case, repository method, and `FileCitationFormat` enum to support Dataverse file citation exports in `EndNote`, `RIS`, `BibTeX`, `CSL`, and `Internal` formats.
 - Datasets: Added `getDatasetReviews` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/reviews`, for retrieving review datasets associated with a dataset by persistent id or numeric id.
 - Datasets: Added `exportDatasetMetadata` use case, repository method, and `ExportedDatasetMetadata` response type to support exporting dataset metadata by numeric id or persistent id through Dataverse endpoint `GET /datasets/export`.
+- Datasets: Added `getDatasetVersions` use case.
 - Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
 - Collections: Added theme information when retrieving a collection using `getCollection`.
 - Collections: Added `setDefaultContributorRole` use case.
