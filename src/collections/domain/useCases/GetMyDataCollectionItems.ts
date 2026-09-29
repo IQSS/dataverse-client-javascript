@@ -24,6 +24,7 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
    * @param {boolean} [showCollections] - If true, dataset results will include the collections they belong to (optional).
    * @param {`${string}:${string}`} [metadataFields] - Metadata fields to include in dataset results (optional).
    * @param {boolean} [keepRawFields] - If true, metadata field values will not be transformed to Markdown (optional).
+   * @param {string | string[]} [filterQueries] - A simple filter query list or a complete raw filter expression (optional).
    * * @returns {Promise<CollectionItemSubset>}
    */
   async execute(
@@ -36,7 +37,8 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
     otherUserName?: string,
     showCollections = false,
     metadataFields?: `${string}:${string}`[],
-    keepRawFields = false
+    keepRawFields = false,
+    filterQueries?: string | string[]
   ): Promise<MyDataCollectionItemSubset> {
     return this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
@@ -48,7 +50,8 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
       otherUserName,
       showCollections,
       metadataFields,
-      keepRawFields
+      keepRawFields,
+      filterQueries
     )
   }
 }
