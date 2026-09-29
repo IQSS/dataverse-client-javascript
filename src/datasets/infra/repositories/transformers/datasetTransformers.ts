@@ -343,7 +343,7 @@ export const transformPayloadToDatasetMetadataBlocks = (
   return Object.keys(metadataBlocksPayload).map((metadataBlockKey) => {
     const metadataBlock = metadataBlocksPayload[metadataBlockKey]
     return {
-      name: metadataBlock.name,
+      name: metadataBlock.name ?? metadataBlockKey,
       fields: transformPayloadToDatasetMetadataFields(metadataBlock.fields, keepRawFields)
     }
   }) as DatasetMetadataBlocks

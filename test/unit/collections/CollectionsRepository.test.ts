@@ -46,7 +46,8 @@ import {
 } from '../../testHelpers/collections/collectionItemsFacetsHelper'
 import {
   OrderType,
-  SortType
+  SortType,
+  CollectionSearchCriteria
 } from '../../../src/collections/domain/models/CollectionSearchCriteria'
 import { RoleAlias } from '../../../src/roles/domain/models/RoleAlias'
 
@@ -652,6 +653,44 @@ describe('CollectionsRepository', () => {
         expectedRequestConfigSessionCookie
       )
       expect(actual).toStrictEqual(testItemSubset)
+    })
+
+
+
+    test('should preserve structured filter query syntax', async () => {
+      const getSpy = jest.spyOn(axios, 'get').mockResolvedValue(testItemPreviewsResponse)
+
+      await sut.getCollectionItems(
+        testCollectionModel.alias,
+        undefined,
+        undefined,
+        new CollectionSearchCriteria().withFilterQueries([
+          'subject_ss:Medicine, Health and Life Sciences'
+        ])
+      )
+
+      const arrayRequestConfig = getSpy.mock.calls[0]?.[1] as { params: URLSearchParams }
+      // fq filter value should be wrapped in quotes
+      expect(arrayRequestConfig.params.getAll(GetCollectionItemsQueryParams.FILTERQUERY)).toEqual([
+        'subject_ss:"Medicine, Health and Life Sciences"'
+      ])
+
+      const rawFilterQuery =
+        '(subject_ss:Medicine OR subject_ss:Health) AND subtreePath:*/42 AND abc:[0 TO 100]'
+      await sut.getCollectionItems(
+        testCollectionModel.alias,
+        undefined,
+        undefined,
+        new CollectionSearchCriteria().withFilterQueries(rawFilterQuery)
+      )
+
+      const rawRequestConfig = getSpy.mock.calls[1]?.[1] as { params: URLSearchParams }
+      // fq filter should be unchanged
+      expect(rawRequestConfig.params.getAll(GetCollectionItemsQueryParams.FILTERQUERY)).toEqual([
+        rawFilterQuery
+      ])
+
+      getSpy.mockRestore()
     })
 
     test('should return item previews when providing pagination params and response is successful', async () => {
