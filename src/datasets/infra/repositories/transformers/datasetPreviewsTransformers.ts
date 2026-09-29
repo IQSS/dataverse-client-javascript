@@ -5,7 +5,10 @@ import { DatasetPreviewSubset } from '../../../domain/models/DatasetPreviewSubse
 import { DatasetPreviewPayload } from './DatasetPreviewPayload'
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 import { CollectionItemType } from '../../../../collections/domain/models/CollectionItemType'
-import { MyDataDatasetPreviewPayload } from './MyDataDatasetPreviewPayload'
+import {
+  MyDataDatasetCollectionPayload,
+  MyDataDatasetPreviewPayload
+} from './MyDataDatasetPreviewPayload'
 
 export const transformDatasetPreviewsResponseToDatasetPreviewSubset = (
   response: AxiosResponse
@@ -62,6 +65,13 @@ export const transformMyDataDatasetPreviewPayloadToDatasetPreview = (
   datasetPreviewPayload.publicationStatuses.forEach((element) => {
     publicationStatuses.push(element as unknown as PublicationStatus)
   })
+  const collections: CollectionSummary[] | undefined = datasetPreviewPayload.collections?.map(
+    (collection: MyDataDatasetCollectionPayload) => ({
+      id: collection.id,
+      alias: collection.alias,
+      displayName: collection.name
+    })
+  )
   return {
     type: CollectionItemType.DATASET,
     persistentId: datasetPreviewPayload.global_id,
@@ -85,6 +95,7 @@ export const transformMyDataDatasetPreviewPayloadToDatasetPreview = (
     ...(datasetPreviewPayload.image_url && {
       imageUrl: datasetPreviewPayload.image_url
     }),
-    userRoles: datasetPreviewPayload.user_roles
+    userRoles: datasetPreviewPayload.user_roles,
+    ...(collections && { collections })
   }
 }

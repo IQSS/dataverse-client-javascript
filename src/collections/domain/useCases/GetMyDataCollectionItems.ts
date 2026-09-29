@@ -21,6 +21,7 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
    * @param {number} [selectedPage] - Offset (starting point) for pagination (optional).
    * @param {string} [searchText] - filter by searching for this text in the results (optional).
    * @param {string} [otherUserName] - filter by searching for this text in the results (optional).
+   * @param {boolean} [showCollections] - If true, dataset results will include the collections they belong to (optional).
    * * @returns {Promise<CollectionItemSubset>}
    */
   async execute(
@@ -30,7 +31,8 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
     limit?: number,
     selectedPage?: number,
     searchText?: string,
-    otherUserName?: string
+    otherUserName?: string,
+    showCollections = false
   ): Promise<MyDataCollectionItemSubset> {
     return this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
@@ -39,7 +41,8 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
       limit,
       selectedPage,
       searchText,
-      otherUserName
+      otherUserName,
+      showCollections
     )
   }
 }

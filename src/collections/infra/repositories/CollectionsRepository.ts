@@ -93,7 +93,8 @@ export enum GetMyDataCollectionItemsQueryParams {
   ROLE_ID = 'role_ids',
   TYPE = 'dvobject_types',
   PUBLISHED_STATES = 'published_states',
-  USER_IDENTIFIER = 'userIdentifier'
+  USER_IDENTIFIER = 'userIdentifier',
+  SHOW_COLLECTIONS = 'show_collections'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -306,7 +307,8 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     limit?: number,
     selectedPage?: number,
     searchText?: string,
-    userIdentifier?: string
+    userIdentifier?: string,
+    showCollections?: boolean
   ): Promise<MyDataCollectionItemSubset> {
     const queryParams = new URLSearchParams()
 
@@ -327,6 +329,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     })
     if (userIdentifier) {
       queryParams.set(GetMyDataCollectionItemsQueryParams.USER_IDENTIFIER, userIdentifier)
+    }
+
+    if (showCollections) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.SHOW_COLLECTIONS, 'true')
     }
 
     collectionItemTypes.forEach((itemType) => {

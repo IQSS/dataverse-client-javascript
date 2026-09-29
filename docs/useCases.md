@@ -423,6 +423,7 @@ This use case supports the following optional parameters depending on the search
 - **selectedPage**: (number) the page of results to be returned. (default is 1)
 - **searchText** is an optional string to filter the results by.
 - **otherUserName** is an optional string to return the collection items of another user. If not set, the calling user will be used. _Only superusers can use this parameter_.
+- **showCollections**: If true, dataset results will include a `collections` array containing [CollectionSummary](../src/collections/domain/models/CollectionSummary.ts) objects for their collections (Optional).
 
 The `CollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
 

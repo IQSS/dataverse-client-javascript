@@ -18,4 +18,11 @@ export interface MyDataDatasetPreviewPayload {
   user_roles: string[]
   image_url?: string
   published_at?: string
+  collections?: MyDataDatasetCollectionPayload[]
+}
+
+export interface MyDataDatasetCollectionPayload {
+  id: number
+  name: string
+  alias: string
 }
