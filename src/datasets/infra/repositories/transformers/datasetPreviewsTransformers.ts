@@ -59,7 +59,8 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
 }
 
 export const transformMyDataDatasetPreviewPayloadToDatasetPreview = (
-  datasetPreviewPayload: MyDataDatasetPreviewPayload
+  datasetPreviewPayload: MyDataDatasetPreviewPayload,
+  keepRawFields = false
 ): DatasetPreview => {
   const publicationStatuses: PublicationStatus[] = []
   datasetPreviewPayload.publicationStatuses.forEach((element) => {
@@ -72,6 +73,9 @@ export const transformMyDataDatasetPreviewPayloadToDatasetPreview = (
       displayName: collection.name
     })
   )
+  const metadataBlocks: DatasetMetadataBlock[] | undefined = datasetPreviewPayload.metadataBlocks
+    ? transformPayloadToDatasetMetadataBlocks(datasetPreviewPayload.metadataBlocks, keepRawFields)
+    : undefined
   return {
     type: CollectionItemType.DATASET,
     persistentId: datasetPreviewPayload.global_id,
@@ -96,6 +100,7 @@ export const transformMyDataDatasetPreviewPayloadToDatasetPreview = (
       imageUrl: datasetPreviewPayload.image_url
     }),
     userRoles: datasetPreviewPayload.user_roles,
-    ...(collections && { collections })
+    ...(collections && { collections }),
+    ...(metadataBlocks && { metadataBlocks })
   }
 }

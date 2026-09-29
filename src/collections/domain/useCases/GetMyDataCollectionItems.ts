@@ -22,6 +22,8 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
    * @param {string} [searchText] - filter by searching for this text in the results (optional).
    * @param {string} [otherUserName] - filter by searching for this text in the results (optional).
    * @param {boolean} [showCollections] - If true, dataset results will include the collections they belong to (optional).
+   * @param {`${string}:${string}`} [metadataFields] - Metadata fields to include in dataset results (optional).
+   * @param {boolean} [keepRawFields] - If true, metadata field values will not be transformed to Markdown (optional).
    * * @returns {Promise<CollectionItemSubset>}
    */
   async execute(
@@ -32,7 +34,9 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
     selectedPage?: number,
     searchText?: string,
     otherUserName?: string,
-    showCollections = false
+    showCollections = false,
+    metadataFields?: `${string}:${string}`[],
+    keepRawFields = false
   ): Promise<MyDataCollectionItemSubset> {
     return this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
@@ -42,7 +46,9 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
       selectedPage,
       searchText,
       otherUserName,
-      showCollections
+      showCollections,
+      metadataFields,
+      keepRawFields
     )
   }
 }

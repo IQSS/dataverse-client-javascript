@@ -94,7 +94,8 @@ export enum GetMyDataCollectionItemsQueryParams {
   TYPE = 'dvobject_types',
   PUBLISHED_STATES = 'published_states',
   USER_IDENTIFIER = 'userIdentifier',
-  SHOW_COLLECTIONS = 'show_collections'
+  SHOW_COLLECTIONS = 'show_collections',
+  METADATA_FIELDS = 'metadata_fields'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -308,7 +309,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     selectedPage?: number,
     searchText?: string,
     userIdentifier?: string,
-    showCollections?: boolean
+    showCollections?: boolean,
+    metadataFields?: `${string}:${string}`[],
+    keepRawFields = false
   ): Promise<MyDataCollectionItemSubset> {
     const queryParams = new URLSearchParams()
 
@@ -334,6 +337,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     if (showCollections) {
       queryParams.set(GetMyDataCollectionItemsQueryParams.SHOW_COLLECTIONS, 'true')
     }
+
+    metadataFields?.forEach((metadataField) => {
+      queryParams.append(GetMyDataCollectionItemsQueryParams.METADATA_FIELDS, metadataField)
+    })
 
     collectionItemTypes.forEach((itemType) => {
       let mappedItemType: string
@@ -363,7 +370,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         if (response.data.success !== true) {
           throw new ReadError(response.data.error_message)
         }
-        return transformMyDataResponseToCollectionItemSubset(response)
+        return transformMyDataResponseToCollectionItemSubset(response, keepRawFields)
       })
       .catch((error) => {
         throw error
