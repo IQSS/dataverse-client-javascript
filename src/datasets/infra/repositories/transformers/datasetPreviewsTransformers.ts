@@ -2,7 +2,8 @@ import { AxiosResponse } from 'axios'
 import { DatasetPreview } from '../../../domain/models/DatasetPreview'
 import { DatasetVersionState } from '../../../domain/models/Dataset'
 import { DatasetPreviewSubset } from '../../../domain/models/DatasetPreviewSubset'
-import { DatasetPreviewPayload } from './DatasetPreviewPayload'
+import { DatasetPreviewCollectionPayload, DatasetPreviewPayload } from './DatasetPreviewPayload'
+import { CollectionSummary } from '../../../../collections/domain/models/CollectionSummary'
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 import { CollectionItemType } from '../../../../collections/domain/models/CollectionItemType'
 import { MyDataDatasetPreviewPayload } from './MyDataDatasetPreviewPayload'
@@ -29,6 +30,14 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
   datasetPreviewPayload.publicationStatuses.forEach((element) => {
     publicationStatuses.push(element as unknown as PublicationStatus)
   })
+  const collections: CollectionSummary[] | undefined = datasetPreviewPayload.collections?.map(
+    (collection: DatasetPreviewCollectionPayload) => ({
+      id: collection.id,
+      alias: collection.alias,
+      displayName: collection.name
+    })
+  )
+
   return {
     type: CollectionItemType.DATASET,
     persistentId: datasetPreviewPayload.global_id,
@@ -52,6 +61,8 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
     ...(datasetPreviewPayload.image_url && {
       imageUrl: datasetPreviewPayload.image_url
     })
+    }),
+    ...(collections && { collections })
   }
 }
 

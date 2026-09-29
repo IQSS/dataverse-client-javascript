@@ -16,4 +16,11 @@ export interface DatasetPreviewPayload {
   identifier_of_dataverse: string
   name_of_dataverse: string
   image_url?: string
+  collections?: DatasetPreviewCollectionPayload[]
+}
+
+export interface DatasetPreviewCollectionPayload {
+  id: number
+  name: string
+  alias: string
 }
