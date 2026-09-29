@@ -427,6 +427,8 @@ This use case supports the following optional parameters depending on the search
 - **metadataFields**: A list of metadata fields to include in dataset results. Each value must use the `metadata_block_name:field_name` format (Optional).
 - **keepRawFields**: If true, metadata field values are returned without Markdown transformation (Optional).
 - **filterQueries**: A list of simple `key:value` filters or a single complete filter expression. A single string is sent unchanged and may contain parentheses, `AND`/`OR`, wildcards, ranges, and other search syntax (Optional).
+- **sort**: The field by which to sort the results (Optional).
+- **order**: The sort order, either ascending or descending (Optional).
 
 The `CollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
 

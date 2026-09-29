@@ -3,6 +3,7 @@ import { MyDataCollectionItemSubset } from '../models/MyDataCollectionItemSubset
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
+import { OrderType, SortType } from '../models/CollectionSearchCriteria'
 
 export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSubset> {
   private collectionsRepository: ICollectionsRepository
@@ -25,6 +26,8 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
    * @param {`${string}:${string}`} [metadataFields] - Metadata fields to include in dataset results (optional).
    * @param {boolean} [keepRawFields] - If true, metadata field values will not be transformed to Markdown (optional).
    * @param {string | string[]} [filterQueries] - A simple filter query list or a complete raw filter expression (optional).
+   * @param {SortType} [sort] - The field by which to sort the results (optional).
+   * @param {OrderType} [order] - The sort order (optional).
    * * @returns {Promise<CollectionItemSubset>}
    */
   async execute(
@@ -38,7 +41,9 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
     showCollections = false,
     metadataFields?: `${string}:${string}`[],
     keepRawFields = false,
-    filterQueries?: string | string[]
+    filterQueries?: string | string[],
+    sort?: SortType,
+    order?: OrderType
   ): Promise<MyDataCollectionItemSubset> {
     return this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
@@ -51,7 +56,9 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
       showCollections,
       metadataFields,
       keepRawFields,
-      filterQueries
+      filterQueries,
+      sort,
+      order
     )
   }
 }

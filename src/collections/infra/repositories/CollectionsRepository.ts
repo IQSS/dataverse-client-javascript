@@ -96,7 +96,9 @@ export enum GetMyDataCollectionItemsQueryParams {
   USER_IDENTIFIER = 'userIdentifier',
   SHOW_COLLECTIONS = 'show_collections',
   METADATA_FIELDS = 'metadata_fields',
-  FILTERQUERY = 'fq'
+  FILTERQUERY = 'fq',
+  SORT = 'sort',
+  ORDER = 'order'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -313,7 +315,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     showCollections?: boolean,
     metadataFields?: `${string}:${string}`[],
     keepRawFields = false,
-    filterQueries?: string | string[]
+    filterQueries?: string | string[],
+    sort?: SortType,
+    order?: OrderType
   ): Promise<MyDataCollectionItemSubset> {
     const queryParams = new URLSearchParams()
 
@@ -346,6 +350,14 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     if (filterQueries) {
       this.applyFilterQueriesToQueryParams(queryParams, filterQueries)
+    }
+
+    if (sort) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.SORT, sort)
+    }
+
+    if (order) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.ORDER, order)
     }
 
     collectionItemTypes.forEach((itemType) => {
