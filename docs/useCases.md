@@ -366,7 +366,7 @@ This use case supports the following optional parameters depending on the search
 
 - **limit**: (number) Limit for pagination.
 - **offset**: (number) Offset for pagination.
-- **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
+- **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties. `filterQueries` may be a list of simple `key:value` filters or a single complete filter expression, which is sent unchanged and may contain parentheses, `AND`/`OR`, wildcards, ranges, and other search syntax.
 - **searchServiceName**: The search service name on which to execute the search (Optional).
 - **showTypeCounts**: If true, the response will include the count per object type (Optional).
 - **showCollections**: If true, dataset results will include a `collections` array containing [CollectionSummary](../src/collections/domain/models/CollectionSummary.ts) objects for their collections (Optional).
