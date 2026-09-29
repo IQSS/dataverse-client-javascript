@@ -369,6 +369,9 @@ This use case supports the following optional parameters depending on the search
 - **collectionSearchCriteria**: ([CollectionSearchCriteria](../src/collections/domain/models/CollectionSearchCriteria.ts)) Supports filtering the collection items by different properties.
 - **searchServiceName**: The search service name on which to execute the search (Optional).
 - **showTypeCounts**: If true, the response will include the count per object type (Optional).
+- **showCollections**: If true, dataset results will include a `collections` array containing [CollectionSummary](../src/collections/domain/models/CollectionSummary.ts) objects for their collections (Optional).
+- **metadataFields**: A list of metadata fields to include in dataset results. Each value must use the `metadata_block_name:field_name` format (Optional).
+- **keepRawFields**: If true, metadata field values are returned without Markdown transformation (Optional).
 
 #### List My Data Collection Items
 

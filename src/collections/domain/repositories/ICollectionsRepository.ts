@@ -50,9 +50,10 @@ export interface ICollectionsRepository {
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria,
     searchServiceName?: string,
-    showTypeCounts?: boolean
     showTypeCounts?: boolean,
-    showCollections?: boolean
+    showCollections?: boolean,
+    metadataFields?: `${string}:${string}`[],
+    keepRawFields?: boolean
   ): Promise<CollectionItemSubset>
   getMyDataCollectionItems(
     roleIds: number[],

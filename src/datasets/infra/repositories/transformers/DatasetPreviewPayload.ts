@@ -1,3 +1,5 @@
+import { MetadataBlocksPayload } from './DatasetPayload'
+
 export interface DatasetPreviewPayload {
   global_id: string
   name: string
@@ -17,6 +19,7 @@ export interface DatasetPreviewPayload {
   name_of_dataverse: string
   image_url?: string
   collections?: DatasetPreviewCollectionPayload[]
+  metadataBlocks?: MetadataBlocksPayload
 }
 
 export interface DatasetPreviewCollectionPayload {

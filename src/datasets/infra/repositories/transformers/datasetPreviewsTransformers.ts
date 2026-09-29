@@ -7,6 +7,8 @@ import { CollectionSummary } from '../../../../collections/domain/models/Collect
 import { PublicationStatus } from '../../../../core/domain/models/PublicationStatus'
 import { CollectionItemType } from '../../../../collections/domain/models/CollectionItemType'
 import { MyDataDatasetPreviewPayload } from './MyDataDatasetPreviewPayload'
+import { DatasetMetadataBlock } from '../../../domain/models/Dataset'
+import { transformPayloadToDatasetMetadataBlocks } from './datasetTransformers'
 
 export const transformDatasetPreviewsResponseToDatasetPreviewSubset = (
   response: AxiosResponse
@@ -24,7 +26,8 @@ export const transformDatasetPreviewsResponseToDatasetPreviewSubset = (
 }
 
 export const transformDatasetPreviewPayloadToDatasetPreview = (
-  datasetPreviewPayload: DatasetPreviewPayload
+  datasetPreviewPayload: DatasetPreviewPayload,
+  keepRawFields = false
 ): DatasetPreview => {
   const publicationStatuses: PublicationStatus[] = []
   datasetPreviewPayload.publicationStatuses.forEach((element) => {
@@ -37,6 +40,9 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
       displayName: collection.name
     })
   )
+  const metadataBlocks: DatasetMetadataBlock[] | undefined = datasetPreviewPayload.metadataBlocks
+    ? transformPayloadToDatasetMetadataBlocks(datasetPreviewPayload.metadataBlocks, keepRawFields)
+    : undefined
 
   return {
     type: CollectionItemType.DATASET,
@@ -60,9 +66,9 @@ export const transformDatasetPreviewPayloadToDatasetPreview = (
     parentCollectionName: datasetPreviewPayload.name_of_dataverse,
     ...(datasetPreviewPayload.image_url && {
       imageUrl: datasetPreviewPayload.image_url
-    })
     }),
-    ...(collections && { collections })
+    ...(collections && { collections }),
+    ...(metadataBlocks && { metadataBlocks })
   }
 }
 

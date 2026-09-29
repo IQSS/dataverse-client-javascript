@@ -51,7 +51,7 @@ export interface MetadataBlocksPayload {
 }
 
 export interface MetadataBlockPayload {
-  name: string
+  name?: string
   fields: MetadataFieldPayload[]
 }
 
