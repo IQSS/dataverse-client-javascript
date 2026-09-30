@@ -423,6 +423,12 @@ This use case supports the following optional parameters depending on the search
 - **selectedPage**: (number) the page of results to be returned. (default is 1)
 - **searchText** is an optional string to filter the results by.
 - **otherUserName** is an optional string to return the collection items of another user. If not set, the calling user will be used. _Only superusers can use this parameter_.
+- **showCollections**: If true, dataset results will include a `collections` array containing [CollectionSummary](../src/collections/domain/models/CollectionSummary.ts) objects for their collections (Optional).
+- **metadataFields**: A list of metadata fields to include in dataset results. Each value must use the `metadata_block_name:field_name` format (Optional).
+- **keepRawFields**: If true, metadata field values are returned without Markdown transformation (Optional).
+- **filterQueries**: A list of simple `key:value` filters or a single complete filter expression. A single string is sent unchanged and may contain parentheses, `AND`/`OR`, wildcards, ranges, and other search syntax (Optional).
+- **sort**: The field by which to sort the results (Optional).
+- **order**: The sort order, either ascending or descending (Optional).
 
 The `CollectionItemSubset`returned instance contains a property called `totalItemCount` which is necessary for pagination.
 

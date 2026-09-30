@@ -1,3 +1,5 @@
+import { MetadataBlocksPayload } from './DatasetPayload'
+
 export interface MyDataDatasetPreviewPayload {
   name: string
   type: string
@@ -18,4 +20,12 @@ export interface MyDataDatasetPreviewPayload {
   user_roles: string[]
   image_url?: string
   published_at?: string
+  collections?: MyDataDatasetCollectionPayload[]
+  metadataBlocks?: MetadataBlocksPayload
+}
+
+export interface MyDataDatasetCollectionPayload {
+  id: number
+  name: string
+  alias: string
 }
