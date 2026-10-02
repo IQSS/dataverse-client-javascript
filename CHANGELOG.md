@@ -22,6 +22,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Changed
 
+- Files: Added an optional dataset `version` parameter to `getFileCitationByFormat` for version-specific file citation exports.
+
 ### Fixed
 
 ### Removed
