@@ -1300,11 +1300,9 @@ import { getDatasetVersions } from '@iqss/dataverse-client-javascript'
 
 const datasetId = 'doi:10.77777/FK2/AAAAAA'
 
-getDatasetVersions
-  .execute(datasetId)
-  .then((datasetVersions: DatasetVersionSubset) => {
-    /* ... */
-  })
+getDatasetVersions.execute(datasetId).then((datasetVersions: DatasetVersionSubset) => {
+  /* ... */
+})
 
 /* ... */
 ```

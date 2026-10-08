@@ -8,6 +8,16 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [v2.3.0] -- 2026-10-08
+
+### Added
+
 - Datasets: Added optional `templateId` support to `createDataset` requests and `getDataset` responses.
 - Guestbooks: Added `editGuestbook` use case.
 - Guestbooks: Added `getGuestbookResponsesByGuestbookId` use case and repository support for retrieving paginated guestbook responses with total count as structured JSON.
@@ -24,10 +34,6 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 ### Changed
 
 - Files: Added an optional dataset `version` parameter to `getFileCitationByFormat` for version-specific file citation exports.
-
-### Fixed
-
-### Removed
 
 ## [v2.2.0] -- 2026-04-24
 
