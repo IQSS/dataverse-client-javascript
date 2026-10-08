@@ -24,6 +24,7 @@ import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 import { RestrictFileDTO } from '../../domain/dtos/RestrictFileDTO'
 import { FileVersionSummarySubset } from '../../domain/models/FileVersionSummaryInfo'
 import { transformFileVersionSummaryInfoResponseToFileVersionSummaryInfo } from './transformers/fileVersionSummaryInfoTransformers'
+import { FileCitationFormat } from '../../domain/models/FileCitationFormat'
 
 export interface GetFilesQueryParams {
   includeDeaccessioned: boolean
@@ -229,6 +230,24 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
       { includeDeaccessioned: includeDeaccessioned }
     )
       .then((response) => response.data.data.message)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getFileCitationByFormat(
+    fileId: number | string,
+    format: FileCitationFormat,
+    version?: string
+  ): Promise<string> {
+    const endpoint = this.buildApiEndpoint(this.accessResourceName, `citation/${format}`, fileId)
+    const request =
+      version === undefined ? this.doGet(endpoint, true) : this.doGet(endpoint, true, { version })
+
+    return request
+      .then((response) =>
+        typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
+      )
       .catch((error) => {
         throw error
       })

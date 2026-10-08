@@ -3,7 +3,8 @@ import {
   WriteError,
   createCollection,
   getCollection,
-  updateCollection
+  updateCollection,
+  CollectionDTO
 } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -32,6 +33,28 @@ describe('execute', () => {
     } finally {
       const updatedCollection = await getCollection.execute(testNewCollectionAlias)
       expect(updatedCollection.name).toBe(testNewName)
+    }
+  })
+
+  test('should successfully update a collection with partial data (name only)', async () => {
+    const testNewCollectionAlias = 'updateCollection-partial-test'
+    const testNewCollection = createCollectionDTO(testNewCollectionAlias)
+    await createCollection.execute(testNewCollection)
+
+    const partialUpdate: Partial<CollectionDTO> = {
+      name: 'Partially Updated Name'
+    }
+
+    expect.assertions(3)
+    try {
+      await updateCollection.execute(testNewCollectionAlias, partialUpdate)
+    } catch (error) {
+      throw new Error('Collection should be updated with partial data')
+    } finally {
+      const updatedCollection = await getCollection.execute(testNewCollectionAlias)
+      expect(updatedCollection.name).toBe('Partially Updated Name')
+      expect(updatedCollection.alias).toBe(testNewCollectionAlias)
+      expect(updatedCollection.type).toBe(testNewCollection.type)
     }
   })
 

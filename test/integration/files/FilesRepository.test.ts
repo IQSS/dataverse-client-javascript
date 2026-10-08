@@ -29,7 +29,19 @@ import {
 } from '../../../src/datasets'
 import { FileModel } from '../../../src/files/domain/models/FileModel'
 import { FileCounts } from '../../../src/files/domain/models/FileCounts'
-import { FileDownloadSizeMode, WriteError } from '../../../src'
+import { FileCitationFormat } from '../../../src/files/domain/models/FileCitationFormat'
+import {
+  FileDownloadSizeMode,
+  WriteError,
+  VersionUpdateType,
+  deaccessionDataset,
+  restrictFile,
+  getDatasetFiles,
+  getMaxEmbargoDurationInMonths,
+  publishDataset,
+  updateFileMetadata
+} from '../../../src'
+import { createBuiltInUser } from '../../testHelpers/users/builtinUserApiHelper'
 import {
   deaccessionDatasetViaApi,
   publishDatasetViaApi,
@@ -653,6 +665,259 @@ describe('FilesRepository', () => {
       await expect(
         sut.getFileCitation(nonExistentFiledId, DatasetNotNumberedVersion.LATEST, false)
       ).rejects.toThrow(errorExpected)
+    })
+  })
+
+  describe('getFileCitationByFormat', () => {
+    describe('version-specific file citations', () => {
+      const alias = `citationVersion${Date.now()}`
+      const originalLabel = 'test-file-1.txt'
+      const draftLabel = 'renamed-citation-file.txt'
+      let dataset: CreatedDatasetIdentifiers
+      let fileId: number
+      let persistentId: string
+      let otherUserKey: string
+
+      const authenticate = (key?: string) => {
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, key)
+      }
+
+      beforeAll(async () => {
+        authenticate(process.env.TEST_API_KEY)
+        await createCollectionViaApi(alias)
+        await publishCollectionViaApi(alias)
+        dataset = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO, alias)
+        await uploadFileViaApi(dataset.numericId, originalLabel)
+        const files = await getDatasetFiles.execute(dataset.numericId)
+        fileId = files.files[0].id
+        await registerFileViaApi(fileId)
+        persistentId = (await getDatasetFiles.execute(dataset.numericId)).files[0].persistentId
+        await publishDataset.execute(dataset.numericId, VersionUpdateType.MAJOR)
+        await waitForNoLocks(dataset.numericId)
+        await updateFileMetadata.execute(fileId, { label: draftLabel })
+        otherUserKey = await createBuiltInUser(`citationReader${Date.now()}`)
+      })
+
+      beforeEach(() => authenticate(process.env.TEST_API_KEY))
+      afterEach(() => authenticate(process.env.TEST_API_KEY))
+
+      afterAll(async () => {
+        authenticate(process.env.TEST_API_KEY)
+        if (dataset) await deletePublishedDatasetViaApi(dataset.persistentId)
+        await deleteCollectionViaApi(alias)
+      })
+
+      test('selects archived metadata and rejects a deaccessioned version', async () => {
+        const lifecycleDataset = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          alias
+        )
+        try {
+          await uploadFileViaApi(lifecycleDataset.numericId, originalLabel)
+          const lifecycleFileId = (await getDatasetFiles.execute(lifecycleDataset.numericId))
+            .files[0].id
+          await publishDataset.execute(lifecycleDataset.numericId, VersionUpdateType.MAJOR)
+          await waitForNoLocks(lifecycleDataset.numericId)
+          await updateFileMetadata.execute(lifecycleFileId, { label: draftLabel })
+          await publishDataset.execute(lifecycleDataset.numericId, VersionUpdateType.MINOR)
+          await waitForNoLocks(lifecycleDataset.numericId)
+          expect(
+            await sut.getFileCitationByFormat(lifecycleFileId, FileCitationFormat.ENDNOTE, '1.0')
+          ).toContain(`<custom1>${originalLabel}</custom1>`)
+          await deaccessionDataset.execute(lifecycleDataset.numericId, '1.0', {
+            deaccessionReason: 'Test version-specific citations'
+          })
+          await expect(
+            sut.getFileCitationByFormat(lifecycleFileId, FileCitationFormat.ENDNOTE, '1.0')
+          ).rejects.toThrow('[400] Dataset version not found: 1.0')
+        } finally {
+          await deletePublishedDatasetViaApi(lifecycleDataset.persistentId)
+        }
+      })
+
+      test.each([
+        { state: 'restricted', restricted: true, embargoed: false },
+        { state: 'embargoed', restricted: false, embargoed: true },
+        { state: 'embargoed and restricted', restricted: true, embargoed: true }
+      ])('requires file access for $state file citations', async ({ restricted, embargoed }) => {
+        const embargoSetting = '/admin/settings/:MaxEmbargoDurationInMonths'
+        let originalEmbargoDuration: number | undefined
+        let embargoSettingChanged = false
+        const restrictedDataset = await createDataset.execute(
+          TestConstants.TEST_NEW_DATASET_DTO,
+          alias
+        )
+        try {
+          await uploadFileViaApi(restrictedDataset.numericId, originalLabel)
+          const restrictedFileId = (await getDatasetFiles.execute(restrictedDataset.numericId))
+            .files[0].id
+          if (restricted) {
+            await restrictFile.execute(restrictedFileId, {
+              restrict: true,
+              enableAccessRequest: true
+            })
+          }
+          if (embargoed) {
+            try {
+              originalEmbargoDuration = await getMaxEmbargoDurationInMonths.execute()
+            } catch (error) {
+              if (!(error instanceof ReadError) || !error.message.includes('[404]')) throw error
+            }
+            await sut.doPut(embargoSetting, '1')
+            embargoSettingChanged = true
+            const dateAvailable = new Date()
+            dateAvailable.setUTCDate(dateAvailable.getUTCDate() + 7)
+            // No public SDK use case currently sets file embargoes.
+            await sut.doPost(
+              `/datasets/${restrictedDataset.numericId}/files/actions/:set-embargo`,
+              {
+                fileIds: [restrictedFileId],
+                dateAvailable: dateAvailable.toISOString().slice(0, 10),
+                reason: 'Test version-specific citations'
+              }
+            )
+          }
+          await publishDataset.execute(restrictedDataset.numericId, VersionUpdateType.MAJOR)
+          await waitForNoLocks(restrictedDataset.numericId)
+          expect(
+            await sut.getFileCitationByFormat(restrictedFileId, FileCitationFormat.ENDNOTE, '1.0')
+          ).toContain(`<custom1>${originalLabel}</custom1>`)
+          authenticate(otherUserKey)
+          await expect(
+            sut.getFileCitationByFormat(restrictedFileId, FileCitationFormat.ENDNOTE, '1.0')
+          ).rejects.toThrow(/\[403\]/)
+        } finally {
+          authenticate(process.env.TEST_API_KEY)
+          try {
+            await deletePublishedDatasetViaApi(restrictedDataset.persistentId)
+          } finally {
+            if (embargoSettingChanged) {
+              if (originalEmbargoDuration === undefined) {
+                await sut.doDelete(embargoSetting)
+              } else {
+                await sut.doPut(embargoSetting, String(originalEmbargoDuration))
+              }
+            }
+          }
+        }
+      })
+
+      describe.each(['numeric', 'persistent'])('%s identifier', (identifierType) => {
+        let identifier: number | string
+        beforeEach(() => {
+          identifier = identifierType === 'numeric' ? fileId : persistentId
+        })
+
+        test.each([
+          ['1.0', originalLabel],
+          [DatasetNotNumberedVersion.LATEST_PUBLISHED, originalLabel],
+          [DatasetNotNumberedVersion.DRAFT, draftLabel],
+          [DatasetNotNumberedVersion.LATEST, draftLabel]
+        ])('selects metadata for %s with authorized credentials', async (version, label) => {
+          const citation = await sut.getFileCitationByFormat(
+            identifier,
+            FileCitationFormat.ENDNOTE,
+            version
+          )
+          expect(citation).toContain(`<custom1>${label}</custom1>`)
+        })
+
+        test.each([
+          '1.0',
+          DatasetNotNumberedVersion.LATEST_PUBLISHED,
+          DatasetNotNumberedVersion.LATEST
+        ])('returns published metadata anonymously for %s', async (version) => {
+          authenticate()
+          const citation = await sut.getFileCitationByFormat(
+            identifier,
+            FileCitationFormat.ENDNOTE,
+            version
+          )
+          expect(citation).toContain(`<custom1>${originalLabel}</custom1>`)
+        })
+
+        test('rejects anonymous access to a draft', async () => {
+          authenticate()
+          await expect(
+            sut.getFileCitationByFormat(identifier, FileCitationFormat.ENDNOTE, ':draft')
+          ).rejects.toThrow(/\[401\]/)
+        })
+
+        test('rejects a real user without draft permissions', async () => {
+          authenticate(otherUserKey)
+          await expect(
+            sut.getFileCitationByFormat(identifier, FileCitationFormat.ENDNOTE, ':draft')
+          ).rejects.toThrow(
+            /\[401\] User @citationReader\d+ is not permitted to perform requested action/
+          )
+        })
+
+        test.each(['666.0', 'invalid'])('rejects invalid dataset version %s', async (version) => {
+          await expect(
+            sut.getFileCitationByFormat(identifier, FileCitationFormat.ENDNOTE, version)
+          ).rejects.toThrow(/\[400\]/)
+        })
+      })
+    })
+
+    test('should return EndNote citation as XML', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.ENDNOTE)
+
+      expect(typeof citation).toBe('string')
+      expect(citation.trimStart()).toMatch(/^<\?xml/)
+    })
+
+    test('should return RIS citation as plain text', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.RIS)
+
+      expect(typeof citation).toBe('string')
+      // RIS records use TY (type) and ER (end of record) tags
+      expect(citation).toMatch(/TY\s+-/)
+      expect(citation).toMatch(/ER\s+-/)
+    })
+
+    test('should return BibTeX citation as plain text', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.BIBTEX)
+
+      expect(typeof citation).toBe('string')
+      // BibTeX entries start with @<entry-type>{
+      expect(citation.trimStart()).toMatch(/^@\w+\{/)
+    })
+
+    test('should return BibTeX citation when file is requested by persistent id', async () => {
+      expect(testFilePersistentId).toBeTruthy()
+
+      const citation = await sut.getFileCitationByFormat(
+        testFilePersistentId,
+        FileCitationFormat.BIBTEX
+      )
+
+      expect(typeof citation).toBe('string')
+      // BibTeX entries start with @<entry-type>{
+      expect(citation.trimStart()).toMatch(/^@\w+\{/)
+    })
+
+    test('should return CSL citation as JSON', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.CSL)
+
+      expect(typeof citation).toBe('string')
+      const parsed = JSON.parse(citation)
+      expect(typeof parsed).toBe('object')
+      expect(parsed).not.toBeNull()
+    })
+
+    test('should return Internal citation as HTML', async () => {
+      const citation = await sut.getFileCitationByFormat(testFileId, FileCitationFormat.INTERNAL)
+
+      expect(typeof citation).toBe('string')
+      // Internal HTML format includes anchor tags linking to the dataset
+      expect(citation).toMatch(/<a\s+href=/i)
+    })
+
+    test('should return error when file does not exist', async () => {
+      await expect(
+        sut.getFileCitationByFormat(nonExistentFiledId, FileCitationFormat.BIBTEX)
+      ).rejects.toThrow(ReadError)
     })
   })
 

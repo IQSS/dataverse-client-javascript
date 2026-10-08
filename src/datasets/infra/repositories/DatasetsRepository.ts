@@ -3,7 +3,8 @@ import { IDatasetsRepository } from '../../domain/repositories/IDatasetsReposito
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
 import {
   transformVersionResponseToDataset,
-  transformDatasetModelToUpdateDatasetRequestPayload
+  transformDatasetModelToUpdateDatasetRequestPayload,
+  transformVersionPayloadToDataset
 } from './transformers/datasetTransformers'
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
@@ -20,17 +21,23 @@ import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummarySubset } from '../../domain/models/DatasetVersionSummaryInfo'
+import { DatasetVersionSubset } from '../../domain/models/DatasetVersionSubset'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
 import { FormattedCitation } from '../../domain/models/FormattedCitation'
 import { DatasetType } from '../../domain/models/DatasetType'
 import { TermsOfAccess } from '../../domain/models/Dataset'
+import { DatasetNotNumberedVersion } from '../../domain/models/DatasetNotNumberedVersion'
 import { transformTermsOfAccessToUpdatePayload } from './transformers/termsOfAccessTransformers'
 import { DatasetLicenseUpdateRequest } from '../../domain/dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../../domain/dtos/DatasetTypeDTO'
-import { StorageDriver } from '../../domain/models/StorageDriver'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { DatasetUploadLimits } from '../../domain/models/DatasetUploadLimits'
+import { DatasetReview } from '../../domain/models/DatasetReview'
+import { transformDatasetReviewsResponseToDatasetReviews } from './transformers/datasetReviewTransformers'
+import { ExportedDatasetMetadata } from '../../domain/models/ExportedDatasetMetadata'
+import { DatasetPayload } from './transformers/DatasetPayload'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -124,6 +131,39 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     } else {
       content = response.data
     }
+
+    return {
+      content,
+      contentType
+    }
+  }
+
+  public async exportDatasetMetadata(
+    datasetId: number | string,
+    exporter: string,
+    version?: DatasetNotNumberedVersion.LATEST_PUBLISHED | DatasetNotNumberedVersion.DRAFT
+  ): Promise<ExportedDatasetMetadata> {
+    const persistentId =
+      typeof datasetId === 'number'
+        ? (
+            await this.getDataset(
+              datasetId,
+              version ?? DatasetNotNumberedVersion.LATEST_PUBLISHED,
+              false,
+              false
+            )
+          ).persistentId
+        : datasetId
+
+    const response = await this.doGet('/datasets/export', true, {
+      exporter,
+      persistentId,
+      ...(version && { version })
+    })
+
+    const contentType = String(response.headers['content-type'] ?? '')
+    const content =
+      typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
 
     return {
       content,
@@ -335,6 +375,42 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       })
   }
 
+  public async getDatasetVersions(
+    datasetId: string | number,
+    limit?: number,
+    offset?: number,
+    excludeMetadataBlocks?: boolean,
+    keepRawFields?: boolean
+  ): Promise<DatasetVersionSubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set('limit', limit.toString())
+    }
+
+    if (offset) {
+      queryParams.set('offset', offset.toString())
+    }
+
+    if (excludeMetadataBlocks !== undefined) {
+      queryParams.set('excludeMetadataBlocks', excludeMetadataBlocks.toString())
+    }
+
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'versions', datasetId),
+      true,
+      queryParams
+    )
+      .then((response) => ({
+        versions: response.data.data.map((x: DatasetPayload) =>
+          transformVersionPayloadToDataset(x, keepRawFields ?? false)
+        )
+      }))
+      .catch((error) => {
+        throw error
+      })
+  }
+
   public async deleteDatasetDraft(datasetId: string | number): Promise<void> {
     return this.doDelete(
       this.buildApiEndpoint(this.datasetsResourceName, 'versions/:draft', datasetId)
@@ -519,6 +595,14 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       true
     )
       .then((response) => (response.data?.data?.uploadLimits ?? {}) as DatasetUploadLimits)
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetReviews(datasetId: number | string): Promise<DatasetReview[]> {
+    return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'reviews', datasetId), true)
+      .then((response) => transformDatasetReviewsResponseToDatasetReviews(response))
       .catch((error) => {
         throw error
       })

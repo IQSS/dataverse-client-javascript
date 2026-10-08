@@ -9,6 +9,7 @@ import { MetadataBlock } from '../../../metadataBlocks'
 import { DatasetVersionDiff } from '../models/DatasetVersionDiff'
 import { DatasetDownloadCount } from '../models/DatasetDownloadCount'
 import { DatasetVersionSummarySubset } from '../models/DatasetVersionSummaryInfo'
+import { DatasetVersionSubset } from '../models/DatasetVersionSubset'
 import { DatasetLinkedCollection } from '../models/DatasetLinkedCollection'
 import { CitationFormat } from '../models/CitationFormat'
 import { FormattedCitation } from '../models/FormattedCitation'
@@ -16,8 +17,11 @@ import { DatasetType } from '../models/DatasetType'
 import { TermsOfAccess } from '../models/Dataset'
 import { DatasetLicenseUpdateRequest } from '../dtos/DatasetLicenseUpdateRequest'
 import { DatasetTypeDTO } from '../dtos/DatasetTypeDTO'
-import { StorageDriver } from '../models/StorageDriver'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { DatasetUploadLimits } from '../models/DatasetUploadLimits'
+import { DatasetReview } from '../models/DatasetReview'
+import { ExportedDatasetMetadata } from '../models/ExportedDatasetMetadata'
+import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion'
 
 export interface IDatasetsRepository {
   getDataset(
@@ -74,6 +78,13 @@ export interface IDatasetsRepository {
     limit?: number,
     offset?: number
   ): Promise<DatasetVersionSummarySubset>
+  getDatasetVersions(
+    datasetId: number | string,
+    limit?: number,
+    offset?: number,
+    excludeMetadataBlocks?: boolean,
+    keepRawFields?: boolean
+  ): Promise<DatasetVersionSubset>
   deleteDatasetDraft(datasetId: number | string): Promise<void>
   linkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
   unlinkDataset(datasetId: number | string, collectionIdOrAlias: number | string): Promise<void>
@@ -85,6 +96,11 @@ export interface IDatasetsRepository {
     format: CitationFormat,
     includeDeaccessioned?: boolean
   ): Promise<FormattedCitation>
+  exportDatasetMetadata(
+    datasetId: number | string,
+    exporter: string,
+    version?: DatasetNotNumberedVersion.LATEST_PUBLISHED | DatasetNotNumberedVersion.DRAFT
+  ): Promise<ExportedDatasetMetadata>
   getDatasetAvailableDatasetTypes(): Promise<DatasetType[]>
   getDatasetAvailableDatasetType(datasetTypeId: number | string): Promise<DatasetType>
   addDatasetType(datasetType: DatasetTypeDTO): Promise<DatasetType>
@@ -104,4 +120,5 @@ export interface IDatasetsRepository {
   ): Promise<void>
   getDatasetStorageDriver(datasetId: number | string): Promise<StorageDriver>
   getDatasetUploadLimits(datasetId: number | string): Promise<DatasetUploadLimits>
+  getDatasetReviews(datasetId: number | string): Promise<DatasetReview[]>
 }

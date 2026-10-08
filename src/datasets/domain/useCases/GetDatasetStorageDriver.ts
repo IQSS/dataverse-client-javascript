@@ -1,6 +1,6 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
+import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { IDatasetsRepository } from '../repositories/IDatasetsRepository'
-import { StorageDriver } from '../models/StorageDriver'
 
 export class GetDatasetStorageDriver implements UseCase<StorageDriver> {
   private datasetsRepository: IDatasetsRepository

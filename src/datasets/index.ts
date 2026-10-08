@@ -19,6 +19,7 @@ import { GetDatasetVersionDiff } from './domain/useCases/GetDatasetVersionDiff'
 import { DeaccessionDataset } from './domain/useCases/DeaccessionDataset'
 import { GetDatasetDownloadCount } from './domain/useCases/GetDatasetDownloadCount'
 import { GetDatasetVersionsSummaries } from './domain/useCases/GetDatasetVersionsSummaries'
+import { GetDatasetVersions } from './domain/useCases/GetDatasetVersions'
 import { DeleteDatasetDraft } from './domain/useCases/DeleteDatasetDraft'
 import { LinkDataset } from './domain/useCases/LinkDataset'
 import { UnlinkDataset } from './domain/useCases/UnlinkDataset'
@@ -35,6 +36,8 @@ import { UpdateTermsOfAccess } from './domain/useCases/UpdateTermsOfAccess'
 import { UpdateDatasetLicense } from './domain/useCases/UpdateDatasetLicense'
 import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriver'
 import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits'
+import { GetDatasetReviews } from './domain/useCases/GetDatasetReviews'
+import { ExportDatasetMetadata } from './domain/useCases/ExportDatasetMetadata'
 
 const datasetsRepository = new DatasetsRepository()
 
@@ -68,6 +71,7 @@ const updateDataset = new UpdateDataset(
 const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
 const getDatasetDownloadCount = new GetDatasetDownloadCount(datasetsRepository)
 const getDatasetVersionsSummaries = new GetDatasetVersionsSummaries(datasetsRepository)
+const getDatasetVersions = new GetDatasetVersions(datasetsRepository)
 const deleteDatasetDraft = new DeleteDatasetDraft(datasetsRepository)
 const linkDataset = new LinkDataset(datasetsRepository)
 const unlinkDataset = new UnlinkDataset(datasetsRepository)
@@ -86,6 +90,8 @@ const updateTermsOfAccess = new UpdateTermsOfAccess(datasetsRepository)
 const updateDatasetLicense = new UpdateDatasetLicense(datasetsRepository)
 const getDatasetStorageDriver = new GetDatasetStorageDriver(datasetsRepository)
 const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
+const getDatasetReviews = new GetDatasetReviews(datasetsRepository)
+const exportDatasetMetadata = new ExportDatasetMetadata(datasetsRepository)
 
 export {
   getDataset,
@@ -103,6 +109,7 @@ export {
   deaccessionDataset,
   getDatasetDownloadCount,
   getDatasetVersionsSummaries,
+  getDatasetVersions,
   deleteDatasetDraft,
   linkDataset,
   unlinkDataset,
@@ -118,9 +125,12 @@ export {
   deleteDatasetType,
   updateDatasetLicense,
   getDatasetStorageDriver,
-  getDatasetUploadLimits
+  getDatasetUploadLimits,
+  getDatasetReviews,
+  exportDatasetMetadata
 }
 export { DatasetNotNumberedVersion } from './domain/models/DatasetNotNumberedVersion'
+export { ExportedDatasetMetadata } from './domain/models/ExportedDatasetMetadata'
 export { DatasetUserPermissions } from './domain/models/DatasetUserPermissions'
 export { DatasetLock, DatasetLockType } from './domain/models/DatasetLock'
 export {
@@ -136,6 +146,7 @@ export {
   TermsOfUse
 } from './domain/models/Dataset'
 export { DatasetPreview } from './domain/models/DatasetPreview'
+export { DatasetVersionSubset } from './domain/models/DatasetVersionSubset'
 export { DatasetVersionDiff } from './domain/models/DatasetVersionDiff'
 export { DatasetPreviewSubset } from './domain/models/DatasetPreviewSubset'
 export {
@@ -157,5 +168,9 @@ export {
 export { DatasetLinkedCollection } from './domain/models/DatasetLinkedCollection'
 export { DatasetType } from './domain/models/DatasetType'
 export { DatasetTypeDTO } from './domain/dtos/DatasetTypeDTO'
-export { StorageDriver } from './domain/models/StorageDriver'
 export { DatasetUploadLimits } from './domain/models/DatasetUploadLimits'
+export {
+  DatasetReview,
+  DatasetReviewRubricMetadataBlock,
+  DatasetReviewRubricMetadataField
+} from './domain/models/DatasetReview'

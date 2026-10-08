@@ -9,10 +9,10 @@ jobs:
   test-unit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -23,10 +23,10 @@ jobs:
   test-integration:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -35,12 +35,13 @@ jobs:
         run: npm run test:integration
 
   test-functional:
+    needs: [test-integration]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm ci
@@ -54,10 +55,10 @@ jobs:
     permissions:
       packages: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version: 22
           registry-url: https://npm.pkg.github.com/
 
       - name: Install npm dependencies

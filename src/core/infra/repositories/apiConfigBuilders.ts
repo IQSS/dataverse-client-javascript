@@ -41,13 +41,19 @@ export const buildRequestConfig = (
       break
 
     case DataverseApiAuthMechanism.BEARER_TOKEN: {
-      if (!ApiConfig.bearerTokenLocalStorageKey) {
+      if (!(ApiConfig.bearerTokenLocalStorageKey || ApiConfig.bearerTokenGetFunction)) {
         throw new Error(
-          'Bearer token local storage key is not set in the ApiConfig, when using bearer token auth mechanism you must set the bearerTokenLocalStorageKey'
+          'Bearer token local storage key or get function is not set in the ApiConfig, when using bearer token auth mechanism you must set the bearerTokenLocalStorageKey or bearerTokenGetFunction'
         )
       }
 
-      const token = getLocalStorageItem<string>(ApiConfig.bearerTokenLocalStorageKey)
+      let token
+
+      if (ApiConfig.bearerTokenLocalStorageKey) {
+        token = getLocalStorageItem<string>(ApiConfig.bearerTokenLocalStorageKey)
+      } else if (ApiConfig.bearerTokenGetFunction) {
+        token = ApiConfig.bearerTokenGetFunction()
+      }
 
       if (token) {
         requestConfig.headers.Authorization = `Bearer ${token}`

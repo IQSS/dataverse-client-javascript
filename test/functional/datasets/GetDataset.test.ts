@@ -93,6 +93,14 @@ describe('execute', () => {
     expect(dataset.termsOfUse.termsOfAccess.termsOfAccessForRestrictedFiles).toBe('Terms of access')
     expect(dataset.termsOfUse.customTerms?.termsOfUse).toBe('Terms of use')
   })
+  test('should return the template id when present', () => {
+    const versionPayload = createDatasetVersionPayload()
+    versionPayload.templateId = 3
+
+    const dataset = transformVersionPayloadToDataset(versionPayload, false)
+
+    expect(dataset.templateId).toBe(3)
+  })
   test('should return metadata fields in markdown format when keepRawFields is false', async () => {
     const createdDatasetIdentifiers = await createDataset.execute(testNewDataset)
 

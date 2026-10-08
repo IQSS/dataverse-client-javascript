@@ -18,7 +18,6 @@ import {
   CONTENT_FIELD_WITH_ALL_TAGS,
   createCollectionViaApi,
   deleteCollectionViaApi,
-  EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS,
   publishCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import {
@@ -27,6 +26,7 @@ import {
   FeaturedItemType
 } from '../../../src/collections/domain/models/FeaturedItem'
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
+import { normalizeHtml } from '../../testHelpers/html/htmlNormalizer'
 import {
   deletePublishedDatasetViaApi,
   publishDatasetViaApi,
@@ -165,7 +165,9 @@ describe('execute', () => {
     expect(secondItemResponse.imageFileUrl).toBeUndefined()
     expect(secondItemResponse.imageFileName).toBeUndefined()
 
-    expect(thirdItemResponse.content).toEqual(EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS)
+    expect(normalizeHtml(thirdItemResponse.content)).toEqual(
+      normalizeHtml(CONTENT_FIELD_WITH_ALL_TAGS)
+    )
     expect(thirdItemResponse.displayOrder).toBe(newFeaturedItems[2].displayOrder)
     expect(thirdItemResponse.imageFileName).toEqual('featured-item-test-image-3.png')
     expect(thirdItemResponse.imageFileUrl).toContain(

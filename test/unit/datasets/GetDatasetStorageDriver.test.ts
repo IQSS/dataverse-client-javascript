@@ -1,6 +1,6 @@
 import { GetDatasetStorageDriver } from '../../../src/datasets/domain/useCases/GetDatasetStorageDriver'
 import { IDatasetsRepository } from '../../../src/datasets/domain/repositories/IDatasetsRepository'
-import { StorageDriver } from '../../../src/datasets/domain/models/StorageDriver'
+import { StorageDriver } from '../../../src/core/domain/models/StorageDriver'
 import { ReadError } from '../../../src/core/domain/repositories/ReadError'
 
 describe('GetDatasetStorageDriver (unit)', () => {

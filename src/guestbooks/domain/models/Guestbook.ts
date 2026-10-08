@@ -1,11 +1,13 @@
 export type GuestbookQuestionType = 'text' | 'textarea' | 'options'
 
 export interface GuestbookOption {
+  id?: number
   value: string
   displayOrder: number
 }
 
 export interface GuestbookCustomQuestion {
+  id?: number
   question: string
   required: boolean
   displayOrder: number
@@ -25,4 +27,6 @@ export interface Guestbook {
   customQuestions: GuestbookCustomQuestion[]
   createTime: string
   dataverseId: number
+  usageCount?: number
+  responseCount?: number
 }

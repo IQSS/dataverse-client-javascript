@@ -7,6 +7,7 @@ import { GetFileDataTables } from './domain/useCases/GetFileDataTables'
 import { GetDatasetFilesTotalDownloadSize } from './domain/useCases/GetDatasetFilesTotalDownloadSize'
 import { GetFile } from './domain/useCases/GetFile'
 import { GetFileCitation } from './domain/useCases/GetFileCitation'
+import { GetFileCitationByFormat } from './domain/useCases/GetFileCitationByFormat'
 import { GetFileAndDataset } from './domain/useCases/GetFileAndDataset'
 import { UploadFile } from './domain/useCases/UploadFile'
 import { DirectUploadClient } from './infra/clients/DirectUploadClient'
@@ -32,6 +33,7 @@ const getDatasetFilesTotalDownloadSize = new GetDatasetFilesTotalDownloadSize(fi
 const getFile = new GetFile(filesRepository)
 const getFileAndDataset = new GetFileAndDataset(filesRepository)
 const getFileCitation = new GetFileCitation(filesRepository)
+const getFileCitationByFormat = new GetFileCitationByFormat(filesRepository)
 const uploadFile = new UploadFile(directUploadClient)
 const addUploadedFilesToDataset = new AddUploadedFilesToDataset(filesRepository)
 const deleteFile = new DeleteFile(filesRepository)
@@ -53,6 +55,7 @@ export {
   getFile,
   getFileAndDataset,
   getFileCitation,
+  getFileCitationByFormat,
   uploadFile,
   addUploadedFilesToDataset,
   deleteFile,
@@ -89,6 +92,7 @@ export {
   FileDataVariableFormatType
 } from './domain/models/FileDataTable'
 export { FileDownloadSizeMode } from './domain/models/FileDownloadSizeMode'
+export { FileCitationFormat } from './domain/models/FileCitationFormat'
 export { FilesSubset } from './domain/models/FilesSubset'
 export { FilePreview, FilePreviewChecksum } from './domain/models/FilePreview'
 export { UploadedFileDTO } from './domain/dtos/UploadedFileDTO'

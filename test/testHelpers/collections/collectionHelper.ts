@@ -1,6 +1,9 @@
-import { Collection, CollectionFacet } from '../../../src/collections'
+import { Collection, CollectionFacet, CollectionTheme } from '../../../src/collections'
 import { DvObjectType } from '../../../src'
-import { CollectionPayload } from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
+import {
+  CollectionPayload,
+  CollectionThemePayload
+} from '../../../src/collections/infra/repositories/transformers/CollectionPayload'
 import { TestConstants } from '../TestConstants'
 import axios from 'axios'
 import { CollectionDTO } from '../../../src/collections/domain/dtos/CollectionDTO'
@@ -22,7 +25,7 @@ const DATAVERSE_API_REQUEST_HEADERS = {
   headers: { 'Content-Type': 'application/json', 'X-Dataverse-Key': process.env.TEST_API_KEY }
 }
 
-export const createCollectionModel = (): Collection => {
+export const createCollectionModel = (theme?: CollectionTheme): Collection => {
   const collectionModel: Collection = {
     id: COLLECTION_ID,
     alias: COLLECTION_ALIAS_STR,
@@ -45,14 +48,23 @@ export const createCollectionModel = (): Collection => {
         displayOrder: 0
       }
     ],
+    allowedDatasetTypes: [
+      {
+        id: 1,
+        name: 'review',
+        displayName: 'Review',
+        description: 'A review of a dataset compiled by the expert community.'
+      }
+    ],
     isMetadataBlockRoot: true,
     isFacetRoot: true,
-    childCount: 0
+    childCount: 0,
+    ...(theme && { theme })
   }
   return collectionModel
 }
 
-export const createCollectionPayload = (): CollectionPayload => {
+export const createCollectionPayload = (theme?: CollectionThemePayload): CollectionPayload => {
   const collectionPayload: CollectionPayload = {
     id: COLLECTION_ID,
     alias: COLLECTION_ALIAS_STR,
@@ -75,9 +87,18 @@ export const createCollectionPayload = (): CollectionPayload => {
         displayOrder: 0
       }
     ],
+    allowedDatasetTypes: [
+      {
+        id: 1,
+        name: 'review',
+        displayName: 'Review',
+        description: 'A review of a dataset compiled by the expert community.'
+      }
+    ],
     isMetadataBlockRoot: true,
     isFacetRoot: true,
-    childCount: 0
+    childCount: 0,
+    ...(theme && { theme })
   }
   return collectionPayload
 }
@@ -134,7 +155,7 @@ export async function setStorageDriverViaApi(
 ): Promise<void> {
   try {
     return await axios.put(
-      `${TestConstants.TEST_API_URL}/admin/dataverse/${collectionAlias}/storageDriver`,
+      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/storageDriver`,
       driverLabel,
       {
         headers: { 'Content-Type': 'text/plain', 'X-Dataverse-Key': process.env.TEST_API_KEY }
@@ -155,6 +176,28 @@ export async function publishCollectionViaApi(collectionAlias: string): Promise<
     )
   } catch (error) {
     throw new Error(`Error while publishing test collection ${collectionAlias}`)
+  }
+}
+
+export async function setCollectionAllowedDatasetTypesViaApi(
+  collectionAlias: string,
+  allowedDatasetTypes: string[]
+): Promise<void> {
+  try {
+    return await axios.put(
+      `${TestConstants.TEST_API_URL}/dataverses/${collectionAlias}/attribute/allowedDatasetTypes`,
+      undefined,
+      {
+        params: {
+          value: allowedDatasetTypes.join(',')
+        },
+        ...DATAVERSE_API_REQUEST_HEADERS
+      }
+    )
+  } catch (error) {
+    throw new Error(
+      `Error while setting allowed dataset types for test collection ${collectionAlias}`
+    )
   }
 }
 
@@ -225,11 +268,12 @@ export const createCollectionFacetRequestPayload = (): CollectionFacetPayload =>
 }
 
 export const CONTENT_FIELD_WITH_ALL_TAGS =
-  '<h1 class="rte-heading">A title</h1><p class="rte-paragraph">Esto es una oracion que contiene texto en <strong class="rte-bold">negrita</strong>, <em class="rte-italic">italica</em>, <u class="rte-underline">subrayada</u>, <s class="rte-strike">tachado</s>, <code class="rte-code">de tipo code</code>, este es <a target="_blank" rel="noopener noreferrer nofollow" class="rte-link" href="https://youtube.com">un link que apunta a youtube</a>.</p><p class="rte-paragraph">Una lista desordenada:</p><ul class="rte-bullet-list"><li><p class="rte-paragraph">Item</p></li><li><p class="rte-paragraph">Item</p></li></ul><p class="rte-paragraph">Una lista ordenada:</p><ol class="rte-ordered-list"><li><p class="rte-paragraph">Item 1</p></li><li><p class="rte-paragraph">Item 2</p></li></ol><blockquote class="rte-blockquote"><p class="rte-paragraph">Este es un blockquote.</p></blockquote><p class="rte-paragraph">Esto que viene es un bloque de codigo.</p><pre class="rte-code-block"><code>      &lt;Controller name={`featuredItems.${itemIndex}.content`} control={control} rules={rules} render={({ field: { onChange, ref, value }, fieldState: { invalid, error } }) =&gt; { console.log({ value }) return ( &lt;Col&gt; &lt;RichTextEditor initialValue={value as string} editorContentAriaLabelledBy={`featuredItems.${itemIndex}.content`} onChange={onChange} invalid={invalid} ariaRequired ref={ref} /&gt; {invalid &amp;&amp; &lt;div className={styles["error-msg"]}&gt;{error?.message}&lt;/div&gt;} &lt;/Col&gt; ) }} /&gt;</code></pre>'
+  '<h1 class="rte-heading">A title</h1><p class="rte-paragraph">Esto es una oracion que contiene texto en <strong class="rte-bold">negrita</strong>, <em class="rte-italic">italica</em>, <u class="rte-underline">subrayada</u>, <s class="rte-strike">tachado</s>, <code class="rte-code">de tipo code</code>, este es <a target="_blank" rel="noopener noreferrer nofollow" class="rte-link" href="https://youtube.com">un link que apunta a youtube</a>.</p><p class="rte-paragraph"><strong class="rte-bold">Negrita</strong> <em class="rte-italic">seguida de italica</em></p><p class="rte-paragraph">Una lista desordenada:</p><ul class="rte-bullet-list"><li><p class="rte-paragraph">Item</p></li><li><p class="rte-paragraph">Item</p></li></ul><p class="rte-paragraph">Una lista ordenada:</p><ol class="rte-ordered-list"><li><p class="rte-paragraph">Item 1</p></li><li><p class="rte-paragraph">Item 2</p></li></ol><blockquote class="rte-blockquote"><p class="rte-paragraph">Este es un blockquote.</p></blockquote><p class="rte-paragraph">Esto que viene es un bloque de codigo.</p><pre class="rte-code-block"><code>      &lt;Controller name={`featuredItems.${itemIndex}.content`} control={control} rules={rules} render={({ field: { onChange, ref, value }, fieldState: { invalid, error } }) =&gt; { console.log({ value }) return ( &lt;Col&gt; &lt;RichTextEditor initialValue={value as string} editorContentAriaLabelledBy={`featuredItems.${itemIndex}.content`} onChange={onChange} invalid={invalid} ariaRequired ref={ref} /&gt; {invalid &amp;&amp; &lt;div className={styles["error-msg"]}&gt;{error?.message}&lt;/div&gt;} &lt;/Col&gt; ) }} /&gt;</code></pre>'
 
-export const EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS =
+export const SERVER_FORMATTED_CONTENT_FIELD_WITH_ALL_TAGS =
   '<h1 class="rte-heading">A title</h1>\n' +
   '<p class="rte-paragraph">Esto es una oracion que contiene texto en <strong class="rte-bold">negrita</strong>, <em class="rte-italic">italica</em>, <u class="rte-underline">subrayada</u>, <s class="rte-strike">tachado</s>, <code class="rte-code">de tipo code</code>, este es <a target="_blank" rel="noopener noreferrer nofollow" class="rte-link" href="https://youtube.com">un link que apunta a youtube</a>.</p>\n' +
+  '<p class="rte-paragraph"><strong class="rte-bold">Negrita</strong> <em class="rte-italic">seguida de italica</em></p>\n' +
   '<p class="rte-paragraph">Una lista desordenada:</p>\n' +
   '<ul class="rte-bullet-list">\n' +
   ' <li><p class="rte-paragraph">Item</p></li>\n' +

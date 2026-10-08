@@ -14,6 +14,27 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Removed
 
+## [v2.3.0] -- 2026-10-08
+
+### Added
+
+- Datasets: Added optional `templateId` support to `createDataset` requests and `getDataset` responses.
+- Guestbooks: Added `editGuestbook` use case.
+- Guestbooks: Added `getGuestbookResponsesByGuestbookId` use case and repository support for retrieving paginated guestbook responses with total count as structured JSON.
+- Guestbooks: Added `downloadGuestbookResponsesByCollectionId` and `downloadGuestbookResponsesOfAGuestbook` use cases and repository support for exporting guestbook responses as raw CSV content.
+- Guestbooks: Added optional `includeStats` support to `getGuestbooksByCollectionId`, returning `usageCount` and `responseCount` when requested.
+- Files: Added `getFileCitationByFormat` use case, repository method, and `FileCitationFormat` enum to support Dataverse file citation exports in `EndNote`, `RIS`, `BibTeX`, `CSL`, and `Internal` formats.
+- Datasets: Added `getDatasetReviews` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/reviews`, for retrieving review datasets associated with a dataset by persistent id or numeric id.
+- Datasets: Added `exportDatasetMetadata` use case, repository method, and `ExportedDatasetMetadata` response type to support exporting dataset metadata by numeric id or persistent id through Dataverse endpoint `GET /datasets/export`.
+- Datasets: Added `getDatasetVersions` use case.
+- Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
+- Collections: Added theme information when retrieving a collection using `getCollection`.
+- Collections: Added `setDefaultContributorRole` use case.
+
+### Changed
+
+- Files: Added an optional dataset `version` parameter to `getFileCitationByFormat` for version-specific file citation exports.
+
 ## [v2.2.0] -- 2026-04-24
 
 ### Added
@@ -25,6 +46,9 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - New Use Case: [Create a Template](./docs/useCases.md#create-a-template) under Templates.
 - New Use Case: [Get a Template](./docs/useCases.md#get-a-template) under Templates.
 - New Use Case: [Delete a Template](./docs/useCases.md#delete-a-template) under Templates.
+- New Use Case: [Update Template Metadata](./docs/useCases.md#update-template-metadata) under Templates.
+- New Use Case: [Update Template License Terms](./docs/useCases.md#update-template-license-terms) under Templates.
+- New Use Case: [Update Template Terms Of Access](./docs/useCases.md#update-template-terms-of-access) under Templates.
 - Templates: Added `setTemplateAsDefault` use case and repository method to support Dataverse endpoint `POST /dataverses/{id}/template/default/{templateId}`.
 - Templates: Added `unsetTemplateAsDefault` use case and repository method to support Dataverse endpoint `DELETE /dataverses/{id}/template/default`.
 - New Use Case: [Update Terms of Access](./docs/useCases.md#update-terms-of-access).
@@ -42,6 +66,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
 - Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.
+- Collections: `updateCollection` now supports partial updates by accepting `Partial<CollectionDTO>`. Only explicitly provided fields are sent in update requests, aligning with Dataverse API semantics. Metadata blocks handling was adjusted to respect inheritance flags and avoid invalid field combinations.
 
 ### Fixed
 
