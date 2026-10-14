@@ -11,15 +11,13 @@ export enum OrderType {
   DESC = 'desc'
 }
 
-export type FilterQuery = `${string}:${string}`
-
 export class CollectionSearchCriteria {
   constructor(
     public readonly searchText?: string,
     public readonly itemTypes?: CollectionItemType[],
     public readonly sort?: SortType,
     public readonly order?: OrderType,
-    public readonly filterQueries?: FilterQuery[]
+    public readonly filterQueries?: string | string[]
   ) {}
 
   withSearchText(searchText: string | undefined): CollectionSearchCriteria {
@@ -62,7 +60,7 @@ export class CollectionSearchCriteria {
     )
   }
 
-  withFilterQueries(filterQueries: FilterQuery[] | undefined): CollectionSearchCriteria {
+  withFilterQueries(filterQueries: string | string[] | undefined): CollectionSearchCriteria {
     return new CollectionSearchCriteria(
       this.searchText,
       this.itemTypes,
