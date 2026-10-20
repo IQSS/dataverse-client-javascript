@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
 import { ReadError } from '../../domain/repositories/ReadError'
 import { WriteError } from '../../domain/repositories/WriteError'
+import { RepositoryErrorDetails } from '../../domain/repositories/RepositoryError'
 import { buildRequestConfig, buildRequestUrl } from './apiConfigBuilders'
 import { ApiConstants } from './ApiConstants'
 
@@ -14,7 +15,7 @@ export abstract class ApiRepository {
       .get(buildRequestUrl(apiEndpoint), buildRequestConfig(authRequired, queryParams))
       .then((response) => response)
       .catch((error) => {
-        throw new ReadError(this.buildErrorMessage(error))
+        throw new ReadError(this.buildErrorMessage(error), this.buildErrorDetails(error))
       })
   }
 
@@ -22,9 +23,10 @@ export abstract class ApiRepository {
     apiEndpoint: string,
     data: string | object | boolean,
     queryParams: object = {},
-    contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
+    contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON,
+    authRequired = true
   ): Promise<AxiosResponse> {
-    return await this.doRequest('post', apiEndpoint, data, queryParams, contentType)
+    return await this.doRequest('post', apiEndpoint, data, queryParams, contentType, authRequired)
   }
 
   public async doPut(
@@ -41,7 +43,7 @@ export abstract class ApiRepository {
       .delete(buildRequestUrl(apiEndpoint), buildRequestConfig(true, queryParams))
       .then((response) => response)
       .catch((error) => {
-        throw new WriteError(this.buildErrorMessage(error))
+        throw new WriteError(this.buildErrorMessage(error), this.buildErrorDetails(error))
       })
   }
 
@@ -60,6 +62,15 @@ export abstract class ApiRepository {
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  private buildErrorDetails(error: any): RepositoryErrorDetails {
+    const fieldErrors = error?.response?.data?.fieldErrors
+    return {
+      statusCode: error?.response?.status,
+      fieldErrors: fieldErrors && typeof fieldErrors === 'object' ? fieldErrors : undefined
+    }
+  }
+
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   private buildErrorMessage(error: any): string {
     const status =
       error.response && error.response.status ? error.response.status : 'unknown error status'
@@ -72,7 +83,8 @@ export abstract class ApiRepository {
     apiEndpoint: string,
     data: string | object | boolean,
     queryParams: object = {},
-    contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON
+    contentType: string = ApiConstants.CONTENT_TYPE_APPLICATION_JSON,
+    authRequired = true
   ): Promise<AxiosResponse> {
     let requestData = data
 
@@ -83,13 +95,13 @@ export abstract class ApiRepository {
     }
 
     const requestUrl = buildRequestUrl(apiEndpoint)
-    const requestConfig = buildRequestConfig(true, queryParams, contentType)
+    const requestConfig = buildRequestConfig(authRequired, queryParams, contentType)
 
     try {
       const response = await axios[method](requestUrl, requestData, requestConfig)
       return response
     } catch (error) {
-      throw new WriteError(this.buildErrorMessage(error))
+      throw new WriteError(this.buildErrorMessage(error), this.buildErrorDetails(error))
     }
   }
 }

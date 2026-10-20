@@ -11,6 +11,8 @@ services:
       DATAVERSE_DB_HOST: postgres
       DATAVERSE_DB_PASSWORD: secret
       DATAVERSE_DB_USER: ${DATAVERSE_DB_USER}
+      DATAVERSE_FEATURE_API_BUILTIN_USER_SIGNUP: '1'
+      DATAVERSE_API_SIGNUP_RATE_LIMIT_PER_HOUR: '0'
       JVM_ARGS: -Ddataverse.files.storage-driver-id=file1
         -Ddataverse.pid.providers=fake
         -Ddataverse.pid.default-provider=fake
