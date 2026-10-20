@@ -38,8 +38,20 @@ import { GetDatasetStorageDriver } from './domain/useCases/GetDatasetStorageDriv
 import { GetDatasetUploadLimits } from './domain/useCases/GetDatasetUploadLimits'
 import { GetDatasetReviews } from './domain/useCases/GetDatasetReviews'
 import { ExportDatasetMetadata } from './domain/useCases/ExportDatasetMetadata'
+import { GetAllowedDatasetCurationLabels } from './domain/useCases/curation/GetAllowedDatasetCurationLabels'
+import { GetDatasetCurationStatus } from './domain/useCases/curation/GetDatasetCurationStatus'
+import { GetDatasetCurationStatusHistory } from './domain/useCases/curation/GetDatasetCurationStatusHistory'
+import { SetDatasetCurationStatus } from './domain/useCases/curation/SetDatasetCurationStatus'
+import { DeleteDatasetCurationStatus } from './domain/useCases/curation/DeleteDatasetCurationStatus'
+import { SubmitDatasetForReview } from './domain/useCases/curation/SubmitDatasetForReview'
 
 const datasetsRepository = new DatasetsRepository()
+const getAllowedDatasetCurationLabels = new GetAllowedDatasetCurationLabels(datasetsRepository)
+const getDatasetCurationStatus = new GetDatasetCurationStatus(datasetsRepository)
+const getDatasetCurationStatusHistory = new GetDatasetCurationStatusHistory(datasetsRepository)
+const setDatasetCurationStatus = new SetDatasetCurationStatus(datasetsRepository)
+const deleteDatasetCurationStatus = new DeleteDatasetCurationStatus(datasetsRepository)
+const submitDatasetForReview = new SubmitDatasetForReview(datasetsRepository)
 
 const getDataset = new GetDataset(datasetsRepository)
 const getDatasetLocks = new GetDatasetLocks(datasetsRepository)
@@ -93,7 +105,15 @@ const getDatasetUploadLimits = new GetDatasetUploadLimits(datasetsRepository)
 const getDatasetReviews = new GetDatasetReviews(datasetsRepository)
 const exportDatasetMetadata = new ExportDatasetMetadata(datasetsRepository)
 
+export { DatasetCurationStatus, DatasetReviewSubmission } from './domain/models/DatasetCuration'
+
 export {
+  getAllowedDatasetCurationLabels,
+  getDatasetCurationStatus,
+  getDatasetCurationStatusHistory,
+  setDatasetCurationStatus,
+  deleteDatasetCurationStatus,
+  submitDatasetForReview,
   getDataset,
   getDatasetLocks,
   getDatasetCitation,
