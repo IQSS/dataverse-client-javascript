@@ -739,28 +739,43 @@ describe('Direct Upload', () => {
     }
 
     test('should give up on a single-part upload once the configured timeout elapses', async () => {
-      const destination = await createTestFileUploadDestination(
-        singlepartFile,
-        testDataset7Ids.numericId
-      )
-      const config: DirectUploadClientConfig = { fileUploadTimeoutMs: 1 }
-      const sut = new DirectUploadClient(filesRepositorySut, config)
+      const stalledStore = http.createServer((request) => {
+        request.resume()
+      })
+      await new Promise<void>((resolve) => stalledStore.listen(0, '127.0.0.1', resolve))
+      const stalledStoreUrl = `http://127.0.0.1:${(stalledStore.address() as AddressInfo).port}`
 
-      await expect(
-        sut.uploadFile(
-          testDataset7Ids.numericId,
+      try {
+        const serverDestination = await createTestFileUploadDestination(
           singlepartFile,
-          jest.fn(),
-          new AbortController(),
-          destination
+          testDataset7Ids.numericId
         )
-      ).rejects.toThrow(
-        new FileUploadError(
-          singlepartFile.name,
-          testDataset7Ids.numericId,
-          'timeout of 1ms exceeded'
+        const destination: FileUploadDestination = {
+          ...serverDestination,
+          urls: [`${stalledStoreUrl}/single-part`]
+        }
+        const config: DirectUploadClientConfig = { fileUploadTimeoutMs: 1 }
+        const sut = new DirectUploadClient(filesRepositorySut, config)
+
+        await expect(
+          sut.uploadFile(
+            testDataset7Ids.numericId,
+            singlepartFile,
+            jest.fn(),
+            new AbortController(),
+            destination
+          )
+        ).rejects.toThrow(
+          new FileUploadError(
+            singlepartFile.name,
+            testDataset7Ids.numericId,
+            'timeout of 1ms exceeded'
+          )
         )
-      )
+      } finally {
+        stalledStore.closeAllConnections()
+        await new Promise<void>((resolve) => stalledStore.close(() => resolve()))
+      }
     })
 
     test('should retry a failing part exactly as many times as configured, then abort the upload', async () => {
