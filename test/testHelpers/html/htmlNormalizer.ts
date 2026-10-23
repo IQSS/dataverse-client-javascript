@@ -1,3 +1,5 @@
+import { JSDOM } from 'jsdom'
+
 const WHITESPACE_SENSITIVE_TAGS = new Set(['pre', 'textarea'])
 
 const BLOCK_TAGS = new Set([
@@ -43,103 +45,73 @@ const BLOCK_TAGS = new Set([
   'ul'
 ])
 
-const TAG_PATTERN = /^<\s*(\/?)\s*([a-zA-Z][\w:-]*)([\s\S]*?)(\/?)\s*>$/
-const ATTRIBUTE_PATTERN = /([\w:-]+)(?:\s*=\s*("[^"]*"|'[^']*'|[^\s"'>]+))?/g
+const document = new JSDOM('').window.document
 
-interface ParsedTag {
-  closing: boolean
-  name: string
-  selfClosing: boolean
+const isElement = (node: Node | null | undefined): node is Element =>
+  node !== null && node !== undefined && node.nodeType === node.ELEMENT_NODE
+
+const isText = (node: Node): node is Text => node.nodeType === node.TEXT_NODE
+
+const tagNameOf = (element: Element): string => element.tagName.toLowerCase()
+
+const isBlockBoundary = (sibling: Node | undefined, parent: Node): boolean =>
+  sibling === undefined
+    ? !isElement(parent) || BLOCK_TAGS.has(tagNameOf(parent))
+    : isElement(sibling) && BLOCK_TAGS.has(tagNameOf(sibling))
+
+const sortAttributes = (element: Element): void => {
+  const attributes = Array.from(element.attributes).sort((one, other) =>
+    one.name.localeCompare(other.name)
+  )
+  attributes.forEach((attribute) => element.removeAttribute(attribute.name))
+  attributes.forEach((attribute) => element.setAttribute(attribute.name, attribute.value))
 }
 
-const parseTag = (token: string): ParsedTag | undefined => {
-  const match = TAG_PATTERN.exec(token)
-  if (match === null) {
-    return undefined
+const normalizeText = (text: Text, afterBoundary: boolean, beforeBoundary: boolean): void => {
+  if (text.data.trim() === '') {
+    if (afterBoundary || beforeBoundary) {
+      text.remove()
+    } else {
+      text.data = ' '
+    }
+    return
   }
-  return {
-    closing: match[1] === '/',
-    name: match[2].toLowerCase(),
-    selfClosing: match[4] === '/'
+
+  let collapsed = text.data.replace(/\s+/g, ' ')
+  if (afterBoundary) {
+    collapsed = collapsed.replace(/^ /, '')
   }
+  if (beforeBoundary) {
+    collapsed = collapsed.replace(/ $/, '')
+  }
+  text.data = collapsed
 }
 
-const normalizeTag = (token: string): string => {
-  const match = TAG_PATTERN.exec(token)
-  if (match === null) {
-    return token
-  }
-  const [, closing, name, attributeSource, selfClosing] = match
-  const attributes = Array.from(attributeSource.matchAll(ATTRIBUTE_PATTERN))
-    .map(([, attributeName, attributeValue]) =>
-      attributeValue === undefined
-        ? attributeName.toLowerCase()
-        : `${attributeName.toLowerCase()}=${normalizeAttributeValue(attributeValue)}`
-    )
-    .sort()
-  const renderedAttributes = attributes.length === 0 ? '' : ` ${attributes.join(' ')}`
-  return `<${closing}${name.toLowerCase()}${renderedAttributes}${selfClosing}>`
-}
+const normalizeChildren = (parent: Node, whitespaceSensitive: boolean): void => {
+  const childrenAsParsed = Array.from(parent.childNodes)
 
-const normalizeAttributeValue = (value: string): string => {
-  const unquoted =
-    (value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))
-      ? value.slice(1, -1)
-      : value
-  return `"${unquoted}"`
-}
-
-const isBlockBoundary = (token: string | undefined): boolean => {
-  if (token === undefined) {
-    return true
-  }
-  const tag = parseTag(token)
-  return tag !== undefined && BLOCK_TAGS.has(tag.name)
+  childrenAsParsed.forEach((child, index) => {
+    if (isElement(child)) {
+      sortAttributes(child)
+      normalizeChildren(
+        child,
+        whitespaceSensitive || WHITESPACE_SENSITIVE_TAGS.has(tagNameOf(child))
+      )
+      return
+    }
+    if (isText(child) && !whitespaceSensitive) {
+      normalizeText(
+        child,
+        isBlockBoundary(childrenAsParsed[index - 1], parent),
+        isBlockBoundary(childrenAsParsed[index + 1], parent)
+      )
+    }
+  })
 }
 
 export const normalizeHtml = (html: string): string => {
-  const tokens = html.split(/(<[^>]*>)/).filter((token) => token !== '')
-  const normalized: string[] = []
-  let whitespaceSensitiveDepth = 0
-
-  tokens.forEach((token, index) => {
-    const tag = token.startsWith('<') ? parseTag(token) : undefined
-
-    if (tag !== undefined) {
-      if (tag.closing && WHITESPACE_SENSITIVE_TAGS.has(tag.name)) {
-        whitespaceSensitiveDepth = Math.max(0, whitespaceSensitiveDepth - 1)
-      }
-      normalized.push(normalizeTag(token))
-      if (!tag.closing && !tag.selfClosing && WHITESPACE_SENSITIVE_TAGS.has(tag.name)) {
-        whitespaceSensitiveDepth += 1
-      }
-      return
-    }
-
-    if (token.startsWith('<') || whitespaceSensitiveDepth > 0) {
-      normalized.push(token)
-      return
-    }
-
-    const previousToken = tokens[index - 1]
-    const nextToken = tokens[index + 1]
-
-    if (token.trim() === '') {
-      if (!isBlockBoundary(previousToken) && !isBlockBoundary(nextToken)) {
-        normalized.push(' ')
-      }
-      return
-    }
-
-    let text = token.replace(/\s+/g, ' ')
-    if (isBlockBoundary(previousToken)) {
-      text = text.replace(/^ /, '')
-    }
-    if (isBlockBoundary(nextToken)) {
-      text = text.replace(/ $/, '')
-    }
-    normalized.push(text)
-  })
-
-  return normalized.join('')
+  const template = document.createElement('template')
+  template.innerHTML = html
+  normalizeChildren(template.content, false)
+  return template.innerHTML
 }

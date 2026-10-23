@@ -9,7 +9,8 @@ import { transformTreeResponseToFileTreePage } from './transformers/fileTreeTran
 import { Dataset, VersionUpdateType } from '../../domain/models/Dataset'
 import {
   transformVersionResponseToDataset,
-  transformDatasetModelToUpdateDatasetRequestPayload
+  transformDatasetModelToUpdateDatasetRequestPayload,
+  transformVersionPayloadToDataset
 } from './transformers/datasetTransformers'
 import { DatasetUserPermissions } from '../../domain/models/DatasetUserPermissions'
 import { transformDatasetUserPermissionsResponseToDatasetUserPermissions } from './transformers/datasetUserPermissionsTransformers'
@@ -26,6 +27,7 @@ import { DatasetVersionDiff } from '../../domain/models/DatasetVersionDiff'
 import { transformDatasetVersionDiffResponseToDatasetVersionDiff } from './transformers/datasetVersionDiffTransformers'
 import { DatasetDownloadCount } from '../../domain/models/DatasetDownloadCount'
 import { DatasetVersionSummarySubset } from '../../domain/models/DatasetVersionSummaryInfo'
+import { DatasetVersionSubset } from '../../domain/models/DatasetVersionSubset'
 import { DatasetLinkedCollection } from '../../domain/models/DatasetLinkedCollection'
 import { CitationFormat } from '../../domain/models/CitationFormat'
 import { transformDatasetLinkedCollectionsResponseToDatasetLinkedCollection } from './transformers/datasetLinkedCollectionsTransformers'
@@ -40,6 +42,7 @@ import { DatasetUploadLimits } from '../../domain/models/DatasetUploadLimits'
 import { DatasetReview } from '../../domain/models/DatasetReview'
 import { transformDatasetReviewsResponseToDatasetReviews } from './transformers/datasetReviewTransformers'
 import { ExportedDatasetMetadata } from '../../domain/models/ExportedDatasetMetadata'
+import { DatasetPayload } from './transformers/DatasetPayload'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -371,6 +374,42 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
       .then((response) => ({
         summaries: response.data.data,
         totalCount: response.data.totalCount
+      }))
+      .catch((error) => {
+        throw error
+      })
+  }
+
+  public async getDatasetVersions(
+    datasetId: string | number,
+    limit?: number,
+    offset?: number,
+    excludeMetadataBlocks?: boolean,
+    keepRawFields?: boolean
+  ): Promise<DatasetVersionSubset> {
+    const queryParams = new URLSearchParams()
+
+    if (limit) {
+      queryParams.set('limit', limit.toString())
+    }
+
+    if (offset) {
+      queryParams.set('offset', offset.toString())
+    }
+
+    if (excludeMetadataBlocks !== undefined) {
+      queryParams.set('excludeMetadataBlocks', excludeMetadataBlocks.toString())
+    }
+
+    return this.doGet(
+      this.buildApiEndpoint(this.datasetsResourceName, 'versions', datasetId),
+      true,
+      queryParams
+    )
+      .then((response) => ({
+        versions: response.data.data.map((x: DatasetPayload) =>
+          transformVersionPayloadToDataset(x, keepRawFields ?? false)
+        )
       }))
       .catch((error) => {
         throw error

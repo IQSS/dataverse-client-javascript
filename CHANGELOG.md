@@ -8,16 +8,6 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
-- Guestbooks: Added `editGuestbook` use case.
-- Guestbooks: Added `getGuestbookResponsesByGuestbookId` use case and repository support for retrieving paginated guestbook responses with total count as structured JSON.
-- Guestbooks: Added `downloadGuestbookResponsesByCollectionId` and `downloadGuestbookResponsesOfAGuestbook` use cases and repository support for exporting guestbook responses as raw CSV content.
-- Guestbooks: Added optional `includeStats` support to `getGuestbooksByCollectionId`, returning `usageCount` and `responseCount` when requested.
-- Files: Added `getFileCitationByFormat` use case, repository method, and `FileCitationFormat` enum to support Dataverse file citation exports in `EndNote`, `RIS`, `BibTeX`, `CSL`, and `Internal` formats.
-- Datasets: Added `getDatasetReviews` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/reviews`, for retrieving review datasets associated with a dataset by persistent id or numeric id.
-- Datasets: Added `exportDatasetMetadata` use case, repository method, and `ExportedDatasetMetadata` response type to support exporting dataset metadata by numeric id or persistent id through Dataverse endpoint `GET /datasets/export`.
-- Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
-- Collections: Added theme information when retrieving a collection using `getCollection`.
-- Collections: Added `setDefaultContributorRole` use case.
 - Datasets: `listDatasetTreeNode` use case and repository method backing `GET /datasets/{id}/versions/{versionId}/tree` for paginated, lazy listing of folders/files inside a dataset version. Returns `FileTreePage` with folder-first ordering, opaque keyset cursors, and per-file `downloadUrl`. The per-file `access` marker is one of `retentionExpired`, `restricted`, `embargoed`, or `public` (resolved in that order), and folder `counts` carry the matching mutually exclusive `restricted`/`embargoed`/`retentionExpired` buckets.
 - Datasets: `iterateDatasetTreeNode` async generator that walks the cursor chain so callers can consume one folder's children without driving pagination by hand.
 - Core: re-export `DataverseApiAuthMechanism` from the public surface so consumers of the standalone reusable bundles (e.g. `dv-tree-view`, `dv-uploader`) can import it without reaching into `core/...`.
@@ -31,6 +21,27 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 ### Fixed
 
 ### Removed
+
+## [v2.3.0] -- 2026-10-08
+
+### Added
+
+- Datasets: Added optional `templateId` support to `createDataset` requests and `getDataset` responses.
+- Guestbooks: Added `editGuestbook` use case.
+- Guestbooks: Added `getGuestbookResponsesByGuestbookId` use case and repository support for retrieving paginated guestbook responses with total count as structured JSON.
+- Guestbooks: Added `downloadGuestbookResponsesByCollectionId` and `downloadGuestbookResponsesOfAGuestbook` use cases and repository support for exporting guestbook responses as raw CSV content.
+- Guestbooks: Added optional `includeStats` support to `getGuestbooksByCollectionId`, returning `usageCount` and `responseCount` when requested.
+- Files: Added `getFileCitationByFormat` use case, repository method, and `FileCitationFormat` enum to support Dataverse file citation exports in `EndNote`, `RIS`, `BibTeX`, `CSL`, and `Internal` formats.
+- Datasets: Added `getDatasetReviews` use case and repository method to support Dataverse endpoint `GET /datasets/{identifier}/reviews`, for retrieving review datasets associated with a dataset by persistent id or numeric id.
+- Datasets: Added `exportDatasetMetadata` use case, repository method, and `ExportedDatasetMetadata` response type to support exporting dataset metadata by numeric id or persistent id through Dataverse endpoint `GET /datasets/export`.
+- Datasets: Added `getDatasetVersions` use case.
+- Collections: Added `allowedDatasetTypes` field to the [Collection](./src/collections/domain/models/Collection.ts) model. This field is optional and only populated the feature is enabled on the installation and configured on the collection.
+- Collections: Added theme information when retrieving a collection using `getCollection`.
+- Collections: Added `setDefaultContributorRole` use case.
+
+### Changed
+
+- Files: Added an optional dataset `version` parameter to `getFileCitationByFormat` for version-specific file citation exports.
 
 ## [v2.2.0] -- 2026-04-24
 
@@ -59,7 +70,7 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Changed
 
-- Add pagination query parameters to Dataset Version Summaries and File Version Summaries use cases.
+- Add pagination query parameters to Dataset Version Summeries and File Version Summaries use cases.
 - Templates: Rename `CreateDatasetTemplateDTO` to `CreateTemplateDTO`.
 - Templates: Rename `createDatasetTemplate` repository method to `createTemplate`.
 - Templates: Rename `getDatasetTemplates` repository method to `getTemplatesByCollectionId`.

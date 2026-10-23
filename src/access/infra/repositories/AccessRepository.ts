@@ -142,7 +142,7 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
     return fetchHeaders
   }
 
-  private async parseResponseBody(response: Response): Promise<any> {
+  private async parseResponseBody(response: Response): Promise<FetchResponseBody | string> {
     const contentType = response.headers.get('content-type') ?? ''
 
     if (contentType.includes('application/json')) {
@@ -158,7 +158,7 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
     }
   }
 
-  private buildFetchErrorMessage(status: number, responseData: any): string {
+  private buildFetchErrorMessage(status: number, responseData: FetchResponseBody | string): string {
     const message =
       typeof responseData === 'string'
         ? responseData
@@ -167,13 +167,21 @@ export class AccessRepository extends ApiRepository implements IAccessRepository
     return `[${status}] ${message}`
   }
 
-  private getSignedUrlOrThrow(responseData: any): string {
-    const signedUrl = responseData?.data?.signedUrl
+  private getSignedUrlOrThrow(responseData: FetchResponseBody | string): string {
+    const signedUrl = typeof responseData === 'string' ? undefined : responseData?.data?.signedUrl
 
     if (typeof signedUrl !== 'string' || signedUrl.length === 0) {
       throw new WriteError('Missing signedUrl in access download response.')
     }
 
     return signedUrl
+  }
+}
+
+interface FetchResponseBody {
+  message?: string
+  data?: {
+    message?: string
+    signedUrl?: unknown
   }
 }

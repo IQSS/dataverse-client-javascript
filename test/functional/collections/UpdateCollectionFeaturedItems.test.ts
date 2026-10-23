@@ -18,7 +18,6 @@ import {
   CONTENT_FIELD_WITH_ALL_TAGS,
   createCollectionViaApi,
   deleteCollectionViaApi,
-  EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS,
   publishCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import {
@@ -167,7 +166,7 @@ describe('execute', () => {
     expect(secondItemResponse.imageFileName).toBeUndefined()
 
     expect(normalizeHtml(thirdItemResponse.content)).toEqual(
-      normalizeHtml(EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS)
+      normalizeHtml(CONTENT_FIELD_WITH_ALL_TAGS)
     )
     expect(thirdItemResponse.displayOrder).toBe(newFeaturedItems[2].displayOrder)
     expect(thirdItemResponse.imageFileName).toEqual('featured-item-test-image-3.png')

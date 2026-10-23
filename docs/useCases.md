@@ -55,6 +55,7 @@ The different use cases currently available in the package are classified below,
     - [Get User Permissions on a Dataset](#get-user-permissions-on-a-dataset)
     - [Get Differences between Two Dataset Versions](#get-differences-between-two-dataset-versions)
     - [List All Datasets](#list-all-datasets)
+    - [Get Dataset Versions](#get-dataset-versions)
     - [Get Dataset Versions Summaries](#get-dataset-versions-summaries)
     - [Get Dataset Linked Collections](#get-dataset-linked-collections)
     - [Get Dataset Available Categories](#get-dataset-available-categories)
@@ -999,6 +1000,8 @@ There is an optional third parameter called `includeDeaccessioned`, which indica
 
 There is an optional fourth parameter called `keepRawFields`, which indicates whether or not to keep the metadata fields as they are and avoid the transformation to Markdown. The default value is `false`.
 
+When the dataset is associated with a template, the returned `Dataset` includes the optional `templateId` field containing that template's numeric identifier.
+
 #### Get Dataset By Private URL Token
 
 Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given an associated Private URL Token.
@@ -1286,6 +1289,34 @@ Note that `collectionId` is an optional parameter to filter datasets by collecti
 
 The `DatasetPreviewSubset`returned instance contains a property called `totalDatasetCount` which is necessary for pagination.
 
+#### Get Dataset Versions
+
+Returns an array of [Dataset](../src/datasets/domain/models/Dataset.ts) that contains information about every specific version.
+
+##### Example call:
+
+```typescript
+import { getDatasetVersions } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+
+getDatasetVersions.execute(datasetId).then((datasetVersions: DatasetVersionSubset) => {
+  /* ... */
+})
+
+/* ... */
+```
+
+_See [use case](../src/datasets/domain/useCases/GetDatasetVersions.ts) implementation_.
+
+- The `datasetId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+- **limit**: (number) Limit for pagination.
+- **offset**: (number) Offset for pagination.
+- **excludeMetadataBlocks**: (boolean) Exclude metadata blocks (default: false).
+- Note that the **excludeFiles** parameter, which is available on Dataverse's "List Versions of a Dataset" API, is not available here. The list of files can be retrieved using the separate use case [List Files in a Dataset](#list-files-in-a-dataset).
+
 #### Get Dataset Versions Summaries
 
 Returns the total count of versions and an array of [DatasetVersionSummaryInfo](../src/datasets/domain/models/DatasetVersionSummaryInfo.ts) that contains information about what changed in every specific version.
@@ -1451,7 +1482,7 @@ createDataset.execute(datasetDTO).then((newDatasetIds: CreatedDatasetIdentifiers
 
 _See [use case](../src/datasets/domain/useCases/CreateDataset.ts) implementation_.
 
-The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call. If you want the dataset type to be anything other than dataset, first [check available dataset types](#get-dataset-available-dataset-types) and then add the name of the dataset type as the third parameter.
+The above example creates the new dataset in the root collection since no collection identifier is specified. If you want to create the dataset in a different collection, you must add the collection identifier as a second parameter in the use case call. If you want the dataset type to be anything other than dataset, first [check available dataset types](#get-dataset-available-dataset-types) and then add the name of the dataset type as the third parameter. To create from an applicable metadata template, set its numeric identifier as `datasetDTO.templateId`; the SDK sends it as the top-level `templateId` field in the request body.
 
 The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models/CreatedDatasetIdentifiers.ts) object, which includes the persistent and numeric identifiers of the created dataset.
 
@@ -2093,9 +2124,11 @@ import { FileCitationFormat, getFileCitationByFormat } from '@iqss/dataverse-cli
 
 const fileId = 3
 
-getFileCitationByFormat.execute(fileId, FileCitationFormat.BIBTEX).then((citationText: string) => {
-  /* ... */
-})
+getFileCitationByFormat
+  .execute(fileId, FileCitationFormat.BIBTEX, '1.0')
+  .then((citationText: string) => {
+    /* ... */
+  })
 
 /* ... */
 ```
@@ -2103,6 +2136,8 @@ getFileCitationByFormat.execute(fileId, FileCitationFormat.BIBTEX).then((citatio
 _See [use case](../src/files/domain/useCases/GetFileCitationByFormat.ts) implementation_.
 
 The `fileId` parameter can be a string, for persistent identifiers, or a number, for numeric identifiers.
+
+The optional third parameter, `version`, selects the **dataset version** whose file metadata is used in the citation. It accepts a numbered version such as `1.0`, or `DatasetNotNumberedVersion.DRAFT`, `LATEST`, or `LATEST_PUBLISHED` (`:draft`, `:latest`, `:latest-published`). When omitted, no version query parameter is sent, it will return the `:latest`.
 
 The `format` parameter must be one of the available [FileCitationFormat](../src/files/domain/models/FileCitationFormat.ts) enum values: `FileCitationFormat.ENDNOTE`, `FileCitationFormat.RIS`, `FileCitationFormat.BIBTEX`, `FileCitationFormat.CSL`, or `FileCitationFormat.INTERNAL`.
 

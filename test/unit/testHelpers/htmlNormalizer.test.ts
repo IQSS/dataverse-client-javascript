@@ -1,7 +1,7 @@
 import { normalizeHtml } from '../../testHelpers/html/htmlNormalizer'
 import {
   CONTENT_FIELD_WITH_ALL_TAGS,
-  EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS
+  SERVER_FORMATTED_CONTENT_FIELD_WITH_ALL_TAGS
 } from '../../testHelpers/collections/collectionHelper'
 
 describe('normalizeHtml', () => {
@@ -28,9 +28,29 @@ describe('normalizeHtml', () => {
       expect(normalizeHtml('<P CLASS="x">t</P>')).toEqual(normalizeHtml('<p class="x">t</p>'))
     })
 
-    test('should treat the sent and pretty-printed forms of the featured item fixture as equal', () => {
+    test('should ignore the order of attributes whose values contain angle brackets', () => {
+      expect(normalizeHtml('<a title="A > B" href="/example">link</a>')).toEqual(
+        normalizeHtml('<a href="/example" title="A > B">link</a>')
+      )
+    })
+
+    test('should ignore the order of attributes quoted with single quotes', () => {
+      expect(normalizeHtml("<a title='A > B' href='/example'>link</a>")).toEqual(
+        normalizeHtml('<a href="/example" title="A > B">link</a>')
+      )
+    })
+
+    test('should ignore equivalent spellings of a void element', () => {
+      expect(normalizeHtml('<p>a<br>b</p>')).toEqual(normalizeHtml('<p>a<br/>b</p>'))
+    })
+
+    test('should ignore equivalent spellings of an escaped character', () => {
+      expect(normalizeHtml('<p>a &amp; b</p>')).toEqual(normalizeHtml('<p>a & b</p>'))
+    })
+
+    test('should treat the sent and server-returned forms of the featured item fixture as equal', () => {
       expect(normalizeHtml(CONTENT_FIELD_WITH_ALL_TAGS)).toEqual(
-        normalizeHtml(EXPECTED_CONTENT_FIELD_WITH_ALL_TAGS)
+        normalizeHtml(SERVER_FORMATTED_CONTENT_FIELD_WITH_ALL_TAGS)
       )
     })
   })
@@ -52,6 +72,12 @@ describe('normalizeHtml', () => {
       )
     })
 
+    test('should not ignore a differing attribute value that contains angle brackets', () => {
+      expect(normalizeHtml('<a title="A > B" href="/example">link</a>')).not.toEqual(
+        normalizeHtml('<a title="A > C" href="/example">link</a>')
+      )
+    })
+
     test('should not ignore differing structure', () => {
       expect(normalizeHtml('<ul><li>a</li><li>b</li></ul>')).not.toEqual(
         normalizeHtml('<ul><li>a</li></ul>')
@@ -65,6 +91,12 @@ describe('normalizeHtml', () => {
     test('should preserve whitespace inside a preformatted block', () => {
       expect(normalizeHtml('<pre><code>  indented\n  lines</code></pre>')).not.toEqual(
         normalizeHtml('<pre><code>indented lines</code></pre>')
+      )
+    })
+
+    test('should preserve the whitespace that separates inline elements in the featured item fixture', () => {
+      expect(normalizeHtml(CONTENT_FIELD_WITH_ALL_TAGS)).not.toEqual(
+        normalizeHtml(CONTENT_FIELD_WITH_ALL_TAGS.replace('</strong> <em', '</strong><em'))
       )
     })
 

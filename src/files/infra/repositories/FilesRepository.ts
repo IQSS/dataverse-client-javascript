@@ -237,12 +237,14 @@ export class FilesRepository extends ApiRepository implements IFilesRepository {
 
   public async getFileCitationByFormat(
     fileId: number | string,
-    format: FileCitationFormat
+    format: FileCitationFormat,
+    version?: string
   ): Promise<string> {
-    return this.doGet(
-      this.buildApiEndpoint(this.accessResourceName, `citation/${format}`, fileId),
-      true
-    )
+    const endpoint = this.buildApiEndpoint(this.accessResourceName, `citation/${format}`, fileId)
+    const request =
+      version === undefined ? this.doGet(endpoint, true) : this.doGet(endpoint, true, { version })
+
+    return request
       .then((response) =>
         typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
       )

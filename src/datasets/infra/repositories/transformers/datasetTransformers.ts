@@ -32,6 +32,7 @@ const turndownService = new TurndownService()
 
 export interface NewDatasetRequestPayload {
   datasetType?: string
+  templateId?: number
   datasetVersion: {
     license?: DatasetLicense
     metadataBlocks: Record<string, MetadataBlockRequestPayload>
@@ -102,6 +103,7 @@ export const transformDatasetModelToNewDatasetRequestPayload = (
 ): NewDatasetRequestPayload => {
   return {
     datasetType,
+    ...(dataset.templateId !== undefined && { templateId: dataset.templateId }),
     datasetVersion: {
       ...(dataset.license && { license: dataset.license }),
       metadataBlocks: transformMetadataBlockModelsToRequestPayload(
@@ -254,10 +256,12 @@ export const transformVersionPayloadToDataset = (
         studyCompletion: transformPayloadText(keepRawFields, versionPayload.studyCompletion)
       }
     },
-    metadataBlocks: transformPayloadToDatasetMetadataBlocks(
-      versionPayload.metadataBlocks,
-      keepRawFields
-    ),
+    ...(versionPayload.metadataBlocks && {
+      metadataBlocks: transformPayloadToDatasetMetadataBlocks(
+        versionPayload.metadataBlocks,
+        keepRawFields
+      )
+    }),
     ...(versionPayload.isPartOf && {
       isPartOf: transformPayloadToOwnerNode(versionPayload.isPartOf)
     })
@@ -298,6 +302,9 @@ export const transformVersionPayloadToDataset = (
   }
   if ('guestbookId' in versionPayload) {
     datasetModel.guestbookId = versionPayload.guestbookId
+  }
+  if ('templateId' in versionPayload) {
+    datasetModel.templateId = versionPayload.templateId
   }
   if ('datasetType' in versionPayload) {
     datasetModel.datasetType = versionPayload.datasetType

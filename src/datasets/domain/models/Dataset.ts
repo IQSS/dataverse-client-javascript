@@ -13,6 +13,7 @@ export interface Dataset {
   publicationDate?: string
   citationDate?: string
   guestbookId?: number
+  templateId?: number
   metadataBlocks: DatasetMetadataBlocks
   isPartOf: DvObjectOwnerNode
   datasetType?: string
