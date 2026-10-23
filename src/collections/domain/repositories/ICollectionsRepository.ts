@@ -5,7 +5,7 @@ import { CollectionFacet } from '../models/CollectionFacet'
 import { FeaturedItem } from '../models/FeaturedItem'
 import { CollectionItemSubset } from '../models/CollectionItemSubset'
 import { MyDataCollectionItemSubset } from '../models/MyDataCollectionItemSubset'
-import { CollectionSearchCriteria } from '../models/CollectionSearchCriteria'
+import { CollectionSearchCriteria, OrderType, SortType } from '../models/CollectionSearchCriteria'
 import { CollectionUserPermissions } from '../models/CollectionUserPermissions'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
@@ -59,7 +59,13 @@ export interface ICollectionsRepository {
     limit?: number,
     selectedPage?: number,
     searchText?: string,
-    otherUserName?: string
+    otherUserName?: string,
+    showCollections?: boolean,
+    metadataFields?: `${string}:${string}`[],
+    keepRawFields?: boolean,
+    filterQueries?: string | string[],
+    sort?: SortType,
+    order?: OrderType
   ): Promise<MyDataCollectionItemSubset>
   updateCollection(
     collectionIdOrAlias: number | string,
