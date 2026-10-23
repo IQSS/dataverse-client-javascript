@@ -4,6 +4,7 @@ export interface DatasetDTO {
   license?: DatasetLicense
   templateId?: number
   metadataBlockValues: DatasetMetadataBlockValuesDTO[]
+  datasetType?: string
 }
 
 export interface DatasetMetadataBlockValuesDTO {
