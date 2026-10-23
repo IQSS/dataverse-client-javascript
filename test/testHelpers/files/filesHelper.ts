@@ -271,3 +271,18 @@ export const singlepartFileExistsInBucket = async (fileUrl: string): Promise<boo
       return false
     })
 }
+
+export const getObjectTagsFromBucket = async (fileUrl: string): Promise<Record<string, string>> => {
+  const separator = fileUrl.includes('?') ? '&' : '?'
+  const response = await axios.get<string>(`${fileUrl}${separator}tagging=`, {
+    responseType: 'text'
+  })
+  const tags: Record<string, string> = {}
+  const tagPattern = /<Tag><Key>([^<]*)<\/Key><Value>([^<]*)<\/Value><\/Tag>/g
+  let match = tagPattern.exec(response.data)
+  while (match !== null) {
+    tags[match[1]] = match[2]
+    match = tagPattern.exec(response.data)
+  }
+  return tags
+}

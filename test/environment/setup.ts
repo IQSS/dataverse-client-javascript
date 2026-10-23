@@ -2,6 +2,10 @@ import * as fs from 'fs'
 import { DockerComposeEnvironment, Wait } from 'testcontainers'
 import axios from 'axios'
 import { TestConstants } from '../testHelpers/TestConstants'
+import {
+  DATASET_TREE_ENDPOINT_AVAILABLE_ENV_VAR,
+  isDatasetTreeEndpointAvailableViaApi
+} from '../testHelpers/datasets/datasetTreeHelper'
 
 const COMPOSE_FILE = 'docker-compose.yml'
 
@@ -17,6 +21,7 @@ const API_KEY_USER_PASSWORD = 'admin1'
 export default async function setupTestEnvironment(): Promise<void> {
   await setupContainers(SKIP_CONTAINERS) //Set skipContainers to true to skip container setup and run tests against an already running instance
   await setupApiKey()
+  await detectDatasetTreeEndpoint()
 }
 
 async function setupContainers(skipContainers?: boolean): Promise<void> {
@@ -48,4 +53,14 @@ async function setupApiKey(): Promise<void> {
       console.error('Tests setup: Error while obtaining API key')
     })
   console.log('API key obtained')
+}
+
+async function detectDatasetTreeEndpoint(): Promise<void> {
+  const available = await isDatasetTreeEndpointAvailableViaApi().catch(() => false)
+  process.env[DATASET_TREE_ENDPOINT_AVAILABLE_ENV_VAR] = String(available)
+  console.log(
+    available
+      ? 'Dataset tree endpoint available; tree integration tests will run'
+      : 'Dataset tree endpoint missing on this Dataverse; tree integration tests will be skipped'
+  )
 }
