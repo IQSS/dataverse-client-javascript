@@ -1,7 +1,7 @@
-import { RepositoryError, RepositoryErrorDetails } from './RepositoryError'
+import { RepositoryError } from './RepositoryError'
 
 export class ReadError extends RepositoryError {
-  constructor(reason?: string, details?: RepositoryErrorDetails) {
-    super('There was an error when reading the resource.', reason, details)
+  constructor(reason?: string) {
+    super('There was an error when reading the resource.', reason)
   }
 }

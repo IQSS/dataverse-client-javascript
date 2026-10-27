@@ -16,5 +16,4 @@ export interface AuthenticatedUser {
   affiliation?: string
   position?: string
   emailLastConfirmed?: string
-  authenticatedOrcid?: string
 }

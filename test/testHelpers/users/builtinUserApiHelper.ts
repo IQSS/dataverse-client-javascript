@@ -25,15 +25,3 @@ export const createBuiltInUser = async (userName: string): Promise<string> => {
     throw new Error(`Error while creating API token`)
   }
 }
-
-export const getAuthenticatedUserViaAdminApi = async (
-  userIdentifier: string
-): Promise<Record<string, unknown>> => {
-  return axios
-    .get(`${TestConstants.TEST_API_URL}/admin/authenticatedUsers/${userIdentifier}`)
-    .then((response) => response.data.data)
-}
-
-export const deleteAuthenticatedUserViaAdminApi = async (userIdentifier: string): Promise<void> => {
-  await axios.delete(`${TestConstants.TEST_API_URL}/admin/authenticatedUsers/${userIdentifier}`)
-}
