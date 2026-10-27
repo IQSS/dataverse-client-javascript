@@ -8,12 +8,6 @@ import {
   transformRecreateApiTokenResponseToApiTokenInfo
 } from './transformers/apiTokenInfoTransformers'
 import { UserDTO } from '../../domain/dtos/UserDTO'
-import { SignUpDTO } from '../../domain/dtos/SignUpDTO'
-import { OrcidSignUpCallbackDTO } from '../../domain/dtos/OrcidSignUpCallbackDTO'
-import { SignUpResult } from '../../domain/models/SignUpResult'
-import { OrcidSignUpConnection } from '../../domain/models/OrcidSignUpConnection'
-import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
-import { transformOrcidSignUpConnectionResponseToOrcidSignUpConnection } from './transformers/orcidSignUpConnectionTransformers'
 
 export class UsersRepository extends ApiRepository implements IUsersRepository {
   private readonly usersResourceName: string = 'users'
@@ -58,49 +52,6 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
       })
   }
 
-  public async signUp(signUpDTO: SignUpDTO): Promise<SignUpResult> {
-    return this.doPost(
-      `/${this.usersResourceName}/signup`,
-      signUpDTO,
-      {},
-      ApiConstants.CONTENT_TYPE_APPLICATION_JSON,
-      false
-    )
-      .then((response): SignUpResult => {
-        if (response.status === 202) {
-          return { status: 'pending' }
-        }
-        return { status: 'created', identifier: response.data.data.identifier }
-      })
-      .catch((error) => {
-        throw error
-      })
-  }
-
-  public async getOrcidSignUpAuthorizationUrl(redirectUri: string): Promise<string> {
-    return this.doGet(`/${this.usersResourceName}/signup/orcid/authorize`, false, { redirectUri })
-      .then((response) => response.data.data.authorizationUrl)
-      .catch((error) => {
-        throw error
-      })
-  }
-
-  public async connectOrcidForSignUp(
-    callback: OrcidSignUpCallbackDTO
-  ): Promise<OrcidSignUpConnection> {
-    return this.doPost(
-      `/${this.usersResourceName}/signup/orcid`,
-      callback,
-      {},
-      ApiConstants.CONTENT_TYPE_APPLICATION_JSON,
-      false
-    )
-      .then((response) => transformOrcidSignUpConnectionResponseToOrcidSignUpConnection(response))
-      .catch((error) => {
-        throw error
-      })
-  }
-
   private getAuthenticatedUserFromResponse(response: AxiosResponse): AuthenticatedUser {
     const responseData = response.data.data
     return {
@@ -120,8 +71,7 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
       deactivatedTime: responseData.deactivatedTime,
       affiliation: responseData.affiliation,
       position: responseData.position,
-      emailLastConfirmed: responseData.emailLastConfirmed,
-      authenticatedOrcid: responseData.authenticatedOrcid
+      emailLastConfirmed: responseData.emailLastConfirmed
     }
   }
 }
