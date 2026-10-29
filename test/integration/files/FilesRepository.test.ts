@@ -69,7 +69,7 @@ describe('FilesRepository', () => {
 
   const testCategoryName = 'testCategory'
 
-  const nonExistentFiledId = 200
+  const nonExistentFiledId = 999999999
 
   const latestDatasetVersionId = DatasetNotNumberedVersion.LATEST
 

@@ -15,15 +15,22 @@ import { MultipartAbortError } from './errors/MultipartAbortError'
 import { FileUploadCancelError } from './errors/FileUploadCancelError'
 import { ApiConstants } from '../../../core/infra/repositories/ApiConstants'
 
+export interface DirectUploadClientConfig {
+  maxMultipartRetries?: number
+  fileUploadTimeoutMs?: number
+}
+
 export class DirectUploadClient implements IDirectUploadClient {
   private filesRepository: IFilesRepository
   private maxMultipartRetries: number
+  private readonly fileUploadTimeoutMs: number
 
-  private readonly fileUploadTimeoutMs: number = 60_000
-
-  constructor(filesRepository: IFilesRepository, maxMultipartRetries = 5) {
+  constructor(filesRepository: IFilesRepository, config: DirectUploadClientConfig = {}) {
+    const normalized: DirectUploadClientConfig =
+      typeof config === 'number' ? { maxMultipartRetries: config } : config
     this.filesRepository = filesRepository
-    this.maxMultipartRetries = maxMultipartRetries
+    this.maxMultipartRetries = normalized.maxMultipartRetries ?? 5
+    this.fileUploadTimeoutMs = normalized.fileUploadTimeoutMs ?? 60_000
   }
 
   public async uploadFile(
@@ -59,11 +66,15 @@ export class DirectUploadClient implements IDirectUploadClient {
   ): Promise<void> {
     try {
       const arrayBuffer = await file.arrayBuffer()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/octet-stream'
+      }
+      const tag = destination.tagging ?? 'dv-state=temp'
+      if (tag !== '') {
+        headers['x-amz-tagging'] = tag
+      }
       await axios.put(destination.urls[0], arrayBuffer, {
-        headers: {
-          'Content-Type': 'application/octet-stream',
-          'x-amz-tagging': 'dv-state=temp'
-        },
+        headers,
         timeout: this.fileUploadTimeoutMs,
         signal: abortController.signal,
         onUploadProgress: (progressEvent) =>
@@ -115,6 +126,7 @@ export class DirectUploadClient implements IDirectUploadClient {
         eTags[`${index + 1}`] = eTag
       } catch (error) {
         if (axios.isCancel(error)) {
+          limitConcurrency.clearQueue()
           await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint as string)
           throw new FileUploadCancelError(file.name, datasetId)
         }
@@ -123,6 +135,7 @@ export class DirectUploadClient implements IDirectUploadClient {
           await new Promise((resolve) => setTimeout(resolve, backoffDelay))
           await uploadPart(destinationUrl, index, retries + 1)
         } else {
+          limitConcurrency.clearQueue()
           await this.abortMultipartUpload(file.name, datasetId, destination.abortEndpoint as string)
 
           const errorMessage =

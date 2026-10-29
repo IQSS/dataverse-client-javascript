@@ -5,6 +5,7 @@ export interface FileSingleUploadDestinationPayload {
   url: string
   partSize: number
   storageIdentifier: string
+  tagging?: string
 }
 
 export interface FileMultipartUploadDestinationPayload {
@@ -13,6 +14,7 @@ export interface FileMultipartUploadDestinationPayload {
   storageIdentifier: string
   complete?: string
   abort?: string
+  tagging?: string
 }
 
 export const transformUploadDestinationsResponseToUploadDestination = (
@@ -24,7 +26,8 @@ export const transformUploadDestinationsResponseToUploadDestination = (
     return {
       urls: [fileUploadDestinationsPayload.url],
       partSize: fileUploadDestinationsPayload.partSize,
-      storageId: fileUploadDestinationsPayload.storageIdentifier
+      storageId: fileUploadDestinationsPayload.storageIdentifier,
+      tagging: fileUploadDestinationsPayload.tagging
     }
   } else {
     return transformMultipartUploadDestinationsPayloadToMultipartUploadDestinationModel(
@@ -45,6 +48,7 @@ export const transformMultipartUploadDestinationsPayloadToMultipartUploadDestina
     partSize: fileUploadDestinationsPayload.partSize,
     storageId: fileUploadDestinationsPayload.storageIdentifier,
     abortEndpoint: fileUploadDestinationsPayload.abort?.substring(4),
-    completeEndpoint: fileUploadDestinationsPayload.complete?.substring(4)
+    completeEndpoint: fileUploadDestinationsPayload.complete?.substring(4),
+    tagging: fileUploadDestinationsPayload.tagging
   }
 }

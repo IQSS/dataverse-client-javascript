@@ -149,6 +149,48 @@ describe('FilesRepository', () => {
         expect(actual).toEqual(testMultipleFileUploadDestination)
       })
 
+      test('should return destination with tagging when single response includes tagging', async () => {
+        const tagging = 'dv-state=temp'
+        jest.spyOn(axios, 'get').mockResolvedValue({
+          data: {
+            status: 'OK',
+            data: {
+              ...createSingleFileUploadDestinationPayload(),
+              tagging
+            }
+          }
+        })
+        jest.spyOn(fs, 'statSync').mockReturnValue({ size: testFileSize } as fs.Stats)
+
+        const actual = await sut.getFileUploadDestination(testDatasetId, singlepartFile)
+
+        expect(actual).toEqual({
+          ...testSingleFileUploadDestination,
+          tagging
+        })
+      })
+
+      test('should return destination with tagging when multipart response includes tagging', async () => {
+        const tagging = 'dv-state=temp'
+        jest.spyOn(axios, 'get').mockResolvedValue({
+          data: {
+            status: 'OK',
+            data: {
+              ...createMultipartFileUploadDestinationPayload(),
+              tagging
+            }
+          }
+        })
+        jest.spyOn(fs, 'statSync').mockReturnValue({ size: testFileSize } as fs.Stats)
+
+        const actual = await sut.getFileUploadDestination(testDatasetId, multipartFile)
+
+        expect(actual).toEqual({
+          ...testMultipleFileUploadDestination,
+          tagging
+        })
+      })
+
       test('should return error on repository read error', async () => {
         jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
         jest.spyOn(fs, 'statSync').mockReturnValue({ size: testFileSize } as fs.Stats)
