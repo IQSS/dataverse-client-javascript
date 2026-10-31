@@ -38,6 +38,12 @@ import { DatasetReview } from '../../domain/models/DatasetReview'
 import { transformDatasetReviewsResponseToDatasetReviews } from './transformers/datasetReviewTransformers'
 import { ExportedDatasetMetadata } from '../../domain/models/ExportedDatasetMetadata'
 import { DatasetPayload } from './transformers/DatasetPayload'
+import { DatasetCurationStatus, DatasetReviewSubmission } from '../../domain/models/DatasetCuration'
+import {
+  transformCurationStatus,
+  transformCurrentCurationStatus,
+  transformAllowedCurationLabels
+} from './transformers/datasetCurationTransformers'
 
 export interface GetAllDatasetPreviewsQueryParams {
   per_page?: number
@@ -47,6 +53,55 @@ export interface GetAllDatasetPreviewsQueryParams {
 
 export class DatasetsRepository extends ApiRepository implements IDatasetsRepository {
   private readonly datasetsResourceName: string = 'datasets'
+
+  private buildCurationEndpoint(datasetId: number | string, operation: string): string {
+    return this.buildApiEndpoint(
+      this.datasetsResourceName,
+      operation,
+      typeof datasetId === 'string' ? encodeURIComponent(datasetId) : datasetId
+    )
+  }
+
+  public async getAllowedDatasetCurationLabels(datasetId: number | string): Promise<string[]> {
+    const response = await this.doGet(
+      this.buildCurationEndpoint(datasetId, 'allowedCurationLabels'),
+      true
+    )
+    return transformAllowedCurationLabels(response.data.data)
+  }
+
+  public async getDatasetCurationStatus(
+    datasetId: number | string
+  ): Promise<DatasetCurationStatus | null> {
+    const response = await this.doGet(this.buildCurationEndpoint(datasetId, 'curationStatus'), true)
+    return transformCurrentCurationStatus(response.data.data)
+  }
+
+  public async getDatasetCurationStatusHistory(
+    datasetId: number | string
+  ): Promise<DatasetCurationStatus[]> {
+    const response = await this.doGet(
+      this.buildCurationEndpoint(datasetId, 'curationStatus'),
+      true,
+      { includeHistory: true }
+    )
+    return response.data.data.map(transformCurationStatus)
+  }
+
+  public async setDatasetCurationStatus(datasetId: number | string, label: string): Promise<void> {
+    await this.doPut(this.buildCurationEndpoint(datasetId, 'curationStatus'), '', { label })
+  }
+
+  public async deleteDatasetCurationStatus(datasetId: number | string): Promise<void> {
+    await this.doDelete(this.buildCurationEndpoint(datasetId, 'curationStatus'))
+  }
+
+  public async submitDatasetForReview(
+    datasetId: number | string
+  ): Promise<DatasetReviewSubmission> {
+    const response = await this.doPost(this.buildCurationEndpoint(datasetId, 'submitForReview'), '')
+    return { inReview: response.data.data.inReview, message: response.data.data.message }
+  }
 
   public async getDatasetSummaryFieldNames(): Promise<string[]> {
     return this.doGet(this.buildApiEndpoint(this.datasetsResourceName, 'summaryFieldNames'))

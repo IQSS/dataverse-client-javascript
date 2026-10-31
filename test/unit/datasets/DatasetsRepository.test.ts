@@ -1290,3 +1290,171 @@ describe('DatasetsRepository', () => {
     })
   })
 })
+
+describe('DatasetsRepository curation methods', () => {
+  const sut = new DatasetsRepository()
+  const status = {
+    label: 'Privacy Review',
+    createTime: '2026-10-14 12:00:00',
+    assigner: '@curator'
+  }
+  const label = 'Author contacted & approval + résumé / final?'
+  const operations = [
+    {
+      name: 'getAllowedDatasetCurationLabels',
+      verb: 'get' as const,
+      path: 'allowedCurationLabels',
+      params: {},
+      data: { message: 'Privacy Review,Final Approval' },
+      expected: ['Privacy Review', 'Final Approval'],
+      execute: (id: number | string) => sut.getAllowedDatasetCurationLabels(id)
+    },
+    {
+      name: 'getDatasetCurationStatus',
+      verb: 'get' as const,
+      path: 'curationStatus',
+      params: {},
+      data: status,
+      expected: status,
+      execute: (id: number | string) => sut.getDatasetCurationStatus(id)
+    },
+    {
+      name: 'getDatasetCurationStatusHistory',
+      verb: 'get' as const,
+      path: 'curationStatus',
+      params: { includeHistory: true },
+      data: [status],
+      expected: [status],
+      execute: (id: number | string) => sut.getDatasetCurationStatusHistory(id)
+    },
+    {
+      name: 'setDatasetCurationStatus',
+      verb: 'put' as const,
+      path: 'curationStatus',
+      params: { label },
+      data: { message: 'Updated' },
+      expected: undefined,
+      execute: (id: number | string) => sut.setDatasetCurationStatus(id, label)
+    },
+    {
+      name: 'deleteDatasetCurationStatus',
+      verb: 'delete' as const,
+      path: 'curationStatus',
+      params: {},
+      data: { message: 'Deleted' },
+      expected: undefined,
+      execute: (id: number | string) => sut.deleteDatasetCurationStatus(id)
+    },
+    {
+      name: 'submitDatasetForReview',
+      verb: 'post' as const,
+      path: 'submitForReview',
+      params: {},
+      data: { inReview: true, message: 'Submitted for review' },
+      expected: { inReview: true, message: 'Submitted for review' },
+      execute: (id: number | string) => sut.submitDatasetForReview(id)
+    }
+  ]
+
+  beforeEach(() => {
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.API_KEY,
+      TestConstants.TEST_DUMMY_API_KEY
+    )
+  })
+  afterEach(() => jest.restoreAllMocks())
+
+  describe.each(operations)('$name', ({ verb, path, params, data, expected, execute }) => {
+    test.each([42, 'doi:10.5072/FK2/A+B&C?#résumé'])(
+      'should send an authenticated request for %s',
+      async (id) => {
+        const request = jest.spyOn(axios, verb).mockResolvedValue({ data: { data } })
+        const endpoint =
+          typeof id === 'number'
+            ? `/datasets/${id}/${path}`
+            : `/datasets/:persistentId/${path}?persistentId=${encodeURIComponent(id)}`
+        const config = {
+          ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY,
+          params
+        }
+
+        expect(await execute(id)).toEqual(expected)
+        const url = `${TestConstants.TEST_API_URL}${endpoint}`
+        const args = verb === 'post' || verb === 'put' ? [url, '', config] : [url, config]
+        expect(request).toHaveBeenCalledWith(...args)
+      }
+    )
+
+    test('should support session authentication', async () => {
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+      const request = jest.spyOn(axios, verb).mockResolvedValue({ data: { data } })
+      await execute(42)
+      const config = {
+        ...TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE,
+        params
+      }
+      const url = `${TestConstants.TEST_API_URL}/datasets/42/${path}`
+      const args = verb === 'post' || verb === 'put' ? [url, '', config] : [url, config]
+      expect(request).toHaveBeenCalledWith(...args)
+    })
+
+    test('should preserve backend permission errors', async () => {
+      jest
+        .spyOn(axios, verb)
+        .mockRejectedValue({ response: { status: 403, data: { message: 'Permission denied' } } })
+      await expect(execute(42)).rejects.toEqual(
+        verb === 'get'
+          ? new ReadError('[403] Permission denied')
+          : new WriteError('[403] Permission denied')
+      )
+    })
+  })
+
+  test.each([{ message: '' }, ''])('should normalize empty allowed labels %p', async (data) => {
+    jest.spyOn(axios, 'get').mockResolvedValue({ data: { data } })
+    expect(await sut.getAllowedDatasetCurationLabels(42)).toEqual([])
+  })
+
+  test('should preserve exact label whitespace', async () => {
+    jest
+      .spyOn(axios, 'get')
+      .mockResolvedValue({ data: { data: ' Privacy Review ,Final Approval' } })
+    expect(await sut.getAllowedDatasetCurationLabels(42)).toEqual([
+      ' Privacy Review ',
+      'Final Approval'
+    ])
+  })
+
+  test('should normalize an absent current status to null', async () => {
+    jest.spyOn(axios, 'get').mockResolvedValue({ data: { data: {} } })
+    expect(await sut.getDatasetCurationStatus(42)).toBeNull()
+  })
+
+  test('should preserve removal records and omitted legacy fields', async () => {
+    jest.spyOn(axios, 'get').mockResolvedValue({
+      data: {
+        data: [
+          { createTime: status.createTime, assigner: status.assigner },
+          { label: 'Legacy label' }
+        ]
+      }
+    })
+    expect(await sut.getDatasetCurationStatusHistory(42)).toStrictEqual([
+      { createTime: status.createTime, assigner: status.assigner },
+      { label: 'Legacy label' }
+    ])
+  })
+
+  test('should preserve a current removal record with no label', async () => {
+    const removal = { createTime: status.createTime, assigner: status.assigner }
+    jest.spyOn(axios, 'get').mockResolvedValue({ data: { data: removal } })
+
+    expect(await sut.getDatasetCurationStatus(42)).toStrictEqual(removal)
+  })
+
+  test('should return an empty history unchanged', async () => {
+    jest.spyOn(axios, 'get').mockResolvedValue({ data: { data: [] } })
+    expect(await sut.getDatasetCurationStatusHistory(42)).toEqual([])
+  })
+})

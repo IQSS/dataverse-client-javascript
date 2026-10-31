@@ -22,8 +22,16 @@ import { DatasetUploadLimits } from '../models/DatasetUploadLimits'
 import { DatasetReview } from '../models/DatasetReview'
 import { ExportedDatasetMetadata } from '../models/ExportedDatasetMetadata'
 import { DatasetNotNumberedVersion } from '../models/DatasetNotNumberedVersion'
+import { DatasetCurationStatus, DatasetReviewSubmission } from '../models/DatasetCuration'
 
 export interface IDatasetsRepository {
+  getAllowedDatasetCurationLabels(datasetId: number | string): Promise<string[]>
+  getDatasetCurationStatus(datasetId: number | string): Promise<DatasetCurationStatus | null>
+  getDatasetCurationStatusHistory(datasetId: number | string): Promise<DatasetCurationStatus[]>
+  setDatasetCurationStatus(datasetId: number | string, label: string): Promise<void>
+  deleteDatasetCurationStatus(datasetId: number | string): Promise<void>
+  submitDatasetForReview(datasetId: number | string): Promise<DatasetReviewSubmission>
+
   getDataset(
     datasetId: number | string,
     datasetVersionId: string,

@@ -44,6 +44,9 @@ The different use cases currently available in the package are classified below,
     - [Unset Template As Default](#unset-template-as-default)
 - [Datasets](#Datasets)
   - [Datasets read use cases](#datasets-read-use-cases)
+    - [Get Allowed Dataset Curation Labels](#get-allowed-dataset-curation-labels)
+    - [Get Dataset Curation Status](#get-dataset-curation-status)
+    - [Get Dataset Curation Status History](#get-dataset-curation-status-history)
     - [Get a Dataset](#get-a-dataset)
     - [Get Dataset By Private URL Token](#get-dataset-by-private-url-token)
     - [Get Dataset Citation Text](#get-dataset-citation-text)
@@ -65,6 +68,9 @@ The different use cases currently available in the package are classified below,
     - [Get Dataset Available Dataset Type](#get-dataset-available-dataset-type)
     - [Get Dataset Upload Limits](#get-dataset-upload-limits)
   - [Datasets write use cases](#datasets-write-use-cases)
+    - [Set Dataset Curation Status](#set-dataset-curation-status)
+    - [Delete Dataset Curation Status](#delete-dataset-curation-status)
+    - [Submit Dataset For Review](#submit-dataset-for-review)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
     - [Update a Dataset License](#update-a-dataset-license)
@@ -967,6 +973,65 @@ _See [use case](../src/templates/domain/useCases/UpdateTemplateTermsOfAccess.ts)
 
 ### Datasets Read Use Cases
 
+Curation labels require the server setting `:AllowedCurationLabels`, a JSON object mapping label-set names to arrays of labels, for example `{"defaultSet": ["Privacy Review", "Final Approval"]}`. A superuser selects a label set on a collection or dataset using the administration APIs. An explicit dataset selection overrides its collection. `DEFAULT` (or no selection) inherits from the parent collection up to the root; if no set is selected there, labels are disabled. `DISABLED` explicitly disables labels. Defining the setting alone does not select a set. Labels currently allow letters, digits, underscores, and spaces. These administration operations are not exposed by these use cases.
+
+Allowed-label reads and status mutations require publish permission. Current-status and history reads also require publish permission by default. With `dataverse.ui.show-curation-status-to-all=true`, users with permission to view the draft can read them. The backend enforces these permissions; the SDK attaches the configured API key, session cookie, or bearer token.
+
+Labels only track curation progress: assigning, changing, or removing one does not submit for review, return to the author, publish, or change review locks. Publication clears the draft label. `DatasetCurationStatus` and `DatasetReviewSubmission` are exported from the package root.
+
+See the [Dataverse curation API guide](https://guides.dataverse.org/en/latest/api/curation-labels.html) for server configuration and API behavior.
+
+#### Get Allowed Dataset Curation Labels
+
+Returns the effective configured labels in server order. Requires publish permission. Labels are returned unchanged, including whitespace.
+
+The `datasetId` accepts a numeric ID or persistent identifier. Configure authentication with `ApiConfig` before calling the use case. Backend failures propagate as `ReadError`.
+
+##### Example call:
+
+```typescript
+import { getAllowedDatasetCurationLabels } from '@iqss/dataverse-client-javascript'
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+await getAllowedDatasetCurationLabels.execute(datasetId) // Promise<string[]>
+```
+
+_See [use case](../src/datasets/domain/useCases/curation/GetAllowedDatasetCurationLabels.ts) implementation_.
+
+#### Get Dataset Curation Status
+
+Returns the current curation record, or `null` when no record exists. A removal is a record with no `label` (`undefined` when read); it retains its timestamp and assigner.
+
+The `datasetId` accepts a numeric ID or persistent identifier. Configure authentication with `ApiConfig` before calling the use case. Backend failures propagate as `ReadError`.
+
+##### Example call:
+
+```typescript
+import { getDatasetCurationStatus } from '@iqss/dataverse-client-javascript'
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+await getDatasetCurationStatus.execute(datasetId) // Promise<DatasetCurationStatus | null>
+```
+
+_See [use case](../src/datasets/domain/useCases/curation/GetDatasetCurationStatus.ts) implementation_.
+
+#### Get Dataset Curation Status History
+
+Returns all assignments and removals, newest first, or an empty array when no history exists. Missing legacy `createTime` and `assigner` fields remain `undefined`. Timestamps remain server strings without timezone conversion.
+
+The `datasetId` accepts a numeric ID or persistent identifier. Configure authentication with `ApiConfig` before calling the use case. Backend failures propagate as `ReadError`.
+
+##### Example call:
+
+```typescript
+import { getDatasetCurationStatusHistory } from '@iqss/dataverse-client-javascript'
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+await getDatasetCurationStatusHistory.execute(datasetId) // Promise<DatasetCurationStatus[]>
+```
+
+_See [use case](../src/datasets/domain/useCases/curation/GetDatasetCurationStatusHistory.ts) implementation_.
+
 #### Get a Dataset
 
 Returns a [Dataset](../src/datasets/domain/models/Dataset.ts) instance, given the search parameters to identify it.
@@ -1422,6 +1487,57 @@ Example returned value:
 ```
 
 ### Datasets Write Use Cases
+
+#### Set Dataset Curation Status
+
+Assigns or changes a configured label on a draft. Requires publish permission. Pass the exact value returned by `getAllowedDatasetCurationLabels`; reserved characters are safely encoded. Unconfigured labels, unchanged labels, and datasets without a draft are rejected by the backend.
+
+The `datasetId` accepts a numeric ID or persistent identifier. Configure authentication with `ApiConfig` before calling the use case. Backend failures propagate as `WriteError`.
+
+##### Example call:
+
+```typescript
+import { setDatasetCurationStatus } from '@iqss/dataverse-client-javascript'
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+await setDatasetCurationStatus.execute(datasetId, 'Privacy Review') // Promise<void>
+```
+
+_See [use case](../src/datasets/domain/useCases/curation/SetDatasetCurationStatus.ts) implementation_.
+
+#### Delete Dataset Curation Status
+
+Removes the current draft label and retains a removal record in its history. Requires publish permission. This does not return the dataset to its author or remove review locks.
+
+The `datasetId` accepts a numeric ID or persistent identifier. Configure authentication with `ApiConfig` before calling the use case. Backend failures propagate as `WriteError`.
+
+##### Example call:
+
+```typescript
+import { deleteDatasetCurationStatus } from '@iqss/dataverse-client-javascript'
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+await deleteDatasetCurationStatus.execute(datasetId) // Promise<void>
+```
+
+_See [use case](../src/datasets/domain/useCases/curation/DeleteDatasetCurationStatus.ts) implementation_.
+
+#### Submit Dataset For Review
+
+Submits a draft for review and returns `{ inReview: boolean, message: string }`. Requires an authenticated user with edit permission; anonymous submission is not supported by the backend. This adds a review lock and notifies curators. Drafts already in review and datasets without a draft are rejected.
+
+The `datasetId` accepts a numeric ID or persistent identifier. Configure authentication with `ApiConfig` before calling the use case. Backend failures propagate as `WriteError`.
+
+##### Example call:
+
+```typescript
+import { submitDatasetForReview } from '@iqss/dataverse-client-javascript'
+
+const datasetId = 'doi:10.77777/FK2/AAAAAA'
+await submitDatasetForReview.execute(datasetId) // Promise<DatasetReviewSubmission>
+```
+
+_See [use case](../src/datasets/domain/useCases/curation/SubmitDatasetForReview.ts) implementation_.
 
 #### Create a Dataset
 
