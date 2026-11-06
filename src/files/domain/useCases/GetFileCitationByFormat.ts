@@ -14,9 +14,14 @@ export class GetFileCitationByFormat implements UseCase<string> {
    *
    * @param {number | string} [fileId] - The File identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {FileCitationFormat} [format] - The citation format to return.
+   * @param {string} [version] - Dataset version: a number such as 1.0, :draft, :latest, or :latest-published. Omit to use the server default. Drafts require access to the dataset.
    * @returns {Promise<string>}
    */
-  async execute(fileId: number | string, format: FileCitationFormat): Promise<string> {
-    return await this.filesRepository.getFileCitationByFormat(fileId, format)
+  async execute(
+    fileId: number | string,
+    format: FileCitationFormat,
+    version?: string
+  ): Promise<string> {
+    return await this.filesRepository.getFileCitationByFormat(fileId, format, version)
   }
 }

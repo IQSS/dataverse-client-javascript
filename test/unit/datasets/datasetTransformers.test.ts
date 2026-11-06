@@ -57,4 +57,13 @@ describe('transformNewDatasetModelToRequestPayload', () => {
 
     expect(actual).toEqual(expectedNewDatasetRequestPayload)
   })
+
+  it('should include the template id at the top level of a new dataset request payload', () => {
+    const testDataset = { ...createDatasetDTO(), templateId: 3 }
+    const testMetadataBlocks = [createDatasetMetadataBlockModel()]
+
+    const actual = transformDatasetModelToNewDatasetRequestPayload(testDataset, testMetadataBlocks)
+
+    expect(actual).toEqual({ ...createNewDatasetRequestPayload(), templateId: 3 })
+  })
 })

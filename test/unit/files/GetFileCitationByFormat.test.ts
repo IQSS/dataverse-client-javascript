@@ -43,7 +43,30 @@ describe('execute', () => {
       const actual = await sut.execute(testId, format)
 
       expect(actual).toEqual(citation)
-      expect(filesRepositoryStub.getFileCitationByFormat).toHaveBeenCalledWith(testId, format)
+      expect(filesRepositoryStub.getFileCitationByFormat).toHaveBeenCalledWith(
+        testId,
+        format,
+        undefined
+      )
+    }
+  )
+
+  test.each(['1.0', ':draft', ':latest', ':latest-published'])(
+    'should forward dataset version %s and a persistent identifier',
+    async (version) => {
+      const repository = <IFilesRepository>{}
+      repository.getFileCitationByFormat = jest.fn().mockResolvedValue('citation')
+      const sut = new GetFileCitationByFormat(repository)
+      const fileId = 'doi:10.5072/FK2/TEST/FILE'
+
+      await expect(sut.execute(fileId, FileCitationFormat.ENDNOTE, version)).resolves.toBe(
+        'citation'
+      )
+      expect(repository.getFileCitationByFormat).toHaveBeenCalledWith(
+        fileId,
+        FileCitationFormat.ENDNOTE,
+        version
+      )
     }
   )
 
