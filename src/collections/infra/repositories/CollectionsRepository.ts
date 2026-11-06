@@ -93,7 +93,12 @@ export enum GetMyDataCollectionItemsQueryParams {
   ROLE_ID = 'role_ids',
   TYPE = 'dvobject_types',
   PUBLISHED_STATES = 'published_states',
-  USER_IDENTIFIER = 'userIdentifier'
+  USER_IDENTIFIER = 'userIdentifier',
+  SHOW_COLLECTIONS = 'show_collections',
+  METADATA_FIELDS = 'metadata_fields',
+  FILTERQUERY = 'fq',
+  SORT = 'sort',
+  ORDER = 'order'
 }
 
 export class CollectionsRepository extends ApiRepository implements ICollectionsRepository {
@@ -306,7 +311,13 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     limit?: number,
     selectedPage?: number,
     searchText?: string,
-    userIdentifier?: string
+    userIdentifier?: string,
+    showCollections?: boolean,
+    metadataFields?: `${string}:${string}`[],
+    keepRawFields = false,
+    filterQueries?: string | string[],
+    sort?: SortType,
+    order?: OrderType
   ): Promise<MyDataCollectionItemSubset> {
     const queryParams = new URLSearchParams()
 
@@ -327,6 +338,26 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     })
     if (userIdentifier) {
       queryParams.set(GetMyDataCollectionItemsQueryParams.USER_IDENTIFIER, userIdentifier)
+    }
+
+    if (showCollections) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.SHOW_COLLECTIONS, 'true')
+    }
+
+    metadataFields?.forEach((metadataField) => {
+      queryParams.append(GetMyDataCollectionItemsQueryParams.METADATA_FIELDS, metadataField)
+    })
+
+    if (filterQueries) {
+      this.applyFilterQueriesToQueryParams(queryParams, filterQueries)
+    }
+
+    if (sort) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.SORT, sort)
+    }
+
+    if (order) {
+      queryParams.set(GetMyDataCollectionItemsQueryParams.ORDER, order)
     }
 
     collectionItemTypes.forEach((itemType) => {
@@ -357,7 +388,7 @@ export class CollectionsRepository extends ApiRepository implements ICollections
         if (response.data.success !== true) {
           throw new ReadError(response.data.error_message)
         }
-        return transformMyDataResponseToCollectionItemSubset(response)
+        return transformMyDataResponseToCollectionItemSubset(response, keepRawFields)
       })
       .catch((error) => {
         throw error
@@ -510,7 +541,18 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     }
 
     if (collectionSearchCriteria?.filterQueries) {
-      collectionSearchCriteria.filterQueries.forEach((filterQuery) => {
+      this.applyFilterQueriesToQueryParams(queryParams, collectionSearchCriteria.filterQueries)
+    }
+  }
+
+  private applyFilterQueriesToQueryParams(
+    queryParams: URLSearchParams,
+    filterQueries: string | string[]
+  ) {
+    if (typeof filterQueries === 'string') {
+      queryParams.append(GetCollectionItemsQueryParams.FILTERQUERY, filterQueries)
+    } else {
+      filterQueries.forEach((filterQuery) => {
         const idx = filterQuery.indexOf(':')
         if (idx === -1) return // Invalid filter query, skip it
 
