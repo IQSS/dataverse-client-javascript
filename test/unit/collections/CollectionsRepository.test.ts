@@ -222,6 +222,31 @@ describe('CollectionsRepository', () => {
         expect(error).toBeInstanceOf(Error)
       })
     })
+
+    test.each([true, false, undefined])(
+      'should send ignoreSettingExcludeEmailFromExport=%s as query parameter',
+      async (ignoreSettingExcludeEmailFromExport) => {
+        jest.spyOn(axios, 'get').mockResolvedValue(testCollectionSuccessfulResponse)
+
+        const actual = await sut.getCollection(
+          testCollectionModel.alias,
+          ignoreSettingExcludeEmailFromExport
+        )
+
+        expect(axios.get).toHaveBeenCalledWith(
+          `${TestConstants.TEST_API_URL}/dataverses/${testCollectionModel.alias}`,
+          {
+            ...expectedRequestConfigApiKey,
+            params: {
+              returnOwners: true,
+              returnChildCount: true,
+              ignoreSettingExcludeEmailFromExport
+            }
+          }
+        )
+        expect(actual).toStrictEqual(testCollectionModel)
+      }
+    )
   })
 
   describe('getCollectionStorageDriver', () => {

@@ -8,6 +8,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Collections: Added optional `ignoreSettingExcludeEmailFromExport` support to `getCollection`.
+
 ### Changed
 
 ### Fixed

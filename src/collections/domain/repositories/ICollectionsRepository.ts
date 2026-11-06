@@ -17,7 +17,10 @@ import { LinkingObjectType } from '../useCases/GetCollectionsForLinking'
 import { RoleAlias } from '../../../roles/domain/models/RoleAlias'
 
 export interface ICollectionsRepository {
-  getCollection(collectionIdOrAlias: number | string): Promise<Collection>
+  getCollection(
+    collectionIdOrAlias: number | string,
+    ignoreSettingExcludeEmailFromExport?: boolean
+  ): Promise<Collection>
   getCollectionStorageDriver(
     collectionIdOrAlias: number | string,
     getEffective?: boolean

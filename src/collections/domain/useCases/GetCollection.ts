@@ -14,9 +14,16 @@ export class GetCollection implements UseCase<Collection> {
    *
    * @param {number | string} [collectionIdOrAlias = ':root'] - A generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId)
    * If this parameter is not set, the default value is: ':root'
+   * @param {boolean} ignoreSettingExcludeEmailFromExport - This prevents the contact emails from being excluded when the setting `ExcludeEmailFromExport` is set to true and the user has EditDataverse permissions.
    * @returns {Promise<Collection>}
    */
-  async execute(collectionIdOrAlias: number | string = ROOT_COLLECTION_ID): Promise<Collection> {
-    return await this.collectionsRepository.getCollection(collectionIdOrAlias)
+  async execute(
+    collectionIdOrAlias: number | string = ROOT_COLLECTION_ID,
+    ignoreSettingExcludeEmailFromExport?: boolean
+  ): Promise<Collection> {
+    return await this.collectionsRepository.getCollection(
+      collectionIdOrAlias,
+      ignoreSettingExcludeEmailFromExport
+    )
   }
 }
