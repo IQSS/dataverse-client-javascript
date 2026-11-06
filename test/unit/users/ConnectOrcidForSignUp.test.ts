@@ -6,7 +6,8 @@ describe('execute', () => {
   const callback: OrcidSignUpCallbackDTO = {
     code: 'orcid-code',
     state: 'orcid-state',
-    redirectUri: 'http://127.0.0.1:8000/spa/sign-up'
+    redirectUri: 'http://127.0.0.1:8000/spa/sign-up',
+    codeVerifier: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'
   }
 
   test('should return the ORCID connection on repository success', async () => {

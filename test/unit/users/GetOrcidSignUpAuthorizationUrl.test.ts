@@ -4,6 +4,7 @@ import { ReadError } from '../../../src'
 
 describe('execute', () => {
   const redirectUri = 'http://127.0.0.1:8000/spa/sign-up'
+  const codeChallenge = 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
 
   test('should return the authorization URL on repository success', async () => {
     const usersRepositoryStub: IUsersRepository = {} as IUsersRepository
@@ -12,9 +13,12 @@ describe('execute', () => {
       .mockResolvedValue('https://orcid.org/oauth/authorize?client_id=APP-1')
     const sut = new GetOrcidSignUpAuthorizationUrl(usersRepositoryStub)
 
-    const actual = await sut.execute(redirectUri)
+    const actual = await sut.execute(redirectUri, codeChallenge)
 
-    expect(usersRepositoryStub.getOrcidSignUpAuthorizationUrl).toHaveBeenCalledWith(redirectUri)
+    expect(usersRepositoryStub.getOrcidSignUpAuthorizationUrl).toHaveBeenCalledWith(
+      redirectUri,
+      codeChallenge
+    )
     expect(actual).toBe('https://orcid.org/oauth/authorize?client_id=APP-1')
   })
 
@@ -25,6 +29,6 @@ describe('execute', () => {
       .mockRejectedValue(new ReadError())
     const sut = new GetOrcidSignUpAuthorizationUrl(usersRepositoryStub)
 
-    await expect(sut.execute(redirectUri)).rejects.toThrow(ReadError)
+    await expect(sut.execute(redirectUri, codeChallenge)).rejects.toThrow(ReadError)
   })
 })

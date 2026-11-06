@@ -2792,7 +2792,9 @@ _See [use case](../src/users/domain/useCases/GetCurrentApiToken.ts) implementati
 
 Returns the ORCID authorization URL that sends a new user to ORCID to authenticate their ORCID iD while signing up. Send the user's browser to this URL; after they sign in, ORCID redirects back to `redirectUri` with `code` and `state` query parameters, which are then passed to [Connect ORCID For Sign-Up](#connect-orcid-for-sign-up).
 
-No credentials are sent, so this works for anonymous users. The installation needs an ORCID OAuth2 provider (it can be disabled for login), and `redirectUri` must be listed in its `dataverse.api.signup.orcid-redirect-uris` setting.
+No credentials are sent, so this works for anonymous users. The installation needs an ORCID OAuth2 provider (it can be disabled for login), and `redirectUri` must be allowed by the installation: by default, its site URL followed by `/modern/sign-up`, or a URL listed in its `dataverse.api.signup.orcid-redirect-uris` setting.
+
+As with PKCE, create a random code verifier first and keep it (for example in `sessionStorage`). Pass its base64url-encoded SHA-256 hash as `codeChallenge`, and the verifier itself to [Connect ORCID For Sign-Up](#connect-orcid-for-sign-up). An ORCID response can then only be used by the browser that started the flow.
 
 ##### Example call:
 
@@ -2801,18 +2803,32 @@ import { getOrcidSignUpAuthorizationUrl } from '@iqss/dataverse-client-javascrip
 
 /* ... */
 
-const redirectUri = 'https://dataverse.example.edu/spa/sign-up'
+const redirectUri = 'https://dataverse.example.edu/modern/sign-up'
 
-getOrcidSignUpAuthorizationUrl.execute(redirectUri).then((authorizationUrl: string) => {
-  window.location.assign(authorizationUrl)
-})
+const toBase64Url = (bytes: Uint8Array) =>
+  btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+
+const codeVerifier = toBase64Url(crypto.getRandomValues(new Uint8Array(32)))
+sessionStorage.setItem('orcidCodeVerifier', codeVerifier)
+const codeChallenge = toBase64Url(
+  new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier)))
+)
+
+getOrcidSignUpAuthorizationUrl
+  .execute(redirectUri, codeChallenge)
+  .then((authorizationUrl: string) => {
+    window.location.assign(authorizationUrl)
+  })
 
 /* ... */
 ```
 
 _See [use case](../src/users/domain/useCases/GetOrcidSignUpAuthorizationUrl.ts) implementation_.
 
-The use case throws a `ReadError` with `statusCode` 404 when no ORCID provider is configured, and 400 when the redirect URI is not allowed.
+The use case throws a `ReadError` with `statusCode` 404 when no ORCID provider is configured, and 400 when the redirect URI is not allowed or the code challenge is missing or invalid.
 
 ### Users write use cases
 
@@ -2927,7 +2943,7 @@ The [SignUpResult](../src/users/domain/models/SignUpResult.ts) is `{ status: 'cr
 
 ### Connect ORCID For Sign-Up
 
-Exchanges the `code` and `state` that ORCID returns to the redirect URI for the user's authenticated ORCID iD, given an [OrcidSignUpCallbackDTO](../src/users/domain/dtos/OrcidSignUpCallbackDTO.ts). Use the same `redirectUri` that was passed to [Get ORCID Sign-Up Authorization URL](#get-orcid-sign-up-authorization-url). No credentials are sent.
+Exchanges the `code` and `state` that ORCID returns to the redirect URI for the user's authenticated ORCID iD, given an [OrcidSignUpCallbackDTO](../src/users/domain/dtos/OrcidSignUpCallbackDTO.ts). Use the same `redirectUri` that was passed to [Get ORCID Sign-Up Authorization URL](#get-orcid-sign-up-authorization-url), and the `codeVerifier` whose hash was passed there as `codeChallenge`. No credentials are sent.
 
 Returns an [OrcidSignUpConnection](../src/users/domain/models/OrcidSignUpConnection.ts) with the ORCID iD, any details the user shares on their ORCID record (useful to pre-fill a sign-up form), and an `orcidToken` to include in [Sign Up](#sign-up). The token is valid for 30 minutes.
 
@@ -2944,7 +2960,8 @@ connectOrcidForSignUp
   .execute({
     code: params.get('code') as string,
     state: params.get('state') as string,
-    redirectUri: 'https://dataverse.example.edu/spa/sign-up'
+    redirectUri: 'https://dataverse.example.edu/modern/sign-up',
+    codeVerifier: sessionStorage.getItem('orcidCodeVerifier') as string
   })
   .then((connection: OrcidSignUpConnection) => {
     /* connection.orcid, connection.firstName, ..., connection.orcidToken */
@@ -2955,7 +2972,7 @@ connectOrcidForSignUp
 
 _See [use case](../src/users/domain/useCases/ConnectOrcidForSignUp.ts) implementation_.
 
-The use case throws a `WriteError` with `statusCode` 409 when the ORCID iD is already linked to another account, and 400 when the state is invalid or expired.
+The use case throws a `WriteError` with `statusCode` 409 when the ORCID iD is already linked to another account, and 400 when the state is invalid or expired, or the code verifier doesn't match the code challenge.
 
 ## Roles
 

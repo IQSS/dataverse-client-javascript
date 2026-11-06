@@ -77,8 +77,14 @@ export class UsersRepository extends ApiRepository implements IUsersRepository {
       })
   }
 
-  public async getOrcidSignUpAuthorizationUrl(redirectUri: string): Promise<string> {
-    return this.doGet(`/${this.usersResourceName}/signup/orcid/authorize`, false, { redirectUri })
+  public async getOrcidSignUpAuthorizationUrl(
+    redirectUri: string,
+    codeChallenge: string
+  ): Promise<string> {
+    return this.doGet(`/${this.usersResourceName}/signup/orcid/authorize`, false, {
+      redirectUri,
+      codeChallenge
+    })
       .then((response) => response.data.data.authorizationUrl)
       .catch((error) => {
         throw error

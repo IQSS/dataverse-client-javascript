@@ -201,7 +201,9 @@ describe('UsersRepository', () => {
 
     test('getOrcidSignUpAuthorizationUrl should return a 404 ReadError', async () => {
       let error: ReadError | undefined = undefined
-      await sut.getOrcidSignUpAuthorizationUrl(redirectUri).catch((e) => (error = e))
+      await sut
+        .getOrcidSignUpAuthorizationUrl(redirectUri, 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM')
+        .catch((e) => (error = e))
 
       expect(error).toBeInstanceOf(ReadError)
       expect((error as unknown as ReadError).statusCode).toBe(404)
@@ -213,7 +215,12 @@ describe('UsersRepository', () => {
     test('connectOrcidForSignUp should return a 404 WriteError', async () => {
       let error: WriteError | undefined = undefined
       await sut
-        .connectOrcidForSignUp({ code: 'code', state: 'state', redirectUri })
+        .connectOrcidForSignUp({
+          code: 'code',
+          state: 'state',
+          redirectUri,
+          codeVerifier: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'
+        })
         .catch((e) => (error = e))
 
       expect(error).toBeInstanceOf(WriteError)

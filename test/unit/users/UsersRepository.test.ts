@@ -185,6 +185,7 @@ describe('signUp', () => {
 describe('getOrcidSignUpAuthorizationUrl', () => {
   const sut: UsersRepository = new UsersRepository()
   const redirectUri = 'http://127.0.0.1:8000/spa/sign-up'
+  const codeChallenge = 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'
 
   beforeEach(() => {
     ApiConfig.init(
@@ -203,11 +204,14 @@ describe('getOrcidSignUpAuthorizationUrl', () => {
       }
     })
 
-    const actual = await sut.getOrcidSignUpAuthorizationUrl(redirectUri)
+    const actual = await sut.getOrcidSignUpAuthorizationUrl(redirectUri, codeChallenge)
 
     expect(axios.get).toHaveBeenCalledWith(
       `${TestConstants.TEST_API_URL}/users/signup/orcid/authorize`,
-      { ...TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG, params: { redirectUri } }
+      {
+        ...TestConstants.TEST_EXPECTED_UNAUTHENTICATED_REQUEST_CONFIG,
+        params: { redirectUri, codeChallenge }
+      }
     )
     expect(actual).toBe('https://orcid.org/oauth/authorize?client_id=APP-1')
   })
@@ -221,7 +225,7 @@ describe('getOrcidSignUpAuthorizationUrl', () => {
     })
 
     let error: ReadError | undefined = undefined
-    await sut.getOrcidSignUpAuthorizationUrl(redirectUri).catch((e) => (error = e))
+    await sut.getOrcidSignUpAuthorizationUrl(redirectUri, codeChallenge).catch((e) => (error = e))
 
     expect(error).toBeInstanceOf(ReadError)
     expect((error as unknown as ReadError).statusCode).toBe(404)
@@ -234,7 +238,8 @@ describe('connectOrcidForSignUp', () => {
   const callback = {
     code: 'orcid-code',
     state: 'orcid-state',
-    redirectUri: 'http://127.0.0.1:8000/spa/sign-up'
+    redirectUri: 'http://127.0.0.1:8000/spa/sign-up',
+    codeVerifier: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'
   }
 
   beforeEach(() => {
