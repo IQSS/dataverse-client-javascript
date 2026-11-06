@@ -17,9 +17,7 @@ export class GetDefaultContributorRole implements UseCase<Role> {
    * If this parameter is not set, the default value is: ':root'
    * @returns {Promise<Role>}
    */
-  async execute(
-    collectionIdOrAlias: number | string = ROOT_COLLECTION_ID
-  ): Promise<Role> {
+  async execute(collectionIdOrAlias: number | string = ROOT_COLLECTION_ID): Promise<Role> {
     return await this.collectionsRepository.getDefaultContributorRole(collectionIdOrAlias)
   }
 }

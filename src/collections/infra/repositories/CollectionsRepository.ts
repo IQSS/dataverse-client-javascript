@@ -44,9 +44,7 @@ import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { LinkingObjectType } from '../../domain/useCases/GetCollectionsForLinking'
 import { RoleAlias } from '../../../roles/domain/models/RoleAlias'
 import { Role } from '../../../roles/domain/models/Role'
-import {
-  transformCollectionDefaultContributorRoleToRole
-} from './transformers/collectionDefaultContributorRoleTransformers'
+import { transformCollectionDefaultContributorRoleToRole } from './transformers/collectionDefaultContributorRoleTransformers'
 
 export interface NewCollectionRequestPayload {
   alias: string
@@ -230,16 +228,12 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       })
   }
 
-  public async getDefaultContributorRole(
-    collectionIdOrAlias: number | string
-  ): Promise<Role> {
+  public async getDefaultContributorRole(collectionIdOrAlias: number | string): Promise<Role> {
     return this.doGet(
       `/${this.collectionsResourceName}/${collectionIdOrAlias}/defaultContributorRole`,
       true
     )
-      .then((response) =>
-        transformCollectionDefaultContributorRoleToRole(response)
-      )
+      .then((response) => transformCollectionDefaultContributorRoleToRole(response))
       .catch((error) => {
         throw error
       })
