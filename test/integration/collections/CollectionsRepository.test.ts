@@ -16,7 +16,10 @@ import {
   getDatasetFiles,
   restrictFile,
   deleteFile,
-  linkDataset
+  linkDataset,
+  setDefaultContributorRole,
+  RoleAlias,
+  deleteCollection
 } from '../../../src'
 import { ApiConfig } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
@@ -59,6 +62,7 @@ import {
   DvObjectFeaturedItemDTO,
   FeaturedItemsDTO
 } from '../../../src/collections/domain/dtos/FeaturedItemsDTO'
+import { createSuperAdminRoleArray } from '../../testHelpers/roles/roleHelper'
 
 describe('CollectionsRepository', () => {
   const testCollectionAlias = 'collectionsRepositoryTestCollection'
@@ -1735,6 +1739,51 @@ describe('CollectionsRepository', () => {
       )
 
       expect(featuredItemsResponseAfterDeletion).toStrictEqual([])
+    })
+  })
+
+  describe('getDefaultContributorRole', () => {
+    const sut = new CollectionsRepository()
+    const collectionAlias = 'getDefaultContributorRoleIntegration'
+    let collectionId: number | undefined
+
+    beforeAll(async () => {
+      collectionId = await createCollection.execute(createCollectionDTO(collectionAlias))
+      await setDefaultContributorRole.execute(collectionId, RoleAlias.CURATOR)
+    })
+
+    afterAll(async () => {
+      if (collectionId !== undefined) {
+        await deleteCollection.execute(collectionId)
+      }
+    })
+
+    test.each(['numeric id', 'alias'])(
+      'should return the configured default role by %s',
+      async (identifierType) => {
+        if (collectionId === undefined) {
+          throw new Error('Test collection was not created')
+        }
+        const identifier = identifierType === 'numeric id' ? collectionId : collectionAlias
+        const expectedRole = createSuperAdminRoleArray().find((role) => role.alias === 'curator')
+
+        const actual = await sut.getDefaultContributorRole(identifier)
+
+        expect(actual).toStrictEqual({
+          ...expectedRole
+        })
+      }
+    )
+
+    test('should return error when collection does not exist', async () => {
+      const invalidCollectionAlias = 'invalid-collection-alias'
+      const expectedError = new ReadError(
+        `[404] Can't find dataverse with identifier='${invalidCollectionAlias}'`
+      )
+
+      await expect(sut.getDefaultContributorRole(invalidCollectionAlias)).rejects.toThrow(
+        expectedError
+      )
     })
   })
 

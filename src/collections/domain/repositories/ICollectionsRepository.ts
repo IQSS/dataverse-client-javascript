@@ -15,6 +15,7 @@ import { AllowedStorageDrivers } from '../models/AllowedStorageDrivers'
 import { StorageDriver } from '../../../core/domain/models/StorageDriver'
 import { LinkingObjectType } from '../useCases/GetCollectionsForLinking'
 import { RoleAlias } from '../../../roles/domain/models/RoleAlias'
+import { Role } from '../../../roles/domain/models/Role'
 
 export interface ICollectionsRepository {
   getCollection(collectionIdOrAlias: number | string): Promise<Collection>
@@ -40,6 +41,7 @@ export interface ICollectionsRepository {
   getCollectionUserPermissions(
     collectionIdOrAlias: number | string
   ): Promise<CollectionUserPermissions>
+  getDefaultContributorRole(collectionIdOrAlias: number | string): Promise<Role>
   setDefaultContributorRole(
     collectionIdOrAlias: number | string,
     roleAlias: RoleAlias | string

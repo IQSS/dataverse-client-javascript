@@ -8,6 +8,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Collections: Added `getDefaultContributorRole` use case.
+
 ### Changed
 
 ### Fixed

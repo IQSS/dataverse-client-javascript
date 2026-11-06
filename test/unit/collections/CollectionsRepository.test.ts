@@ -903,6 +903,41 @@ describe('CollectionsRepository', () => {
     })
   })
 
+  describe('getDefaultContributorRole', () => {
+    test.each([123, 'test-collection', ':root'])(
+      'should return the default role for %s',
+      async (identifier) => {
+        const role = {
+          id: 7,
+          alias: 'curator',
+          name: 'Curator',
+          description: 'Can edit and publish datasets.',
+          permissions: ['EditDataset', 'PublishDataset']
+        }
+        jest.spyOn(axios, 'get').mockResolvedValue({
+          data: { status: 'OK', data: { ...role } }
+        })
+
+        const actual = await sut.getDefaultContributorRole(identifier)
+
+        expect(axios.get).toHaveBeenCalledWith(
+          `${TestConstants.TEST_API_URL}/dataverses/${identifier}/defaultContributorRole`,
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+        expect(actual).toStrictEqual(role)
+      }
+    )
+
+    test('should return error result on error response', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValue(TestConstants.TEST_ERROR_RESPONSE)
+      let error = undefined as unknown as ReadError
+
+      await sut.getDefaultContributorRole('missing').catch((e) => (error = e))
+
+      expect(error).toBeInstanceOf(ReadError)
+    })
+  })
+
   describe('setDefaultContributorRole', () => {
     const testRoleAlias = RoleAlias.CURATOR
 

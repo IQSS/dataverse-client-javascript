@@ -19,6 +19,7 @@ The different use cases currently available in the package are classified below,
     - [List My Data Collection Items](#list-my-data-collection-items)
     - [Get Collection Featured Items](#get-collection-featured-items)
     - [Get Collections for Linking](#get-collections-for-linking)
+    - [Get Default Contributor Role](#get-default-contributor-role)
   - [Collections write use cases](#collections-write-use-cases)
     - [Create a Collection](#create-a-collection)
     - [Set Collection Storage Driver](#set-collection-storage-driver)
@@ -515,6 +516,38 @@ Notes:
 
 - When the first argument is `'collection'`, the second argument can be a numeric collection id or a collection alias.
 - When the first argument is `'dataset'`, the second argument must be the dataset persistent identifier string (e.g., `doi:...`).
+
+#### Get Default Contributor Role
+
+Returns the default [Role](../src/roles/domain/models/Role.ts) assigned to a user who creates a dataset in the collection.
+
+Requires the `ManageDataversePermissions` permission on the collection.
+
+##### Example call:
+
+```typescript
+import { getDefaultContributorRole } from '@iqss/dataverse-client-javascript'
+
+/* ... */
+
+const collectionIdOrAlias = 'classicLiterature'
+
+getDefaultContributorRole
+  .execute(collectionIdOrAlias)
+  .then((role) => {
+    /* ... */
+  })
+
+/* ... */
+```
+
+_See [use case](../src/collections/domain/useCases/GetDefaultContributorRole.ts)_ implementation.
+
+The `collectionIdOrAlias` is a generic collection identifier, which can be either a string (for queries by CollectionAlias), or a number (for queries by CollectionId).
+
+If no collection identifier is specified, the default collection identifier; `:root` will be used.
+
+The call returns a `Promise<Role>` and rejects with a `ReadError` if the collection cannot be read, including when it does not exist or the caller lacks permission.
 
 ### Collections Write Use Cases
 
