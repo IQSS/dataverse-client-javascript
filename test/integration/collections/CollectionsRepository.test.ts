@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
@@ -194,6 +195,51 @@ describe('CollectionsRepository', () => {
       expect(
         actual.allowedDatasetTypes === undefined || Array.isArray(actual.allowedDatasetTypes)
       ).toBe(true)
+    })
+
+    describe('ignoreSettingExcludeEmailFromExport', () => {
+      const settingEndpoint = `${TestConstants.TEST_API_URL}/admin/settings/:ExcludeEmailFromExport`
+      let originalSetting: string | undefined
+      let settingLoaded = false
+
+      beforeAll(async () => {
+        const response = await axios.get(settingEndpoint, {
+          validateStatus: (status) => status === 200 || status === 404
+        })
+        originalSetting = response.status === 200 ? response.data.data : undefined
+        settingLoaded = true
+        await axios.put(settingEndpoint, 'true')
+      })
+
+      afterAll(async () => {
+        if (settingLoaded) {
+          if (originalSetting === undefined) {
+            await axios.delete(settingEndpoint)
+          } else {
+            await axios.put(settingEndpoint, originalSetting)
+          }
+        }
+      })
+
+      test.each([true, false, undefined])(
+        'should send ignoreSettingExcludeEmailFromExport=%s as query parameter',
+        async (ignoreSettingExcludeEmailFromExport) => {
+          const actual = await sut.getCollection(
+            testCollectionAlias,
+            ignoreSettingExcludeEmailFromExport
+          )
+
+          expect(actual.id).toBe(testCollectionId)
+          expect(actual.contacts).toEqual(
+            ignoreSettingExcludeEmailFromExport
+              ? [
+                { email: 'pi@example.edu', displayOrder: 0 },
+                { email: 'student@example.edu', displayOrder: 1 }
+              ]
+              : undefined
+          )
+        }
+      )
     })
   })
 
