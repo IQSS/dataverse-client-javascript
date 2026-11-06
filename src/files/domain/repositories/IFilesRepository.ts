@@ -58,7 +58,11 @@ export interface IFilesRepository {
     includeDeaccessioned: boolean
   ): Promise<string>
 
-  getFileCitationByFormat(fileId: number | string, format: FileCitationFormat): Promise<string>
+  getFileCitationByFormat(
+    fileId: number | string,
+    format: FileCitationFormat,
+    version?: string
+  ): Promise<string>
 
   getFileUploadDestination(datasetId: number | string, file: File): Promise<FileUploadDestination>
 

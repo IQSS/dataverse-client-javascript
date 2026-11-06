@@ -5,14 +5,21 @@ import {
   FileCitationFormat,
   getDatasetFiles,
   getFileCitationByFormat,
-  ReadError
+  publishDataset,
+  updateFileMetadata,
+  VersionUpdateType
 } from '../../../src'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
 import {
   createCollectionViaApi,
+  publishCollectionViaApi,
   deleteCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
-import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
+import {
+  deletePublishedDatasetViaApi,
+  waitForNoLocks,
+  deleteUnpublishedDatasetViaApi
+} from '../../testHelpers/datasets/datasetHelper'
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
 import { TestConstants } from '../../testHelpers/TestConstants'
 
@@ -113,11 +120,50 @@ describe('execute', () => {
     expect(citation).toMatch(/<a\s+href=/i)
   })
 
+  test('preserves historical citations after publishing renamed file metadata', async () => {
+    const dataset = await createDataset.execute(
+      TestConstants.TEST_NEW_DATASET_DTO,
+      testCollectionAlias
+    )
+    try {
+      await uploadFileViaApi(dataset.numericId, testTextFile1Name)
+      const fileId = (await getDatasetFiles.execute(dataset.numericId)).files[0].id
+      await publishCollectionViaApi(testCollectionAlias)
+      await publishDataset.execute(dataset.numericId, VersionUpdateType.MAJOR)
+      await waitForNoLocks(dataset.numericId)
+      await updateFileMetadata.execute(fileId, { label: 'renamed-file.txt' })
+      expect(
+        await getFileCitationByFormat.execute(fileId, FileCitationFormat.ENDNOTE, ':draft')
+      ).toContain('<custom1>renamed-file.txt</custom1>')
+      await publishDataset.execute(dataset.numericId, VersionUpdateType.MINOR)
+      await waitForNoLocks(dataset.numericId)
+      expect(
+        await getFileCitationByFormat.execute(fileId, FileCitationFormat.ENDNOTE, '1.1')
+      ).toContain('<custom1>renamed-file.txt</custom1>')
+      expect(
+        await getFileCitationByFormat.execute(fileId, FileCitationFormat.ENDNOTE, '1.0')
+      ).toContain(`<custom1>${testTextFile1Name}</custom1>`)
+      expect(
+        await getFileCitationByFormat.execute(fileId, FileCitationFormat.RIS, '1.0')
+      ).toContain(`C1  - ${testTextFile1Name}`)
+      await uploadFileViaApi(dataset.numericId, 'test-file-2.txt')
+      const newFile = (await getDatasetFiles.execute(dataset.numericId)).files.find(
+        (file) => file.id !== fileId
+      )
+      if (!newFile) throw new Error('Newly uploaded file was not returned')
+      await expect(
+        getFileCitationByFormat.execute(newFile.id, FileCitationFormat.ENDNOTE, '1.0')
+      ).rejects.toThrow('[400] File not found in dataset version: 1.0')
+    } finally {
+      await deletePublishedDatasetViaApi(dataset.persistentId)
+    }
+  })
+
   test('should throw an error when the file id does not exist', async () => {
-    const nonExistentFileId = 5
+    const nonExistentFileId = 2147483647
 
     await expect(
       getFileCitationByFormat.execute(nonExistentFileId, FileCitationFormat.BIBTEX)
-    ).rejects.toThrow(ReadError)
+    ).rejects.toThrow(/\[404\]/)
   })
 })
