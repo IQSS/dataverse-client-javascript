@@ -8,7 +8,14 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Users: Added `signUp` use case for creating a builtin user account without authentication (`POST /users/signup`).
+- Users: Added `getOrcidSignUpAuthorizationUrl` and `connectOrcidForSignUp` use cases for authenticating an ORCID iD while signing up.
+- Users: Added optional `authenticatedOrcid` to `AuthenticatedUser`.
+- Core: `ReadError` and `WriteError` now expose the response's `statusCode` and, when the API returns them, per-field `fieldErrors`.
+
 ### Changed
+
+- Core: `ApiRepository.doPost` accepts an optional `authRequired` argument (default `true`) to send a request without the configured credentials.
 
 ### Fixed
 
