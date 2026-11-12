@@ -5,6 +5,8 @@ export interface CollectionDTO {
   name: string
   contacts: string[]
   type: CollectionType
+  /** True stops guestbook inheritance; false includes guestbooks from parent collections. */
+  guestbookRoot?: boolean
   affiliation?: string
   description?: string
   metadataBlockNames?: string[]

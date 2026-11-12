@@ -118,6 +118,52 @@ describe('CollectionsRepository', () => {
     jest.clearAllMocks()
   })
 
+  describe('guestbookRoot', () => {
+    test.each([true, false, undefined])('reads guestbookRoot=%s', async (guestbookRoot) => {
+      jest.spyOn(axios, 'get').mockResolvedValue({
+        data: { data: { ...createCollectionPayload(), guestbookRoot } }
+      })
+
+      const collection = await sut.getCollection('test-collection')
+
+      expect(collection.guestbookRoot).toBe(guestbookRoot)
+      expect(Object.prototype.hasOwnProperty.call(collection, 'guestbookRoot')).toBe(
+        guestbookRoot !== undefined
+      )
+    })
+
+    test.each([true, false, undefined])('creates with guestbookRoot=%s', async (guestbookRoot) => {
+      jest.spyOn(axios, 'post').mockResolvedValue({ data: { data: { id: 1 } } })
+
+      await sut.createCollection({ ...createCollectionDTO(), guestbookRoot })
+
+      const requestBody = JSON.parse(jest.mocked(axios.post).mock.calls[0][1] as string)
+      expect(requestBody).toEqual({ ...createNewCollectionRequestPayload(), guestbookRoot })
+      expect(Object.prototype.hasOwnProperty.call(requestBody, 'guestbookRoot')).toBe(
+        guestbookRoot !== undefined
+      )
+
+      expect(axios.post).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}/dataverses/:root`,
+        expect.any(String),
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+    })
+
+    test.each([123, 'test-collection'])('updates only guestbookRoot by %s', async (identifier) => {
+      jest.spyOn(axios, 'put').mockResolvedValue({ data: { data: {} } })
+      for (const guestbookRoot of [true, false]) {
+        await sut.updateCollection(identifier, { guestbookRoot })
+
+        expect(axios.put).toHaveBeenLastCalledWith(
+          `${TestConstants.TEST_API_URL}/dataverses/${identifier}`,
+          JSON.stringify({ guestbookRoot }),
+          TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+        )
+      }
+    })
+  })
+
   describe('getCollection', () => {
     const expectedRequestConfigApiKey = {
       params: {
