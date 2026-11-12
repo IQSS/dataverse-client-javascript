@@ -166,6 +166,8 @@ The different use cases currently available in the package are classified below,
 
 Returns a [Collection](../src/collections/domain/models/Collection.ts) instance, given the search parameters to identify it.
 
+The optional `guestbookRoot` property reports guestbook inheritance: `false` includes guestbooks from parent collections; `true` stops inheritance. It is undefined when the server does not expose this setting (before Dataverse 6.12).
+
 ##### Example call:
 
 ```typescript
@@ -522,6 +524,8 @@ Notes:
 
 Creates a new Collection, given a [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) object and an optional parent collection identifier, which defaults to `:root`.
 
+On Dataverse 6.12 or later, optionally set `guestbookRoot` to `false` to include parent guestbooks or `true` to stop inheritance. Omit it to use the server default.
+
 ##### Example call:
 
 ```typescript
@@ -602,7 +606,15 @@ The `collectionIdOrAlias` is a generic collection identifier, which can be eithe
 
 #### Update a Collection
 
-Updates an existing collection, given a collection identifier and a [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) including the updated collection data.
+Updates an existing collection, given a collection identifier and a partial [CollectionDTO](../src/collections/domain/dtos/CollectionDTO.ts) including the updated collection data.
+
+On Dataverse 6.12 or later, persist the "include guestbooks from parent collections" setting using `guestbookRoot`. The value is the inverse of the checkbox: `false` includes parent guestbooks and `true` stops inheritance. Omitting the property leaves the setting unchanged.
+
+```typescript
+await updateCollection.execute(collectionIdOrAlias, { guestbookRoot: false })
+const collection = await getCollection.execute(collectionIdOrAlias)
+const includeParentGuestbooks = collection.guestbookRoot === false
+```
 
 ##### Example call:
 

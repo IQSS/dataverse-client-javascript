@@ -4,6 +4,7 @@ export interface CollectionPayload {
   id: number
   alias: string
   name: string
+  guestbookRoot?: boolean
   affiliation?: string
   isReleased: boolean
   description?: string

@@ -8,6 +8,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Collections: Exposed optional `guestbookRoot` through `getCollection`, `createCollection`, and `updateCollection` to read and persist guestbook inheritance settings (Dataverse 6.12+).
+
 ### Changed
 
 ### Fixed
