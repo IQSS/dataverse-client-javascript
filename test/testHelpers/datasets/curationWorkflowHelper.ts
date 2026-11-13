@@ -6,6 +6,7 @@ import {
   createDataset,
   deleteCollection,
   deleteDatasetDraft,
+  returnDatasetToAuthor,
   getDataset,
   getDatasetLocks,
   DatasetNotNumberedVersion,
@@ -60,11 +61,7 @@ export const createCurationWorkflowFixture = async (): Promise<CurationWorkflowF
       if (dataset) {
         const locks = await getDatasetLocks.execute(dataset.numericId)
         if (locks.some((lock) => lock.lockType === DatasetLockType.IN_REVIEW)) {
-          await axios.post(
-            `${TestConstants.TEST_API_URL}/datasets/${dataset.numericId}/returnToAuthor`,
-            { reasonForReturn: 'Integration test cleanup' },
-            { headers }
-          )
+          await returnDatasetToAuthor.execute(dataset.numericId, 'Integration test cleanup')
         }
         const latest = await getDataset.execute(
           dataset.numericId,

@@ -114,6 +114,31 @@ describe('DatasetsRepository curation methods', () => {
         ).toBe(DatasetVersionState.DRAFT)
       })
     })
+    describe('returnDatasetToAuthor', () => {
+      test('should remove the review lock and keep the draft editable', async () => {
+        await sut.submitDatasetForReview(id)
+        expect(await sut.returnDatasetToAuthor(id, 'Please add missing metadata.')).toBeUndefined()
+        expect(await getDatasetLocks.execute(id)).not.toEqual(
+          expect.arrayContaining([expect.objectContaining({ lockType: DatasetLockType.IN_REVIEW })])
+        )
+        expect(
+          (await getDataset.execute(id, DatasetNotNumberedVersion.DRAFT)).versionInfo.state
+        ).toBe(DatasetVersionState.DRAFT)
+        expect((await sut.submitDatasetForReview(id)).inReview).toBe(true)
+      })
+      test('should reject a draft not in review', async () => {
+        await expect(sut.returnDatasetToAuthor(id, 'Please add metadata.')).rejects.toThrow(
+          /not.*review/i
+        )
+      })
+      test('should reject an empty reason and retain the review lock', async () => {
+        await sut.submitDatasetForReview(id)
+        await expect(sut.returnDatasetToAuthor(id, '')).rejects.toThrow(/\[400\]/)
+        expect(await getDatasetLocks.execute(id)).toEqual(
+          expect.arrayContaining([expect.objectContaining({ lockType: DatasetLockType.IN_REVIEW })])
+        )
+      })
+    })
     describe('submitDatasetForReview', () => {
       test('should submit a draft and add the review lock', async () => {
         const actual = await sut.submitDatasetForReview(id)
@@ -131,6 +156,10 @@ describe('DatasetsRepository curation methods', () => {
   })
 
   const operations = [
+    {
+      name: 'returnDatasetToAuthor',
+      execute: () => sut.returnDatasetToAuthor(fixture.dataset.numericId, 'Please add metadata.')
+    },
     {
       name: 'getAllowedDatasetCurationLabels',
       execute: () => sut.getAllowedDatasetCurationLabels(fixture.dataset.numericId)
@@ -187,6 +216,11 @@ describe('DatasetsRepository curation methods', () => {
       await sut.setDatasetCurationStatus(fixture.dataset.numericId, fixture.labels[0])
       await publishDataset.execute(fixture.dataset.numericId, VersionUpdateType.MAJOR)
       await waitForNoLocks(fixture.dataset.numericId)
+    })
+    test('returnDatasetToAuthor should reject a released dataset', async () => {
+      await expect(
+        sut.returnDatasetToAuthor(fixture.dataset.numericId, 'Please revise.')
+      ).rejects.toThrow(/not.*review/i)
     })
     test('should clear the review lock and label on publication', async () => {
       expect(await getDatasetLocks.execute(fixture.dataset.numericId)).toEqual([])

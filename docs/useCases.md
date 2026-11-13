@@ -71,6 +71,7 @@ The different use cases currently available in the package are classified below,
     - [Set Dataset Curation Status](#set-dataset-curation-status)
     - [Delete Dataset Curation Status](#delete-dataset-curation-status)
     - [Submit Dataset For Review](#submit-dataset-for-review)
+    - [Return Dataset To Author](#return-dataset-to-author)
     - [Create a Dataset](#create-a-dataset)
     - [Update a Dataset](#update-a-dataset)
     - [Update a Dataset License](#update-a-dataset-license)
@@ -1521,6 +1522,20 @@ await deleteDatasetCurationStatus.execute(datasetId) // Promise<void>
 ```
 
 _See [use case](../src/datasets/domain/useCases/curation/DeleteDatasetCurationStatus.ts) implementation_.
+
+#### Return Dataset To Author
+
+Returns a draft currently in review to its authors. Requires authentication and publish permission. The server removes the review lock, records the reason, and notifies authors. Backend validation and permission failures are exposed as `WriteError`.
+
+```typescript
+import { returnDatasetToAuthor } from '@iqss/dataverse-client-javascript'
+
+await returnDatasetToAuthor.execute(datasetId, 'Please add missing metadata.') // Promise<void>
+```
+
+`datasetId` accepts a numeric ID or persistent identifier. `reasonForReturn` is required unless the server disables that requirement; the SDK sends the supplied text unchanged.
+
+_See [use case](../src/datasets/domain/useCases/curation/ReturnDatasetToAuthor.ts) implementation and [API documentation](https://guides.dataverse.org/en/latest/api/native-api.html#return-a-dataset-to-author)._
 
 #### Submit Dataset For Review
 

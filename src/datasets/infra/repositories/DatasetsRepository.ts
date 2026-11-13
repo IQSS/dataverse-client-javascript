@@ -96,6 +96,13 @@ export class DatasetsRepository extends ApiRepository implements IDatasetsReposi
     await this.doDelete(this.buildCurationEndpoint(datasetId, 'curationStatus'))
   }
 
+  public async returnDatasetToAuthor(
+    datasetId: number | string,
+    reasonForReturn: string
+  ): Promise<void> {
+    await this.doPost(this.buildCurationEndpoint(datasetId, 'returnToAuthor'), { reasonForReturn })
+  }
+
   public async submitDatasetForReview(
     datasetId: number | string
   ): Promise<DatasetReviewSubmission> {

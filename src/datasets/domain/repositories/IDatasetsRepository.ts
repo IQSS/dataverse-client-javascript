@@ -30,6 +30,7 @@ export interface IDatasetsRepository {
   getDatasetCurationStatusHistory(datasetId: number | string): Promise<DatasetCurationStatus[]>
   setDatasetCurationStatus(datasetId: number | string, label: string): Promise<void>
   deleteDatasetCurationStatus(datasetId: number | string): Promise<void>
+  returnDatasetToAuthor(datasetId: number | string, reasonForReturn: string): Promise<void>
   submitDatasetForReview(datasetId: number | string): Promise<DatasetReviewSubmission>
 
   getDataset(

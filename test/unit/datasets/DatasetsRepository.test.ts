@@ -1458,3 +1458,78 @@ describe('DatasetsRepository curation methods', () => {
     expect(await sut.getDatasetCurationStatusHistory(42)).toEqual([])
   })
 })
+
+describe('DatasetsRepository.returnDatasetToAuthor', () => {
+  const sut = new DatasetsRepository()
+  const reasonForReturn = 'Please fix metadata.\nKeep Unicode: résumé & notes.'
+  beforeEach(() =>
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.API_KEY,
+      TestConstants.TEST_DUMMY_API_KEY
+    )
+  )
+  afterEach(() => {
+    jest.restoreAllMocks()
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.API_KEY,
+      TestConstants.TEST_DUMMY_API_KEY
+    )
+  })
+  test.each([42, 'doi:10.5072/FK2/A+B&C?#résumé'])(
+    'posts JSON with authentication for %s',
+    async (id) => {
+      const request = jest
+        .spyOn(axios, 'post')
+        .mockResolvedValue({ data: { data: { inReview: false } } })
+      const endpoint =
+        typeof id === 'number'
+          ? `/datasets/${id}/returnToAuthor`
+          : `/datasets/:persistentId/returnToAuthor?persistentId=${encodeURIComponent(id)}`
+      expect(await sut.returnDatasetToAuthor(id, reasonForReturn)).toBeUndefined()
+      expect(request).toHaveBeenCalledWith(
+        `${TestConstants.TEST_API_URL}${endpoint}`,
+        JSON.stringify({ reasonForReturn }),
+        TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_API_KEY
+      )
+    }
+  )
+  test('supports session cookies', async () => {
+    ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.SESSION_COOKIE)
+    const request = jest.spyOn(axios, 'post').mockResolvedValue({ data: {} })
+    await sut.returnDatasetToAuthor(42, reasonForReturn)
+    expect(request).toHaveBeenCalledWith(
+      `${TestConstants.TEST_API_URL}/datasets/42/returnToAuthor`,
+      JSON.stringify({ reasonForReturn }),
+      TestConstants.TEST_EXPECTED_AUTHENTICATED_REQUEST_CONFIG_SESSION_COOKIE
+    )
+  })
+  test('supports bearer authentication', async () => {
+    ApiConfig.init(
+      TestConstants.TEST_API_URL,
+      DataverseApiAuthMechanism.BEARER_TOKEN,
+      undefined,
+      undefined,
+      () => 'test-token'
+    )
+    const request = jest.spyOn(axios, 'post').mockResolvedValue({ data: {} })
+    await sut.returnDatasetToAuthor(42, reasonForReturn)
+    expect(request).toHaveBeenCalledWith(
+      `${TestConstants.TEST_API_URL}/datasets/42/returnToAuthor`,
+      JSON.stringify({ reasonForReturn }),
+      {
+        params: {},
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer test-token' }
+      }
+    )
+  })
+  test.each([400, 401, 403, 404])('preserves backend errors with status %s', async (status) => {
+    jest
+      .spyOn(axios, 'post')
+      .mockRejectedValue({ response: { status, data: { message: 'Return rejected' } } })
+    await expect(sut.returnDatasetToAuthor(42, reasonForReturn)).rejects.toEqual(
+      new WriteError(`[${status}] Return rejected`)
+    )
+  })
+})

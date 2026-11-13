@@ -5,6 +5,7 @@ import {
   setDatasetCurationStatus,
   deleteDatasetCurationStatus,
   submitDatasetForReview,
+  returnDatasetToAuthor,
   getDatasetLocks,
   DatasetLockType
 } from '../../../src'
@@ -44,5 +45,10 @@ describe('Dataset curation public use cases', () => {
     expect(await getDatasetLocks.execute(id)).toEqual(
       expect.arrayContaining([expect.objectContaining({ lockType: DatasetLockType.IN_REVIEW })])
     )
+    await returnDatasetToAuthor.execute(id, 'Please revise the description.')
+    expect(await getDatasetLocks.execute(id)).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ lockType: DatasetLockType.IN_REVIEW })])
+    )
+    expect((await submitDatasetForReview.execute(id)).inReview).toBe(true)
   })
 })

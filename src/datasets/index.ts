@@ -43,6 +43,7 @@ import { GetDatasetCurationStatus } from './domain/useCases/curation/GetDatasetC
 import { GetDatasetCurationStatusHistory } from './domain/useCases/curation/GetDatasetCurationStatusHistory'
 import { SetDatasetCurationStatus } from './domain/useCases/curation/SetDatasetCurationStatus'
 import { DeleteDatasetCurationStatus } from './domain/useCases/curation/DeleteDatasetCurationStatus'
+import { ReturnDatasetToAuthor } from './domain/useCases/curation/ReturnDatasetToAuthor'
 import { SubmitDatasetForReview } from './domain/useCases/curation/SubmitDatasetForReview'
 
 const datasetsRepository = new DatasetsRepository()
@@ -51,6 +52,7 @@ const getDatasetCurationStatus = new GetDatasetCurationStatus(datasetsRepository
 const getDatasetCurationStatusHistory = new GetDatasetCurationStatusHistory(datasetsRepository)
 const setDatasetCurationStatus = new SetDatasetCurationStatus(datasetsRepository)
 const deleteDatasetCurationStatus = new DeleteDatasetCurationStatus(datasetsRepository)
+const returnDatasetToAuthor = new ReturnDatasetToAuthor(datasetsRepository)
 const submitDatasetForReview = new SubmitDatasetForReview(datasetsRepository)
 
 const getDataset = new GetDataset(datasetsRepository)
@@ -113,6 +115,7 @@ export {
   getDatasetCurationStatusHistory,
   setDatasetCurationStatus,
   deleteDatasetCurationStatus,
+  returnDatasetToAuthor,
   submitDatasetForReview,
   getDataset,
   getDatasetLocks,
