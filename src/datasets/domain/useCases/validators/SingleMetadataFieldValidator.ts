@@ -4,7 +4,10 @@ import {
 } from './BaseMetadataFieldValidator'
 import { ControlledVocabularyFieldError } from './errors/ControlledVocabularyFieldError'
 import { MetadataFieldValidator } from './MetadataFieldValidator'
-import { DatasetMetadataChildFieldValueDTO } from '../../dtos/DatasetDTO'
+import {
+  DatasetMetadataChildFieldValueDTO,
+  DatasetMetadataFieldValueDTO
+} from '../../dtos/DatasetDTO'
 import { MultipleMetadataFieldValidator } from './MultipleMetadataFieldValidator'
 import {
   MetadataFieldInfo,
@@ -143,18 +146,26 @@ export class SingleMetadataFieldValidator extends BaseMetadataFieldValidator {
       // At this point we know we are standing on a child field that is required and the parent field is not required
 
       // Get the sibling fields and check if any of them has a value
-      const { [childMetadataFieldKey as keyof Record<string, string>]: _, ...siblingFields } =
-        datasetMetadataFieldAndValueInfo.metadataFieldValue as Record<string, string>
+      const { [childMetadataFieldKey]: _, ...siblingFields } =
+        datasetMetadataFieldAndValueInfo.metadataFieldValue as DatasetMetadataChildFieldValueDTO
 
-      const siblingsValues = Object.values(siblingFields) as string[]
-
-      const isAnySiblingValuePresent = siblingsValues.some(
-        ([, value]) => value !== undefined && value !== ''
+      const isAnySiblingValuePresent = Object.values(siblingFields).some((value) =>
+        this.hasValue(value)
       )
 
       result = !isAnySiblingValuePresent
     }
 
     return result
+  }
+
+  private hasValue(value: DatasetMetadataFieldValueDTO | undefined): boolean {
+    if (typeof value === 'string') {
+      return value.trim() !== ''
+    }
+    if (value === undefined) {
+      return false
+    }
+    return Object.values(value).some((child) => this.hasValue(child))
   }
 }

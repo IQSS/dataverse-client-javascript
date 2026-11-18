@@ -19,4 +19,6 @@ export type DatasetMetadataFieldValueDTO =
   | DatasetMetadataChildFieldValueDTO
   | DatasetMetadataChildFieldValueDTO[]
 
-export type DatasetMetadataChildFieldValueDTO = Record<string, string>
+export interface DatasetMetadataChildFieldValueDTO {
+  [key: string]: DatasetMetadataFieldValueDTO
+}
