@@ -12,6 +12,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 - Datasets: Added public use cases for allowed curation labels, current status, status history, setting/removing labels, and submitting drafts for review, with numeric and persistent identifier support.
 
+- Datasets: Support deeply nested metadata fields in the use cases `createDataset` and `updateDataset`.
+
 ### Changed
 
 ### Fixed
