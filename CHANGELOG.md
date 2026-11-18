@@ -8,6 +8,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- External tools: `getFileExternalToolResolved` accepts a guestbook response when launching a file tool.
+
 ### Changed
 
 ### Fixed

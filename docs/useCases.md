@@ -3238,28 +3238,34 @@ _See [use case](../src/externalTools/domain/useCases/GetDatasetExternalToolResol
 
 Returns an instance of [FileExternalToolResolved](../src/externalTools/domain/models/ExternalTool.ts), which contains the resolved URL for accessing an external tool that operates at the file level.
 
+For a file that requires a guestbook, pass the completed form as `guestbookResponse` in the launch options.
+
 ##### Example call:
 
 ```typescript
-import { getFileExternalToolResolved } from '@iqss/dataverse-client-javascript'
+import {
+  getFileExternalToolResolved,
+  type GetFileExternalToolDTO
+} from '@iqss/dataverse-client-javascript'
 
 /* ... */
 const toolId = 1
 const fileId = 2
-const getExternalToolDTO: GetExternalToolDTO = {
+const getExternalToolDTO: GetFileExternalToolDTO = {
   preview: true,
-  locale: 'en'
+  locale: 'en',
+  guestbookResponse: { name: 'Example Reader', email: 'reader@example.org' }
 }
 
 getFileExternalToolResolved
-  .execute(toolId, fileId, getExternalToolDTO)
-  .then((fileExternalToolResolved: FileExternalToolResolved) => {
+  .execute(fileId, toolId, getExternalToolDTO)
+  .then((fileExternalToolResolved) => {
     /* ... */
   })
 /* ... */
 ```
 
-_See [use case](../src/externalTools/domain/useCases/GetfileExternalToolResolved.ts) implementation_.
+_See [use case](../src/externalTools/domain/useCases/GetFileExternalToolResolved.ts) implementation_.
 
 ## Guestbooks
 

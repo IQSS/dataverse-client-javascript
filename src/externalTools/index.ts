@@ -23,3 +23,5 @@ export {
   DatasetExternalToolResolved,
   FileExternalToolResolved
 } from './domain/models/ExternalTool'
+
+export type { GetFileExternalToolDTO } from './domain/dtos/GetExternalToolDTO'
