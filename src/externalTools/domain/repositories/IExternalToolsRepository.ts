@@ -1,4 +1,4 @@
-import { GetExternalToolDTO } from '../dtos/GetExternalToolDTO'
+import { GetExternalToolDTO, GetFileExternalToolDTO } from '../dtos/GetExternalToolDTO'
 import {
   DatasetExternalToolResolved,
   ExternalTool,
@@ -15,6 +15,6 @@ export interface IExternalToolsRepository {
   getFileExternalToolResolved(
     fileId: number | string,
     toolId: number,
-    getExternalToolDTO: GetExternalToolDTO
+    getExternalToolDTO: GetFileExternalToolDTO
   ): Promise<FileExternalToolResolved>
 }

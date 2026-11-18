@@ -10,13 +10,27 @@ import {
   CREATE_FILE_EXTERNAL_TOOL_PAYLOAD,
   CREATE_DATASET_EXTERNAL_TOOL_PAYLOAD
 } from '../../testHelpers/externalTools/externalToolsHelper'
-import { createDataset, CreatedDatasetIdentifiers, getDatasetFiles, WriteError } from '../../../src'
+import {
+  assignDatasetGuestbook,
+  createDataset,
+  CreatedDatasetIdentifiers,
+  createGuestbook,
+  getDatasetFiles,
+  getFileExternalToolResolved,
+  WriteError
+} from '../../../src'
 import {
   createCollectionViaApi,
-  deleteCollectionViaApi
+  deleteCollectionViaApi,
+  publishCollectionViaApi
 } from '../../testHelpers/collections/collectionHelper'
 import { uploadFileViaApi } from '../../testHelpers/files/filesHelper'
-import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
+import {
+  deletePublishedDatasetViaApi,
+  deleteUnpublishedDatasetViaApi,
+  publishDatasetViaApi,
+  waitForNoLocks
+} from '../../testHelpers/datasets/datasetHelper'
 
 describe('ExternalToolsRepository', () => {
   const sut: ExternalToolsRepository = new ExternalToolsRepository()
@@ -110,6 +124,79 @@ describe('ExternalToolsRepository', () => {
       )
       expect(fileExternalToolResolved.toolUrlResolved).toContain(`preview=true`)
       expect(fileExternalToolResolved.preview).toBe(true)
+    })
+
+    test('creates a new guestbook response when launching a file tool again', async () => {
+      const dataset = await createDataset.execute(
+        TestConstants.TEST_NEW_DATASET_DTO,
+        testCollectionAlias
+      )
+      let published = false
+
+      try {
+        const guestbookId = await createGuestbook.execute(
+          {
+            name: 'File tool guestbook',
+            enabled: true,
+            nameRequired: true,
+            emailRequired: true,
+            institutionRequired: false,
+            positionRequired: false,
+            customQuestions: []
+          },
+          testCollectionAlias
+        )
+        await assignDatasetGuestbook.execute(dataset.numericId, guestbookId)
+        await uploadFileViaApi(dataset.numericId, testTextFile1Name)
+        const { files } = await getDatasetFiles.execute(dataset.numericId)
+        await publishCollectionViaApi(testCollectionAlias)
+        await publishDatasetViaApi(dataset.numericId)
+        published = true
+        await waitForNoLocks(dataset.numericId)
+
+        ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY)
+        const options = {
+          locale: 'en',
+          guestbookResponse: { name: 'Example Reader', email: 'reader@example.org' }
+        }
+        const preview = await getFileExternalToolResolved.execute(
+          files[0].id,
+          testFileExternalToolId,
+          {
+            ...options,
+            preview: true
+          }
+        )
+        const newWindow = await getFileExternalToolResolved.execute(
+          files[0].id,
+          testFileExternalToolId,
+          {
+            ...options,
+            preview: false
+          }
+        )
+
+        const responseIds = [preview, newWindow].map(({ toolUrlResolved }) => {
+          const callback = new URL(toolUrlResolved).searchParams.get('callback') ?? ''
+          return new URL(Buffer.from(callback, 'base64').toString()).searchParams.get(
+            'guestbookResponseId'
+          )
+        })
+        expect(responseIds[0]).toMatch(/^\d+$/)
+        expect(responseIds[1]).toMatch(/^\d+$/)
+        expect(responseIds[0]).not.toBe(responseIds[1])
+      } finally {
+        ApiConfig.init(
+          TestConstants.TEST_API_URL,
+          DataverseApiAuthMechanism.API_KEY,
+          process.env.TEST_API_KEY
+        )
+        if (published) {
+          await deletePublishedDatasetViaApi(dataset.persistentId)
+        } else {
+          await deleteUnpublishedDatasetViaApi(dataset.numericId)
+        }
+      }
     })
 
     test('should return error if file external tool id does not exist', async () => {

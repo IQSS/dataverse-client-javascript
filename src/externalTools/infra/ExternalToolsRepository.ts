@@ -5,7 +5,7 @@ import {
   ExternalTool,
   FileExternalToolResolved
 } from '../domain/models/ExternalTool'
-import { GetExternalToolDTO } from '../domain/dtos/GetExternalToolDTO'
+import { GetExternalToolDTO, GetFileExternalToolDTO } from '../domain/dtos/GetExternalToolDTO'
 import { datasetExternalToolTransformer } from './transformers/datasetExternalToolTransformer'
 import { fileExternalToolTransformer } from './transformers/fileExternalToolTransformer'
 import { externalToolsTransformer } from './transformers/externalToolsTransformer'
@@ -39,7 +39,7 @@ export class ExternalToolsRepository extends ApiRepository implements IExternalT
   public async getFileExternalToolResolved(
     fileId: number | string,
     toolId: number,
-    getExternalToolDTO: GetExternalToolDTO
+    getExternalToolDTO: GetFileExternalToolDTO
   ): Promise<FileExternalToolResolved> {
     return this.doPost(
       this.buildApiEndpoint('files', `externalTool/${toolId}/toolUrl`, fileId),

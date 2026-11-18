@@ -1,5 +1,5 @@
 import { UseCase } from '../../../core/domain/useCases/UseCase'
-import { GetExternalToolDTO } from '../dtos/GetExternalToolDTO'
+import { GetFileExternalToolDTO } from '../dtos/GetExternalToolDTO'
 import { FileExternalToolResolved } from '../models/ExternalTool'
 import { IExternalToolsRepository } from '../repositories/IExternalToolsRepository'
 
@@ -17,13 +17,13 @@ export class GetFileExternalToolResolved implements UseCase<FileExternalToolReso
    *
    * @param {number | string} [fileId] - The File identifier, which can be a string (for persistent identifiers), or a number (for numeric identifiers).
    * @param {number} toolId - The identifier of the external tool.
-   * @param {GetExternalToolDTO} getExternalToolDTO - The GetExternalToolDTO object containing additional parameters for the request.
+   * @param {GetFileExternalToolDTO} getExternalToolDTO - The launch options and optional guestbook response.
    * @returns {Promise<FileExternalToolResolved>}
    */
   async execute(
     fileId: number | string,
     toolId: number,
-    getExternalToolDTO: GetExternalToolDTO
+    getExternalToolDTO: GetFileExternalToolDTO
   ): Promise<FileExternalToolResolved> {
     return await this.externalToolsRepository.getFileExternalToolResolved(
       fileId,
