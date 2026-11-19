@@ -8,6 +8,10 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 
 ### Added
 
+- Datasets: Added `returnDatasetToAuthor` to return drafts in review with a reason, supporting numeric and persistent identifiers and configured authentication.
+
+- Datasets: Added public use cases for allowed curation labels, current status, status history, setting/removing labels, and submitting drafts for review, with numeric and persistent identifier support.
+
 ### Changed
 
 ### Fixed
