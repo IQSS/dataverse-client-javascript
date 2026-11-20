@@ -1,6 +1,8 @@
 import { CollectionItemType } from '../../../collections'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
 import { DatasetVersionInfo } from './Dataset'
+import { CollectionSummary } from '../../../collections/domain/models/CollectionSummary'
+import { DatasetMetadataBlock } from './Dataset'
 
 export interface DatasetPreview {
   type: CollectionItemType.DATASET
@@ -15,4 +17,6 @@ export interface DatasetPreview {
   parentCollectionAlias: string
   imageUrl?: string
   userRoles?: string[]
+  collections?: CollectionSummary[]
+  metadataBlocks?: DatasetMetadataBlock[]
 }

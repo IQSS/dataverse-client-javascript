@@ -83,6 +83,8 @@ export enum GetCollectionItemsQueryParams {
   TYPE = 'type',
   FILTERQUERY = 'fq',
   SHOW_TYPE_COUNTS = 'show_type_counts',
+  SHOW_COLLECTIONS = 'show_collections',
+  METADATA_FIELDS = 'metadata_fields',
   SEARCH_SERVICE_NAME = 'search_service'
 }
 
@@ -246,7 +248,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     offset?: number,
     collectionSearchCriteria?: CollectionSearchCriteria,
     searchServiceName?: string,
-    showTypeCounts?: boolean
+    showTypeCounts?: boolean,
+    showCollections?: boolean,
+    metadataFields?: `${string}:${string}`[],
+    keepRawFields?: boolean
   ): Promise<CollectionItemSubset> {
     const queryParams = new URLSearchParams({
       [GetCollectionItemsQueryParams.QUERY]: '*',
@@ -271,6 +276,14 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       queryParams.set(GetCollectionItemsQueryParams.SHOW_TYPE_COUNTS, 'true')
     }
 
+    if (showCollections) {
+      queryParams.set(GetCollectionItemsQueryParams.SHOW_COLLECTIONS, 'true')
+    }
+
+    metadataFields?.forEach((metadataField) => {
+      queryParams.append(GetCollectionItemsQueryParams.METADATA_FIELDS, metadataField)
+    })
+
     if (searchServiceName) {
       queryParams.set(GetCollectionItemsQueryParams.SEARCH_SERVICE_NAME, searchServiceName)
     }
@@ -280,7 +293,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     }
 
     return this.doGet('/search', true, queryParams)
-      .then((response) => transformCollectionItemsResponseToCollectionItemSubset(response))
+      .then((response) =>
+        transformCollectionItemsResponseToCollectionItemSubset(response, keepRawFields)
+      )
       .catch((error) => {
         throw error
       })
@@ -510,18 +525,25 @@ export class CollectionsRepository extends ApiRepository implements ICollections
     }
 
     if (collectionSearchCriteria?.filterQueries) {
-      collectionSearchCriteria.filterQueries.forEach((filterQuery) => {
-        const idx = filterQuery.indexOf(':')
-        if (idx === -1) return // Invalid filter query, skip it
+      if (typeof collectionSearchCriteria.filterQueries === 'string') {
+        queryParams.append(
+          GetCollectionItemsQueryParams.FILTERQUERY,
+          collectionSearchCriteria.filterQueries
+        )
+      } else {
+        collectionSearchCriteria.filterQueries.forEach((filterQuery) => {
+          const idx = filterQuery.indexOf(':')
+          if (idx === -1) return // Invalid filter query, skip it
 
-        const filterQueryKey = filterQuery.substring(0, idx).trim()
-        const filterQueryValue = filterQuery.substring(idx + 1).trim()
+          const filterQueryKey = filterQuery.substring(0, idx).trim()
+          const filterQueryValue = filterQuery.substring(idx + 1).trim()
 
-        const filterQueryValueWithQuotes = `"${filterQueryValue}"`
-        const filterQueryToSet = `${filterQueryKey}:${filterQueryValueWithQuotes}`
+          const filterQueryValueWithQuotes = `"${filterQueryValue}"`
+          const filterQueryToSet = `${filterQueryKey}:${filterQueryValueWithQuotes}`
 
-        queryParams.append(GetCollectionItemsQueryParams.FILTERQUERY, filterQueryToSet)
-      })
+          queryParams.append(GetCollectionItemsQueryParams.FILTERQUERY, filterQueryToSet)
+        })
+      }
     }
   }
 
