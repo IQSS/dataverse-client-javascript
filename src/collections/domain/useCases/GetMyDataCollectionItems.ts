@@ -3,6 +3,7 @@ import { MyDataCollectionItemSubset } from '../models/MyDataCollectionItemSubset
 import { ICollectionsRepository } from '../repositories/ICollectionsRepository'
 import { CollectionItemType } from '../../../collections/domain/models/CollectionItemType'
 import { PublicationStatus } from '../../../core/domain/models/PublicationStatus'
+import { OrderType, SortType } from '../models/CollectionSearchCriteria'
 
 export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSubset> {
   private collectionsRepository: ICollectionsRepository
@@ -21,6 +22,12 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
    * @param {number} [selectedPage] - Offset (starting point) for pagination (optional).
    * @param {string} [searchText] - filter by searching for this text in the results (optional).
    * @param {string} [otherUserName] - filter by searching for this text in the results (optional).
+   * @param {boolean} [showCollections] - If true, dataset results will include the collections they belong to (optional).
+   * @param {`${string}:${string}`} [metadataFields] - Metadata fields to include in dataset results (optional).
+   * @param {boolean} [keepRawFields] - If true, metadata field values will not be transformed to Markdown (optional).
+   * @param {string | string[]} [filterQueries] - A simple filter query list or a complete raw filter expression (optional).
+   * @param {SortType} [sort] - The field by which to sort the results (optional).
+   * @param {OrderType} [order] - The sort order (optional).
    * * @returns {Promise<CollectionItemSubset>}
    */
   async execute(
@@ -30,7 +37,13 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
     limit?: number,
     selectedPage?: number,
     searchText?: string,
-    otherUserName?: string
+    otherUserName?: string,
+    showCollections = false,
+    metadataFields?: `${string}:${string}`[],
+    keepRawFields = false,
+    filterQueries?: string | string[],
+    sort?: SortType,
+    order?: OrderType
   ): Promise<MyDataCollectionItemSubset> {
     return this.collectionsRepository.getMyDataCollectionItems(
       roleIds,
@@ -39,7 +52,13 @@ export class GetMyDataCollectionItems implements UseCase<MyDataCollectionItemSub
       limit,
       selectedPage,
       searchText,
-      otherUserName
+      otherUserName,
+      showCollections,
+      metadataFields,
+      keepRawFields,
+      filterQueries,
+      sort,
+      order
     )
   }
 }
