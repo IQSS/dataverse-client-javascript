@@ -235,4 +235,59 @@ describe('validate', () => {
       0
     )
   })
+
+  describe('when validating a partial update', () => {
+    const partialUpdateValidator = new DatasetResourceValidator(metadataFieldValidator, true)
+    const partialUpdate = (
+      fields: DatasetDTO['metadataBlockValues'][number]['fields']
+    ): DatasetDTO => ({
+      metadataBlockValues: [{ name: 'citation', fields }]
+    })
+
+    test('should allow omitted required fields', () => {
+      expect(() =>
+        partialUpdateValidator.validate(
+          partialUpdate({ title: 'Updated title' }),
+          testMetadataBlocks
+        )
+      ).not.toThrow()
+    })
+
+    test.each(['', ' '])('should reject a supplied empty required title: %p', (title) => {
+      expect(() =>
+        partialUpdateValidator.validate(partialUpdate({ title: title }), testMetadataBlocks)
+      ).toThrow(
+        'There was an error when validating the field title from metadata block citation. Reason was: The field should not be empty.'
+      )
+    })
+
+    test('should reject an invalid supplied field type', () => {
+      expect(() =>
+        partialUpdateValidator.validate(
+          partialUpdate({ title: ['Invalid title'] }),
+          testMetadataBlocks
+        )
+      ).toThrow('Expecting a single field, not an array.')
+    })
+
+    test('should require mandatory children of supplied compound fields', () => {
+      expect(() =>
+        partialUpdateValidator.validate(
+          partialUpdate({ author: [{ authorAffiliation: 'Dataverse.org' }] }),
+          testMetadataBlocks
+        )
+      ).toThrow(
+        'There was an error when validating the field authorName from metadata block citation with parent field author in position 0. Reason was: The field should not be empty.'
+      )
+    })
+
+    test('should allow a valid supplied compound field without other required fields', () => {
+      expect(() =>
+        partialUpdateValidator.validate(
+          partialUpdate({ author: [{ authorName: 'Updated author' }] }),
+          testMetadataBlocks
+        )
+      ).not.toThrow()
+    })
+  })
 })
