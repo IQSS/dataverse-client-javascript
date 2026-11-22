@@ -75,6 +75,9 @@ const transformPayloadToCollection = (collectionPayload: CollectionPayload): Col
     isFacetRoot: collectionPayload.isFacetRoot,
     description: collectionPayload.description,
     childCount: collectionPayload.childCount,
+    ...(collectionPayload.guestbookRoot !== undefined && {
+      guestbookRoot: collectionPayload.guestbookRoot
+    }),
     ...(collectionPayload.theme && {
       theme: collectionPayload.theme
     }),

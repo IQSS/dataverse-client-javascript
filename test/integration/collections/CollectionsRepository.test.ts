@@ -1,3 +1,7 @@
+import {
+  createBuiltInUser,
+  deleteAuthenticatedUserViaAdminApi
+} from '../../testHelpers/users/builtinUserApiHelper'
 import { CollectionsRepository } from '../../../src/collections/infra/repositories/CollectionsRepository'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import {
@@ -86,6 +90,55 @@ describe('CollectionsRepository', () => {
       process.env.TEST_API_KEY
     )
     await deleteCollectionViaApi(testCollectionAlias)
+  })
+
+  describe('guestbookRoot', () => {
+    const authenticate = (key?: string) =>
+      ApiConfig.init(TestConstants.TEST_API_URL, DataverseApiAuthMechanism.API_KEY, key)
+
+    beforeEach(() => authenticate(process.env.TEST_API_KEY))
+    afterEach(() => authenticate(process.env.TEST_API_KEY))
+
+    test('allows anonymous reads but rejects guestbookRoot updates without permission', async () => {
+      const username = `guestbookReader${Date.now()}`
+      const otherUserKey = await createBuiltInUser(username)
+      const id = await sut.createCollection({
+        ...createCollectionDTO('guestbook-root-permissions'),
+        guestbookRoot: false
+      })
+      try {
+        await sut.publishCollection(id)
+        authenticate()
+        expect((await sut.getCollection(id)).guestbookRoot).toBe(false)
+        authenticate(otherUserKey)
+        await expect(sut.updateCollection(id, { guestbookRoot: true })).rejects.toMatchObject({
+          message: expect.stringContaining(`[401] User @${username} is not permitted`)
+        })
+        authenticate(process.env.TEST_API_KEY)
+        expect((await sut.getCollection(id)).guestbookRoot).toBe(false)
+      } finally {
+        authenticate(process.env.TEST_API_KEY)
+        await sut.deleteCollection(id)
+        await deleteAuthenticatedUserViaAdminApi(username)
+      }
+    })
+
+    test.each([true, false])(
+      'persists guestbookRoot=%s on creation and update',
+      async (guestbookRoot) => {
+        const dto = { ...createCollectionDTO(`guestbook-root-${guestbookRoot}`), guestbookRoot }
+        const id = await sut.createCollection(dto)
+        try {
+          expect((await sut.getCollection(id)).guestbookRoot).toBe(guestbookRoot)
+          await sut.updateCollection(dto.alias, { guestbookRoot: !guestbookRoot })
+          expect((await sut.getCollection(dto.alias)).guestbookRoot).toBe(!guestbookRoot)
+          await sut.updateCollection(id, { name: 'Renamed collection' })
+          expect((await sut.getCollection(id)).guestbookRoot).toBe(!guestbookRoot)
+        } finally {
+          await sut.deleteCollection(id)
+        }
+      }
+    )
   })
 
   describe('getCollection', () => {

@@ -8,6 +8,8 @@ export interface Collection {
   alias: string
   name: string
   isReleased: boolean
+  /** True stops guestbook inheritance; false includes guestbooks from parent collections. */
+  guestbookRoot?: boolean
   affiliation?: string
   description?: string
   isPartOf: DvObjectOwnerNode

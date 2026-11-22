@@ -4,6 +4,7 @@ import {
   createCollection,
   getCollection,
   updateCollection,
+  deleteCollection,
   CollectionDTO
 } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
@@ -17,6 +18,24 @@ describe('execute', () => {
       DataverseApiAuthMechanism.API_KEY,
       process.env.TEST_API_KEY
     )
+  })
+
+  test('persists guestbook inheritance through public use cases', async () => {
+    const dto = { ...createCollectionDTO('guestbook-root-functional'), guestbookRoot: true }
+    const id = await createCollection.execute(dto)
+    try {
+      expect((await getCollection.execute(id)).guestbookRoot).toBe(true)
+      await updateCollection.execute(dto.alias, { guestbookRoot: false })
+      expect((await getCollection.execute(dto.alias)).guestbookRoot).toBe(false)
+      await updateCollection.execute(id, { name: 'Updated guestbook collection' })
+      expect((await getCollection.execute(id)).guestbookRoot).toBe(false)
+      await updateCollection.execute(id, { guestbookRoot: true })
+      const collection = await getCollection.execute(id)
+      expect(collection.guestbookRoot).toBe(true)
+      expect(collection.name).toBe('Updated guestbook collection')
+    } finally {
+      await deleteCollection.execute(id)
+    }
   })
 
   test('should successfully update a new collection', async () => {

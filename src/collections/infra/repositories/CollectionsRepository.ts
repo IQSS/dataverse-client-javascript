@@ -50,6 +50,7 @@ export interface NewCollectionRequestPayload {
   dataverseContacts: NewCollectionContactRequestPayload[]
   dataverseType: string
   description?: string
+  guestbookRoot?: boolean
   affiliation?: string
   metadataBlocks: NewCollectionMetadataBlocksRequestPayload
 }
@@ -401,6 +402,9 @@ export class CollectionsRepository extends ApiRepository implements ICollections
       dataverseType: collectionDTO.type,
       ...(collectionDTO.description && { description: collectionDTO.description }),
       ...(collectionDTO.affiliation && { affiliation: collectionDTO.affiliation }),
+      ...(collectionDTO.guestbookRoot !== undefined && {
+        guestbookRoot: collectionDTO.guestbookRoot
+      }),
       metadataBlocks: metadataBlocksRequestBody
     }
   }
@@ -476,6 +480,10 @@ export class CollectionsRepository extends ApiRepository implements ICollections
 
     if (collectionDTO.affiliation !== undefined) {
       requestBody.affiliation = collectionDTO.affiliation
+    }
+
+    if (collectionDTO.guestbookRoot !== undefined) {
+      requestBody.guestbookRoot = collectionDTO.guestbookRoot
     }
 
     if (metadataBlocksRequestBody !== undefined) {
