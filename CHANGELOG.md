@@ -12,6 +12,8 @@ This changelog follows the principles of [Keep a Changelog](https://keepachangel
 - Users: Added `getOrcidSignUpAuthorizationUrl` and `connectOrcidForSignUp` use cases for authenticating an ORCID iD while signing up.
 - Users: Added optional `authenticatedOrcid` to `AuthenticatedUser`.
 - Core: `ReadError` and `WriteError` now expose the response's `statusCode` and, when the API returns them, per-field `fieldErrors`.
+- Datasets: Added `returnDatasetToAuthor` to return drafts in review with a reason, supporting numeric and persistent identifiers and configured authentication.
+- Datasets: Added public use cases for allowed curation labels, current status, status history, setting/removing labels, and submitting drafts for review, with numeric and persistent identifier support.
 
 ### Changed
 
