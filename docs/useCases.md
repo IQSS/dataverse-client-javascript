@@ -1619,9 +1619,9 @@ The use case returns a [CreatedDatasetIdentifiers](../src/datasets/domain/models
 
 Updates an existing Dataset, given a [DatasetDTO](../src/datasets/domain/dtos/DatasetDTO.ts) with the updated information.
 
-If a draft of the dataset already exists, the metadata of that draft is overwritten; otherwise, a new draft is created with the updated metadata.
+If a draft of the dataset already exists, only the supplied metadata fields are replaced; otherwise, a new draft is created with the updated metadata. Omitted fields retain their existing values, including required fields. Supplied compound fields and arrays replace the entire field value, so include any existing entries you want to keep.
 
-This use case validates the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
+This use case validates only the submitted fields of each metadata block and can return errors of type [ResourceValidationError](../src/core/domain/useCases/validators/errors/ResourceValidationError.ts), which include sufficient information to determine which field value is invalid and why.
 
 ##### Example call:
 
@@ -1652,15 +1652,7 @@ const datasetDTO: DatasetDTO = {
             datasetContactEmail: 'johndoe@dataverse.com',
             datasetContactName: 'John'
           }
-        ],
-        dsDescription: [
-          {
-            dsDescriptionValue: 'This is the description of our new dataset'
-          }
-        ],
-        subject: 'Earth and Environmental Sciences'
-
-        /* Rest of field values... */
+        ]
       }
     }
   ]

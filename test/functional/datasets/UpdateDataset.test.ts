@@ -7,6 +7,7 @@ import {
 import { ApiConfig } from '../../../src'
 import { TestConstants } from '../../testHelpers/TestConstants'
 import { DataverseApiAuthMechanism } from '../../../src/core/infra/repositories/ApiConfig'
+import { deleteUnpublishedDatasetViaApi } from '../../testHelpers/datasets/datasetHelper'
 import { DatasetDescription } from '../../../src/datasets/domain/models/Dataset'
 
 describe('execute', () => {
@@ -70,5 +71,40 @@ describe('execute', () => {
       (updatedDataset.metadataBlocks[0].fields.dsDescription[0] as DatasetDescription)
         .dsDescriptionValue
     ).toEqual(updatedDsDescription)
+  })
+
+  test('should update only the supplied fields, and preserve omitted fields', async () => {
+    const createdDataset = await createDataset.execute(TestConstants.TEST_NEW_DATASET_DTO)
+
+    try {
+      const originalDataset = await getDataset.execute(createdDataset.numericId)
+      const originalCitation = originalDataset.metadataBlocks.find(
+        (block) => block.name === 'citation'
+      )
+      const updatedTitle = 'Title updated without resending other required fields'
+
+      await expect(
+        updateDataset.execute(createdDataset.numericId, {
+          metadataBlockValues: [
+            {
+              name: 'citation',
+              fields: { title: updatedTitle }
+            }
+          ]
+        })
+      ).resolves.toBeUndefined()
+
+      const updatedDataset = await getDataset.execute(createdDataset.numericId)
+      const updatedCitation = updatedDataset.metadataBlocks.find(
+        (block) => block.name === 'citation'
+      )
+      expect(originalCitation).toBeDefined()
+      expect(updatedCitation?.fields).toEqual({
+        ...originalCitation?.fields,
+        title: updatedTitle
+      })
+    } finally {
+      await deleteUnpublishedDatasetViaApi(createdDataset.numericId)
+    }
   })
 })

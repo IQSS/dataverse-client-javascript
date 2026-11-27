@@ -71,16 +71,15 @@ const metadataFieldValidator = new MetadataFieldValidator(
 )
 const publishDataset = new PublishDataset(datasetsRepository)
 const metadataBlocksRepository = new MetadataBlocksRepository()
-const datasetResourceValidator = new DatasetResourceValidator(metadataFieldValidator)
 const createDataset = new CreateDataset(
   datasetsRepository,
   metadataBlocksRepository,
-  datasetResourceValidator
+  new DatasetResourceValidator(metadataFieldValidator)
 )
 const updateDataset = new UpdateDataset(
   datasetsRepository,
   metadataBlocksRepository,
-  datasetResourceValidator
+  new DatasetResourceValidator(metadataFieldValidator, true)
 )
 const deaccessionDataset = new DeaccessionDataset(datasetsRepository)
 const getDatasetDownloadCount = new GetDatasetDownloadCount(datasetsRepository)
