@@ -81,8 +81,7 @@ const getChildFieldKeys = (metadataBlockFieldsPayload: Record<string, unknown>):
 }
 
 const transformPayloadMetadataFieldInfo = (
-  metadataFieldInfoPayload: MetadataFieldInfoPayload,
-  isChild = false
+  metadataFieldInfoPayload: MetadataFieldInfoPayload
 ): MetadataFieldInfo => {
   const metadataFieldInfo: MetadataFieldInfo = {
     name: metadataFieldInfoPayload.name,
@@ -103,7 +102,7 @@ const transformPayloadMetadataFieldInfo = (
     typeClass: metadataFieldInfoPayload.typeClass as MetadataFieldTypeClass,
     displayOnCreate: metadataFieldInfoPayload.displayOnCreate
   }
-  if (!isChild && 'childFields' in metadataFieldInfoPayload) {
+  if ('childFields' in metadataFieldInfoPayload) {
     const childMetadataFieldsPayload = metadataFieldInfoPayload.childFields as Record<
       string,
       MetadataFieldInfoPayload
@@ -111,8 +110,7 @@ const transformPayloadMetadataFieldInfo = (
     const childMetadataFields: Record<string, MetadataFieldInfo> = {}
     Object.keys(childMetadataFieldsPayload).map((metadataFieldKey) => {
       childMetadataFields[metadataFieldKey] = transformPayloadMetadataFieldInfo(
-        childMetadataFieldsPayload[metadataFieldKey],
-        true
+        childMetadataFieldsPayload[metadataFieldKey]
       )
     })
     metadataFieldInfo.childMetadataFields = childMetadataFields

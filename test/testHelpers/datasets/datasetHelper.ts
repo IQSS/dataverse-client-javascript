@@ -760,6 +760,28 @@ export const createDatasetMetadataBlockModel = (): MetadataBlock => {
   }
 }
 
+/**
+ *
+ * This method creates a simplified and altered version of the Citation Metadata Block, including a deeply nested
+ * compound field, only for testing purposes.
+ *
+ * @returns {MetadataBlock} A MetadataBlock testing instance.
+ *
+ **/
+export const createDatasetNestedMetadataBlockModel = (): MetadataBlock => {
+  const metadataBlock = createDatasetMetadataBlockModel()
+  // Edit metadata block model to contain nested compound fields
+  const author = metadataBlock.metadataFields.author
+  author.childMetadataFields = {
+    authorDetails: {
+      ...author,
+      multiple: false,
+      childMetadataFields: author.childMetadataFields
+    }
+  }
+  return metadataBlock
+}
+
 export const createNewDatasetRequestPayload = (
   license?: DatasetLicense,
   datasetType?: string
